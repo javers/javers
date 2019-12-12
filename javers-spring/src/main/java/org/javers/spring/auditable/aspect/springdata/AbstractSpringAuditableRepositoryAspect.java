@@ -27,9 +27,8 @@ public class AbstractSpringAuditableRepositoryAspect {
     }
 
     protected void onSave(JoinPoint pjp, Object returnedObject) {
-        getRepositoryInterface(pjp).ifPresent( i -> {
-            AspectUtil.collectReturnedObjects(returnedObject).forEach(o -> javersCommitAdvice.commitObject(o));
-        });
+        getRepositoryInterface(pjp).ifPresent(i ->
+                AspectUtil.collectReturnedObjects(returnedObject).forEach(javersCommitAdvice::commitObject));
     }
 
     protected void onDelete(JoinPoint pjp) {
@@ -56,12 +55,12 @@ public class AbstractSpringAuditableRepositoryAspect {
         public void handle(RepositoryMetadata repositoryMetadata, Object domainObjectOrId) {
             if (isIdClass(repositoryMetadata, domainObjectOrId)) {
                 Class<?> domainType = repositoryMetadata.getDomainType();
-                if (javers.findSnapshots(QueryBuilder.byInstanceId(domainObjectOrId, domainType).build()).size() == 0) {
+                if (javers.findSnapshots(QueryBuilder.byInstanceId(domainObjectOrId, domainType).limit(1).build()).size() == 0) {
                     return;
                 }
                 javersCommitAdvice.commitShallowDeleteById(domainObjectOrId, domainType);
             } else if (isDomainClass(repositoryMetadata, domainObjectOrId)) {
-                if (javers.findSnapshots(QueryBuilder.byInstance(domainObjectOrId).build()).size() == 0) {
+                if (javers.findSnapshots(QueryBuilder.byInstance(domainObjectOrId).limit(1).build()).size() == 0) {
                     return;
                 }
                 javersCommitAdvice.commitShallowDelete(domainObjectOrId);

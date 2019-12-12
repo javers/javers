@@ -26,7 +26,7 @@ class DummyAuditedRepository {
         //... omitted
     }
 
-    DummyObject find(DummyObject query){
+    DummyObject find(DummyObject query) {
         //... omitted
         null
     }
@@ -36,13 +36,26 @@ class DummyAuditedRepository {
         //... omitted
     }
 
+    @JaversAuditableDelete(domainType = DummyObject.class)
+    void deleteById(String id) {
+    }
+
+    @JaversAuditableDelete(domainType = DummyObject.class)
+    void deleteAllById(Iterable<String> ids) {
+    }
+
     @JaversAuditableDelete
-    void deleteTwo(DummyObject obj, obj2){
+    void deleteByIdNoClass(String id) {
+    }
+
+
+    @JaversAuditableDelete
+    void deleteTwo(DummyObject obj, obj2) {
         //... omitted
     }
 
     @JaversAuditableDelete
-    void deleteAll(Iterable<DummyObject> objetcs){
+    void deleteAll(Iterable<DummyObject> objetcs) {
         //... omitted
     }
 

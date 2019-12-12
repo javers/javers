@@ -19,4 +19,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface JaversAuditableDelete {
+
+    /**
+     * domain type of entity to delete, required in case of delete by id
+     */
+    Class<?> domainType() default Void.class;
 }
