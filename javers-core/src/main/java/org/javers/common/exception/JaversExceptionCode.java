@@ -6,7 +6,14 @@ package org.javers.common.exception;
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public enum JaversExceptionCode {
+    WRONG_USAGE_OF_JAVERS_AUDITABLE_DELETE("" +
+            "The argument '%s' you have passed to a method '%s' annotated with @JaversAuditableDelete " +
+            "is not an Entity, nor a Value Object. " +
+            "If your intention is to delete by Id, provide the Entity class parameter."),
+
     MALFORMED_JAVERS_MONGODB_PROPERTIES("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
+
+    CM("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
 
     ID_TYPE_NOT_SUPPORTED("%s %s can't be used as Id-property type. Problematic class: '%s'.") ,
 
