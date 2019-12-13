@@ -11,6 +11,8 @@ public enum JaversExceptionCode {
             "is not an Entity, nor a Value Object. " +
             "If your intention is to delete by Id, provide the Entity class parameter."),
 
+    MALFORMED_JAVERS_MONGODB_PROPERTIES("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
+
     CM("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
 
     ID_TYPE_NOT_SUPPORTED("%s %s can't be used as Id-property type. Problematic class: '%s'.") ,
