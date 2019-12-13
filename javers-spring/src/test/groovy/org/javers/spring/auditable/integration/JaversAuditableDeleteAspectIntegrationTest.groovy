@@ -1,5 +1,7 @@
 package org.javers.spring.auditable.integration
 
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.model.DummyObject
@@ -87,7 +89,7 @@ class JaversAuditableDeleteAspectIntegrationTest extends Specification {
         }
     }
 
-    def "should commit delete by id when method is annotated with @JaversAuditableDelete"() {
+    def "should commit delete by Id when a method is annotated with @JaversAuditableDelete"() {
         given:
         def o = new DummyObject()
 
@@ -102,7 +104,7 @@ class JaversAuditableDeleteAspectIntegrationTest extends Specification {
         snapshots[1].initial
     }
 
-    def "should commit ids iterable when method is annotated with @JaversAuditableDelete"() {
+    def "should commit by Ids iterable when a method is annotated with @JaversAuditableDelete"() {
         given:
         def objects = [new DummyObject(), new DummyObject()]
 
@@ -121,7 +123,7 @@ class JaversAuditableDeleteAspectIntegrationTest extends Specification {
         }
     }
 
-    def "should throw exception if no domain type present when annotated with @JaversAuditableDelete"() {
+    def "should throw the exception if no entity parameter is given when deleting by Id using @JaversAuditableDelete"() {
         given:
         def o = new DummyObject()
 
@@ -130,6 +132,8 @@ class JaversAuditableDeleteAspectIntegrationTest extends Specification {
         repository.deleteByIdNoClass(o.id)
 
         then:
-        thrown(IllegalStateException)
+        JaversException e = thrown()
+        println e
+        e.code == JaversExceptionCode.WRONG_USAGE_OF_JAVERS_AUDITABLE_DELETE
     }
 }

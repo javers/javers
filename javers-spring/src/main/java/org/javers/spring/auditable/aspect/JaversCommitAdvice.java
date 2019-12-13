@@ -3,14 +3,18 @@ package org.javers.spring.auditable.aspect;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.javers.common.collections.Maps;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
-import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.PrimitiveOrValueType;
 import org.javers.spring.annotation.JaversAuditableDelete;
 import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
+
+import java.lang.reflect.Method;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
@@ -37,23 +41,23 @@ public class JaversCommitAdvice {
 
     public void commitDeleteMethodArguments(JoinPoint jp) {
         for (Object arg : AspectUtil.collectArguments(jp)) {
-            JaversType typeMapping = javers.getTypeMapping(arg.getClass());
-            if (typeMapping instanceof EntityType) {
+            JaversType javersType = javers.getTypeMapping(arg.getClass());
+            if (javersType instanceof ManagedType) {
                 commitShallowDelete(arg);
-            } else if (typeMapping instanceof PrimitiveOrValueType) {
-                commitShallowDeleteById(arg, getDomainTypeForDelete(jp));
+            } else if (javersType instanceof PrimitiveOrValueType) {
+                commitShallowDeleteById(arg, getDomainTypeToDelete(jp, arg));
             }
         }
     }
 
-    private Class<?> getDomainTypeForDelete(JoinPoint jp) {
-        JaversAuditableDelete javersAuditableDelete =
-                ((MethodSignature) jp.getSignature()).getMethod().getAnnotation(JaversAuditableDelete.class);
-        Class<?> domainType = javersAuditableDelete.domainType();
-        if (domainType == Void.class) {
-            throw new IllegalStateException("Committing by id requires a domain type");
+    private Class<?> getDomainTypeToDelete(JoinPoint jp, Object id) {
+        Method method = ((MethodSignature) jp.getSignature()).getMethod();
+        JaversAuditableDelete javersAuditableDelete = method.getAnnotation(JaversAuditableDelete.class);
+        Class<?> entity = javersAuditableDelete.entity();
+        if (entity == Void.class) {
+            throw new JaversException(JaversExceptionCode.WRONG_USAGE_OF_JAVERS_AUDITABLE_DELETE, id, method);
         }
-        return domainType;
+        return entity;
     }
 
     public void commitObject(Object domainObject) {

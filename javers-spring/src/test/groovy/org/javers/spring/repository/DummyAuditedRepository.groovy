@@ -36,11 +36,11 @@ class DummyAuditedRepository {
         //... omitted
     }
 
-    @JaversAuditableDelete(domainType = DummyObject.class)
+    @JaversAuditableDelete(entity = DummyObject)
     void deleteById(String id) {
     }
 
-    @JaversAuditableDelete(domainType = DummyObject.class)
+    @JaversAuditableDelete(entity = DummyObject.class)
     void deleteAllById(Iterable<String> ids) {
     }
 

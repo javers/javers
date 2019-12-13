@@ -101,7 +101,7 @@ public interface Javers {
      * This method doesn't delete anything from JaVers repository.
      * It just persists 'terminal snapshot' of a given object.
      *
-     * @param deleted object to be marked as deleted
+     * @param deleted object to be marked as deleted (Entity or Value Object)
      */
     Commit commitShallowDelete(String author, Object deleted);
 
