@@ -14,7 +14,7 @@ public class JaversMongoProperties extends JaversSpringProperties {
     private boolean documentDbCompatibilityEnabled = false;
 
     // Set 0 to disable.
-    private int cacheSize = 5000;
+    private int snapshotsCacheSize = 5000;
 
     private Mongodb mongodb;
 
@@ -26,12 +26,12 @@ public class JaversMongoProperties extends JaversSpringProperties {
         this.documentDbCompatibilityEnabled = documentDbCompatibilityEnabled;
     }
 
-    public int getCacheSize() {
-        return cacheSize;
+    public int getSnapshotsCacheSize() {
+        return snapshotsCacheSize;
     }
 
-    public void setCacheSize(final int cacheSize) {
-        this.cacheSize = cacheSize;
+    public void setSnapshotsCacheSize(final int cacheSize) {
+        this.snapshotsCacheSize = cacheSize;
     }
 
     public Mongodb getMongodb() {

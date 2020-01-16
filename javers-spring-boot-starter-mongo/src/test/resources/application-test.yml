@@ -8,4 +8,4 @@ javers:
   commitIdGenerator: random
   documentDbCompatibilityEnabled: true
   objectAccessHook: org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook
-  cacheSize: 100
+  snapshotsCacheSize: 100
