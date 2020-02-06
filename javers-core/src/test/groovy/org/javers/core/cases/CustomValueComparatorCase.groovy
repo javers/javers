@@ -20,7 +20,7 @@ class CustomValueComparatorCase extends Specification {
     }
 
     class Container {
-        Map<String, Parent> map = new HashMap<>()
+        Parent parent
     }
 
     class CustomDoubleComparator implements CustomValueComparator<Double> {
@@ -50,12 +50,9 @@ class CustomValueComparatorCase extends Specification {
         Parent c1 = new Child1(prop1: "Hi")
         Parent c2 = new Child2(prop2: 1.2)
 
+        Container container1 = new Container(parent: c1)
 
-        Container container1 = new Container()
-        container1.map.put("key", c1)
-
-        Container container2 = new Container()
-        container2.map.put("key", c2)
+        Container container2 = new Container(parent: c2)
 
         def diff = javers.compare(container1, container2)
 
