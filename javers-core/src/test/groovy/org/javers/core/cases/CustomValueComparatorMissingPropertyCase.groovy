@@ -7,7 +7,10 @@ import spock.lang.Specification
 
 import java.math.RoundingMode
 
-class CustomValueComparatorCase extends Specification {
+/**
+ * https://github.com/javers/javers/issues/935
+ */
+class CustomValueComparatorMissingPropertyCase extends Specification {
 
     class Parent {}
 
@@ -57,7 +60,7 @@ class CustomValueComparatorCase extends Specification {
         def diff = javers.compare(container1, container2)
 
         then:
-        diff.changes.size() == 1
+        diff.changes.size() == 2
 
         println(diff.changes)
     }
