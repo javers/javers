@@ -146,9 +146,9 @@ public class JsonConverterBuilder {
     }
 
     public JsonConverter build() {
-        registerJsonTypeAdapters(UtilTypeCoreAdapters.adapters());
-        registerJsonTypeAdapters(Java8TypeAdapters.adapters());
-        registerJsonTypeAdapter(new AtomicTypeAdapter(typeSafeValues));
+        registerBuiltInAdapters(Java8TypeAdapters.adapters());
+        registerBuiltInAdapters(UtilTypeCoreAdapters.adapters());
+        registerBuiltInAdapter(new AtomicTypeAdapter(typeSafeValues));
 
         if (prettyPrint){
             gsonBuilder.setPrettyPrinting();
@@ -169,6 +169,18 @@ public class JsonConverterBuilder {
 
         registerNativeGsonSerializer(targetType, jsonSerializer);
         registerNativeGsonDeserializer(targetType, jsonDeserializer);
+    }
+
+    private void registerBuiltInAdapters(final List<JsonTypeAdapter> adapters) {
+        adapters.forEach(this::registerBuiltInAdapter);
+    }
+
+    private void registerBuiltInAdapter(final JsonTypeAdapter adapter) {
+        adapter.getValueTypes().forEach( c -> {
+            if (!valueTypes.contains(c)) {
+                registerJsonTypeAdapterForType((Class) c, adapter);
+            }
+        });
     }
 
     private static class SkipFieldExclusionStrategy implements ExclusionStrategy {
