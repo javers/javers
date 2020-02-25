@@ -64,9 +64,6 @@ class CaseWithBuiltInTypeAdaptersOverride extends Specification {
         def converter = JaversBuilder.javers().registerValueTypeAdapter(adapter).build().getJsonConverter()
         def defaultConverter = JaversBuilder.javers().build().getJsonConverter()
 
-        println("adapter.getValueType     " + adapter.getValueType() )
-        println("converted using default: " + converter.toJson(obj))
-
         expect:
         converter.toJson(obj) == "\"" + adapter.serialize(obj) + "\""
         converter.fromJson("\"" + adapter.serialize(obj) + "\"", adapter.getValueType()) ==
