@@ -22,11 +22,13 @@ public class JsonConverterBuilder {
     private boolean typeSafeValues = false;
     private boolean prettyPrint = true;
     private final GsonBuilder gsonBuilder;
-    private final List<Class> valueTypes = new ArrayList<>();
+    private final List<Class> builtInValueTypes = new ArrayList<>();
 
     public JsonConverterBuilder() {
         this.gsonBuilder = new GsonBuilder();
         this.gsonBuilder.setExclusionStrategies(new SkipFieldExclusionStrategy());
+        registerBuiltInAdapters(Java8TypeAdapters.adapters());
+        registerBuiltInAdapters(UtilTypeCoreAdapters.adapters());
     }
 
     /**
@@ -141,13 +143,11 @@ public class JsonConverterBuilder {
         return this;
     }
 
-    public List<Class> getValueTypes() {
-        return Collections.unmodifiableList(valueTypes);
+    public List<Class> getBuiltInValueTypes() {
+        return Collections.unmodifiableList(builtInValueTypes);
     }
 
     public JsonConverter build() {
-        registerBuiltInAdapters(Java8TypeAdapters.adapters());
-        registerBuiltInAdapters(UtilTypeCoreAdapters.adapters());
         registerBuiltInAdapter(new AtomicTypeAdapter(typeSafeValues));
 
         if (prettyPrint){
@@ -163,7 +163,6 @@ public class JsonConverterBuilder {
     }
 
     private void registerJsonTypeAdapterForType(Class targetType, final JsonTypeAdapter adapter) {
-        valueTypes.add(targetType);
         JsonSerializer jsonSerializer = (value, type, jsonSerializationContext) -> adapter.toJson(value, jsonSerializationContext);
         JsonDeserializer jsonDeserializer = (jsonElement, type, jsonDeserializationContext) -> adapter.fromJson(jsonElement, jsonDeserializationContext);
 
@@ -177,9 +176,8 @@ public class JsonConverterBuilder {
 
     private void registerBuiltInAdapter(final JsonTypeAdapter adapter) {
         adapter.getValueTypes().forEach( c -> {
-            if (!valueTypes.contains(c)) {
-                registerJsonTypeAdapterForType((Class) c, adapter);
-            }
+            builtInValueTypes.add((Class) c);
+            registerJsonTypeAdapterForType((Class) c, adapter);
         });
     }
 
