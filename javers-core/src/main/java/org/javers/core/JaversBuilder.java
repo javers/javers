@@ -780,7 +780,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         JsonConverter jsonConverter = jsonConverterBuilder.build();
         addComponent(jsonConverter);
 
-        return Lists.transform(jsonConverterBuilder.getValueTypes(), c -> new ValueType(c));
+        return Lists.transform(jsonConverterBuilder.getBuiltInValueTypes(), c -> new ValueType(c));
     }
 
     private void bootDateTimeProvider() {
