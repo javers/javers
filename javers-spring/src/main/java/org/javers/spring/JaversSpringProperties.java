@@ -9,7 +9,6 @@ import org.javers.core.graph.ObjectAccessHook;
 public abstract class JaversSpringProperties extends JaversCoreProperties {
     private boolean auditableAspectEnabled = true;
     private boolean springDataAuditableRepositoryAspectEnabled = true;
-    private boolean auditableAspectAsyncEnabled = true;
     private String objectAccessHook = defaultObjectAccessHook();
 
     public boolean isAuditableAspectEnabled() {
@@ -20,20 +19,12 @@ public abstract class JaversSpringProperties extends JaversCoreProperties {
         return springDataAuditableRepositoryAspectEnabled;
     }
 
-    public boolean auditableAspectAsyncEnabled() {
-        return auditableAspectAsyncEnabled;
-    }
-
     public void setAuditableAspectEnabled(boolean auditableAspectEnabled) {
         this.auditableAspectEnabled = auditableAspectEnabled;
     }
 
     public void setSpringDataAuditableRepositoryAspectEnabled(boolean springDataAuditableRepositoryAspectEnabled) {
         this.springDataAuditableRepositoryAspectEnabled = springDataAuditableRepositoryAspectEnabled;
-    }
-
-    public void setAuditableAspectAsyncEnabled(boolean auditableAspectAsyncEnabled) {
-        this.auditableAspectAsyncEnabled = auditableAspectAsyncEnabled;
     }
 
     public String getObjectAccessHook() {

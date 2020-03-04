@@ -40,6 +40,8 @@ class JaversMongoStarterTest extends Specification{
         javersProperties.commitIdGenerator == "random"
         javersProperties.documentDbCompatibilityEnabled == true
         javersProperties.objectAccessHook == "org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook"
+        !javersProperties.auditableAspectAsyncEnabled
+        javersProperties.asyncCommitExecutorThreadCount == 1
     }
 
     def "shouldReadBeanMappingStyleFromYml"() {

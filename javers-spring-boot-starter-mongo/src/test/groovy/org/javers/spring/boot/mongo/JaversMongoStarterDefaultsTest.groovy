@@ -36,6 +36,8 @@ class JaversMongoStarterDefaultsTest extends Specification{
         javersProperties.packagesToScan == ""
        !javersProperties.mongodb
         javersProperties.objectAccessHook == "org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook"
+        javersProperties.auditableAspectAsyncEnabled
+        javersProperties.asyncCommitExecutorThreadCount == 2
     }
 
     def "should connect to Mongo configured in spring.data.mongodb properties"(){

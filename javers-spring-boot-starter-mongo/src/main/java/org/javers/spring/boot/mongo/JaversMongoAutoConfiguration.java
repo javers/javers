@@ -131,6 +131,6 @@ public class JaversMongoAutoConfiguration {
     @Bean(name = "javersAsyncExecutor")
     @ConditionalOnMissingBean(name="javersAsyncExecutor")
     public Executor javersAsyncExecutor(){
-        return  Executors.newFixedThreadPool(javersMongoProperties.getJaversExecutorThreadCount());
+        return  Executors.newFixedThreadPool(javersMongoProperties.getAsyncCommitExecutorThreadCount());
     }
 }
