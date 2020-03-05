@@ -15,8 +15,12 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Commits all arguments passed to methods annotated with {@link JaversAuditableAsync}
- * (only if a method exits normally, i.e. no Exception has been thrown).
+ *  Asynchronously commits all arguments passed to methods annotated with {@link JaversAuditableAsync}
+ *  by calling {@link Javers#commitAsync(String, Object, Executor)} for each method argument.
+ *  <br/><br/>
+ *
+ *  This is the {@link AfterReturning} aspect, it triggers
+ *  only if a method exits normally, i.e. if no Exception has been thrown.
  */
 @Aspect
 public class JaversAuditableAspectAsync {

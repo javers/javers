@@ -7,12 +7,16 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.concurrent.Executor;
 
 /**
- * Enables asynchronous auto-audit when put on a method (typically on a method in a Repository)
+ * Enables asynchronous auto-audit aspect when put on a method (typically in a Repository).
  * <br/><br/>
  *
- * Triggers {@link Javers#commitAsync} for each method argument.
+ * Triggers {@link Javers#commitAsync(String, Object, Executor)} for each method argument.
+ * <br/><br/>
+ *
+ * <b>Important!</b> Works with MongoDB, not implemented for SQL repositories.
  *
  * @see JaversAuditableAspectAsync
  * @author Razi

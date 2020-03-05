@@ -1,5 +1,6 @@
 package org.javers.spring.boot.mongo;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.client.MongoDatabase;
@@ -27,6 +28,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
 
@@ -112,25 +114,38 @@ public class JaversMongoAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    public JaversAuditableAspect javersAuditableAspect(
+            Javers javers,
+            AuthorProvider authorProvider,
+            CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
     }
 
     @Bean
-    @ConditionalOnProperty(name = "javers.auditableAspectAsyncEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversAuditableAspectAsync javersAuditableAspectAsync(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, @Qualifier("javersAsyncExecutor")Executor executor) {
-        return new JaversAuditableAspectAsync(javers, authorProvider, commitPropertiesProvider,executor);
+    @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(
+            Javers javers,
+            AuthorProvider authorProvider,
+            CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
     }
 
     @Bean
-    @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
-        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
+    @ConditionalOnProperty(name = "javers.auditableAspectAsyncEnabled", havingValue = "true", matchIfMissing = true)
+    public JaversAuditableAspectAsync javersAuditableAspectAsync (
+            Javers javers,
+            AuthorProvider authorProvider,
+            CommitPropertiesProvider commitPropertiesProvider,
+            @Qualifier("javersAsyncExecutor")Executor executor) {
+        return new JaversAuditableAspectAsync(javers, authorProvider, commitPropertiesProvider, javersAsyncExecutor());
     }
 
     @Bean(name = "javersAsyncExecutor")
     @ConditionalOnMissingBean(name="javersAsyncExecutor")
-    public Executor javersAsyncExecutor(){
-        return  Executors.newFixedThreadPool(javersMongoProperties.getAsyncCommitExecutorThreadCount());
+    public Executor javersAsyncExecutor() {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("javersAsyncExecutor-%d")
+                .build();
+        return  Executors.newFixedThreadPool(javersMongoProperties.getAsyncCommitExecutorThreadCount(), threadFactory);
     }
 }

@@ -28,7 +28,7 @@ class JaversAuditableAspectIntegrationTest extends Specification {
         javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build()).size() == 1
     }
 
-    def "should not commit method args when it doesn't exited normally"() {
+    def "should not commit method args when it didn't exit normally"() {
         given:
         def o = new DummyObject()
 

@@ -16,14 +16,11 @@ import java.util.Optional;
 
 public class AbstractSpringAuditableRepositoryAspect {
     private final JaversCommitAdvice javersCommitAdvice;
-    private final AuditChangeHandler deleteHandler;
     private final Javers javers;
 
     protected AbstractSpringAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this.javers = javers;
         this.javersCommitAdvice = new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider);
-
-        this.deleteHandler = new OnDeleteAuditChangeHandler();
     }
 
     protected void onSave(JoinPoint pjp, Object returnedObject) {
@@ -36,7 +33,7 @@ public class AbstractSpringAuditableRepositoryAspect {
         getRepositoryInterface(pjp).ifPresent( i -> {
             RepositoryMetadata metadata = DefaultRepositoryMetadata.getMetadata(i);
             for (Object deletedObject : AspectUtil.collectArguments(pjp)) {
-                deleteHandler.handle(metadata, deletedObject);
+                handleDelete(metadata, deletedObject);
             }
         });
     }
@@ -50,10 +47,8 @@ public class AbstractSpringAuditableRepositoryAspect {
         return Optional.empty();
     }
 
-    private class OnDeleteAuditChangeHandler implements AuditChangeHandler {
 
-        @Override
-        public void handle(RepositoryMetadata repositoryMetadata, Object domainObjectOrId) {
+    void handleDelete(RepositoryMetadata repositoryMetadata, Object domainObjectOrId) {
             if (isIdClass(repositoryMetadata, domainObjectOrId)) {
                 Class<?> domainType = repositoryMetadata.getDomainType();
                 if (javers.findSnapshots(QueryBuilder.byInstanceId(domainObjectOrId, domainType).build()).size() == 0) {
@@ -68,14 +63,14 @@ public class AbstractSpringAuditableRepositoryAspect {
             } else {
                 throw new IllegalArgumentException("Domain object or object id expected");
             }
-        }
-
-        private boolean isDomainClass(RepositoryMetadata metadata, Object o) {
-            return metadata.getDomainType().isAssignableFrom(o.getClass());
-        }
-
-        private boolean isIdClass(RepositoryMetadata metadata, Object o) {
-            return metadata.getIdType().isAssignableFrom(o.getClass());
-        }
     }
+
+    private boolean isDomainClass(RepositoryMetadata metadata, Object o) {
+        return metadata.getDomainType().isAssignableFrom(o.getClass());
+    }
+
+    private boolean isIdClass(RepositoryMetadata metadata, Object o) {
+        return metadata.getIdType().isAssignableFrom(o.getClass());
+    }
+
 }

@@ -105,7 +105,6 @@ public class JaversSpringMongoApplicationConfig {
     public ExecutorService javersAsyncAuditExecutor() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("JaversAuditableAsync-%d")
-                .setDaemon(true)
                 .build();
         return Executors.newFixedThreadPool(2, threadFactory);
     }

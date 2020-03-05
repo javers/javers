@@ -39,24 +39,11 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
         waitForCommit(o)
 
         then:
-        javers.findSnapshots(query).size() == 1
-    }
+        def snapshot = javers.findSnapshots(query)[0]
 
-    void waitForCommit(DummyObject... objects) {
-        for (int i=0; i<50; i++) {
-            println("wait 50ms ...")
-            sleep(50)
+        snapshot.globalId.cdoId == o.id
+        snapshot.commitMetadata.properties["key"] == "ok"
 
-            def sizes = objects.collect{o ->
-                def query = QueryBuilder.byInstanceId(o.id, DummyObject).build()
-                javers.findSnapshots(query).size()
-            }
-            println("sizes : " + sizes)
-
-            if (sizes.sum() >= objects.size()) {
-                break
-            }
-        }
     }
 
     def "should asynchronously commit two method's arguments when annotated with @JaversAuditableAsync"() {
@@ -79,42 +66,42 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
         javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build()).size() == 1
     }
 
-    @Ignore
-    def "should commit with properties provided by CommitPropertiesProvider"(){
+    def "should asynchronously commit an iterable argument when method is annotated with @JaversAuditableAsync"() {
         given:
-        def o = new DummyObject()
+        def o1 = new DummyObject()
+        def o2 = new DummyObject()
+        def objects = [o1, o2]
 
         when:
-        repository.save(o)
-
-        then:
-        def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())[0]
-        snapshot.commitMetadata.properties["key"] == "ok"
-    }
-
-    @Ignore
-    def "should commit iterable argument when method is annotated with @JaversAuditable"() {
-        given:
-        def objects = [new DummyObject(), new DummyObject()]
-
-        when: "iterable arg test"
         repository.saveAll(objects)
 
         then:
-        objects.each {
-            javers.findSnapshots(QueryBuilder.byInstanceId(it.id, DummyObject).build()).size() == 1
-        }
-    }
-
-    @Ignore
-    def "should not advice a method from a Repository when no annotation"() {
-        given:
-        def o = new DummyObject()
+        javers.findSnapshots(QueryBuilder.byInstanceId(o1.id, DummyObject).build()).size() == 0
+        javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build()).size() == 0
 
         when:
-        repository.find(o)
+        waitForCommit(o1, o2)
 
         then:
-        javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build()).size() == 0
+        javers.findSnapshots(QueryBuilder.byInstanceId(o1.id, DummyObject).build()).size() == 1
+        javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build()).size() == 1
+    }
+
+    void waitForCommit(DummyObject... objects) {
+        println "waitForCommit..."
+        for (int i=0; i<50; i++) {
+            println("wait 50ms ...")
+            sleep(50)
+
+            def sizes = objects.collect{o ->
+                def query = QueryBuilder.byInstanceId(o.id, DummyObject).build()
+                javers.findSnapshots(query).size()
+            }
+            println("sizes : " + sizes)
+
+            if (sizes.sum() >= objects.size()) {
+                break
+            }
+        }
     }
 }
