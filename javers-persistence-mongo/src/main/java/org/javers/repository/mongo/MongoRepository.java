@@ -64,8 +64,8 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
      *
      * See <a href="http://docs.aws.amazon.com/documentdb/latest/developerguide/functional-differences.html">functional differences</a>.
      */
-    public static MongoRepository mongoRepositoryWithDocumentDBCompatibility(MongoDatabase mongo) {
-        return new MongoRepository(mongo, DEFAULT_CACHE_SIZE, DOCUMENT_DB);
+    public static MongoRepository mongoRepositoryWithDocumentDBCompatibility(MongoDatabase mongo, int cacheSize) {
+        return new MongoRepository(mongo, cacheSize, DOCUMENT_DB);
     }
 
     /**

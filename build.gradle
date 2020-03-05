@@ -14,7 +14,7 @@ buildscript {
 
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.10.1'
-    id 'io.codearte.nexus-staging' version '0.20.0'
+    id 'io.codearte.nexus-staging' version '0.21.2'
     id 'de.marcphilipp.nexus-publish' version '0.2.0' apply false
     id 'com.adarshr.test-logger' version '1.6.0'
 }
@@ -151,8 +151,8 @@ subprojects {
     //io.codearte.gradle
     nexusStaging {
         packageGroup = 'org.javers'
-        numberOfRetries = 20
-        delayBetweenRetriesInMillis = 3000
+        numberOfRetries = 50
+        delayBetweenRetriesInMillis = 5000
     }
     
     nexusPublishing {

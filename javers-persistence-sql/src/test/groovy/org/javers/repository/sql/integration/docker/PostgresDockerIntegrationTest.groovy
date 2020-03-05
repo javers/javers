@@ -9,10 +9,14 @@ import spock.lang.Shared
 import java.sql.Connection
 import java.sql.DriverManager
 
+import static org.testcontainers.containers.PostgreSQLContainer.IMAGE
+
 class PostgresDockerIntegrationTest extends JaversSqlRepositoryE2ETest {
 
     @ClassRule @Shared
-    public PostgreSQLContainer postgres = new PostgreSQLContainer()
+    public PostgreSQLContainer postgres = new PostgreSQLContainer(
+            IMAGE+":12.1"
+    )
 
     Connection createConnection() {
        String url = postgres.jdbcUrl

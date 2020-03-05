@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.custom.CustomValueComparator;
+import org.javers.core.metamodel.property.MissingProperty;
 
 class CustomValueComparatorNullSafe<T> implements CustomValueComparator<T> {
     private final CustomValueComparator<T> delegate;
@@ -18,6 +19,10 @@ class CustomValueComparatorNullSafe<T> implements CustomValueComparator<T> {
         }
 
         if ((o1 == null && o2 != null) || (o1 != null && o2 == null)) {
+            return false;
+        }
+
+        if (o1 == MissingProperty.INSTANCE || o2 == MissingProperty.INSTANCE) {
             return false;
         }
 

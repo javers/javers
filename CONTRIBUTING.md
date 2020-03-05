@@ -1,9 +1,10 @@
 # How to contribute
 
+## Issues
+You can report a **Bug** or a **Feature Request** to our [github issues](http://github.com/javers/javers/issues/).
+**Questions** should be asked at [stackoverflow.com](http://stackoverflow.com/questions/tagged/javers?sort=newest).
+
 ## Guidelines for Bug Reporting
-You can report a Bug or a Feature Request to our [github issues](http://github.com/javers/javers/issues/).
-Questions should be asked at [stackoverflow.com](http://stackoverflow.com/questions/tagged/javers?sort=newest).
-We'll answer them.
 
 Bug Reports have to contain:
 

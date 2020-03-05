@@ -8,5 +8,6 @@ javers:
   commitIdGenerator: random
   documentDbCompatibilityEnabled: true
   objectAccessHook: org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook
+  snapshotsCacheSize: 100
   asyncCommitExecutorThreadCount: 1
   auditableAspectAsyncEnabled: false

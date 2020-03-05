@@ -87,9 +87,9 @@ public class JaversMongoAutoConfiguration {
     private MongoRepository createMongoRepository(MongoDatabase mongoDatabase) {
         if (javersMongoProperties.isDocumentDbCompatibilityEnabled()){
             logger.info("enabling Amazon DocumentDB compatibility");
-            return mongoRepositoryWithDocumentDBCompatibility(mongoDatabase);
+            return mongoRepositoryWithDocumentDBCompatibility(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
         }
-        return new MongoRepository(mongoDatabase);
+        return new MongoRepository(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
     }
 
     @Bean(name = "SpringSecurityAuthorProvider")

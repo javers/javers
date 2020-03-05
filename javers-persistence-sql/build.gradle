@@ -10,7 +10,7 @@ dependencies {
 
     testCompile 'commons-dbcp:commons-dbcp:1.4'
     testCompile 'com.h2database:h2:1.4.187'
-    testCompile 'org.postgresql:postgresql:42.2.5'
+    testCompile 'org.postgresql:postgresql:42.2.9'
     testCompile 'org.mariadb.jdbc:mariadb-java-client:2.2.3'
     testCompile 'mysql:mysql-connector-java:8.0.14'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'

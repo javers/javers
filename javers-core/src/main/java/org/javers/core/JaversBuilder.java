@@ -114,7 +114,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
             conditionalTypesPlugins.add(new GuavaAddOns());
         }
 
-        // bootstrap phase 1: container & core
+        // bootstrap pico container & core module
         bootContainer();
         addModule(new CoreJaversModule(getContainer()));
     }
@@ -130,7 +130,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     protected Javers assembleJaversInstance(){
-        // bootstrap phase 2: main modules
+        // boot main modules
         addModule(new DiffFactoryModule());
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new SnapshotModule(getContainer()));
@@ -141,13 +141,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new ShadowModule(getContainer()));
         addModule(new JqlModule(getContainer()));
 
-        // bootstrap phase 3: add-on modules
+        // boot add-ons modules
         Set<JaversType> additionalTypes = bootAddOns();
 
-        // bootstrap phase 4: TypeMapper
-        bootManagedTypeModule();
+        // boot TypeMapper module
+        addModule(new TypeMapperModule(getContainer()));
 
-        // bootstrap phase 5: JSON beans & domain aware typeAdapters
+        // boot JSON beans & domain aware typeAdapters
         additionalTypes.addAll( bootJsonConverter() );
 
         bootDateTimeProvider();
@@ -157,6 +157,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
             typeMapper().getJaversType(c);
         }
         typeMapper().addPluginTypes(additionalTypes);
+
+        mapRegisteredClasses();
 
         bootRepository();
 
@@ -760,11 +762,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return additionalTypes;
     }
 
-    private void bootManagedTypeModule() {
-        addModule(new TypeMapperModule(getContainer()));
-        mapRegisteredClasses();
-    }
-
     /**
      * boots JsonConverter and registers domain aware typeAdapters
      */
@@ -783,7 +780,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         JsonConverter jsonConverter = jsonConverterBuilder.build();
         addComponent(jsonConverter);
 
-        return Lists.transform(jsonConverterBuilder.getValueTypes(), c -> new ValueType(c));
+        return Lists.transform(jsonConverterBuilder.getBuiltInValueTypes(), c -> new ValueType(c));
     }
 
     private void bootDateTimeProvider() {
