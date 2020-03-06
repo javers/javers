@@ -45,3 +45,5 @@ public abstract class JaversSpringProperties extends JaversCoreProperties {
         return (ObjectAccessHook)ReflectionUtil.newInstance(clazz);
     }
 }
+
+

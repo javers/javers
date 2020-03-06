@@ -41,6 +41,8 @@ class JaversMongoStarterTest extends Specification{
         javersProperties.documentDbCompatibilityEnabled == true
         javersProperties.objectAccessHook == "org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook"
         javersProperties.snapshotsCacheSize == 100
+        !javersProperties.auditableAspectAsyncEnabled
+        javersProperties.asyncCommitExecutorThreadCount == 1
     }
 
     def "shouldReadBeanMappingStyleFromYml"() {

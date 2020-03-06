@@ -18,6 +18,10 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     private Mongodb mongodb;
 
+    private Integer asyncCommitExecutorThreadCount = 2;
+
+    private boolean auditableAspectAsyncEnabled = true;
+
     public boolean isDocumentDbCompatibilityEnabled() {
         return documentDbCompatibilityEnabled;
     }
@@ -40,6 +44,22 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     public void setMongodb(Mongodb mongodb) {
         this.mongodb = mongodb;
+    }
+
+    public Integer getAsyncCommitExecutorThreadCount() {
+        return asyncCommitExecutorThreadCount;
+    }
+
+    public void setAsyncCommitExecutorThreadCount(Integer asyncCommitExecutorThreadCount) {
+        this.asyncCommitExecutorThreadCount = asyncCommitExecutorThreadCount;
+    }
+
+    public boolean isAuditableAspectAsyncEnabled() {
+        return auditableAspectAsyncEnabled;
+    }
+
+    public void setAuditableAspectAsyncEnabled(boolean auditableAspectAsyncEnabled) {
+        this.auditableAspectAsyncEnabled = auditableAspectAsyncEnabled;
     }
 
     /**

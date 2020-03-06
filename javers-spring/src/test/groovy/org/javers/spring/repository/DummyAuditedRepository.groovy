@@ -17,6 +17,11 @@ class DummyAuditedRepository {
     }
 
     @JaversAuditable
+    void saveAndFail(DummyObject obj) {
+        throw new RuntimeException()
+    }
+
+    @JaversAuditable
     void saveTwo(DummyObject obj, obj2){
         //... omitted
     }

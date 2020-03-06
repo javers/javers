@@ -75,7 +75,7 @@ public interface Javers {
      *
      * <b>Important!</b> Works with MongoDB, not implemented for SQL repositories.
      *
-     * @param executor ExecutorService to be used to process commit() asynchronously
+     * @param executor ExecutorService to be used to process commit() asynchronously.
      */
     CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Executor executor);
 

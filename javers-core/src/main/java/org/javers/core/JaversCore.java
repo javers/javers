@@ -31,6 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
@@ -110,12 +111,12 @@ class JaversCore implements Javers {
     public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Map<String, String> commitProperties,
                                                  Executor executor) {
         long start = System.currentTimeMillis();
-       
+
         argumentsAreNotNull(author, commitProperties, currentVersion);
         assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion);
-        
-        CompletableFuture<Commit> commit = commitFactory
-                .create(author, commitProperties, currentVersion, executor)
+
+        CompletableFuture<Commit> commit =
+                supplyAsync(() -> commitFactory.create(author, commitProperties, currentVersion), executor)
                 .thenApply(it -> new CommitWithTimestamp(it, System.currentTimeMillis()))
                 .thenApplyAsync(it -> {
                     persist(it.getCommit());
@@ -129,7 +130,7 @@ class JaversCore implements Javers {
         long stop = System.currentTimeMillis();
         Commit persistedCommit = it.getCommit();
         Long creationTime = it.getTimestamp();
-        logger.info(persistedCommit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(creationTime-start), (stop-creationTime));
+        logger.info(persistedCommit.toString()+", done asynchronously in "+ (stop-start)+ " millis (diff:{}, persist:{})",(creationTime-start), (stop-creationTime));
         return persistedCommit;
     }
 
@@ -151,7 +152,7 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId) {
-        return  commitShallowDeleteById(author, globalId, Collections.<String, String>emptyMap());
+        return commitShallowDeleteById(author, globalId, Collections.<String, String>emptyMap());
     }
 
 
@@ -173,26 +174,31 @@ class JaversCore implements Javers {
 
     @Override
     public Diff initial(Object newDomainObject) {
+        Validate.argumentIsNotNull(newDomainObject);
         return diffFactory.initial(newDomainObject);
     }
 
     @Override
     public <T> List<Shadow<T>> findShadows(JqlQuery query) {
+        Validate.argumentIsNotNull(query);
         return (List)queryRunner.queryForShadows(query);
     }
 
     @Override
     public <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query) {
+        Validate.argumentIsNotNull(query);
         return (Stream)queryRunner.queryForShadowsStream(query);
     }
 
     @Override
     public List<CdoSnapshot> findSnapshots(JqlQuery query){
+        Validate.argumentIsNotNull(query);
         return queryRunner.queryForSnapshots(query);
     }
 
     @Override
     public Changes findChanges(JqlQuery query){
+        Validate.argumentIsNotNull(query);
         return new Changes(queryRunner.queryForChanges(query), configuration.getPrettyValuePrinter());
     }
 

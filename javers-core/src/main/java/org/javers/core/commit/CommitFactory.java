@@ -21,10 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
-import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -73,12 +70,6 @@ public class CommitFactory {
         argumentsAreNotNull(author, currentVersion);
         LiveGraph currentGraph = createLiveGraph(currentVersion);
         return createCommit(author, properties, currentGraph);
-    }
-
-    public CompletableFuture<Commit> create(String author, Map<String, String> properties, Object currentVersion, Executor executor) {
-        argumentsAreNotNull(author, currentVersion);
-        LiveGraph currentGraph = createLiveGraph(currentVersion);
-        return supplyAsync( () -> createCommit(author, properties, currentGraph), executor);
     }
 
     private Commit createCommit(String author, Map<String, String> properties, LiveGraph currentGraph){

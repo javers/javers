@@ -17,8 +17,8 @@ class JaversAuditableAspectIntegrationTest extends Specification {
     @Autowired
     DummyAuditedRepository repository
 
-    def "should commit single argument when method is annotated with @JaversAuditable"() {
-        given: "one arg test"
+    def "should commit a method's argument when annotated with @JaversAuditable"() {
+        given:
         def o = new DummyObject()
 
         when:
@@ -28,7 +28,20 @@ class JaversAuditableAspectIntegrationTest extends Specification {
         javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build()).size() == 1
     }
 
-    def "should commit few arguments when method is annotated with @JaversAuditable"() {
+    def "should not commit method args when it didn't exit normally"() {
+        given:
+        def o = new DummyObject()
+
+        when:
+        try {
+            repository.saveAndFail(o)
+        } catch (Exception e) {}
+
+        then:
+        javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build()).size() == 0
+    }
+
+    def "should commit method's arguments when annotated with @JaversAuditable"() {
         given:
         def o1 = new DummyObject()
         def o2 = new DummyObject()

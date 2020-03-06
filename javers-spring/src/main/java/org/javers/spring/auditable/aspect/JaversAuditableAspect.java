@@ -4,13 +4,21 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.javers.core.Javers;
+import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.EmptyPropertiesProvider;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- * Commits all arguments passed to methods with @JaversAuditable annotation
- * (only if a method exits normally, i.e. no Exception has been thrown).
+ * Commits all arguments passed to methods annotated with {@link JaversAuditable}
+ * by calling {@link Javers#commit(String, Object)} for each method argument.
+ * <br/><br/>
+ *
+ * This is the {@link AfterReturning} aspect, it triggers
+ * only if a method exits normally, i.e. if no Exception has been thrown.
  * <br/><br/>
  *
  * Spring @Transactional attributes (like noRollbackFor or noRollbackForClassName)

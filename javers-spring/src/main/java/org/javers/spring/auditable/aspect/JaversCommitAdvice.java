@@ -6,6 +6,7 @@ import org.javers.common.collections.Maps;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
+import org.javers.core.commit.Commit;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.PrimitiveOrValueType;
@@ -15,6 +16,12 @@ import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
@@ -26,20 +33,29 @@ public class JaversCommitAdvice {
     private final Javers javers;
     private final AuthorProvider authorProvider;
     private final CommitPropertiesProvider commitPropertiesProvider;
+    private final Executor executor;
 
     public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this.javers = javers;
         this.authorProvider = authorProvider;
         this.commitPropertiesProvider = commitPropertiesProvider;
+        this.executor = null;
     }
 
-    public void commitSaveMethodArguments(JoinPoint pjp) {
+    public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, Executor executor) {
+		this.javers = javers;
+		this.authorProvider = authorProvider;
+		this.commitPropertiesProvider = commitPropertiesProvider;
+    	this.executor = executor;
+	}
+
+	void commitSaveMethodArguments(JoinPoint pjp) {
         for (Object arg : AspectUtil.collectArguments(pjp)) {
             commitObject(arg);
         }
     }
 
-    public void commitDeleteMethodArguments(JoinPoint jp) {
+    void commitDeleteMethodArguments(JoinPoint jp) {
         for (Object arg : AspectUtil.collectArguments(jp)) {
             JaversType javersType = javers.getTypeMapping(arg.getClass());
             if (javersType instanceof ManagedType) {
@@ -62,10 +78,7 @@ public class JaversCommitAdvice {
 
     public void commitObject(Object domainObject) {
         String author = authorProvider.provide();
-
-        javers.commit(author, domainObject, Maps.merge(
-                commitPropertiesProvider.provideForCommittedObject(domainObject),
-                commitPropertiesProvider.provide()));
+        javers.commit(author, domainObject, propsForCommit(domainObject));
     }
 
     public void commitShallowDelete(Object domainObject) {
@@ -82,5 +95,25 @@ public class JaversCommitAdvice {
         javers.commitShallowDeleteById(author, instanceId(domainObjectId, domainType), Maps.merge(
                 commitPropertiesProvider.provideForDeleteById(domainType, domainObjectId),
                 commitPropertiesProvider.provide()));
+    }
+
+    Optional<CompletableFuture<Commit>> commitSaveMethodArgumentsAsync(JoinPoint pjp) {
+        List<CompletableFuture<Commit>> futures = AspectUtil.collectArguments(pjp)
+                .stream()
+                .map(arg -> commitObjectAsync(arg))
+                .collect(Collectors.toList());
+
+        return futures.size() == 0 ? Optional.empty() : Optional.of(futures.get(futures.size() - 1));
+    }
+
+    CompletableFuture<Commit> commitObjectAsync(Object domainObject) {
+        String author = this.authorProvider.provide();
+        return this.javers.commitAsync(author, domainObject, propsForCommit(domainObject), executor);
+    }
+
+    private Map<String, String> propsForCommit(Object domainObject) {
+        return Maps.merge(
+                commitPropertiesProvider.provideForCommittedObject(domainObject),
+                commitPropertiesProvider.provide());
     }
 }

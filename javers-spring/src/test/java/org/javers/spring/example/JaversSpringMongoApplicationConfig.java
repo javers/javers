@@ -1,14 +1,19 @@
 package org.javers.spring.example;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mongodb.MongoClient;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
+import org.javers.spring.annotation.JaversAuditable;
+import org.javers.spring.annotation.JaversAuditableAsync;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +25,10 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 @Configuration
 @ComponentScan(basePackages = "org.javers.spring.repository")
@@ -61,8 +70,8 @@ public class JaversSpringMongoApplicationConfig {
     /**
      * Enables auto-audit aspect for ordinary repositories.<br/>
      *
-     * Use {@link org.javers.spring.annotation.JaversAuditable}
-     * to mark data writing methods that you want to audit.
+     * Use {@link JaversAuditable}
+     * to mark repository methods that you want to audit.
      */
     @Bean
     public JaversAuditableAspect javersAuditableAspect() {
@@ -72,13 +81,32 @@ public class JaversSpringMongoApplicationConfig {
     /**
      * Enables auto-audit aspect for Spring Data repositories. <br/>
      *
-     * Use {@link org.javers.spring.annotation.JaversSpringDataAuditable}
+     * Use {@link JaversSpringDataAuditable}
      * to annotate CrudRepositories you want to audit.
      */
     @Bean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
         return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(),
                 commitPropertiesProvider());
+    }
+
+    /**
+     * Enables asynchronous auto-audit aspect for ordinary repositories.<br/>
+     *
+     * Use {@link JaversAuditableAsync}
+     * to mark repository methods that you want to audit.
+     */
+    @Bean
+    public JaversAuditableAspectAsync javersAuditableAspectAsync() {
+        return new JaversAuditableAspectAsync(javers(), authorProvider(), commitPropertiesProvider(), javersAsyncAuditExecutor());
+    }
+
+    @Bean
+    public ExecutorService javersAsyncAuditExecutor() {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("JaversAuditableAsync-%d")
+                .build();
+        return Executors.newFixedThreadPool(2, threadFactory);
     }
 
     /**
