@@ -2,7 +2,6 @@ package org.javers.spring.auditable.aspect;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.javers.common.collections.Collections;
 import org.javers.common.collections.Maps;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
