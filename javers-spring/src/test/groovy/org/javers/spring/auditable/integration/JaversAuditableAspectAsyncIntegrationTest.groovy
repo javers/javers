@@ -5,8 +5,6 @@ import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync
 import org.javers.spring.model.DummyObject
 import org.javers.spring.repository.DummyAuditedAsyncRepository
-import org.javers.spring.repository.DummyAuditedRepository
-import org.junit.Ignore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
@@ -18,6 +16,9 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
     Javers javers
 
     @Autowired
+    JaversAuditableAspectAsync javersAuditableAspectAsync
+
+    @Autowired
     DummyAuditedAsyncRepository repository
 
     @Autowired
@@ -27,18 +28,21 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
         given:
         def o = new DummyObject()
 
+        assert javersAuditableAspectAsync.lastAsyncCommit.isEmpty()
+
         when:
         repository.save(o)
 
         then:
         def query = QueryBuilder.byInstanceId(o.id, DummyObject).build()
 
-        javers.findSnapshots(query).size() == 0
+        !javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
 
         when:
         waitForCommit(o)
 
         then:
+        javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
         def snapshot = javers.findSnapshots(query)[0]
 
         snapshot.globalId.cdoId == o.id
@@ -55,13 +59,13 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
         repository.saveTwo(o1, o2)
 
         then:
-        javers.findSnapshots(QueryBuilder.byInstanceId(o1.id, DummyObject).build()).size() == 0
-        javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build()).size() == 0
+        !javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
 
         when:
         waitForCommit(o1, o2)
 
         then:
+        javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
         javers.findSnapshots(QueryBuilder.byInstanceId(o1.id, DummyObject).build()).size() == 1
         javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build()).size() == 1
     }
@@ -76,22 +80,21 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
         repository.saveAll(objects)
 
         then:
-        javers.findSnapshots(QueryBuilder.byInstanceId(o1.id, DummyObject).build()).size() == 0
-        javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build()).size() == 0
+        !javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
 
         when:
         waitForCommit(o1, o2)
 
         then:
+        javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
         javers.findSnapshots(QueryBuilder.byInstanceId(o1.id, DummyObject).build()).size() == 1
         javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build()).size() == 1
     }
 
     void waitForCommit(DummyObject... objects) {
         println "waitForCommit..."
+        long start = new Date().time
         for (int i=0; i<50; i++) {
-            println("wait 50ms ...")
-            sleep(50)
 
             def sizes = objects.collect{o ->
                 def query = QueryBuilder.byInstanceId(o.id, DummyObject).build()
@@ -100,8 +103,13 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
             println("sizes : " + sizes)
 
             if (sizes.sum() >= objects.size()) {
+                long stop = new Date().time
+                println "awaited " + (stop - start) + " millis"
                 break
             }
+
+            println("$i - wait 50ms ...")
+            sleep(50)
         }
     }
 }

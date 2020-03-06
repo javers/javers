@@ -2,10 +2,12 @@ package org.javers.spring.auditable.aspect;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.javers.common.collections.Collections;
 import org.javers.common.collections.Maps;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
+import org.javers.core.commit.Commit;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.PrimitiveOrValueType;
@@ -14,10 +16,13 @@ import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
-import java.util.Map;
-import java.util.concurrent.Executor;
-
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
@@ -93,15 +98,18 @@ public class JaversCommitAdvice {
                 commitPropertiesProvider.provide()));
     }
 
-    void commitSaveMethodArgumentsAsync(JoinPoint pjp) {
-        for (Object arg : AspectUtil.collectArguments(pjp)) {
-            commitObjectAsync(arg);
-        }
+    Optional<CompletableFuture<Commit>> commitSaveMethodArgumentsAsync(JoinPoint pjp) {
+        List<CompletableFuture<Commit>> futures = AspectUtil.collectArguments(pjp)
+                .stream()
+                .map(arg -> commitObjectAsync(arg))
+                .collect(Collectors.toList());
+
+        return futures.size() == 0 ? Optional.empty() : Optional.of(futures.get(futures.size() - 1));
     }
 
-    void commitObjectAsync(Object domainObject) {
+    CompletableFuture<Commit> commitObjectAsync(Object domainObject) {
         String author = this.authorProvider.provide();
-        this.javers.commitAsync(author, domainObject, propsForCommit(domainObject), executor);
+        return this.javers.commitAsync(author, domainObject, propsForCommit(domainObject), executor);
     }
 
     private Map<String, String> propsForCommit(Object domainObject) {

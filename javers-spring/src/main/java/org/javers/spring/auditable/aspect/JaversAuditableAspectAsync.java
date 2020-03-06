@@ -10,6 +10,7 @@ import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Aspect
 public class JaversAuditableAspectAsync {
     private final JaversCommitAdvice javersCommitAdvice;
+    private Optional<CompletableFuture<Commit>> lastAsyncCommit = Optional.empty();
 
     public JaversAuditableAspectAsync(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider,Executor executor) {
         this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider, executor));
@@ -36,6 +38,10 @@ public class JaversAuditableAspectAsync {
 
     @AfterReturning("@annotation(org.javers.spring.annotation.JaversAuditableAsync)")
     public void commitAdvice(JoinPoint pjp) {
-		javersCommitAdvice.commitSaveMethodArgumentsAsync(pjp);
+        lastAsyncCommit = javersCommitAdvice.commitSaveMethodArgumentsAsync(pjp);
+    }
+
+    Optional<CompletableFuture<Commit>> getLastAsyncCommit() {
+        return lastAsyncCommit;
     }
 }
