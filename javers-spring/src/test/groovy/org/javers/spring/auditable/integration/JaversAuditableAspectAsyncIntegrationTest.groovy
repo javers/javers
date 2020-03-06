@@ -44,8 +44,8 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
         waitForCommit([o])
 
         then:
-        javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
         def snapshot = javers.findSnapshots(byInstanceId(o.id, DummyObject).build())[0]
+        javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
 
         snapshot.globalId.cdoId == o.id
         snapshot.commitMetadata.properties["key"] == "ok"
@@ -69,9 +69,9 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
         waitForCommit([o1, o2])
 
         then:
-        javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
         javers.findSnapshots(byInstanceId(o1.id, DummyObject).build()).size() == 1
         javers.findSnapshots(byInstanceId(o2.id, DummyObject).build()).size() == 1
+        javersAuditableAspectAsync.lastAsyncCommit.get().isDone()
     }
 
     def "should asynchronously commit an iterable argument when method is annotated with @JaversAuditableAsync"() {
