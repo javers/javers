@@ -96,7 +96,7 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
     }
 
     void waitForCommit(List objects) {
-        println "waitForCommit..."
+        println "waitForCommit... "
         long start = new Date().time
         for (int i=0; i<50; i++) {
 
