@@ -9,13 +9,14 @@ import org.javers.spring.annotation.JaversAuditableAsync;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * <b>INCUBATING - Javers Async API has incubating status.</b>
+ * <br/><br/>
+ *
  *  Asynchronously commits all arguments passed to methods annotated with {@link JaversAuditableAsync}
  *  by calling {@link Javers#commitAsync(String, Object, Executor)} for each method argument.
  *  <br/><br/>

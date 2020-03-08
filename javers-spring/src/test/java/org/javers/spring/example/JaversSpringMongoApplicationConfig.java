@@ -91,6 +91,9 @@ public class JaversSpringMongoApplicationConfig {
     }
 
     /**
+     * <b>INCUBATING - Javers Async API has incubating status.</b>
+     * <br/><br/>
+     *
      * Enables asynchronous auto-audit aspect for ordinary repositories.<br/>
      *
      * Use {@link JaversAuditableAsync}
@@ -101,6 +104,10 @@ public class JaversSpringMongoApplicationConfig {
         return new JaversAuditableAspectAsync(javers(), authorProvider(), commitPropertiesProvider(), javersAsyncAuditExecutor());
     }
 
+    /**
+     * <b>INCUBATING - Javers Async API has incubating status.</b>
+     * <br/><br/>
+     */
     @Bean
     public ExecutorService javersAsyncAuditExecutor() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()

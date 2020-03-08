@@ -10,6 +10,9 @@ import java.lang.annotation.Target;
 import java.util.concurrent.Executor;
 
 /**
+ * <b>INCUBATING - Javers Async API has incubating status.</b>
+ * <br/><br/>
+ *
  * Enables asynchronous auto-audit aspect when put on a method (typically in a Repository).
  * <br/><br/>
  *

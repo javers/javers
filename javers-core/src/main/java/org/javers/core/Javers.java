@@ -73,7 +73,8 @@ public interface Javers {
      * Async version of {@link #commit(String, Object)}
      * <br/><br/>
      *
-     * <b>Important!</b> Works with MongoDB, not implemented for SQL repositories.
+     * <b>Important!</b> Async Javers commits work seamless with MongoDB.
+     * If you are using SQL repository &mdash; take extra care about transaction management.
      *
      * @param executor ExecutorService to be used to process commit() asynchronously.
      */
@@ -82,8 +83,6 @@ public interface Javers {
     /**
      * Async version of {@link #commit(String, Object, Map)}
      * <br/><br/>
-     *
-     * <b>Important!</b> Works with MongoDB, not implemented for SQL repositories.
      *
      * @param executor ExecutorService to be used to process commit() asynchronously
      */
