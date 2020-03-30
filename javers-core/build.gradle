@@ -2,7 +2,7 @@ apply plugin: 'application'
 mainClassName = "org.javers.core.selftest.Application"
 
 java {
-    registerFeature('comparator') {
+    registerFeature('javersLegacy') {
         usingSourceSet(sourceSets.main)
     }
 }
@@ -14,8 +14,8 @@ dependencies {
     compile "io.github.classgraph:classgraph:$classgraphVersion"
 
     //should be on application's classpath when using custom comparators
-    comparatorImplementation "joda-time:joda-time:$jodaVersion"
-    comparatorImplementation "com.google.guava:guava:$guavaVersion"
+    javersLegacyImplementation "joda-time:joda-time:$jodaVersion"
+    javersLegacyImplementation "com.google.guava:guava:$guavaVersion"
 
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile "com.google.guava:guava:$guavaVersion"
