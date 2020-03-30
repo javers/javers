@@ -17,6 +17,8 @@ dependencies {
     javersLegacyImplementation "joda-time:joda-time:$jodaVersion"
     javersLegacyImplementation "com.google.guava:guava:$guavaVersion"
 
+    testCompile "joda-time:joda-time:$jodaVersion"
+    testCompile "com.google.guava:guava:$guavaVersion"
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile "com.google.guava:guava:$guavaVersion"
     testCompile "org.mongodb:mongodb-driver:$mongoDbDriverVersion"
