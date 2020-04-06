@@ -68,7 +68,6 @@ public class CommitFactory {
     }
 
     public Commit create(String author, Map<String, String> properties, Object currentVersion){
-        System.out.println("create commit "+ currentVersion);
         argumentsAreNotNull(author, currentVersion);
         LiveGraph currentGraph = createLiveGraph(currentVersion);
         return createCommit(author, properties, currentGraph);
