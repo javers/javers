@@ -4,6 +4,7 @@ import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.graph.Cdo;
@@ -67,6 +68,7 @@ public class CommitFactory {
     }
 
     public Commit create(String author, Map<String, String> properties, Object currentVersion){
+        System.out.println("create commit "+ currentVersion);
         argumentsAreNotNull(author, currentVersion);
         LiveGraph currentGraph = createLiveGraph(currentVersion);
         return createCommit(author, properties, currentGraph);

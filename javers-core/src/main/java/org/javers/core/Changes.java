@@ -34,7 +34,7 @@ public class Changes extends AbstractList<Change> {
 
     public Changes(List<Change> changes, PrettyValuePrinter valuePrinter) {
         Validate.argumentsAreNotNull(changes, valuePrinter);
-        this.changes = changes;
+        this.changes = Collections.unmodifiableList(changes);
         this.valuePrinter = valuePrinter;
     }
 
