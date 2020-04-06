@@ -4,15 +4,20 @@ import com.google.common.collect.HashMultiset
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.GlobalIdTestBuilder
+import org.javers.core.Javers
+import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
+import org.javers.core.json.typeadapter.commit.CdoSnapshotStateTypeAdapter
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.javers.guava.MultimapBuilder
+import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -25,14 +30,15 @@ import static org.javers.core.model.DummyUser.dummyUser
  * @author pawel szymczyk
  */
 class CdoSnapshotTypeAdapterTest extends Specification {
+    @Shared
+    JaversTestBuilder javers = javersTestAssembly()
+
+    @Shared
+    def now = ZonedDateTime.now()
 
     def "should serialize CdoSnapshot to Json"() {
         given:
-        def now = ZonedDateTime.now()
-        def javers = javersTestAssembly()
-
-        def dummyUserCdo = javers.createLiveNode( new DummyUser(name:"kaz", age:5) )
-        def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata(now))
+        def snapshot = createSnapshot( new DummyUser(name:"kaz", age:5) )
 
         when:
         def jsonText = javers.jsonConverter.toJson(snapshot)
@@ -53,18 +59,14 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
     def "should serialize state with primitive values in CdoSnapshot"() {
         given:
-        def javers = javersTestAssembly()
         def dummyUser = new DummyUser(
                 name:'kaz',
                 age:1,
                 flag:true,
                 _char:'a')
 
-        def dummyUserCdo = javers.createLiveNode( dummyUser )
-        def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata())
-
         when:
-        String jsonText = javers.jsonConverter.toJson(snapshot)
+        String jsonText = toJson( dummyUser )
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -79,13 +81,10 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
     def "should serialize state with entity in CdoSnapshot"() {
         given:
-        def javers = javersTestAssembly()
         def dummyUser = dummyUser("kaz").withDetails()
-        def cdo = javers.createLiveNode( dummyUser )
-        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
-        String jsonText = javers.jsonConverter.toJson(snapshot)
+        String jsonText = toJson( dummyUser )
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -94,14 +93,10 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
     def "should serialize state with value object in CdoSnapshot"() {
         given:
-        def javers = javersTestAssembly()
         def dummyUserDetails = DummyUserDetails.dummyUserDetails(1).withAddress("London", "St John Street")
 
-        def cdo = javers.createLiveNode( dummyUserDetails )
-        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
-
         when:
-        String jsonText = javers.jsonConverter.toJson(snapshot)
+        String jsonText = toJson( dummyUserDetails )
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -110,15 +105,12 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
     def "should serialize & deserialize state with Map of Entities"(){
       given:
-      def javers = javersTestAssembly()
       def entity = new SnapshotEntity(id:1, mapOfEntities: [(new SnapshotEntity(id:2)) : new SnapshotEntity(id:3)])
-
-      def cdo = javers.createLiveNode( entity )
-      def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
+      def snapshot = createSnapshot(entity)
 
       when:
-      def jsonText = javers.jsonConverter.toJson(snapshot)
-      def deserializedSnapshot = javersTestAssembly().jsonConverter.fromJson(jsonText, CdoSnapshot)
+      def jsonText = toJson( entity )
+      def deserializedSnapshot = fromJson(jsonText)
 
       then:
       snapshot.getPropertyValue("mapOfEntities") == deserializedSnapshot.getPropertyValue("mapOfEntities")
@@ -126,15 +118,12 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
     def "should serialize & deserialize state with Multimaps in CdoSnapshots"() {
         given:
-        def javers = javersTestAssembly()
         def entity = new SnapshotEntity(id: 1,
                 multiMapPrimitiveToEntity: MultimapBuilder.create(["NY": [new SnapshotEntity(id: 2), new SnapshotEntity(id: 3)]]))
-
-        def cdo = javers.createLiveNode( entity )
-        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
+        def snapshot = createSnapshot(entity)
 
         when:
-        def jsonText = javers.jsonConverter.toJson(snapshot)
+        def jsonText = toJson( entity )
 
         then:
         def jsonMultimap = new JsonSlurper().parseText(jsonText).state.multiMapPrimitiveToEntity
@@ -144,7 +133,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         ]
 
         when:
-        def deserializedSnapshot = javersTestAssembly().jsonConverter.fromJson(jsonText, CdoSnapshot)
+        def deserializedSnapshot = fromJson(jsonText)
 
         then:
         snapshot.getPropertyValue("mapOfEntities") == deserializedSnapshot.getPropertyValue("mapOfEntities")
@@ -152,15 +141,10 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
     def "should serialize state with Multisets in CdoSnapshots"() {
         given:
-        def javers = javersTestAssembly()
         def entity = new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(['a','a','b']))
 
-        def cdo = javers.createLiveNode( entity )
-        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
-
         when:
-        def jsonText = javers.jsonConverter.toJson(snapshot)
-        println jsonText
+        def jsonText = toJson( entity )
 
         then:
         def jsonMultiset = new JsonSlurper().parseText(jsonText).state.multiSetOfPrimitives
@@ -169,18 +153,14 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
     def "should serialize state with collections in CdoSnapshots"() {
         given:
-        def javers = javersTestAssembly()
         def dummyUser = new DummyUser(name: "kaz",
                 intArray: [1, 2],
                 integerList: [3, 4],
                 stringSet: ["5", "6"] as Set,
                 primitiveMap: [time: LocalDateTime.of(2000, 1, 1, 12, 0, 0)] )
 
-        def cdo = javers.createLiveNode( dummyUser )
-        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
-
         when:
-        String jsonText = javers.jsonConverter.toJson(snapshot)
+        String jsonText = toJson( dummyUser )
 
         then:
         def json = new JsonSlurper().parseText jsonText
@@ -193,7 +173,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
     }
 
-    def "should deserialize CdoSnapshot state event if user's class is strongly refactored"(){
+    def "should deserialize Snapshot state event if user's class is strongly refactored"(){
       given:
         def json = """
         { 
@@ -229,7 +209,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }"""
 
       when:
-      def snapshot = javersTestAssembly().jsonConverter.fromJson(json, CdoSnapshot)
+      def snapshot = fromJson(json)
 
       then:
         snapshot.commitMetadata.id.value() == "1.0"
@@ -247,7 +227,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.state.getPropertyValue("someReference") == instanceId("1",DummyUserDetails)
     }
 
-    def "should deserialize CdoSnapshot metadata"() {
+    def "should deserialize Snapshot metadata"() {
         given:
         def changed = ["name", "age"]
         def commitProperties = [["key" : "os", "value" : "Solaris"]]
@@ -272,7 +252,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
 
         when:
-        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+        def snapshot = fromJson(json.toString())
 
         then:
         snapshot.commitMetadata.id.value() == "1.0"
@@ -304,7 +284,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
 
         when:
-        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+        def snapshot = fromJson(json.toString())
 
         then:
         def expectedInstant = snapshot.commitMetadata.commitDate.toInstant(ZonedDateTime.now().getOffset())
@@ -312,7 +292,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.commitMetadata.commitDateInstant == expectedInstant
     }
 
-    def "should deserialize CdoSnapshot.version to 0 when version field is missing"() {
+    def "should deserialize Snapshot.version to 0 when version field is missing"() {
 
         given:
         def json = new JsonBuilder()
@@ -331,13 +311,13 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
 
         when:
-        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+        def snapshot = fromJson(json.toString())
 
         then:
         snapshot.version == 0
     }
 
-    def "should deserialize CdoSnapshot state with primitive values"() {
+    def "should deserialize Snapshot state with primitive values"() {
 
         given:
         def json = new JsonBuilder()
@@ -360,7 +340,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
 
         when:
-        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+        def snapshot = fromJson(json.toString())
 
         then:
         with (snapshot) {
@@ -371,7 +351,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
     }
 
-    def "should deserialize CdoSnapshot state with Entity reference"() {
+    def "should deserialize Snapshot state with Entity reference"() {
 
         given:
         def json = new JsonBuilder()
@@ -395,14 +375,14 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
 
         when:
-        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+        def snapshot = fromJson(json.toString())
 
         then:
         def entityId = snapshot.getPropertyValue("dummyUserDetails")
         entityId == instanceId(1, DummyUserDetails)
     }
 
-    def "should deserialize CdoSnapshot state with ValueObject reference"() {
+    def "should deserialize Snapshot state with ValueObject reference"() {
 
         given:
         def json = new JsonBuilder()
@@ -430,14 +410,14 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
 
         when:
-        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+        def snapshot = fromJson(json.toString())
 
         then:
         def valueObjectId = snapshot.getPropertyValue("dummyAddress")
         valueObjectId == GlobalIdTestBuilder.valueObjectId(1, DummyUserDetails, "dummyAddress")
     }
 
-    def "should deserialize CdoSnapshot state with collections"() {
+    def "should deserialize Snapshot state with collections"() {
 
         given:
         def json = new JsonBuilder()
@@ -468,7 +448,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
 
         when:
-        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+        def snapshot = fromJson(json.toString())
 
         then:
         with (snapshot) {
@@ -486,7 +466,51 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
     }
 
-    CommitMetadata someCommitMetadata(ZonedDateTime now = ZonedDateTime.now()){
+    CommitMetadata someCommitMetadata(){
         new CommitMetadata("kazik", [:], now.toLocalDateTime(), now.toInstant(), new CommitId(1, 0))
+    }
+
+    CdoSnapshot createSnapshot(def entity) {
+        def entityCdo = javers.createLiveNode(entity)
+        javers.snapshotFactory.createInitial(entityCdo, someCommitMetadata())
+    }
+
+    String toJson(def entity) {
+        CdoSnapshot snapshot = createSnapshot(entity)
+        def jsonText = javers.jsonConverter.toJson(snapshot)
+        println jsonText
+        jsonText
+    }
+
+    CdoSnapshot fromJson(String jsonText) {
+        javers.jsonConverter.fromJson(jsonText, CdoSnapshot)
+    }
+
+
+    class Pair<L, R> {
+        L left
+        R right
+    }
+
+    @Unroll
+    def "should serialize and deserialize #originalValue.class.simpleName property value with Type token"() {
+        given:
+        def entity = new Pair(left:originalValue)
+
+        when:
+        def jsonText = toJson(entity)
+        CdoSnapshot deserialized = fromJson(jsonText)
+
+        then:
+        deserialized.state.getPropertyValue("left") == originalValue
+        deserialized.state.getPropertyValue("right") == null
+
+        where:
+        originalValue | expectedClass
+        1             | Integer
+        1L            | Integer
+        111111111111L | Long
+        1.0           | Double
+        'a'           | String
     }
 }

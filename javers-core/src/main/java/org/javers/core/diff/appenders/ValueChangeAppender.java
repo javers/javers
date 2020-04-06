@@ -11,7 +11,7 @@ class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
 
     @Override
     public boolean supports(JaversType propertyType) {
-        return  propertyType instanceof PrimitiveOrValueType;
+        return  propertyType instanceof PrimitiveOrValueType || propertyType instanceof TokenType;
     }
 
     /**

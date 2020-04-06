@@ -1,6 +1,7 @@
 package org.javers.core.commit;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.Changes;
 import org.javers.core.CommitIdGenerator;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
@@ -101,7 +102,7 @@ public final class Commit {
     /**
      * @return unmodifiableList
      */
-    public List<Change> getChanges() {
+    public Changes getChanges() {
         return diff.getChanges();
     }
 
