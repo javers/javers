@@ -1,6 +1,6 @@
 package org.javers.spring.auditable.integration
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
 import org.javers.spring.auditable.CommitPropertiesProvider
 import org.javers.spring.example.JaversSpringMongoApplicationConfig
 import org.springframework.beans.factory.annotation.Autowired

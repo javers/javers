@@ -1,6 +1,7 @@
 package org.javers.repository.mongo
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
+import com.mongodb.client.MongoClients
 import de.flapdoodle.embed.mongo.MongodExecutable
 import de.flapdoodle.embed.mongo.MongodProcess
 import de.flapdoodle.embed.mongo.MongodStarter
@@ -26,7 +27,7 @@ class EmbeddedMongoFactory {
                     .net(new Net(BIND_IP, port, Network.localhostIsIPv6()))
                     .build())
             mongodExecutable.start()
-            mongoClient = new MongoClient(BIND_IP, port)
+            mongoClient = MongoClients.create("mongodb://$BIND_IP:$port")
         }
 
         MongoClient getClient () {

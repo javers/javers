@@ -1,6 +1,6 @@
 package org.javers.repository.mongo.integration
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoDatabase
 import org.javers.repository.mongo.JaversMongoRepositoryE2ETest
 
@@ -13,6 +13,6 @@ class MongoIntegrationTest extends JaversMongoRepositoryE2ETest {
 
     @Override
     protected MongoDatabase getMongoDb() {
-        new MongoClient('localhost', 27017).getDatabase("j_int_test")
+        MongoClients.create("mongodb://localhost:27017").getDatabase("j_int_test")
     }
 }
