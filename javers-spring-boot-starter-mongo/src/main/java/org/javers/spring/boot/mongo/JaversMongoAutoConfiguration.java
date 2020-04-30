@@ -1,6 +1,6 @@
 package org.javers.spring.boot.mongo;
 
-import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.javers.core.Javers;
@@ -13,17 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-
-import java.util.Optional;
 
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
 
@@ -45,9 +40,9 @@ public class JaversMongoAutoConfiguration {
     @Autowired
     private MongoProperties mongoProperties; //from spring-boot-starter-data-mongodb
 
-    @Autowired
-    @Qualifier("javersMongoClientOptions")
-    private Optional<MongoClientOptions> mongoClientOptions;
+    @Autowired(required = false)
+    @Qualifier("javersMongoClientSettings")
+    private MongoClientSettings mongoClientSettings;
 
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
@@ -67,20 +62,20 @@ public class JaversMongoAutoConfiguration {
 
     private MongoDatabase initJaversMongoDatabase() {
         if (!javersMongoProperties.isDedicatedMongodbConfigurationEnabled()) {
-            MongoDatabase mongoDatabase = mongoClient.getDatabase( mongoProperties.getMongoClientDatabase() );
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoProperties.getMongoClientDatabase());
             logger.info("connecting Javers to Mongo database '{}' configured in spring.data.mongodb properties",
-                        mongoDatabase.getName());
+                    mongoDatabase.getName());
             return mongoDatabase;
         } else {
-            MongoDatabase mongoDatabase = JaversDedicatedMongoFactory.createMongoDatabase(javersMongoProperties, mongoClientOptions);
+            MongoDatabase mongoDatabase = JaversDedicatedMongoFactory.createMongoDatabase(javersMongoProperties, mongoClientSettings);
             logger.info("connecting Javers to Mongo database '{}' configured in javers.mongodb properties",
-                        mongoDatabase.getName());
+                    mongoDatabase.getName());
             return mongoDatabase;
         }
     }
 
     private MongoRepository createMongoRepository(MongoDatabase mongoDatabase) {
-        if (javersMongoProperties.isDocumentDbCompatibilityEnabled()){
+        if (javersMongoProperties.isDocumentDbCompatibilityEnabled()) {
             logger.info("enabling Amazon DocumentDB compatibility");
             return mongoRepositoryWithDocumentDBCompatibility(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
         }
