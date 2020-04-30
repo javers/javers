@@ -4,6 +4,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
+import org.javers.core.CommitIdGenerator;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.*;
@@ -57,7 +58,14 @@ public class JqlQuery {
         streamStats.add(nextStats);
     }
 
-    void validate(){
+    void validate(CommitIdGenerator commitIdGenerator){
+        if (queryParams.toCommitId().isPresent() &&
+            commitIdGenerator != CommitIdGenerator.SYNCHRONIZED_SEQUENCE)
+        {
+            throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
+                    "toCommitId() filter can be used only with CommitIdGenerator.SYNCHRONIZED_SEQUENCE");
+        }
+
         if (isAggregate()) {
             if (!(isClassQuery() || isInstanceIdQuery())) {
                 throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
@@ -115,10 +123,10 @@ public class JqlQuery {
         }
     }
 
-    void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
+    void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper, CommitIdGenerator commitIdGenerator) {
         stats = new Stats();
         filter = filterDefinition.compile(globalIdFactory, typeMapper);
-        validate();
+        validate(commitIdGenerator);
     }
 
     boolean matches(GlobalId globalId) {
