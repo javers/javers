@@ -46,7 +46,8 @@ class JaversDedicatedMongoFactory {
             if (credentials != null)
                 mongoClient = MongoClients.create(builder(settings).credential(credentials).build());
             else
-                mongoClient = MongoClients.create(builder(settings).applyConnectionString(new ConnectionString(serverAddress.toString())).build());
+                mongoClient = MongoClients.create(builder(settings)
+                        .applyConnectionString(new ConnectionString("mongodb://" + serverAddress.toString())).build());
             return mongoClient.getDatabase(properties.getMongodb().getDatabase());
         }
 
