@@ -1,6 +1,6 @@
 package org.javers.repository.mongo.cases
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoDatabase
 import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.DiffIgnore

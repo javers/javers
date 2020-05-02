@@ -1,6 +1,6 @@
 package org.javers.spring.boot.mongo
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoDatabase
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder

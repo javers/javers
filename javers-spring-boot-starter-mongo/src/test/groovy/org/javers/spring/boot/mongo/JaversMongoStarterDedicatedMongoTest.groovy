@@ -1,6 +1,6 @@
 package org.javers.spring.boot.mongo
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoDatabase
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
@@ -36,7 +36,7 @@ abstract class JaversMongoStarterDedicatedMongoTest extends Specification {
         javers.commit("a", dummyEntity)
         def snapshots = javers.findSnapshots(QueryBuilder.byInstance(dummyEntity).build())
 
-        MongoDatabase dedicatedDb = new MongoClient("localhost", PORT).getDatabase("javers-dedicated")
+        MongoDatabase dedicatedDb = MongoClients.create("mongodb://localhost:$PORT").getDatabase("javers-dedicated")
 
         then:
         snapshots.size() == 1

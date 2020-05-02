@@ -1,5 +1,7 @@
 package org.javers.repository.mongo.cases
 
+import com.mongodb.client.MongoClient
+
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 import javax.persistence.Id
@@ -8,7 +10,6 @@ import org.javers.core.JaversBuilder
 import org.javers.repository.mongo.EmbeddedMongoFactory
 import org.javers.repository.mongo.MongoRepository
 
-import com.mongodb.MongoClient
 import com.mongodb.client.MongoDatabase
 
 import groovy.transform.EqualsAndHashCode

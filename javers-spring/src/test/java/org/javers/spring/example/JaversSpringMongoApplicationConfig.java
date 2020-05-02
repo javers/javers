@@ -1,7 +1,8 @@
 package org.javers.spring.example;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -56,7 +57,7 @@ public class JaversSpringMongoApplicationConfig {
     @Bean(name="realMongoClient")
     @ConditionalOnMissingBean
     public MongoClient mongo() {
-        return new MongoClient();
+        return MongoClients.create();
     }
 
     /**
