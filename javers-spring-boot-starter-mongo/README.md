@@ -42,17 +42,21 @@ javers:
 
 Either `host` or `uri` has to set.
 
-#### MongoClientOptions
-If greater control is required over how Javers configures the `MongoClient` instance,
-you can configure a `MongoClientOptions` bean named `javersMongoClientOptions`.
+#### MongoClientSettings
+If better control is required over how Javers configures the `MongoClient` instance,
+you can configure a `MongoClientSettings` bean named `javersMongoClientSettings`.
 If there is no such bean, default client options are used. 
 
-For example, to configure the MongoClient with custom parameters,
+For example, if you want to enable SSL and set socket timeout,
 define this bean:
 
 ```java
 @Bean("javersMongoClientSettings")
 public MongoClientSettings clientSettings() {
-    return MongoClientSetting.builder().build();
+    return MongoClientSettings.builder()
+            .applyToSslSettings(builder -> builder.enabled(true))
+            .applyToSocketSettings(
+                builder -> builder.connectTimeout(500, TimeUnit.MILLISECONDS))
+            .build();
 }
 ```
