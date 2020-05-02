@@ -20,7 +20,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
+import java.util.Optional;
+
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
+import static org.javers.spring.boot.mongo.JaversDedicatedMongoFactory.createMongoDatabase;
 
 /**
  * @author pawelszymczyk
@@ -63,11 +66,12 @@ public class JaversMongoAutoConfiguration {
     private MongoDatabase initJaversMongoDatabase() {
         if (!javersMongoProperties.isDedicatedMongodbConfigurationEnabled()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoProperties.getMongoClientDatabase());
-            logger.info("connecting Javers to Mongo database '{}' configured in spring.data.mongodb properties",
-                    mongoDatabase.getName());
+            logger.info("connecting Javers to Mongo database '{} at '{}' configured in spring.data.mongodb properties",
+                    mongoDatabase.getName(), mongoClient.getClusterDescription());
             return mongoDatabase;
         } else {
-            MongoDatabase mongoDatabase = JaversDedicatedMongoFactory.createMongoDatabase(javersMongoProperties, mongoClientSettings);
+            MongoDatabase mongoDatabase =
+                    createMongoDatabase(javersMongoProperties, Optional.ofNullable(mongoClientSettings));
             logger.info("connecting Javers to Mongo database '{}' configured in javers.mongodb properties",
                     mongoDatabase.getName());
             return mongoDatabase;

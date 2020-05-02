@@ -1,18 +1,24 @@
 package org.javers.spring.boot.mongo
 
 import com.mongodb.client.MongoClient
+import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoDatabase
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
+import org.javers.repository.mongo.EmbeddedMongoFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import spock.lang.Shared
 import spock.lang.Specification
 
 /**
  * @author pawelszymczyk
  */
 @SpringBootTest(classes = [TestApplication])
+@ActiveProfiles("defaults-test")
 class JaversMongoStarterDefaultsTest extends Specification{
+    static String DB_NAME = 'spring-mongo-default'
 
     @Autowired Javers javers
 
@@ -45,9 +51,10 @@ class JaversMongoStarterDefaultsTest extends Specification{
       javers.commit("a", dummyEntity)
       def snapshots = javers.findSnapshots(QueryBuilder.byInstance(dummyEntity).build())
 
-      MongoDatabase mongoDatabase = mongoClient.getDatabase( "spring-mongo" )
+      MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME)
 
       then:
+      javers.repository.delegate.mongoSchemaManager.mongo.name == "spring-mongo-default"
       snapshots.size() == 1
       mongoDatabase.getCollection("jv_snapshots").countDocuments() == 1
     }
