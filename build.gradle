@@ -8,6 +8,7 @@ buildscript {
 
     dependencies {
         classpath 'org.owasp:dependency-check-gradle:3.1.2'
+        classpath 'com.adarshr:gradle-test-logger-plugin:2.0.0'
      }
 }
 
@@ -15,13 +16,17 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.10.1'
     id 'io.codearte.nexus-staging' version '0.21.2'
     id 'de.marcphilipp.nexus-publish' version '0.2.0' apply false
-    id 'com.adarshr.test-logger' version '1.6.0'
+    id 'com.adarshr.test-logger' version '2.0.0'
 }
 
 scmVersion {
     tag {
         prefix = 'javers'
     }
+}
+
+wrapper() {
+    gradleVersion = '6.3'
 }
 
 subprojects {
