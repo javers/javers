@@ -16,7 +16,6 @@ import spock.lang.Specification
  * @author pawelszymczyk
  */
 @SpringBootTest(classes = [TestApplication])
-@ActiveProfiles("defaults-test")
 class JaversMongoStarterDefaultsTest extends Specification{
     static String DB_NAME = 'spring-mongo-default'
 
