@@ -39,11 +39,11 @@ class JaversDedicatedMongoFactory {
             int port = properties.getMongodb().getPort() == null ? DEFAULT_PORT
                     : properties.getMongodb().getPort();
 
-            MongoClientSettings settings = mongoClientSettings.orElseGet(() -> builder().build());
-            Builder clientBuilder = MongoClientSettings
-                    .builder(settings)
-                    .applyToClusterSettings(b ->
-                            b.hosts(Lists.asList(new ServerAddress(host, port))));
+            Builder clientBuilder = mongoClientSettings
+                    .map(s -> MongoClientSettings.builder(s))
+                    .orElse(MongoClientSettings.builder());
+
+            clientBuilder.applyToClusterSettings(b -> b.hosts(Lists.asList(new ServerAddress(host, port))));
 
             MongoCredential credentials = getCredentials(properties);
             if (credentials != null) {
