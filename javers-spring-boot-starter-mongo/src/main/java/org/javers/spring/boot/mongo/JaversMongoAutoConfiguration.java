@@ -43,9 +43,9 @@ public class JaversMongoAutoConfiguration {
     @Autowired
     private MongoProperties mongoProperties; //from spring-boot-starter-data-mongodb
 
-    @Autowired(required = false)
+    @Autowired
     @Qualifier("javersMongoClientSettings")
-    private MongoClientSettings mongoClientSettings;
+    private Optional<MongoClientSettings> mongoClientSettings;
 
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
@@ -66,12 +66,12 @@ public class JaversMongoAutoConfiguration {
     private MongoDatabase initJaversMongoDatabase() {
         if (!javersMongoProperties.isDedicatedMongodbConfigurationEnabled()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoProperties.getMongoClientDatabase());
-            logger.info("connecting Javers to Mongo database '{} at '{}' configured in spring.data.mongodb properties",
-                    mongoDatabase.getName(), mongoClient.getClusterDescription());
+            logger.info("connecting Javers to Mongo database '{}' configured in spring.data.mongodb properties",
+                        mongoDatabase.getName());
             return mongoDatabase;
         } else {
-            MongoDatabase mongoDatabase =
-                    createMongoDatabase(javersMongoProperties, Optional.ofNullable(mongoClientSettings));
+            MongoDatabase mongoDatabase = JaversDedicatedMongoFactory
+                    .createMongoDatabase(javersMongoProperties, mongoClientSettings);
             logger.info("connecting Javers to Mongo database '{}' configured in javers.mongodb properties",
                     mongoDatabase.getName());
             return mongoDatabase;
