@@ -1,15 +1,11 @@
 package org.javers.spring.boot.mongo
 
-import com.mongodb.client.MongoClient
-import com.mongodb.client.MongoClients
+import com.mongodb.MongoClient
 import com.mongodb.client.MongoDatabase
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
-import org.javers.repository.mongo.EmbeddedMongoFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import spock.lang.Shared
 import spock.lang.Specification
 
 /**
