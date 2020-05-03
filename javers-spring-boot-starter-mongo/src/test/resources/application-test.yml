@@ -11,3 +11,8 @@ javers:
   snapshotsCacheSize: 100
   asyncCommitExecutorThreadCount: 1
   auditableAspectAsyncEnabled: false
+
+spring:
+  data:
+    mongodb:
+      database: spring-mongo

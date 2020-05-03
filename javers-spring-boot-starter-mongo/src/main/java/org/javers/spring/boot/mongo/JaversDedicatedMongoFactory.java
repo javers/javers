@@ -3,15 +3,16 @@ package org.javers.spring.boot.mongo;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoClientSettings.Builder;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import org.javers.common.collections.Lists;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 import static com.mongodb.MongoClientSettings.builder;
@@ -25,12 +26,10 @@ class JaversDedicatedMongoFactory {
     private static String DEFAULT_HOST = "localhost";
     private static int DEFAULT_PORT = 27017;
 
-    static MongoDatabase createMongoDatabase(JaversMongoProperties properties, @Nullable MongoClientSettings mongoClientSettings) {
-        final MongoClientSettings settings = Optional.ofNullable(mongoClientSettings)
-                .orElseGet(() -> builder().build());
-
+    static MongoDatabase createMongoDatabase(JaversMongoProperties properties,
+                                             Optional<MongoClientSettings> mongoClientSettings) {
         if (properties.getMongodb().getUri() != null) {
-            final ConnectionString connectionString = new ConnectionString(properties.getMongodb().getUri());
+            ConnectionString connectionString = new ConnectionString(properties.getMongodb().getUri());
             MongoClient mongoClient = MongoClients.create(connectionString);
             return mongoClient.getDatabase(connectionString.getDatabase());
         }
@@ -39,15 +38,19 @@ class JaversDedicatedMongoFactory {
                     : properties.getMongodb().getHost();
             int port = properties.getMongodb().getPort() == null ? DEFAULT_PORT
                     : properties.getMongodb().getPort();
-            ServerAddress serverAddress = new ServerAddress(host, port);
+
+            Builder clientBuilder = mongoClientSettings
+                    .map(s -> MongoClientSettings.builder(s))
+                    .orElse(MongoClientSettings.builder());
+
+            clientBuilder.applyToClusterSettings(b -> b.hosts(Lists.asList(new ServerAddress(host, port))));
 
             MongoCredential credentials = getCredentials(properties);
-            MongoClient mongoClient;
-            if (credentials != null)
-                mongoClient = MongoClients.create(builder(settings).credential(credentials).build());
-            else
-                mongoClient = MongoClients.create(builder(settings)
-                        .applyConnectionString(new ConnectionString("mongodb://" + serverAddress.toString())).build());
+            if (credentials != null) {
+                clientBuilder.credential(credentials);
+            }
+
+            MongoClient mongoClient = MongoClients.create(clientBuilder.build());
             return mongoClient.getDatabase(properties.getMongodb().getDatabase());
         }
 
