@@ -165,3 +165,7 @@ subprojects {
         password = project.findProperty('nexusPassword') ?: 'secured'
     }
 }
+
+wrapper() {
+    gradleVersion = '6.4.1'
+}
