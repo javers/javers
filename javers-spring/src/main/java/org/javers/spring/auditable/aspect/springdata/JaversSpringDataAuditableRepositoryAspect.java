@@ -7,6 +7,7 @@ import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
+import org.springframework.core.annotation.Order;
 import java.util.Map;
 
 /**
@@ -17,6 +18,7 @@ import java.util.Map;
  * Calls {@link Javers#commitShallowDelete(String, Object, Map)} on arguments passed to delete() methods.
  */
 @Aspect
+@Order(0)
 public class JaversSpringDataAuditableRepositoryAspect extends AbstractSpringAuditableRepositoryAspect {
     public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         super(javers, authorProvider, commitPropertiesProvider);
