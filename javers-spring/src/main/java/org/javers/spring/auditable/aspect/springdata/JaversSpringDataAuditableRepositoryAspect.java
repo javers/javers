@@ -17,6 +17,7 @@ import java.util.Map;
  * Calls {@link Javers#commitShallowDelete(String, Object, Map)} on arguments passed to delete() methods.
  */
 @Aspect
+@Order(0)
 public class JaversSpringDataAuditableRepositoryAspect extends AbstractSpringAuditableRepositoryAspect {
     public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         super(javers, authorProvider, commitPropertiesProvider);
