@@ -15,8 +15,6 @@ import org.javers.common.exception.JaversExceptionCode;
 
 import java.util.Optional;
 
-import static com.mongodb.MongoClientSettings.builder;
-
 /**
  * Helper class for creating {@code MongoClient} based on Javers MongoDB properties.
  *

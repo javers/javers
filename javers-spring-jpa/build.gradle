@@ -8,7 +8,7 @@ dependencies {
 
     compile "org.hibernate:hibernate-core:$hibernateVersion"
     compile "org.springframework:spring-tx:$springVersion"
-    compile "org.springframework.data:spring-data-jpa:$springDataJPAVersion"
+    compile "org.springframework.data:spring-data-jpa:$springBootVersion"
 
     testCompile 'com.h2database:h2:1.4.184'
     testCompile "org.springframework:spring-orm:$springVersion"

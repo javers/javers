@@ -39,7 +39,7 @@ public class JaversMongoAutoConfiguration {
     private JaversMongoProperties javersMongoProperties;
 
     @Autowired
-    private com.mongodb.MongoClient mongoClient; //from spring-boot-starter-data-mongodb
+    private com.mongodb.client.MongoClient mongoClient; //from spring-boot-starter-data-mongodb
 
     @Autowired
     private MongoProperties mongoProperties; //from spring-boot-starter-data-mongodb
