@@ -8,6 +8,7 @@ import org.javers.core.commit.Commit;
 import org.javers.spring.annotation.JaversAuditableAsync;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.springframework.core.annotation.Order;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -25,6 +26,7 @@ import java.util.concurrent.Executor;
  *  only if a method exits normally, i.e. if no Exception has been thrown.
  */
 @Aspect
+@Order(0)
 public class JaversAuditableAspectAsync {
     private final JaversCommitAdvice javersCommitAdvice;
     private Optional<CompletableFuture<Commit>> lastAsyncCommit = Optional.empty();
