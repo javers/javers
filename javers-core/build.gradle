@@ -21,7 +21,7 @@ dependencies {
     testCompile "com.google.guava:guava:$guavaVersion"
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile "com.google.guava:guava:$guavaVersion"
-    testCompile "org.mongodb:mongodb-driver:$mongoDbDriverVersion"
+    testCompile "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
     testCompile ('org.mongodb.morphia:morphia:0.108') {
         exclude group: 'org.mongodb', module: 'mongo-java-driver'
     }
