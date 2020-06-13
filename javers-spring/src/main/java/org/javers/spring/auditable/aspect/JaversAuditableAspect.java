@@ -8,6 +8,7 @@ import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.EmptyPropertiesProvider;
+import org.springframework.core.annotation.Order;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * have no effects on this aspect.
  */
 @Aspect
+@Order(0)
 public class JaversAuditableAspect {
     private final JaversCommitAdvice javersCommitAdvice;
 

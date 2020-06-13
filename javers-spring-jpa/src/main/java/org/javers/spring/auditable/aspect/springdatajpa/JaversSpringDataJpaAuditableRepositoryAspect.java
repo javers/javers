@@ -7,6 +7,7 @@ import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.aspect.springdata.AbstractSpringAuditableRepositoryAspect;
+import org.springframework.core.annotation.Order;
 
 /**
  * Commits all arguments passed to save(), delete() and saveAndFlush() methods
@@ -14,6 +15,7 @@ import org.javers.spring.auditable.aspect.springdata.AbstractSpringAuditableRepo
  * when repositories are annotated with (class-level) @JaversSpringDataAuditable.
  */
 @Aspect
+@Order(0)
 public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpringAuditableRepositoryAspect {
     public JaversSpringDataJpaAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         super(javers, authorProvider, commitPropertiesProvider);
