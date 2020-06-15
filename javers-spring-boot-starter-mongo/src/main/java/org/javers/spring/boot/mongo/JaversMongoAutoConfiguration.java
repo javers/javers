@@ -2,6 +2,8 @@ package org.javers.spring.boot.mongo;
 
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoDatabase;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
@@ -10,6 +12,7 @@ import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -18,6 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClas
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -39,7 +43,7 @@ public class JaversMongoAutoConfiguration {
     private JaversMongoProperties javersMongoProperties;
 
     @Autowired
-    private com.mongodb.client.MongoClient mongoClient; //from spring-boot-starter-data-mongodb
+    private ApplicationContext applicationContext;
 
     @Autowired
     private MongoProperties mongoProperties; //from spring-boot-starter-data-mongodb
@@ -66,7 +70,7 @@ public class JaversMongoAutoConfiguration {
 
     private MongoDatabase initJaversMongoDatabase() {
         if (!javersMongoProperties.isDedicatedMongodbConfigurationEnabled()) {
-            MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoProperties.getMongoClientDatabase());
+            MongoDatabase mongoDatabase = getDefaultMongoDatabase();
             logger.info("connecting Javers to Mongo database '{}' configured in spring.data.mongodb properties",
                         mongoDatabase.getName());
             return mongoDatabase;
@@ -76,6 +80,27 @@ public class JaversMongoAutoConfiguration {
             logger.info("connecting Javers to Mongo database '{}' configured in javers.mongodb properties",
                     mongoDatabase.getName());
             return mongoDatabase;
+        }
+    }
+
+    //from the spring-boot-starter-data-mongodb
+    private MongoDatabase getDefaultMongoDatabase() {
+        if (getBean(com.mongodb.client.MongoClient.class).isPresent()) {
+            return getBean(com.mongodb.client.MongoClient.class).get().getDatabase(mongoProperties.getMongoClientDatabase());
+        }
+        if (getBean(com.mongodb.MongoClient.class).isPresent()) {
+            return getBean(com.mongodb.MongoClient.class).get().getDatabase(mongoProperties.getMongoClientDatabase());
+        }
+        throw new JaversException(
+                JaversExceptionCode.RUNTIME_EXCEPTION,
+                "Can't fins the default mongoClient bean. It should be crated by the spring-boot-starter-data-mongodb");
+    }
+
+    private <T> Optional<T> getBean(Class<T> ofType) {
+        try {
+            return Optional.of(applicationContext.getBean(ofType));
+        } catch (BeansException e) {
+            return Optional.empty();
         }
     }
 
