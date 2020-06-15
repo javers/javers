@@ -23,5 +23,5 @@ deploy:
   script: travis/deployToSonatype.sh
   on:
     tags: true
-    branch: master
+    branch: k10
 
