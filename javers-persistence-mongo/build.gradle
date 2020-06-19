@@ -7,6 +7,7 @@ dependencies {
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
+    testCompile 'org.picocontainer:picocontainer:2.15'
 }
 
 task integrationTest(type: Test) {

@@ -24,4 +24,5 @@ dependencies {
 
     testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     testCompile project(':javers-persistence-mongo')
+    testCompile "com.google.guava:guava:$guavaVersion"
 }
