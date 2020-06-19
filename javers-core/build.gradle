@@ -8,10 +8,10 @@ java {
 }
 
 dependencies {
-    compile "org.slf4j:slf4j-api:$slf4jApiVersion"
-    compile "com.google.code.gson:gson:$gsonVersion"
-    compile 'org.picocontainer:picocontainer:2.15'
-    compile "io.github.classgraph:classgraph:$classgraphVersion"
+    api "org.slf4j:slf4j-api:$slf4jApiVersion"
+    api "com.google.code.gson:gson:$gsonVersion"
+    implementation 'org.picocontainer:picocontainer:2.15'
+    implementation "io.github.classgraph:classgraph:$classgraphVersion"
 
     //should be on application's classpath when using custom comparators
     javersLegacyImplementation "joda-time:joda-time:$jodaVersion"
