@@ -13,6 +13,7 @@ import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
+import org.javers.core.metamodel.annotation.ValueObject
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
 import spock.lang.Unroll
@@ -589,13 +590,14 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         @Id int id
         List<String> propsList
         Set<String> propsSet
+        Map<String, String> propsMap
     }
 
     def "should report when a list property is added or removed"(){
       given:
       def javers = javers().build()
       def object1 = new Entity1(id:1)
-      def object2 = new Entity2(id:1, propsList: ["p"], propsSet: ["p"] as Set)
+      def object2 = new Entity2(id:1, propsList: ["p"], propsSet: ["p"] as Set, propsMap: ["k": "v"])
 
       when:
       def diff = javers.compare(object1, object2)
@@ -603,9 +605,10 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       def changes = diff.getChangesByType(PropertyChange)
 
       then:
-      changes.size() == 2
+      changes.size() == 3
       changes[0].propertyAdded
       changes[1].propertyAdded
+      changes[2].propertyAdded
 
       when:
       diff = javers.compare(object2, object1)
@@ -613,8 +616,9 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       changes = diff.getChangesByType(PropertyChange)
 
       then:
-      changes.size() == 2
+      changes.size() == 3
       changes[0].propertyRemoved
       changes[1].propertyRemoved
+      changes[2].propertyRemoved
     }
 }
