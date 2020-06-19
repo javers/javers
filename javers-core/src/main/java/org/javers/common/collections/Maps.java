@@ -1,5 +1,7 @@
 package org.javers.common.collections;
 
+import org.javers.core.metamodel.property.MissingProperty;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +13,7 @@ import java.util.Set;
 public class Maps {
 
     public static Map wrapNull(Object map){
-        if (map == null){
+        if (map == null || map == MissingProperty.INSTANCE){
             return Collections.emptyMap();
         }
         return (Map)map;
