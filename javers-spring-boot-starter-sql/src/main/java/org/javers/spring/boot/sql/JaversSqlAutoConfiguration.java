@@ -1,9 +1,11 @@
 package org.javers.spring.boot.sql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.javers.core.Javers;
+import org.javers.jackson.JaversJacksonModule;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
@@ -17,10 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -37,6 +41,7 @@ import javax.persistence.EntityManagerFactory;
 @Configuration
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties(value = {JaversSqlProperties.class, JpaProperties.class})
+@AutoConfigureBefore(JacksonAutoConfiguration.class)
 @AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
 public class JaversSqlAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversSqlAutoConfiguration.class);
@@ -54,7 +59,7 @@ public class JaversSqlAutoConfiguration {
         SessionFactoryImplementor sessionFactory =
                 (SessionFactoryImplementor) entityManagerFactory.unwrap(SessionFactory.class);
 
-        Dialect hibernateDialect = sessionFactory.getDialect();
+        Dialect hibernateDialect = sessionFactory.getJdbcServices().getDialect();
         logger.info("detected Hibernate dialect: " + hibernateDialect.getClass().getSimpleName());
 
         return dialectMapper.map(hibernateDialect);
@@ -121,5 +126,12 @@ public class JaversSqlAutoConfiguration {
     @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
     public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
+    }
+
+    @Bean(name = "JaversJacksonModule")
+    @ConditionalOnClass(ObjectMapper.class)
+    @ConditionalOnMissingBean
+    public JaversJacksonModule javersModule(Javers javers) {
+        return new JaversJacksonModule(javers);
     }
 }

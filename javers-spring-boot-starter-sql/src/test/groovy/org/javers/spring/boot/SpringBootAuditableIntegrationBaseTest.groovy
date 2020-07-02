@@ -1,6 +1,9 @@
 package org.javers.spring.boot
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.javers.core.Javers
+import org.javers.core.JaversBuilder
+import org.javers.jackson.JaversJacksonModule
 import org.javers.spring.boot.sql.DummyEntityRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
@@ -60,6 +63,29 @@ abstract class SpringBootAuditableIntegrationBaseTest extends Specification {
         then:
         javers.findSnapshots(byInstanceId(jFreshEmployee.id, EmployeeEntity).build()).size() == 1
         javers.findSnapshots(byInstanceId(jFreshEmployee.department.id, DepartmentEntity).build()).size() == 1
+    }
+
+    def "@JaversSpringDataAuditableJacksonSerialization output should be the same as gson"() {
+        given: "generating Ids and persistence is fine"
+        def employee = createEmployee()
+        employee.id == null
+        employee.getDepartment().id == null
+        def freshEmployee = employeeRepository.save(employee)
+        println(freshEmployee)
+
+        when:
+        def jEmployee = createEmployee()
+        def jFreshEmployee = employeeRepositoryWithJavers.save(jEmployee)
+        println(jFreshEmployee)
+
+        then:
+        def snapshots = javers.findSnapshots(byInstanceId(jFreshEmployee.id, EmployeeEntity).build())
+        def objectMapper = new ObjectMapper()
+        def unprettyJavers = JaversBuilder.javers().withPrettyPrint(false).build()
+        objectMapper.registerModule(new JaversJacksonModule(unprettyJavers))
+        def jacksonString = objectMapper.writeValueAsString(snapshots);
+        def gsonString = unprettyJavers.getJsonConverter().toJson(snapshots);
+        jacksonString == gsonString
     }
 
     EmployeeEntity createEmployee() {

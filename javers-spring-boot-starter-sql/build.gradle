@@ -5,6 +5,8 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
     compile "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
+    compile "com.fasterxml.jackson.core:jackson-databind"
+
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile 'com.h2database:h2:1.4.187'
     testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"

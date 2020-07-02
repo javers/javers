@@ -1,11 +1,12 @@
 package org.javers.spring.sql
 
 
+import org.javers.jackson.JaversJacksonModule
 import org.javers.repository.sql.DialectName
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
-import org.javers.spring.boot.sql.JaversSqlProperties
 import org.javers.spring.boot.TestApplication
+import org.javers.spring.boot.sql.JaversSqlProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -26,6 +27,9 @@ class JaversSqlAutoConfigurationTest extends Specification {
 
     @Autowired
     AuthorProvider provider
+
+    @Autowired
+    JaversJacksonModule javersModule
 
     def "should read configuration from yml" () {
         expect:
@@ -50,5 +54,10 @@ class JaversSqlAutoConfigurationTest extends Specification {
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {
         expect:
         provider instanceof SpringSecurityAuthorProvider
+    }
+
+    def "shouldHaveJacksonJaversModule" () {
+        expect:
+        javersModule instanceof JaversJacksonModule
     }
 }
