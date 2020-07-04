@@ -1,13 +1,13 @@
 dependencies {
-    compile project(':javers-core')
-    compile "org.polyjdbc:polyjdbc:$polyjdbcVersion"
-    compile "com.google.guava:guava:$guavaVersion"
+    api project(':javers-core')
+    implementation "org.polyjdbc:polyjdbc:$polyjdbcVersion"
+    implementation "com.google.guava:guava:$guavaVersion"
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
 
     //required for @javax.persistence.Id ann in SnapshotEntity.class
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
-
+    testCompile 'org.picocontainer:picocontainer:2.15'
     testCompile 'commons-dbcp:commons-dbcp:1.4'
     testCompile 'com.h2database:h2:1.4.187'
     testCompile 'org.postgresql:postgresql:42.2.9'

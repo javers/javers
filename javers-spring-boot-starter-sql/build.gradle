@@ -1,9 +1,8 @@
 dependencies {
-    compile project(':javers-core')
-    compile project(':javers-spring-jpa')
+    api project(':javers-spring-jpa')
 
-    compile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
-    compile "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile 'com.h2database:h2:1.4.187'
