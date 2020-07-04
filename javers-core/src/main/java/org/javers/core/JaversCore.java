@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
@@ -77,7 +78,9 @@ class JaversCore implements Javers {
     public Commit commit(String author, Object currentVersion, Map<String, String> commitProperties) {
         long start = System.currentTimeMillis();
 
-        argumentsAreNotNull(author, commitProperties, currentVersion);
+        argumentIsNotNull(author);
+        argumentIsNotNull(commitProperties);
+        argumentIsNotNull(currentVersion);
         assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion);
 
         Commit commit = commitFactory.create(author, commitProperties, currentVersion);
