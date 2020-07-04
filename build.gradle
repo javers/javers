@@ -141,9 +141,9 @@ subprojects {
             }
         }
     }
-   // signing {
-   //     sign publishing.publications
-   // }
+    signing {
+        sign publishing.publications
+    }
     //-- eof maven-publish.publish spell --
 
     test {
