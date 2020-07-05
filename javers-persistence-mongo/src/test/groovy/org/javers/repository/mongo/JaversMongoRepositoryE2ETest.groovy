@@ -3,11 +3,13 @@ package org.javers.repository.mongo
 import com.mongodb.client.MongoDatabase
 import org.javers.core.JaversRepositoryShadowE2ETest
 import org.javers.core.JaversTestBuilder
+import org.javers.core.commit.Commit
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.QueryParamsBuilder
-import spock.lang.Shared
+import org.javers.repository.jql.JqlQuery
+import org.javers.shadow.Shadow
 
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
@@ -149,5 +151,33 @@ abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryShadowE2ETes
 
         then:
         history.size() == 2
+    }
+
+    def "CASE FOR ISSUE 958 -> should return two shadows for entity with two commits"() {
+        given: "there are commits with ids 1.0 and 1.1"
+            MongoRepository mongoRepository = (MongoRepository) repository
+
+            def commitFactory = javersTestBuilder.commitFactory
+
+            def kazikV1 = dummyUser("Kazik").withAge(1)
+            def kazikV2 = dummyUser("Kazik").withAge(2)
+
+            Commit commit1 = commitFactory.create("author", [:], kazikV1)
+            Commit commit2 = commitFactory.create("author", [:], kazikV2)
+
+            mongoRepository.persist(commit1)
+            mongoRepository.persist(commit2)
+
+        when: "query has list of commits 1.0 and 1.1"
+            JqlQuery query = byInstanceId("Kazik", "org.javers.core.model.DummyUser")
+                    .withCommitIds(List.of(BigDecimal.valueOf(1.0), BigDecimal.valueOf(1.1)))
+                    // ^ commenting line above makes test pass
+                    .withScopeDeepPlus()
+                    .limit(Integer.MAX_VALUE)
+                    .build();
+            List<Shadow<Object>> shadows = javers.findShadows(query);
+
+        then: "two shadows (one per each commit) are returned"
+            shadows.size() == 2
     }
 }
