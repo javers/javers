@@ -2,7 +2,6 @@ package org.javers.core
 
 import org.javers.core.commit.Commit
 
-import static groovyx.gpars.GParsPool.withPool
 import org.javers.common.date.DateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.commit.CommitMetadata
