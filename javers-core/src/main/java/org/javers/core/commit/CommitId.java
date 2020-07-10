@@ -66,7 +66,7 @@ public final class CommitId implements Comparable<CommitId>, Serializable {
      * e.g. "1.0"
      */
     public String value(){
-        return majorId+"."+minorId;
+        return valueAsNumber().toString();
     }
 
     public long getMajorId() {

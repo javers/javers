@@ -274,12 +274,12 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
                 query =  Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.to().get())));
             }
             if (params.toCommitId().isPresent()) {
-                BigDecimal commitId = params.toCommitId().get().valueAsNumber();
+                double commitId = params.toCommitId().get().valueAsNumber().doubleValue();
                 query = Filters.and(query, Filters.lte(COMMIT_ID, commitId));
             }
             if (params.commitIds().size() > 0) {
                 query = Filters.in(COMMIT_ID, params.commitIds().stream()
-                        .map(CommitId::valueAsNumber).collect(Collectors.toSet()));
+                        .map(it -> it.valueAsNumber().doubleValue()).collect(Collectors.toSet()));
             }
             if (params.version().isPresent()) {
                 query = Filters.and(query, createVersionQuery(params.version().get()));

@@ -12,7 +12,7 @@ class CommitSeqGeneratorTest extends Specification {
         def gen1 = new CommitSeqGenerator().nextId(null)
 
         then:
-        gen1.value() == "1.0"
+        gen1.value() == "1.00"
     }
 
     def "should inc minor and assign 0 to minor when seq calls"() {
@@ -24,13 +24,13 @@ class CommitSeqGeneratorTest extends Specification {
         def gen1 = commitSeqGenerator.nextId(head)
 
         then:
-        gen1.value() == "2.0"
+        gen1.value() == "2.00"
 
         when:
         def gen2 = commitSeqGenerator.nextId(gen1)
 
         then:
-        gen2.value() == "3.0"
+        gen2.value() == "3.00"
     }
 
     def "should inc minor when the same head"() {

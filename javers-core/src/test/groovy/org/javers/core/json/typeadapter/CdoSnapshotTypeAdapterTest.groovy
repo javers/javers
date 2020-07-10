@@ -212,7 +212,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
       def snapshot = fromJson(json)
 
       then:
-        snapshot.commitMetadata.id.value() == "1.0"
+        snapshot.commitMetadata.id.value() == "1.00"
         snapshot.commitMetadata.author == "author"
         snapshot.globalId == instanceId("kaz",DummyUser)
         snapshot.initial == true
@@ -234,7 +234,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json {
             commitMetadata {
-                id "1.0"
+                id "1.00"
                 author "author"
                 properties commitProperties
                 commitDate "2000-01-01T12:00:00.001"
@@ -255,7 +255,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def snapshot = fromJson(json.toString())
 
         then:
-        snapshot.commitMetadata.id.value() == "1.0"
+        snapshot.commitMetadata.id.value() == "1.00"
         snapshot.commitMetadata.author == "author"
         snapshot.commitMetadata.properties == ["os" : "Solaris"]
         snapshot.commitMetadata.commitDate.toString() == "2000-01-01T12:00:00.001"

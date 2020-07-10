@@ -103,7 +103,7 @@ class JaversCommitE2ETest extends Specification {
 
         then:
         CommitAssert.assertThat(commit)
-                .hasId("2.0")
+                .hasId("2.00")
                 .hasChanges(1)
                 .hasObjectRemoved(instanceId(1,SnapshotEntity))
                 .hasSnapshots(1)
@@ -142,7 +142,7 @@ class JaversCommitE2ETest extends Specification {
         commit.author == "some.login"
         commit.commitDate
         CommitAssert.assertThat(commit)
-                    .hasId("1.0")
+                    .hasId("1.00")
                     .hasSnapshots(2)
                     .hasSnapshot(cdoId,  [id:1, valueObjectRef:voId])
                     .hasSnapshot(voId,   [city : "London"])
