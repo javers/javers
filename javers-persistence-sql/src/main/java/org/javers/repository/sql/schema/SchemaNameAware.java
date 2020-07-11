@@ -56,10 +56,6 @@ public abstract class SchemaNameAware {
         return tableNameProvider.getGlobalIdPkSeqWithSchema();
     }
 
-    protected String getSequenceName(String pkColName){
-        return tableNameProvider.getSequenceName(pkColName);
-    }
-
     protected Optional<String> getSchemaName() {
         return tableNameProvider.getSchemaName();
     }

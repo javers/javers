@@ -16,3 +16,7 @@ javers:
     localDate: "dd-mm-yyyy"
     localTime: "HH mm ss"
   objectAccessHook: org.javers.spring.boot.DummySqlObjectAccessHook
+  sqlGlobalIdTableName: 'cust_jv_global_id'
+  sqlCommitTableName: 'cust_jv_commit'
+  sqlSnapshotTableName: 'cust_jv_snapshot'
+  sqlCommitPropertyTableName: 'cust_jv_commit_property'

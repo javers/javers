@@ -39,6 +39,10 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
                 .withConnectionProvider({ DriverManager.getConnection("jdbc:h2:mem:empty-test") } as ConnectionProvider)
                 .withSchemaManagementEnabled(false)
                 .withDialect(getDialect())
+                .withGlobalIdTableName(useGlobalIdTableName())
+                .withCommitTableName(useCommitTablename())
+                .withSnapshotTableName(useSnapshotTableName())
+                .withCommitPropertyTableName(useCommitPropertyTablename())
                 .build()).build()
 
         when:
@@ -60,9 +64,9 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
 
         when:
         clearTables()
-        execute("alter sequence  ${schemaPrefix()}jv_commit_pk_seq restart with 1")
-        execute("alter sequence  ${schemaPrefix()}jv_global_id_pk_seq restart with 1")
-        execute("alter sequence  ${schemaPrefix()}jv_snapshot_pk_seq restart with 1")
+        execute("alter sequence  ${schemaPrefix()}${getCommitPkSeqName()} restart with 1")
+        execute("alter sequence  ${schemaPrefix()}${getGlobalIdPkSeq()} restart with 1")
+        execute("alter sequence  ${schemaPrefix()}${getSnapshotTablePkSeq()} restart with 1")
         def sqlRepository = (JaversSqlRepository) repository
         sqlRepository.evictSequenceAllocationCache()
         sqlRepository.evictCache()
