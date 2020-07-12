@@ -42,6 +42,7 @@ import static org.javers.repository.mongo.MongoSchemaManager.*;
  */
 public class MongoRepository implements JaversRepository, ConfigurationAware {
     private final static int DEFAULT_CACHE_SIZE = 5000;
+    private final static double COMMIT_ID_PRECISION = 0.005;
 
     private static final int DESC = -1;
     private final MongoSchemaManager mongoSchemaManager;
@@ -274,12 +275,11 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
                 query =  Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.to().get())));
             }
             if (params.toCommitId().isPresent()) {
-                BigDecimal commitId = params.toCommitId().get().valueAsNumber();
-                query = Filters.and(query, Filters.lte(COMMIT_ID, commitId));
+                query = Filters.and(query, Filters.lte(COMMIT_ID, params.toCommitId().get().valueAsNumber().doubleValue() + COMMIT_ID_PRECISION));
             }
             if (params.commitIds().size() > 0) {
-                query = Filters.in(COMMIT_ID, params.commitIds().stream()
-                        .map(CommitId::valueAsNumber).collect(Collectors.toSet()));
+                query = Filters.or(params.commitIds().stream()
+                        .map(it -> commitIdFilter(it)).collect(Collectors.toList()));
             }
             if (params.version().isPresent()) {
                 query = Filters.and(query, createVersionQuery(params.version().get()));
@@ -299,6 +299,17 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
         }
         return query;
+    }
+
+    private Bson commitIdFilter(CommitId commitId) {
+        if (commitId.getMinorId() > 0) {
+            commitId.valueAsNumber().doubleValue();
+            return Filters.and(
+                    Filters.gte(COMMIT_ID, commitId.valueAsNumber().doubleValue() - COMMIT_ID_PRECISION),
+                    Filters.lte(COMMIT_ID, commitId.valueAsNumber().doubleValue() + COMMIT_ID_PRECISION)
+            );
+        }
+        return Filters.eq(COMMIT_ID, commitId.getMajorId());
     }
 
     private FindIterable<Document> applyQueryParams(FindIterable<Document> findIterable, Optional<QueryParams> queryParams) {

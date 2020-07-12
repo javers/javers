@@ -7,7 +7,6 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.QueryParamsBuilder
-import spock.lang.Shared
 
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
