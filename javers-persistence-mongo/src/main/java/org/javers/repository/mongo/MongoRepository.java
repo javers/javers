@@ -274,12 +274,11 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
                 query =  Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.to().get())));
             }
             if (params.toCommitId().isPresent()) {
-                double commitId = params.toCommitId().get().valueAsNumber().doubleValue();
-                query = Filters.and(query, Filters.lte(COMMIT_ID, commitId));
+                query = Filters.and(query, Filters.lte(COMMIT_ID, commitIdforQuery(params.toCommitId().get())));
             }
             if (params.commitIds().size() > 0) {
                 query = Filters.in(COMMIT_ID, params.commitIds().stream()
-                        .map(it -> it.valueAsNumber().doubleValue()).collect(Collectors.toSet()));
+                        .map(it -> commitIdforQuery(it)).collect(Collectors.toSet()));
             }
             if (params.version().isPresent()) {
                 query = Filters.and(query, createVersionQuery(params.version().get()));
@@ -299,6 +298,13 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
         }
         return query;
+    }
+
+    private Object commitIdforQuery(CommitId commitId) {
+        if (commitId.getMinorId() > 0) {
+            commitId.valueAsNumber().doubleValue();
+        }
+        return commitId.getMajorId();
     }
 
     private FindIterable<Document> applyQueryParams(FindIterable<Document> findIterable, Optional<QueryParams> queryParams) {
