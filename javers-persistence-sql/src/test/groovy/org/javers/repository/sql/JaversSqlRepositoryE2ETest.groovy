@@ -8,6 +8,9 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryBuilder
+import org.javers.repository.sql.schema.JaversSchemaManager
+import org.javers.repository.sql.schema.TableNameProvider
+import spock.lang.Shared
 
 import java.sql.Connection
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -16,6 +19,10 @@ import java.util.concurrent.atomic.AtomicInteger
 import static groovyx.gpars.GParsPool.withPool
 
 abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest {
+    @Shared String globalIdTableName
+    @Shared String commitTableName
+    @Shared String snapshotTableName
+    @Shared String commitPropertyTableName
 
     private ThreadLocal<Connection> connection = ThreadLocal.withInitial({createAndInitConnection()})
     private Collection<Connection> connections = new ConcurrentLinkedQueue<>()
@@ -25,6 +32,8 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
     protected abstract DialectName getDialect()
 
     protected abstract String getSchema()
+
+    @Shared JaversSchemaManager schemaManager
 
     protected Connection getConnection() {
         connection.get()
@@ -57,56 +66,30 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
 
     @Override
     protected JaversRepository prepareJaversRepository() {
-        SqlRepositoryBuilder
+        def repository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider({ getConnection() } as ConnectionProvider)
                 .withDialect(getDialect())
                 .withSchema(getSchema())
-                .withGlobalIdTableName(globalIdTableName())
-                .withCommitTableName(commitTableName())
-                .withSnapshotTableName(snapshotTableName())
-                .withCommitPropertyTableName(commitPropertyTableName())
+                .withGlobalIdTableName(globalIdTableName)
+                .withCommitTableName(commitTableName)
+                .withSnapshotTableName(snapshotTableName)
+                .withCommitPropertyTableName(commitPropertyTableName)
                 .build()
+        this.schemaManager = repository.schemaManager
+        repository
     }
 
     def clearTables() {
-        execute("delete  from ${schemaPrefix()}${useSnapshotTableName()}")
-        execute("delete  from ${schemaPrefix()}${useCommitPropertyTablename()}")
-        execute("delete  from ${schemaPrefix()}${useCommitTablename()}")
-        execute("delete  from ${schemaPrefix()}${useGlobalIdTableName()}")
+        execute("delete  from " + schemaManager.snapshotTableNameWithSchema)
+        execute("delete  from " + schemaManager.commitPropertyTableNameWithSchema)
+        execute("delete  from " + schemaManager.commitTableNameWithSchema)
+        execute("delete  from " + schemaManager.globalIdTableNameWithSchema)
         getConnection().commit()
     }
 
     String schemaPrefix() {
         getSchema() ? getSchema() + "." : ""
-    }
-
-    String useGlobalIdTableName() {
-        globalIdTableName() ? globalIdTableName() : "jv_global_id"
-    }
-
-    String useCommitTablename() {
-        commitTableName() ? commitTableName() : "jv_commit"
-    }
-
-    String useCommitPropertyTablename() {
-        commitPropertyTableName() ? commitPropertyTableName() : "jv_commit_property"
-    }
-
-    String useSnapshotTableName() {
-        snapshotTableName() ? snapshotTableName() : "jv_snapshot"
-    }
-
-    String getCommitPkSeqName() {
-        useCommitTablename() + "_commit_pk_seq"
-    }
-
-    String getGlobalIdPkSeq() {
-        useGlobalIdTableName() + "_global_id_pk_seq"
-    }
-
-    String getSnapshotTablePkSeq() {
-        useSnapshotTableName() + "_snapshot_pk_seq"
     }
 
     def execute(String sql) {
@@ -136,7 +119,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
                 [2, 11.02],
                 [1, 11.01]
         ].each {
-            sql.execute "insert into ${schemaPrefix()}${useCommitTablename()} (commit_pk, commit_id) values (?,?)", it
+            sql.execute "insert into ${schemaManager.commitTableNameWithSchema} (commit_pk, commit_id) values (?,?)", it
         }
 
         when:
@@ -282,21 +265,5 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
 
         then:
         javers.findSnapshots(QueryBuilder.byInstanceId(sId, SnapshotEntity).limit(1000).build()).size() == threads * 4 + 1
-    }
-
-    protected String globalIdTableName(){
-        null
-    }
-
-    protected String commitTableName(){
-        null
-    }
-
-    protected String snapshotTableName() {
-        null
-    }
-
-    protected String commitPropertyTableName(){
-        null
     }
 }

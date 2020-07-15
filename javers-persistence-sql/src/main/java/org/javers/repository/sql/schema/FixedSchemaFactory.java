@@ -1,5 +1,6 @@
 package org.javers.repository.sql.schema;
 
+import com.google.gson.internal.LinkedHashTreeMap;
 import org.polyjdbc.core.dialect.*;
 import org.polyjdbc.core.schema.model.LongAttributeBuilder;
 import org.polyjdbc.core.schema.model.RelationBuilder;
@@ -22,15 +23,12 @@ public class FixedSchemaFactory extends SchemaNameAware {
     public static final String GLOBAL_ID_FRAGMENT =   "fragment";     //since 1.2
     public static final String GLOBAL_ID_TYPE_NAME =  "type_name";    //since 2.0
     public static final String GLOBAL_ID_OWNER_ID_FK ="owner_id_fk";  //since 1.2
-    public static final String GLOBAL_ID_PK_SEQ =     "global_id_pk_seq";
 
     public static final String COMMIT_PK =            "commit_pk";
     public static final String COMMIT_AUTHOR =        "author";
     public static final String COMMIT_COMMIT_DATE =   "commit_date";
     public static final String COMMIT_COMMIT_DATE_INSTANT =   "commit_date_instant";
     public static final String COMMIT_COMMIT_ID =     "commit_id";
-    public static final String COMMIT_PK_SEQ =        "commit_pk_seq";
-
     public static final String COMMIT_PROPERTY_COMMIT_FK =  "commit_fk";
     public static final String COMMIT_PROPERTY_NAME =       "property_name";
     public static final String COMMIT_PROPERTY_VALUE =      "property_value";
@@ -40,7 +38,6 @@ public class FixedSchemaFactory extends SchemaNameAware {
     public static final String SNAPSHOT_GLOBAL_ID_FK = "global_id_fk";
     public static final String SNAPSHOT_TYPE =         "type";
     public static final String SNAPSHOT_VERSION =      "version";
-    public static final String SNAPSHOT_TABLE_PK_SEQ = "snapshot_pk_seq";
     public static final String SNAPSHOT_STATE =        "state";
     public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v 1.2
     public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";       //since 2.0
@@ -55,7 +52,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     }
 
     Map<String, Schema> allTablesSchema(Dialect dialect) {
-        Map<String, Schema> schema = new TreeMap<>();
+        Map<String, Schema> schema = new LinkedHashTreeMap<>();
 
         schema.put(getGlobalIdTableName().localName(), globalIdTableSchema(dialect));
         schema.put(getCommitTableName().localName(),    commitTableSchema(dialect));
@@ -69,8 +66,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         DBObjectName tableName = getSnapshotTableName();
         Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(tableName, SNAPSHOT_PK, schema, relationBuilder);
-        schema.addSequence(getSequenceName(tableName.localName(), SNAPSHOT_TABLE_PK_SEQ)).build();
+        primaryKey(SNAPSHOT_PK, schema, relationBuilder, getSnapshotTablePkSeqWithSchema());
         relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
                        .withAttribute().longAttr(SNAPSHOT_VERSION).and()
                        .withAttribute().text(SNAPSHOT_STATE).and()
@@ -90,8 +86,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         DBObjectName tableName = getCommitTableName();
         Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(tableName, COMMIT_PK,schema,relationBuilder);
-        schema.addSequence(getSequenceName(tableName.localName(), COMMIT_PK_SEQ)).build();
+        primaryKey(COMMIT_PK, schema, relationBuilder, getCommitPkSeqWithSchema());
         relationBuilder
                 .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
                 .withAttribute().timestamp(COMMIT_COMMIT_DATE).and()
@@ -136,8 +131,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         Schema schema = emptySchema(dialect);
 
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(tableName, GLOBAL_ID_PK, schema,relationBuilder);
-        schema.addSequence(getSequenceName(tableName.localName(), GLOBAL_ID_PK_SEQ)).build();
+        primaryKey(GLOBAL_ID_PK, schema, relationBuilder, getGlobalIdPkSeqWithSchema());
         relationBuilder
                 .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
                 .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and()
@@ -193,14 +187,10 @@ public class FixedSchemaFactory extends SchemaNameAware {
         return indexName;
     }
 
-    private void primaryKey(DBObjectName tableName, String pkColName, Schema schema, RelationBuilder relationBuilder) {
-        relationBuilder.withAttribute().longAttr(pkColName)
-                .withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
-                .primaryKey(tableName.localName() + "_" + pkColName).using(pkColName).and();
-    }
-
-    private String getSequenceName(String tableName, String seqName) {
-        return tableName + "_" + seqName;
+    private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder, String seqNameWithSchema) {
+        relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
+                .primaryKey("jv_"+pkColName).using(pkColName).and();
+        schema.addSequence(seqNameWithSchema).build();
     }
 
     static class IndexedCols {

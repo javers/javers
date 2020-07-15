@@ -5,12 +5,15 @@ import org.javers.repository.sql.SqlRepositoryConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
-
 /**
  * @author Ian Agius
  */
 public class TableNameProvider {
+    private static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
+    private static final String COMMIT_PK_SEQ =        "jv_commit_pk_seq";
+    private static final String GLOBAL_ID_PK_SEQ =     "jv_global_id_pk_seq";
+
+
     private static final String DEFAULT_GLOBAL_ID_TABLE_NAME = "jv_global_id";
     private static final String DEFAULT_SNAPSHOT_TABLE_NAME =   "jv_snapshot";
     private static final String DEFAULT_COMMIT_TABLE_NAME =    "jv_commit";
@@ -44,18 +47,15 @@ public class TableNameProvider {
     }
 
     public String getSnapshotTablePkSeqWithSchema() {
-        return fullDbName(configuration.getSnapshotTableName()
-                .orElse(DEFAULT_SNAPSHOT_TABLE_NAME) + "_" + SNAPSHOT_TABLE_PK_SEQ).nameWithSchema();
+        return fullDbName(SNAPSHOT_TABLE_PK_SEQ).nameWithSchema();
     }
 
     public String getGlobalIdPkSeqWithSchema() {
-        return fullDbName(configuration.getGlobalIdTableName()
-                .orElse(DEFAULT_GLOBAL_ID_TABLE_NAME) + "_" + GLOBAL_ID_PK_SEQ).nameWithSchema();
+        return fullDbName(GLOBAL_ID_PK_SEQ).nameWithSchema();
     }
 
     public String getCommitPkSeqWithSchema() {
-        return fullDbName(configuration.getCommitTableName()
-                .orElse(DEFAULT_COMMIT_TABLE_NAME) + "_" + COMMIT_PK_SEQ).nameWithSchema();
+        return fullDbName(COMMIT_PK_SEQ).nameWithSchema();
     }
 
     /**

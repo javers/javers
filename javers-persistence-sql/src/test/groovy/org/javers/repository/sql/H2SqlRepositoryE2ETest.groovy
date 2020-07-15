@@ -39,10 +39,10 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
                 .withConnectionProvider({ DriverManager.getConnection("jdbc:h2:mem:empty-test") } as ConnectionProvider)
                 .withSchemaManagementEnabled(false)
                 .withDialect(getDialect())
-                .withGlobalIdTableName(useGlobalIdTableName())
-                .withCommitTableName(useCommitTablename())
-                .withSnapshotTableName(useSnapshotTableName())
-                .withCommitPropertyTableName(useCommitPropertyTablename())
+                .withGlobalIdTableName(globalIdTableName)
+                .withCommitTableName(commitTableName)
+                .withSnapshotTableName(snapshotTableName)
+                .withCommitPropertyTableName(commitPropertyTableName)
                 .build()).build()
 
         when:
