@@ -220,7 +220,6 @@ public class JaversSchemaManager extends SchemaNameAware {
     }
 
     private void ensureTable(String tableName, Schema schema) {
-        System.out.println("!! ensureTable " + tableName);
         String schemaName = schemaFactory.getSchemaNameUsedForSchemaInspection();
         if (relationExists(tableName, schema.getSchemaName())) {
             logger.debug("table {}.{} exists", schemaName, tableName);
