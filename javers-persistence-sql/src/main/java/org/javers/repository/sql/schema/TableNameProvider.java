@@ -11,30 +11,26 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
  * @author Ian Agius
  */
 public class TableNameProvider {
-    private static final Logger logger = LoggerFactory.getLogger(TableNameProvider.class);
+    private static final String DEFAULT_GLOBAL_ID_TABLE_NAME = "jv_global_id";
+    private static final String DEFAULT_SNAPSHOT_TABLE_NAME =   "jv_snapshot";
+    private static final String DEFAULT_COMMIT_TABLE_NAME =    "jv_commit";
+    private static final String DEFAULT_COMMIT_PROPERTY_TABLE_NAME = "jv_commit_property";
 
-    private final Optional<String> schemaName;
-    private final Optional<String> globalIdTableName;
-    private final Optional<String> commitTableName;
-    private final Optional<String> snapshotTableName;
-    private final Optional<String> commitPropertyTableName;
+    private static final Logger logger = LoggerFactory.getLogger(TableNameProvider.class);
+    private final SqlRepositoryConfiguration configuration;
 
     public TableNameProvider(SqlRepositoryConfiguration configuration) {
-        this.schemaName = configuration.getSchemaNameAsOptional();
-        this.globalIdTableName = configuration.getGlobalIdTableNameAsOptional();
-        this.commitTableName = configuration.getCommitTableNameAsOptional();
-        this.snapshotTableName = configuration.getSnapshotTableNameAsOptional();
-        this.commitPropertyTableName = configuration.getCommitPropertyTableNameAsOptional();
-
-        logger.info("Commit table:          {}", getCommitTableNameWithSchema());
-        logger.info("CommitProperty table:  {}", getCommitPropertyTableNameWithSchema());
-        logger.info("GlobalId table:        {}", getGlobalIdTableNameWithSchema());
-        logger.info("Snapshot table:        {}", getSnapshotTableNameWithSchema());
+        this.configuration = configuration;
+        logger.info("Commit table:           {}", getCommitTableNameWithSchema());
+        logger.info("CommitProperty table:   {}", getCommitPropertyTableNameWithSchema());
+        logger.info("GlobalId table:         {}", getGlobalIdTableNameWithSchema());
+        logger.info("Snapshot table:         {}", getSnapshotTableNameWithSchema());
     }
 
     public String getGlobalIdTableNameWithSchema() {
         return getGlobalIdTableName().nameWithSchema();
     }
+
     public String getCommitTableNameWithSchema() {
         return getCommitTableName().nameWithSchema();
     }
@@ -48,18 +44,18 @@ public class TableNameProvider {
     }
 
     public String getSnapshotTablePkSeqWithSchema() {
-        return new DBObjectName(schemaName,
-                snapshotTableName.orElse(SNAPSHOT_TABLE_NAME) + "_" + SNAPSHOT_TABLE_PK_SEQ).nameWithSchema();
+        return fullDbName(configuration.getSnapshotTableName()
+                .orElse(DEFAULT_SNAPSHOT_TABLE_NAME) + "_" + SNAPSHOT_TABLE_PK_SEQ).nameWithSchema();
     }
 
     public String getGlobalIdPkSeqWithSchema() {
-        return new DBObjectName(schemaName,
-                globalIdTableName.orElse(GLOBAL_ID_TABLE_NAME) + "_" + GLOBAL_ID_PK_SEQ).nameWithSchema();
+        return fullDbName(configuration.getGlobalIdTableName()
+                .orElse(DEFAULT_GLOBAL_ID_TABLE_NAME) + "_" + GLOBAL_ID_PK_SEQ).nameWithSchema();
     }
 
     public String getCommitPkSeqWithSchema() {
-        return new DBObjectName(schemaName,
-                commitTableName.orElse(COMMIT_TABLE_NAME) + "_" + COMMIT_PK_SEQ).nameWithSchema();
+        return fullDbName(configuration.getCommitTableName()
+                .orElse(DEFAULT_COMMIT_TABLE_NAME) + "_" + COMMIT_PK_SEQ).nameWithSchema();
     }
 
     /**
@@ -67,26 +63,30 @@ public class TableNameProvider {
      */
     @Deprecated
     public String getCdoClassTableNameWithSchema() {
-        return new DBObjectName(schemaName, "jv_cdo_class").nameWithSchema();
+        return fullDbName("jv_cdo_class").nameWithSchema();
     }
 
     DBObjectName getGlobalIdTableName() {
-        return new DBObjectName(schemaName, globalIdTableName.orElse(GLOBAL_ID_TABLE_NAME));
+        return fullDbName(configuration.getGlobalIdTableName().orElse(DEFAULT_GLOBAL_ID_TABLE_NAME));
     }
 
     DBObjectName getCommitTableName() {
-        return new DBObjectName(schemaName, commitTableName.orElse(COMMIT_TABLE_NAME));
+        return fullDbName(configuration.getCommitTableName().orElse(DEFAULT_COMMIT_TABLE_NAME));
     }
 
     DBObjectName getCommitPropertyTableName() {
-        return new DBObjectName(schemaName, commitPropertyTableName.orElse(COMMIT_PROPERTY_TABLE_NAME));
+        return fullDbName(configuration.getCommitPropertyTableName().orElse(DEFAULT_COMMIT_PROPERTY_TABLE_NAME));
     }
 
     DBObjectName getSnapshotTableName() {
-        return new DBObjectName(schemaName, snapshotTableName.orElse(SNAPSHOT_TABLE_NAME));
+        return fullDbName(configuration.getSnapshotTableName().orElse(DEFAULT_SNAPSHOT_TABLE_NAME));
     }
 
     Optional<String> getSchemaName() {
-        return schemaName;
+        return configuration.getSchemaNameAsOptional();
+    }
+
+    private DBObjectName fullDbName(String name) {
+        return new DBObjectName(configuration.getSchemaNameAsOptional(), name);
     }
 }

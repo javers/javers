@@ -17,7 +17,6 @@ import java.util.TreeMap;
 public class FixedSchemaFactory extends SchemaNameAware {
     private static final int MAX_INDEX_KEY_LEN_IN_MYSQL = 191;
 
-    public static final String GLOBAL_ID_TABLE_NAME = "jv_global_id";
     public static final String GLOBAL_ID_PK =         "global_id_pk";
     public static final String GLOBAL_ID_LOCAL_ID =   "local_id";
     public static final String GLOBAL_ID_FRAGMENT =   "fragment";     //since 1.2
@@ -25,7 +24,6 @@ public class FixedSchemaFactory extends SchemaNameAware {
     public static final String GLOBAL_ID_OWNER_ID_FK ="owner_id_fk";  //since 1.2
     public static final String GLOBAL_ID_PK_SEQ =     "global_id_pk_seq";
 
-    public static final String COMMIT_TABLE_NAME =    "jv_commit";
     public static final String COMMIT_PK =            "commit_pk";
     public static final String COMMIT_AUTHOR =        "author";
     public static final String COMMIT_COMMIT_DATE =   "commit_date";
@@ -33,12 +31,10 @@ public class FixedSchemaFactory extends SchemaNameAware {
     public static final String COMMIT_COMMIT_ID =     "commit_id";
     public static final String COMMIT_PK_SEQ =        "commit_pk_seq";
 
-    public static final String COMMIT_PROPERTY_TABLE_NAME = "jv_commit_property";
     public static final String COMMIT_PROPERTY_COMMIT_FK =  "commit_fk";
     public static final String COMMIT_PROPERTY_NAME =       "property_name";
     public static final String COMMIT_PROPERTY_VALUE =      "property_value";
 
-    public static final String SNAPSHOT_TABLE_NAME =   "jv_snapshot";
     public static final String SNAPSHOT_PK =           "snapshot_pk";
     public static final String SNAPSHOT_COMMIT_FK =    "commit_fk";
     public static final String SNAPSHOT_GLOBAL_ID_FK = "global_id_fk";

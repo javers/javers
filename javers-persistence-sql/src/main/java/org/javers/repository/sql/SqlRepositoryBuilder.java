@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static org.javers.common.string.Strings.isNonEmpty;
+
 /**
  * @author bartosz walacik
  */
@@ -24,9 +26,6 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private boolean globalIdCacheDisabled;
     private boolean schemaManagementEnabled = true;
 
-    /**
-     * table names to be used when creating Javers SQL schema
-     */
     private String globalIdTableName;
     private String commitTableName;
     private String snapshotTableName;
@@ -57,7 +56,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
      * @since 2.4
      */
     public SqlRepositoryBuilder withSchema(String schemaName) {
-        if (schemaName != null && !schemaName.isEmpty()) {
+        if (isNonEmpty(schemaName)) {
             this.schemaName = schemaName;
         }
         return this;
@@ -78,28 +77,28 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     }
 
     public SqlRepositoryBuilder withGlobalIdTableName(String globalIdTableName) {
-        if(globalIdTableName !=null && !globalIdTableName.isEmpty()) {
+        if(isNonEmpty(globalIdTableName)) {
             this.globalIdTableName = globalIdTableName;
         }
         return this;
     }
 
     public SqlRepositoryBuilder withCommitTableName(String commitTableName) {
-        if(commitTableName !=null && !commitTableName.isEmpty()) {
+        if(isNonEmpty(commitTableName)) {
             this.commitTableName = commitTableName;
         }
         return this;
     }
 
     public SqlRepositoryBuilder withSnapshotTableName(String snapshotTableName) {
-        if(snapshotTableName !=null && !snapshotTableName.isEmpty()) {
+        if(isNonEmpty(snapshotTableName)) {
             this.snapshotTableName = snapshotTableName;
         }
         return this;
     }
 
     public SqlRepositoryBuilder withCommitPropertyTableName(String commitPropertyTableName) {
-        if(commitPropertyTableName !=null && !commitPropertyTableName.isEmpty()) {
+        if(isNonEmpty(commitPropertyTableName)) {
             this.commitPropertyTableName = commitPropertyTableName;
         }
         return this;
@@ -107,13 +106,9 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     public JaversSqlRepository build() {
         logger.info("starting SqlRepository...");
-        logger.info("  dialect:                 {}", dialectName);
-        logger.info("  schemaManagementEnabled: {}", schemaManagementEnabled);
-        logger.info("  schemaName:              {}", schemaName);
-        logger.info("  globalIdTableName        {}", globalIdTableName);
-        logger.info("  commitTableName          {}", commitTableName);
-        logger.info("  snapshotTableName        {}", snapshotTableName);
-        logger.info("  commitPropertyTableName  {}", commitPropertyTableName);
+        logger.info("  dialect:                  {}", dialectName);
+        logger.info("  schemaManagementEnabled:  {}", schemaManagementEnabled);
+        logger.info("  schema name:              {}", schemaName);
         bootContainer();
 
         SqlRepositoryConfiguration config =

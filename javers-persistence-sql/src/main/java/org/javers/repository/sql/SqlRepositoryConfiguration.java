@@ -51,19 +51,19 @@ public class SqlRepositoryConfiguration {
         return schemaManagementEnabled;
     }
 
-    public Optional<String> getGlobalIdTableNameAsOptional() {
+    public Optional<String> getGlobalIdTableName() {
         return Optional.ofNullable(globalIdTableName);
     }
 
-    public Optional<String> getCommitTableNameAsOptional() {
+    public Optional<String> getCommitTableName() {
         return Optional.ofNullable(commitTableName);
     }
 
-    public Optional<String> getSnapshotTableNameAsOptional() {
+    public Optional<String> getSnapshotTableName() {
         return Optional.ofNullable(snapshotTableName);
     }
 
-    public Optional<String> getCommitPropertyTableNameAsOptional() {
+    public Optional<String> getCommitPropertyTableName() {
         return Optional.ofNullable(commitPropertyTableName);
     }
 }

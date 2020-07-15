@@ -2,9 +2,6 @@ package org.javers.repository.sql.schema;
 
 import java.util.Optional;
 
-/**
- * TODO should be replaced with Java8 interface with default impl
- */
 public abstract class SchemaNameAware {
     private final TableNameProvider tableNameProvider;
 
