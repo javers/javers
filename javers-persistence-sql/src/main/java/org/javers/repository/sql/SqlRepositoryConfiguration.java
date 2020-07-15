@@ -12,12 +12,24 @@ public class SqlRepositoryConfiguration {
     private final String schemaName;
     private final boolean schemaManagementEnabled;
 
-    SqlRepositoryConfiguration(boolean globalIdCacheDisabled, String schemaName, boolean schemaManagementEnabled) {
+    private final String globalIdTableName;
+    private final String commitTableName;
+    private final String snapshotTableName;
+    private final String commitPropertyTableName;
+
+    SqlRepositoryConfiguration(boolean globalIdCacheDisabled, String schemaName,
+                                      boolean schemaManagementEnabled, String globalIdTableName,
+                                      String commitTableName,
+                                      String snapshotTableName, String commitPropertyTableName) {
         Validate.argumentCheck(schemaName == null || !schemaName.isEmpty(),"schemaName should be null or non-empty");
 
         this.globalIdCacheDisabled = globalIdCacheDisabled;
         this.schemaName = schemaName;
         this.schemaManagementEnabled = schemaManagementEnabled;
+        this.globalIdTableName = globalIdTableName;
+        this.commitTableName = commitTableName;
+        this.snapshotTableName = snapshotTableName;
+        this.commitPropertyTableName = commitPropertyTableName;
     }
 
     public boolean isGlobalIdCacheDisabled() {
@@ -37,5 +49,21 @@ public class SqlRepositoryConfiguration {
 
     public boolean isSchemaManagementEnabled() {
         return schemaManagementEnabled;
+    }
+
+    public Optional<String> getGlobalIdTableNameAsOptional() {
+        return Optional.ofNullable(globalIdTableName);
+    }
+
+    public Optional<String> getCommitTableNameAsOptional() {
+        return Optional.ofNullable(commitTableName);
+    }
+
+    public Optional<String> getSnapshotTableNameAsOptional() {
+        return Optional.ofNullable(snapshotTableName);
+    }
+
+    public Optional<String> getCommitPropertyTableNameAsOptional() {
+        return Optional.ofNullable(commitPropertyTableName);
     }
 }

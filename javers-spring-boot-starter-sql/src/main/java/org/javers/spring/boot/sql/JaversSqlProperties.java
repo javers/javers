@@ -11,6 +11,10 @@ public class JaversSqlProperties extends JaversSpringProperties {
     private boolean sqlSchemaManagementEnabled = true;
     private boolean sqlGlobalIdCacheDisabled = false;
     private String sqlSchema;
+    private String sqlGlobalIdTableName;
+    private String sqlCommitTableName;
+    private String sqlSnapshotTableName;
+    private String sqlCommitPropertyTableName;
 
     public boolean isSqlSchemaManagementEnabled() {
         return sqlSchemaManagementEnabled;
@@ -38,5 +42,37 @@ public class JaversSqlProperties extends JaversSpringProperties {
 
     protected String defaultObjectAccessHook(){
         return DEFAULT_OBJECT_ACCESS_HOOK;
+    }
+
+    public String getSqlGlobalIdTableName() {
+        return sqlGlobalIdTableName;
+    }
+
+    public void setSqlGlobalIdTableName(String sqlGlobalIdTableName) {
+        this.sqlGlobalIdTableName = sqlGlobalIdTableName;
+    }
+
+    public String getSqlCommitTableName() {
+        return sqlCommitTableName;
+    }
+
+    public void setSqlCommitTableName(String sqlCommitTableName) {
+        this.sqlCommitTableName = sqlCommitTableName;
+    }
+
+    public String getSqlSnapshotTableName() {
+        return sqlSnapshotTableName;
+    }
+
+    public void setSqlSnapshotTableName(String sqlSnapshotTableName) {
+        this.sqlSnapshotTableName = sqlSnapshotTableName;
+    }
+
+    public String getSqlCommitPropertyTableName() {
+        return sqlCommitPropertyTableName;
+    }
+
+    public void setSqlCommitPropertyTableName(String sqlCommitPropertyTableName) {
+        this.sqlCommitPropertyTableName = sqlCommitPropertyTableName;
     }
 }

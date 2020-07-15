@@ -14,9 +14,17 @@ public class TableNameProvider {
     private static final Logger logger = LoggerFactory.getLogger(TableNameProvider.class);
 
     private final Optional<String> schemaName;
+    private final Optional<String> globalIdTableName;
+    private final Optional<String> commitTableName;
+    private final Optional<String> snapshotTableName;
+    private final Optional<String> commitPropertyTableName;
 
     public TableNameProvider(SqlRepositoryConfiguration configuration) {
         this.schemaName = configuration.getSchemaNameAsOptional();
+        this.globalIdTableName = configuration.getGlobalIdTableNameAsOptional();
+        this.commitTableName = configuration.getCommitTableNameAsOptional();
+        this.snapshotTableName = configuration.getSnapshotTableNameAsOptional();
+        this.commitPropertyTableName = configuration.getCommitPropertyTableNameAsOptional();
 
         logger.info("Commit table:          {}", getCommitTableNameWithSchema());
         logger.info("CommitProperty table:  {}", getCommitPropertyTableNameWithSchema());
@@ -40,15 +48,18 @@ public class TableNameProvider {
     }
 
     public String getSnapshotTablePkSeqWithSchema() {
-        return new DBObjectName(schemaName, SNAPSHOT_TABLE_PK_SEQ).nameWithSchema();
+        return new DBObjectName(schemaName,
+                snapshotTableName.orElse(SNAPSHOT_TABLE_NAME) + "_" + SNAPSHOT_TABLE_PK_SEQ).nameWithSchema();
     }
 
     public String getGlobalIdPkSeqWithSchema() {
-        return new DBObjectName(schemaName, GLOBAL_ID_PK_SEQ).nameWithSchema();
+        return new DBObjectName(schemaName,
+                globalIdTableName.orElse(GLOBAL_ID_TABLE_NAME) + "_" + GLOBAL_ID_PK_SEQ).nameWithSchema();
     }
 
     public String getCommitPkSeqWithSchema() {
-        return new DBObjectName(schemaName, COMMIT_PK_SEQ).nameWithSchema();
+        return new DBObjectName(schemaName,
+                commitTableName.orElse(COMMIT_TABLE_NAME) + "_" + COMMIT_PK_SEQ).nameWithSchema();
     }
 
     /**
@@ -59,24 +70,20 @@ public class TableNameProvider {
         return new DBObjectName(schemaName, "jv_cdo_class").nameWithSchema();
     }
 
-    public String getSequenceName(String pkColName) {
-        return new DBObjectName(schemaName, "jv_" + pkColName + "_seq").localName();
-    }
-
     DBObjectName getGlobalIdTableName() {
-        return new DBObjectName(schemaName, GLOBAL_ID_TABLE_NAME);
+        return new DBObjectName(schemaName, globalIdTableName.orElse(GLOBAL_ID_TABLE_NAME));
     }
 
     DBObjectName getCommitTableName() {
-        return new DBObjectName(schemaName, COMMIT_TABLE_NAME);
+        return new DBObjectName(schemaName, commitTableName.orElse(COMMIT_TABLE_NAME));
     }
 
     DBObjectName getCommitPropertyTableName() {
-        return new DBObjectName(schemaName, COMMIT_PROPERTY_TABLE_NAME);
+        return new DBObjectName(schemaName, commitPropertyTableName.orElse(COMMIT_PROPERTY_TABLE_NAME));
     }
 
     DBObjectName getSnapshotTableName() {
-        return new DBObjectName(schemaName, SNAPSHOT_TABLE_NAME);
+        return new DBObjectName(schemaName, snapshotTableName.orElse(SNAPSHOT_TABLE_NAME));
     }
 
     Optional<String> getSchemaName() {
