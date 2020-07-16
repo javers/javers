@@ -64,9 +64,9 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
 
         when:
         clearTables()
-        execute("alter sequence  ${schemaPrefix()}${getCommitPkSeqName()} restart with 1")
-        execute("alter sequence  ${schemaPrefix()}${getGlobalIdPkSeq()} restart with 1")
-        execute("alter sequence  ${schemaPrefix()}${getSnapshotTablePkSeq()} restart with 1")
+        execute("alter sequence "+ schemaManager.commitPkSeqWithSchema +" restart with 1")
+        execute("alter sequence "+ schemaManager.globalIdPkSeqWithSchema +" restart with 1")
+        execute("alter sequence "+ schemaManager.snapshotTablePkSeqWithSchema +" restart with 1")
         def sqlRepository = (JaversSqlRepository) repository
         sqlRepository.evictSequenceAllocationCache()
         sqlRepository.evictCache()
