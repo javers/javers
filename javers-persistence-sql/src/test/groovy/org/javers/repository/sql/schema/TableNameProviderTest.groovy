@@ -12,13 +12,13 @@ class TableNameProviderTest extends Specification {
 
         then:
         names.commitTableNameWithSchema == "jv_commit"
-        names.commitPkSeqName == "jv_commit_pk_seq"
+        names.commitPkSeqName.toString() == "jv_commit_pk_seq"
 
         names.globalIdTableNameWithSchema == "jv_global_id"
-        names.globalIdPkSeqName == "jv_global_id_pk_seq"
+        names.globalIdPkSeqName.toString() == "jv_global_id_pk_seq"
 
         names.snapshotTableNameWithSchema == "jv_snapshot"
-        names.snapshotTablePkSeqName == "jv_snapshot_pk_seq"
+        names.snapshotTablePkSeqName.toString() == "jv_snapshot_pk_seq"
 
         names.commitPropertyTableNameWithSchema == "jv_commit_property"
     }
@@ -30,13 +30,13 @@ class TableNameProviderTest extends Specification {
 
         then:
         names.commitTableNameWithSchema == "s.jv_commit"
-        names.commitPkSeqName == "s.jv_commit_pk_seq"
+        names.commitPkSeqName.toString() == "s.jv_commit_pk_seq"
 
         names.globalIdTableNameWithSchema == "s.jv_global_id"
-        names.globalIdPkSeqName == "s.jv_global_id_pk_seq"
+        names.globalIdPkSeqName.toString() == "s.jv_global_id_pk_seq"
 
         names.snapshotTableNameWithSchema == "s.jv_snapshot"
-        names.snapshotTablePkSeqName == "s.jv_snapshot_pk_seq"
+        names.snapshotTablePkSeqName.toString() == "s.jv_snapshot_pk_seq"
 
         names.commitPropertyTableNameWithSchema == "s.jv_commit_property"
     }
@@ -48,13 +48,13 @@ class TableNameProviderTest extends Specification {
 
         then:
         names.commitTableNameWithSchema == "c"
-        names.commitPkSeqName == "jv_commit_pk_seq"
+        names.commitPkSeqName.toString() == "jv_commit_pk_seq"
 
         names.globalIdTableNameWithSchema == "g"
-        names.globalIdPkSeqName == "jv_global_id_pk_seq"
+        names.globalIdPkSeqName.toString() == "jv_global_id_pk_seq"
 
         names.snapshotTableNameWithSchema == "s"
-        names.snapshotTablePkSeqName == "jv_snapshot_pk_seq"
+        names.snapshotTablePkSeqName.toString() == "jv_snapshot_pk_seq"
 
         names.commitPropertyTableNameWithSchema == "cp"
     }
