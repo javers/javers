@@ -8,7 +8,6 @@ import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.StringUtils;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * non-configurable schema factory, gives schema with default table names
@@ -66,7 +65,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         DBObjectName tableName = getSnapshotTableName();
         Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(SNAPSHOT_PK, schema, relationBuilder, getSnapshotTablePkSeqWithSchema());
+        primaryKey(SNAPSHOT_PK, schema, relationBuilder, getSnapshotTablePkSeqName().localName());
         relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
                        .withAttribute().longAttr(SNAPSHOT_VERSION).and()
                        .withAttribute().text(SNAPSHOT_STATE).and()
@@ -86,7 +85,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         DBObjectName tableName = getCommitTableName();
         Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(COMMIT_PK, schema, relationBuilder, getCommitPkSeqWithSchema());
+        primaryKey(COMMIT_PK, schema, relationBuilder, getCommitPkSeqName().localName());
         relationBuilder
                 .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
                 .withAttribute().timestamp(COMMIT_COMMIT_DATE).and()
@@ -131,7 +130,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         Schema schema = emptySchema(dialect);
 
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(GLOBAL_ID_PK, schema, relationBuilder, getGlobalIdPkSeqWithSchema());
+        primaryKey(GLOBAL_ID_PK, schema, relationBuilder, getGlobalIdPkSeqName().localName());
         relationBuilder
                 .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
                 .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and()
@@ -187,10 +186,10 @@ public class FixedSchemaFactory extends SchemaNameAware {
         return indexName;
     }
 
-    private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder, String seqNameWithSchema) {
+    private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder, String seqNameLocal) {
         relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
                 .primaryKey("jv_"+pkColName).using(pkColName).and();
-        schema.addSequence(seqNameWithSchema).build();
+        schema.addSequence(seqNameLocal).build();
     }
 
     static class IndexedCols {

@@ -46,16 +46,16 @@ public class TableNameProvider {
         return getSnapshotTableName().nameWithSchema();
     }
 
-    public String getSnapshotTablePkSeqWithSchema() {
-        return fullDbName(SNAPSHOT_TABLE_PK_SEQ).nameWithSchema();
+    public DBObjectName getSnapshotTablePkSeqName() {
+        return fullDbName(SNAPSHOT_TABLE_PK_SEQ);
     }
 
-    public String getGlobalIdPkSeqWithSchema() {
-        return fullDbName(GLOBAL_ID_PK_SEQ).nameWithSchema();
+    public DBObjectName getGlobalIdPkSeqName() {
+        return fullDbName(GLOBAL_ID_PK_SEQ);
     }
 
-    public String getCommitPkSeqWithSchema() {
-        return fullDbName(COMMIT_PK_SEQ).nameWithSchema();
+    public DBObjectName getCommitPkSeqName() {
+        return fullDbName(COMMIT_PK_SEQ);
     }
 
     /**

@@ -33,7 +33,7 @@ public class CdoSnapshotRepository extends SchemaNameAware {
                     .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
                     .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged()))
                     .value(SNAPSHOT_MANAGED_TYPE, cdoSnapshot.getManagedType().getName())
-                    .sequence(SNAPSHOT_PK, getSnapshotTablePkSeqWithSchema())
+                    .sequence(SNAPSHOT_PK, getSnapshotTablePkSeqName().nameWithSchema())
                     .execute();
         }
     }
