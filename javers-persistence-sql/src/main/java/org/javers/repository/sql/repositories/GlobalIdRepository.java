@@ -114,7 +114,7 @@ public class GlobalIdRepository extends SchemaNameAware {
         }
 
         return insert.into(getGlobalIdTableNameWithSchema())
-              .sequence(GLOBAL_ID_PK, getGlobalIdPkSeqWithSchema())
+              .sequence(GLOBAL_ID_PK, getGlobalIdPkSeqName().nameWithSchema())
               .executeAndGetSequence();
     }
 

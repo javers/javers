@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static org.javers.common.string.Strings.isNonEmpty;
+
 /**
  * @author bartosz walacik
  */
@@ -23,6 +25,11 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private String schemaName;
     private boolean globalIdCacheDisabled;
     private boolean schemaManagementEnabled = true;
+
+    private String globalIdTableName;
+    private String commitTableName;
+    private String snapshotTableName;
+    private String commitPropertyTableName;
 
     public SqlRepositoryBuilder() {
     }
@@ -49,7 +56,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
      * @since 2.4
      */
     public SqlRepositoryBuilder withSchema(String schemaName) {
-        if (schemaName != null && !schemaName.isEmpty()) {
+        if (isNonEmpty(schemaName)) {
             this.schemaName = schemaName;
         }
         return this;
@@ -69,15 +76,44 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+    public SqlRepositoryBuilder withGlobalIdTableName(String globalIdTableName) {
+        if(isNonEmpty(globalIdTableName)) {
+            this.globalIdTableName = globalIdTableName;
+        }
+        return this;
+    }
+
+    public SqlRepositoryBuilder withCommitTableName(String commitTableName) {
+        if(isNonEmpty(commitTableName)) {
+            this.commitTableName = commitTableName;
+        }
+        return this;
+    }
+
+    public SqlRepositoryBuilder withSnapshotTableName(String snapshotTableName) {
+        if(isNonEmpty(snapshotTableName)) {
+            this.snapshotTableName = snapshotTableName;
+        }
+        return this;
+    }
+
+    public SqlRepositoryBuilder withCommitPropertyTableName(String commitPropertyTableName) {
+        if(isNonEmpty(commitPropertyTableName)) {
+            this.commitPropertyTableName = commitPropertyTableName;
+        }
+        return this;
+    }
+
     public JaversSqlRepository build() {
         logger.info("starting SqlRepository...");
-        logger.info("  dialect:                 {}", dialectName);
-        logger.info("  schemaManagementEnabled: {}", schemaManagementEnabled);
-        logger.info("  schemaName:              {}", schemaName);
+        logger.info("  dialect:                  {}", dialectName);
+        logger.info("  schemaManagementEnabled:  {}", schemaManagementEnabled);
+        logger.info("  schema name:              {}", schemaName);
         bootContainer();
 
         SqlRepositoryConfiguration config =
-                new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName, schemaManagementEnabled);
+                new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName, schemaManagementEnabled,
+                        globalIdTableName, commitTableName, snapshotTableName, commitPropertyTableName);
         addComponent(config);
 
         PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
