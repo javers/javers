@@ -43,6 +43,12 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         int b
     }
 
+    class IgnoredPropsClass {
+        int id
+        int a
+        int b
+    }
+
     def "should allow passing null to currentVersion"(){
       given:
       def javers = JaversBuilder.javers().build()
@@ -578,6 +584,27 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         rChange.propertyName == "firstRef"
         rChange.left.value().endsWith "SnapshotEntity/21"
         rChange.right == null
+    }
+
+    def "should ignore classes thats comply with IgnoredClassesStrategy"() {
+        given:
+        def strategy = new IgnoredClassesStrategy() {
+            @Override
+            boolean isIgnored(Class<?> domainClass) {
+                return domainClass.name.endsWith("IgnoredPropsClass")
+            }
+        }
+        def javers = JaversBuilder.javers().registerIgnoredClassesStrategy(strategy).build()
+
+        when:
+        def propsClass = new PropsClass(id: 1, a: 2, b: 3)
+        def ignoredPropsClass = new IgnoredPropsClass(id: 1, a: 2, b: 3)
+        def json = javers.getJsonConverter().toJson(propsClass)
+        def ignoredJson = javers.getJsonConverter().toJson(ignoredPropsClass)
+
+        then:
+        json == "{\n  \"id\": 1,\n  \"a\": 2,\n  \"b\": 3\n}"
+        ignoredJson == "null"
     }
 
     @TypeName("E")

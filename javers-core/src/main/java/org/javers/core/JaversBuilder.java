@@ -498,6 +498,21 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
+     * Add strategy for ignored classes.
+     * <br/><br/>
+     * <p>
+     * Use this method if you are not willing to use {@link DiffIgnore} annotation on multiple
+     * classes or registerIgnoredClass
+     *
+     * @see DiffIgnore
+     */
+    public JaversBuilder registerIgnoredClassesStrategy(IgnoredClassesStrategy ignoredClassesStrategy) {
+        argumentIsNotNull(ignoredClassesStrategy);
+        jsonConverterBuilder().registerIgnoredClassesStrategy(ignoredClassesStrategy);
+        return this;
+    }
+
+    /**
      * Registers a {@link ValueType} and its custom JSON adapter.
      * <br><br>
      *
