@@ -47,12 +47,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         int b
     }
 
-    class IgnoredPropsClass {
-        int id
-        int a
-        int b
-    }
-
     def "should allow passing null to currentVersion"(){
       given:
       def javers = JaversBuilder.javers().build()
