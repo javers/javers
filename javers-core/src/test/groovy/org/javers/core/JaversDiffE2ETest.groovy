@@ -15,7 +15,11 @@ import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
 import org.javers.core.metamodel.annotation.ValueObject
 import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.type.EntityType
+import org.javers.core.metamodel.type.IgnoredType
+import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.*
+import spock.lang.Shared
 import spock.lang.Unroll
 
 import javax.persistence.EmbeddedId
@@ -399,6 +403,70 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         javers.compare(left, right).changes.size() == 0
     }
 
+    def "should ignore properties with @DiffIgnored type"() {
+        given:
+        def javers = javers().build()
+        def left =  new DummyUser(name: "a",
+                                  propertyWithDiffIgnoredType: new DummyIgnoredType(value: 1),
+                                  propertyWithDiffIgnoredSubtype: new IgnoredSubType(value: 1))
+        def right = new DummyUser(name: "a",
+                                  propertyWithDiffIgnoredType: new DummyIgnoredType(value: 2),
+                                  propertyWithDiffIgnoredSubtype: new IgnoredSubType(value: 2))
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 0
+        javers.getTypeMapping(DummyIgnoredType) instanceof IgnoredType
+        javers.getTypeMapping(IgnoredSubType) instanceof IgnoredType
+    }
+
+    class Foo {
+        Bar bar
+        BarBar barBar
+    }
+
+    class Bar {
+        int value
+    }
+    class BarBar {
+        int value
+    }
+
+    def "should ignore properties with type explicitly registered as ignored" () {
+        given:
+        def javers = javers().registerIgnoredClass(Bar).build()
+        def left =  new Foo(bar:new Bar(value:1))
+        def right = new Foo(bar:new Bar(value:2))
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 0
+        javers.getTypeMapping(Bar) instanceof IgnoredType
+    }
+
+    def "should ignore properties with type registered as ignored using IgnoredClassesStrategy" () {
+        given:
+        def javers = javers().registerIgnoredClassesStrategy(
+                {c -> return c == Bar}
+        ).build()
+        def left =  new Foo(bar:new Bar(value:1), barBar: new BarBar(value:1))
+        def right = new Foo(bar:new Bar(value:2), barBar: new BarBar(value:2))
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 1
+        println diff.changes[0].propertyNameWithPath == 'barBar.value'
+
+        javers.getTypeMapping(Bar) instanceof IgnoredType
+        javers.getTypeMapping(BarBar) instanceof ValueObjectType
+    }
+
     def "should ignore properties declared in a class with @IgnoreDeclaredProperties"(){
         given:
         def javers = javers().build()
@@ -412,7 +480,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         diff.changes.size() == 1
         diff.changes[0].propertyName == "age"
     }
-
 
     def "should compare ValueObjects in Lists as Sets when ListCompareAlgorithm.SET is enabled"() {
       given:
@@ -584,27 +651,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         rChange.propertyName == "firstRef"
         rChange.left.value().endsWith "SnapshotEntity/21"
         rChange.right == null
-    }
-
-    def "should ignore classes thats comply with IgnoredClassesStrategy"() {
-        given:
-        def strategy = new IgnoredClassesStrategy() {
-            @Override
-            boolean isIgnored(Class<?> domainClass) {
-                return domainClass.name.endsWith("IgnoredPropsClass")
-            }
-        }
-        def javers = JaversBuilder.javers().registerIgnoredClassesStrategy(strategy).build()
-
-        when:
-        def propsClass = new PropsClass(id: 1, a: 2, b: 3)
-        def ignoredPropsClass = new IgnoredPropsClass(id: 1, a: 2, b: 3)
-        def json = javers.getJsonConverter().toJson(propsClass)
-        def ignoredJson = javers.getJsonConverter().toJson(ignoredPropsClass)
-
-        then:
-        json == "{\n  \"id\": 1,\n  \"a\": 2,\n  \"b\": 3\n}"
-        ignoredJson == "null"
     }
 
     @TypeName("E")

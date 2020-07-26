@@ -36,9 +36,9 @@ public class TypeMapper {
 
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 
-    public TypeMapper(ClassScanner classScanner, JaversCoreConfiguration javersCoreConfiguration) {
+    public TypeMapper(ClassScanner classScanner, JaversCoreConfiguration javersCoreConfiguration, DynamicMappingStrategy dynamicMappingStrategy) {
         //Pico doesn't support cycles, so manual construction
-        TypeFactory typeFactory = new TypeFactory(classScanner, this);
+        TypeFactory typeFactory = new TypeFactory(classScanner, this, dynamicMappingStrategy);
 
         engine.registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
         this.typeFactory = typeFactory;

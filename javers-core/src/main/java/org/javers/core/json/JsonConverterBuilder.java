@@ -2,7 +2,6 @@ package org.javers.core.json;
 
 import com.google.gson.*;
 import org.javers.common.validation.Validate;
-import org.javers.core.IgnoredClassesStrategy;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.java8support.Java8TypeAdapters;
@@ -144,12 +143,6 @@ public class JsonConverterBuilder {
         return this;
     }
 
-    public JsonConverterBuilder registerIgnoredClassesStrategy(IgnoredClassesStrategy ignoredClassesStrategy) {
-        Validate.argumentIsNotNull(ignoredClassesStrategy);
-        this.gsonBuilder.addSerializationExclusionStrategy(new IgnoredClassesExclusionStrategy(ignoredClassesStrategy));
-        return this;
-    }
-
     public List<Class> getBuiltInValueTypes() {
         return Collections.unmodifiableList(builtInValueTypes);
     }
@@ -196,23 +189,6 @@ public class JsonConverterBuilder {
 
         public boolean shouldSkipField(FieldAttributes field) {
             return field.getAnnotation(DiffIgnore.class) != null;
-        }
-    }
-
-    private class IgnoredClassesExclusionStrategy implements ExclusionStrategy {
-
-        private final IgnoredClassesStrategy ignoredClassesStrategy;
-
-        private IgnoredClassesExclusionStrategy(IgnoredClassesStrategy ignoredClassesStrategy) {
-            this.ignoredClassesStrategy = ignoredClassesStrategy;
-        }
-
-        public boolean shouldSkipClass(Class<?> clazz) {
-            return this.ignoredClassesStrategy.isIgnored(clazz);
-        }
-
-        public boolean shouldSkipField(FieldAttributes field) {
-            return false;
         }
     }
 }

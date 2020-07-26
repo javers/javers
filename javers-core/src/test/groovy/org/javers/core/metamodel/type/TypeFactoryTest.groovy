@@ -42,7 +42,7 @@ class TypeFactoryTest extends Specification {
     static TypeFactory create(MappingStyle mappingStyle){
         def javersTestAssembly = javersTestAssembly(mappingStyle)
         def classScanner = javersTestAssembly.getContainerComponent(ClassScanner)
-        new TypeFactory(classScanner, javersTestAssembly.typeMapper)
+        new TypeFactory(classScanner, javersTestAssembly.typeMapper, new DynamicMappingStrategy())
     }
 
     def setupSpec() {
