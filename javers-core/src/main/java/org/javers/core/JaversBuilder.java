@@ -91,6 +91,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
     private DateProvider dateProvider;
     private long bootStart = System.currentTimeMillis();
 
+    private IgnoredClassesStrategy ignoredClassesStrategy;
+
     public static JaversBuilder javers() {
         return new JaversBuilder();
     }
@@ -145,6 +147,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         Set<JaversType> additionalTypes = bootAddOns();
 
         // boot TypeMapper module
+        addComponent(new DynamicMappingStrategy(ignoredClassesStrategy));
         addModule(new TypeMapperModule(getContainer()));
 
         // boot JSON beans & domain aware typeAdapters
@@ -494,6 +497,20 @@ public class JaversBuilder extends AbstractContainerBuilder {
     public JaversBuilder registerIgnoredClass(Class<?> ignoredClass) {
         argumentIsNotNull(ignoredClass);
         registerType(new IgnoredTypeDefinition(ignoredClass));
+        return this;
+    }
+
+    /**
+     * A dynamic version of {@link JaversBuilder#registerIgnoredClass(Class)}
+     * Registers strategy for marking certain classes as ignored.
+     * <br/><br/>
+     *
+     * Use this method as the alternative to the {@link DiffIgnore} annotation
+     * or multiple calls of {@link JaversBuilder#registerIgnoredClass(Class)}.
+     */
+    public JaversBuilder registerIgnoredClassesStrategy(IgnoredClassesStrategy ignoredClassesStrategy) {
+        argumentIsNotNull(ignoredClassesStrategy);
+        this.ignoredClassesStrategy = ignoredClassesStrategy;
         return this;
     }
 
