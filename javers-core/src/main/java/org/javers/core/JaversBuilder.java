@@ -490,7 +490,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * Marks given class as ignored by JaVers.
      * <br/><br/>
      *
-     * Use this method if you are not willing to use {@link DiffIgnore} annotation.
+     * Use this method as an alternative to the {@link DiffIgnore} annotation.
      *
      * @see DiffIgnore
      */
@@ -501,9 +501,18 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * A dynamic version of {@link JaversBuilder#registerIgnoredClass(Class)}
-     * Registers strategy for marking certain classes as ignored.
+     * A dynamic version of {@link JaversBuilder#registerIgnoredClass(Class)}.
+     * <br/>
+     * Registers a custom strategy for marking certain classes as ignored.
      * <br/><br/>
+     *
+     * For example, you can ignore classes by package naming convention:
+     *
+     * <pre>
+     * Javers javers = JaversBuilder.javers()
+     *         .registerIgnoredClassesStrategy(c -> c.getName().startsWith("com.ignore.me"))
+     *         .build();
+     * </pre>
      *
      * Use this method as the alternative to the {@link DiffIgnore} annotation
      * or multiple calls of {@link JaversBuilder#registerIgnoredClass(Class)}.
