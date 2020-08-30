@@ -6,10 +6,7 @@ import com.google.gson.JsonSyntaxException;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.CdoSnapshotState;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.*;
 
 import java.time.format.DateTimeParseException;
@@ -76,7 +73,7 @@ class ShadowGraphBuilder {
         ShadowBuilder shadowBuilder = new ShadowBuilder(cdoSnapshot, null);
         builtNodes.put(cdoSnapshot.getGlobalId(), shadowBuilder);
 
-        JsonObject jsonElement = toJson(cdoSnapshot.getState());
+        JsonObject jsonElement = toJson(cdoSnapshot.stateWithAllPrimitives());
         mapCustomPropertyNamesToJavaOrigin(cdoSnapshot.getManagedType(), jsonElement);
         followReferences(shadowBuilder, jsonElement);
 

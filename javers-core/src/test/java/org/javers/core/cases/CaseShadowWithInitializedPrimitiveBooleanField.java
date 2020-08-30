@@ -1,14 +1,18 @@
 package org.javers.core.cases;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-import javax.persistence.Id;
-import java.util.List;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
+import org.javers.shadow.Shadow;
 import org.junit.Test;
+
+import javax.persistence.Id;
+import java.util.List;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class CaseShadowWithInitializedPrimitiveBooleanField {
 
@@ -24,9 +28,15 @@ public class CaseShadowWithInitializedPrimitiveBooleanField {
         javers.commit( "author", original );
 
         JqlQuery query = QueryBuilder.byInstanceId( personId, Person.class ).build();
-        List<org.javers.shadow.Shadow<Person>> shadows = javers.findShadows( query );
+        List<Shadow<Person>> shadows = javers.findShadows( query );
+        List<CdoSnapshot> snapshots = javers.findSnapshots( query);
 
         Person shadow = shadows.get( 0 ).get();
+
+        System.out.println("loaded snapshot " + snapshots.get(0));
+        System.out.println("original " + original.isActive());
+        System.out.println("shadow " + shadow.isActive());
+
         assertThat( shadow.isActive() ).isEqualTo( original.isActive() );
     }
 

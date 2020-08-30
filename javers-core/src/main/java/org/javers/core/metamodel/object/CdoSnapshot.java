@@ -14,6 +14,7 @@ import java.util.function.BiFunction;
 
 import static java.util.Collections.unmodifiableList;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
 import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
 
@@ -170,7 +171,17 @@ public final class CdoSnapshot extends Cdo {
             .append("Snapshot{commit:").append(getCommitMetadata().getId()).append(", ")
             .append("id:").append(getGlobalId()).append(", ")
             .append("version:").append(getVersion()).append(", ")
-            .append(getState()+"}");
+            .append("state:" + getState()+"}");
         return stringBuilder.toString();
+    }
+
+    /**
+     * Original state enriched with default primitive values (like <code>boolean false</code>).
+     */
+    public CdoSnapshotState stateWithAllPrimitives() {
+        CdoSnapshotStateBuilder builder = cdoSnapshotState();
+        getManagedType().getProperties().forEach( p ->
+                builder.withPropertyValue(p, getPropertyValue(p)));
+        return builder.build();
     }
 }
