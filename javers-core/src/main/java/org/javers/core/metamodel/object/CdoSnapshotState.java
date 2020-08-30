@@ -124,13 +124,13 @@ public class CdoSnapshotState {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("(");
+        stringBuilder.append("{");
         String prefix = "";
         for (String propertyKey : getSortedPropertyKeys()) {
             stringBuilder.append(prefix).append(propertyKey).append(":").append(getPropertyValue(propertyKey));
             prefix = ", ";
         }
-        stringBuilder.append(")");
+        stringBuilder.append("}");
         return stringBuilder.toString();
     }
 
