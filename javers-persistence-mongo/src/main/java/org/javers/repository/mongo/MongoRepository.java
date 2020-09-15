@@ -271,8 +271,14 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             if (params.from().isPresent()) {
                 query = Filters.and(query, Filters.gte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.from().get())));
             }
+            if (params.fromInstant().isPresent()) {
+                query = Filters.and(query, Filters.gte(COMMIT_DATE_INSTANT, UtilTypeCoreAdapters.serialize(params.fromInstant().get())));
+            }
             if (params.to().isPresent()) {
                 query =  Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.to().get())));
+            }
+            if (params.toInstant().isPresent()) {
+                query = Filters.and(query, Filters.lte(COMMIT_DATE_INSTANT, UtilTypeCoreAdapters.serialize(params.toInstant().get())));
             }
             if (params.toCommitId().isPresent()) {
                 query = Filters.and(query, Filters.lte(COMMIT_ID, params.toCommitId().get().valueAsNumber().doubleValue() + COMMIT_ID_PRECISION));

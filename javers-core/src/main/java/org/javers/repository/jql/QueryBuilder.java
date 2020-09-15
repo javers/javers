@@ -11,6 +11,7 @@ import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.jql.FilterDefinition.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -326,10 +327,29 @@ public class QueryBuilder {
     }
 
     /**
+     * Limits to snapshots created after this UTC date or exactly at this UTC date.
+     * <br/><br/>
+     *
+     * <h2>CommitDate is an UTC instant</h2>
+     */
+    public QueryBuilder fromInstant(Instant fromInstant) {
+        queryParamsBuilder.fromInstant(fromInstant);
+        return this;
+    }
+
+    /**
      * Limits to snapshots created before this date or exactly at this date.
      */
     public QueryBuilder to(LocalDateTime to) {
         queryParamsBuilder.to(to);
+        return this;
+    }
+
+    /**
+     * Limits to snapshots created before this UTC date or exactly at this UTC date.
+     */
+    public QueryBuilder toInstant(Instant toInstant) {
+        queryParamsBuilder.toInstant(toInstant);
         return this;
     }
 
