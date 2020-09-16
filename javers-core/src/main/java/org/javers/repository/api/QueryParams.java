@@ -194,28 +194,35 @@ public class QueryParams {
                 "skip", skip);
     }
 
+    // TODO: refactor - move to InMemoryRepository?
     public boolean hasDates() {
-        return from().isPresent() || fromInstant().isPresent() || to().isPresent() || toInstant().isPresent();
+        return from().isPresent() || to().isPresent();
     }
 
+    // TODO: refactor - move to InMemoryRepository?
     public boolean isDateInRange(LocalDateTime date) {
         if (from().isPresent() && from().get().isAfter(date)){
             return false;
         }
-        if (fromInstant().isPresent()) {
-            Instant dateInstant = date.atZone(ZoneId.systemDefault()).toInstant();
-            if (fromInstant().get().isAfter(dateInstant)) {
-                return false;
-            }
-        }
         if (to().isPresent() && to().get().isBefore(date)){
             return false;
         }
-        if (toInstant().isPresent()) {
-            Instant dateInstant = date.atZone(ZoneId.systemDefault()).toInstant();
-            if (toInstant().get().isBefore(dateInstant)) {
-                return false;
-            }
+
+        return true;
+    }
+
+    // TODO: refactor - move to InMemoryRepository?
+    public boolean hasInstants() {
+        return fromInstant().isPresent() || toInstant().isPresent();
+    }
+
+    // TODO: refactor - move to InMemoryRepository?
+    public boolean isInstantInRange(Instant instant) {
+        if (fromInstant().isPresent() && fromInstant().get().isAfter(instant)) {
+            return false;
+        }
+        if (toInstant().isPresent() && toInstant().get().isBefore(instant)) {
+            return false;
         }
 
         return true;

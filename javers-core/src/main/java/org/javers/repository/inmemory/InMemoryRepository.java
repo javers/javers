@@ -135,6 +135,9 @@ public class InMemoryRepository implements JaversRepository {
         if (queryParams.hasDates()) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
         }
+        if (queryParams.hasInstants()) {
+            snapshots = filterSnapshotsByCommitDateInstant(snapshots, queryParams);
+        }
         if (queryParams.changedProperty().isPresent()){
             snapshots = filterByPropertyName(snapshots, queryParams.changedProperty().get());
         }
@@ -159,6 +162,10 @@ public class InMemoryRepository implements JaversRepository {
 
     private List<CdoSnapshot> filterSnapshotsByCommitDate(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
         return Lists.positiveFilter(snapshots, snapshot -> queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate()));
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByCommitDateInstant(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
+        return Lists.positiveFilter(snapshots, snapshot -> queryParams.isInstantInRange(snapshot.getCommitMetadata().getCommitDateInstant()));
     }
 
     private List<CdoSnapshot> filterSnapshotsByCommitProperties(List<CdoSnapshot> snapshots, final Map<String, String> commitProperties) {
