@@ -25,6 +25,7 @@ import javax.persistence.Id
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 import static groovyx.gpars.GParsPool.withPool
@@ -712,6 +713,39 @@ class JaversRepositoryE2ETest extends Specification {
             (5..3).collect{LocalDateTime.of(2015,01,1,it,0)},
             (3..1).collect{LocalDateTime.of(2015,01,1,it,0)},
             (4..2).collect{LocalDateTime.of(2015,01,1,it,0)}
+        ]
+    }
+
+    @Unroll
+    def "should query for Entity snapshots with UTC time range filter - #what"() {
+        given:
+        (1..5).each {
+            def entity = new SnapshotEntity(id: 1, intProperty: it)
+            def now = ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC)
+            setNow(now)
+            javers.commit('author', entity)
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+        def commitDates = snapshots.commitMetadata.commitDateInstant
+
+        then:
+        commitDates == expectedCommitDates
+
+        where:
+        what << ['util fromInstant', 'util toInstant', 'util in UTC time range']
+        query << [
+                byInstanceId(1, SnapshotEntity).fromInstant(ZonedDateTime.of(2020, 9, 26, 3, 0, 0, 0, ZoneOffset.UTC).toInstant()).build(),
+                byInstanceId(1, SnapshotEntity).toInstant(ZonedDateTime.of(2020, 9, 26, 3, 0, 0, 0, ZoneOffset.UTC).toInstant()).build(),
+                byInstanceId(1, SnapshotEntity)
+                        .fromInstant(ZonedDateTime.of(2020, 9, 26, 2, 0, 0, 0, ZoneOffset.UTC).toInstant())
+                        .toInstant(ZonedDateTime.of(2020, 9, 26, 4, 0, 0, 0, ZoneOffset.UTC).toInstant()).build()
+        ]
+        expectedCommitDates << [
+                (5..3).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC).toInstant() },
+                (3..1).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC).toInstant() },
+                (4..2).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC).toInstant() }
         ]
     }
 
