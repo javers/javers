@@ -721,7 +721,7 @@ class JaversRepositoryE2ETest extends Specification {
         given:
         (1..5).each {
             def entity = new SnapshotEntity(id: 1, intProperty: it)
-            def now = ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC)
+            def now = ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.systemDefault())
             setNow(now)
             javers.commit('author', entity)
         }
@@ -736,16 +736,16 @@ class JaversRepositoryE2ETest extends Specification {
         where:
         what << ['util fromInstant', 'util toInstant', 'util in UTC time range']
         query << [
-                byInstanceId(1, SnapshotEntity).fromInstant(ZonedDateTime.of(2020, 9, 26, 3, 0, 0, 0, ZoneOffset.UTC).toInstant()).build(),
-                byInstanceId(1, SnapshotEntity).toInstant(ZonedDateTime.of(2020, 9, 26, 3, 0, 0, 0, ZoneOffset.UTC).toInstant()).build(),
+                byInstanceId(1, SnapshotEntity).fromInstant(ZonedDateTime.of(2020, 9, 26, 3, 0, 0, 0, ZoneOffset.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toInstant()).build(),
+                byInstanceId(1, SnapshotEntity).toInstant(ZonedDateTime.of(2020, 9, 26, 3, 0, 0, 0, ZoneOffset.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toInstant()).build(),
                 byInstanceId(1, SnapshotEntity)
-                        .fromInstant(ZonedDateTime.of(2020, 9, 26, 2, 0, 0, 0, ZoneOffset.UTC).toInstant())
-                        .toInstant(ZonedDateTime.of(2020, 9, 26, 4, 0, 0, 0, ZoneOffset.UTC).toInstant()).build()
+                        .fromInstant(ZonedDateTime.of(2020, 9, 26, 2, 0, 0, 0, ZoneOffset.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toInstant())
+                        .toInstant(ZonedDateTime.of(2020, 9, 26, 4, 0, 0, 0, ZoneOffset.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toInstant()).build()
         ]
         expectedCommitDates << [
-                (5..3).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC).toInstant() },
-                (3..1).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC).toInstant() },
-                (4..2).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC).toInstant() }
+                (5..3).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toInstant() },
+                (3..1).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toInstant() },
+                (4..2).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toInstant() }
         ]
     }
 
