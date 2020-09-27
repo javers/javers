@@ -49,10 +49,27 @@ public class CommitMetadata implements Serializable {
         return unmodifiableMap(properties);
     }
 
+    /**
+     * Created date as local date.
+     * <br/><br/>
+     *
+     * CommitDate is persisted as LocalDateTime
+     * (without information about time zone and daylight saving time).
+     * <br/><br/>
+     *
+     * It may affects your query results. For example,
+     * once a year when DST ends,
+     * one hour is repeated (clock goes back from 3 am to 2 am).
+     * Looking just on the commitDate we
+     * can't distinct in which <i>iteration</i> of the hour, given commit was made.
+     */
     public LocalDateTime getCommitDate() {
         return commitDate;
     }
 
+    /**
+     * Created date as UTC timestamp
+     */
     public Instant getCommitDateInstant() {
         return commitDateInstant;
     }

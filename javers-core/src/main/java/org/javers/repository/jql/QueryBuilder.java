@@ -1,16 +1,16 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Sets;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.jql.FilterDefinition.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -305,19 +305,9 @@ public class QueryBuilder {
 
     /**
      * Limits to snapshots created after this date or exactly at this date.
-     * <br/><br/>
      *
-     * <h2>CommitDate is local datetime</h2>
-     * Please remember that commitDate is persisted as LocalDateTime
-     * (without information about time zone and daylight saving time).
-     * <br/><br/>
-     *
-     * It may affects your query results. For example,
-     * once a year when DST ends,
-     * one hour is repeated (clock goes back from 3 am to 2 am).
-     * Looking just on the commitDate we
-     * can't distinct in which <i>iteration</i> of the hour, given commit was made.
-     *
+     * @see CommitMetadata#getCommitDate()
+     * @see #fromInstant(Instant)}
      * @see #to(LocalDateTime)
      */
     public QueryBuilder from(LocalDateTime from) {
@@ -326,10 +316,39 @@ public class QueryBuilder {
     }
 
     /**
+     * Limits to snapshots created after this UTC date or exactly at this UTC date.
+     * <br/><br/>
+     *
+     * @see CommitMetadata#getCommitDateInstant()
+     * @see #toInstant(Instant)
+     * @see #from(LocalDateTime)
+     */
+    public QueryBuilder fromInstant(Instant fromInstant) {
+        queryParamsBuilder.fromInstant(fromInstant);
+        return this;
+    }
+
+    /**
      * Limits to snapshots created before this date or exactly at this date.
+     *
+     * @see CommitMetadata#getCommitDate()
+     * @see #toInstant(Instant)}
+     * @see #from(LocalDateTime)
      */
     public QueryBuilder to(LocalDateTime to) {
         queryParamsBuilder.to(to);
+        return this;
+    }
+
+    /**
+     * Limits to snapshots created before this UTC date or exactly at this UTC date.
+     *
+     * @see CommitMetadata#getCommitDateInstant()
+     * @see #fromInstant(Instant)
+     * @see #to(LocalDateTime)
+     */
+    public QueryBuilder toInstant(Instant toInstant) {
+        queryParamsBuilder.toInstant(toInstant);
         return this;
     }
 

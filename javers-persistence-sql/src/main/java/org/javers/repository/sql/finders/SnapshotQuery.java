@@ -68,8 +68,16 @@ class SnapshotQuery {
             selectBuilder.and(COMMIT_COMMIT_DATE, ">=", localDateTimeParam(from));
         });
 
+        queryParams.fromInstant().ifPresent(fromInstant -> {
+            selectBuilder.and(COMMIT_COMMIT_DATE_INSTANT, ">=", instantParam(fromInstant));
+        });
+
         queryParams.to().ifPresent(to -> {
             selectBuilder.and(COMMIT_COMMIT_DATE, "<=", localDateTimeParam(to));
+        });
+
+        queryParams.toInstant().ifPresent(toInstant -> {
+            selectBuilder.and(COMMIT_COMMIT_DATE_INSTANT, "<=", instantParam(toInstant));
         });
 
         queryParams.toCommitId().ifPresent(commitId -> {

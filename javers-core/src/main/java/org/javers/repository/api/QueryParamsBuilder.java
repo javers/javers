@@ -5,6 +5,7 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.jql.QueryBuilder;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import java.util.*;
@@ -16,7 +17,9 @@ public class QueryParamsBuilder {
     private int limit;
     private int skip;
     private LocalDateTime from;
+    private Instant fromInstant;
     private LocalDateTime to;
+    private Instant toInstant;
     private CommitId toCommitId;
     private Set<CommitId> commitIds = new HashSet<>();
     private Long version;
@@ -84,10 +87,26 @@ public class QueryParamsBuilder {
     }
 
     /**
+     * @see QueryBuilder#fromInstant(Instant)
+     */
+    public QueryParamsBuilder fromInstant(Instant fromInstant) {
+        this.fromInstant = fromInstant;
+        return this;
+    }
+
+    /**
      * @see QueryBuilder#to(LocalDateTime)
      */
     public QueryParamsBuilder to(LocalDateTime to) {
         this.to = to;
+        return this;
+    }
+
+    /**
+     * @see QueryBuilder#toInstant(Instant)
+     */
+    public QueryParamsBuilder toInstant(Instant toInstant) {
+        this.toInstant = toInstant;
         return this;
     }
 
@@ -168,6 +187,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType, loadCommitProps);
+        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType, loadCommitProps);
     }
 }

@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public abstract class Parameter<T> {
@@ -34,6 +35,10 @@ public abstract class Parameter<T> {
 
     public static Parameter<LocalDateTime> localDateTimeParam(LocalDateTime value){
         return new LocalDateTimeParameter(null, value);
+    }
+
+    public static Parameter<Instant> instantParam(Instant value) {
+        return new InstantParameter(null, value);
     }
 
     String getName() {
@@ -120,6 +125,17 @@ public abstract class Parameter<T> {
 
         private Timestamp toTimestamp(LocalDateTime value) {
             return new Timestamp(UtilTypeCoreAdapters.toUtilDate(value).getTime());
+        }
+    }
+
+    static class InstantParameter extends Parameter<Instant> {
+        InstantParameter(String name, Instant value) {
+            super(name, value);
+        }
+
+        @Override
+        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setString(order, getValue().toString());
         }
     }
 
