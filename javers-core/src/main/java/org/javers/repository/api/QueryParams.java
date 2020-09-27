@@ -193,38 +193,4 @@ public class QueryParams {
                 "limit", limit,
                 "skip", skip);
     }
-
-    // TODO: refactor - move to InMemoryRepository?
-    public boolean hasDates() {
-        return from().isPresent() || to().isPresent();
-    }
-
-    // TODO: refactor - move to InMemoryRepository?
-    public boolean isDateInRange(LocalDateTime date) {
-        if (from().isPresent() && from().get().isAfter(date)){
-            return false;
-        }
-        if (to().isPresent() && to().get().isBefore(date)){
-            return false;
-        }
-
-        return true;
-    }
-
-    // TODO: refactor - move to InMemoryRepository?
-    public boolean hasInstants() {
-        return fromInstant().isPresent() || toInstant().isPresent();
-    }
-
-    // TODO: refactor - move to InMemoryRepository?
-    public boolean isInstantInRange(Instant instant) {
-        if (fromInstant().isPresent() && fromInstant().get().isAfter(instant)) {
-            return false;
-        }
-        if (toInstant().isPresent() && toInstant().get().isBefore(instant)) {
-            return false;
-        }
-
-        return true;
-    }
 }

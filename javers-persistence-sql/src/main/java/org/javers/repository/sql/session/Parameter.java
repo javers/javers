@@ -135,11 +135,7 @@ public abstract class Parameter<T> {
 
         @Override
         void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
-            preparedStatement.setTimestamp(order, toTimestamp(getValue()));
-        }
-
-        private Timestamp toTimestamp(Instant value) {
-            return Timestamp.from(value);
+            preparedStatement.setString(order, getValue().toString());
         }
     }
 
