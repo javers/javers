@@ -2,16 +2,17 @@ package org.javers.repository.sql.integration.docker
 
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepositoryE2ETest
-import org.junit.ClassRule
 import org.testcontainers.containers.MSSQLServerContainer
+import org.testcontainers.spock.Testcontainers
 import spock.lang.Shared
 
 import java.sql.Connection
 import java.sql.DriverManager
 
+@Testcontainers
 class MSSqlDockerIntegrationWithSchemaTest extends JaversSqlRepositoryE2ETest {
 
-    @ClassRule @Shared
+    @Shared
     public MSSQLServerContainer mssqlserver = new MSSQLServerContainer()
             .withInitScript("init_postgresql_with_schema.sql")
 

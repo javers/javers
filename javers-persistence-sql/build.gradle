@@ -15,6 +15,7 @@ dependencies {
     testCompile 'mysql:mysql-connector-java:8.0.14'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
     testCompile "joda-time:joda-time:$jodaVersion"
+    testCompile "org.testcontainers:spock:$testcontainers"
     testCompile "org.testcontainers:mssqlserver:$testcontainers"
     testCompile "org.testcontainers:postgresql:$testcontainers"
     testCompile "org.testcontainers:mysql:$testcontainers"
@@ -24,6 +25,7 @@ dependencies {
 }
 
 task integrationTest(type: Test) {
+    useJUnitPlatform()
     filter {
         includeTestsMatching 'org.javers.repository.sql.integration.opendatabases.*'
     }
