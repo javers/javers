@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.javers.common.collections.Lists.asList;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 import static java.time.LocalTime.MIDNIGHT;
 import static org.javers.repository.jql.ShadowScope.*;
@@ -193,13 +194,24 @@ public class QueryBuilder {
     }
 
     /**
-     * Only snapshots which changed a given property.
+     * Only snapshots with changes on a given property.
      *
      * @see CdoSnapshot#getChanged()
      */
     public QueryBuilder withChangedProperty(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
-        queryParamsBuilder.changedProperty(propertyName);
+        queryParamsBuilder.changedProperties(asList(propertyName));
+        return this;
+    }
+
+    /**
+     * Only snapshots with changes on one or more properties from a given list.
+     *
+     * @see CdoSnapshot#getChanged()
+     */
+    public QueryBuilder withChangedPropertyIn(String... propertyNames) {
+        Validate.argumentIsNotNull(propertyNames);
+        queryParamsBuilder.changedProperties(asList(propertyNames));
         return this;
     }
 

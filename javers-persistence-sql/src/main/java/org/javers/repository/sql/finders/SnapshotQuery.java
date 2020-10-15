@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 import static org.javers.repository.sql.session.Parameter.*;
 
@@ -60,9 +59,13 @@ class SnapshotQuery {
     }
 
     private void applyQueryParams() {
-        queryParams.changedProperty().ifPresent(changedProperty -> {
-            selectBuilder.and(SNAPSHOT_CHANGED, "like", stringParam("%\"" + queryParams.changedProperty().get() +"\"%"));
-        });
+        if (queryParams.changedProperties().size() > 0) {
+            selectBuilder.append("AND (" +
+                    queryParams.changedProperties().stream()
+                            .map(it -> SNAPSHOT_CHANGED + " LIKE '%" + it + "%'")
+                            .collect(Collectors.joining(" OR ")) +
+                    ")");
+        }
 
         queryParams.from().ifPresent(from -> {
             selectBuilder.and(COMMIT_COMMIT_DATE, ">=", localDateTimeParam(from));

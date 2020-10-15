@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.CommitIdGenerator;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -24,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Fake impl of JaversRepository
@@ -140,8 +138,8 @@ public class InMemoryRepository implements JaversRepository {
         if (hasInstants(queryParams)) {
             snapshots = filterSnapshotsByCommitDateInstant(snapshots, queryParams);
         }
-        if (queryParams.changedProperty().isPresent()){
-            snapshots = filterByPropertyName(snapshots, queryParams.changedProperty().get());
+        if (queryParams.changedProperties().size() > 0) {
+            snapshots = filterByPropertyNames(snapshots, queryParams.changedProperties());
         }
         if (queryParams.snapshotType().isPresent()){
             snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getType() == queryParams.snapshotType().get());
@@ -262,8 +260,8 @@ public class InMemoryRepository implements JaversRepository {
         this.jsonConverter = jsonConverter;
     }
 
-    private List<CdoSnapshot> filterByPropertyName(List<CdoSnapshot> snapshots, final String propertyName){
-        return Lists.positiveFilter(snapshots, input -> input.hasChangeAt(propertyName));
+    private List<CdoSnapshot> filterByPropertyNames(List<CdoSnapshot> snapshots, final Set<String> propertyNames){
+        return Lists.positiveFilter(snapshots, input -> propertyNames.stream().anyMatch(input::hasChangeAt));
     }
 
     private List<CdoSnapshot> getAll(){

@@ -295,6 +295,43 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots.size() == 3
     }
 
+    def "should query for ValueObject snapshots by ValueObject class and changed properties"() {
+        given:
+        def objects = [
+          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London",   street: "str")) ,
+          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London 2", street: "str")) ,
+          new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris", street: "str")) ,
+          new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris", street: "str 2"))] //noise
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
+                .withChangedPropertyIn("city", "street")
+                .withSnapshotTypeUpdate().build())
+
+        then:
+        snapshots.size() == 2
+        snapshots.each {
+            assert it.globalId.typeName == DummyAddress.name
+        }
+
+        when:
+        snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
+                .withChangedPropertyIn("city", "street").build())
+
+        then:
+        snapshots.size() == 4
+
+        when:
+        snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
+                .withChangedPropertyIn("street").build())
+
+        then:
+        snapshots.size() == 3
+    }
+
     def "should query for Entity snapshots with snapshotType filter"(){
       given:
       javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1) )

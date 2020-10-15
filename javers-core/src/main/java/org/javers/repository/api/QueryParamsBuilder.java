@@ -27,7 +27,7 @@ public class QueryParamsBuilder {
     private boolean aggregate;
     private boolean newObjectChanges;
     private Map<String, String> commitProperties = new HashMap<>();
-    private String changedProperty;
+    private Set<String> changedProperties = new HashSet<>();
     private SnapshotType snapshotType;
     private boolean loadCommitProps = true;
 
@@ -167,10 +167,10 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryBuilder#withChangedProperty(String)
+     * @see QueryBuilder#withChangedPropertyIn(String...)
      */
-    public QueryParamsBuilder changedProperty(String propertyName) {
-        this.changedProperty = propertyName;
+    public QueryParamsBuilder changedProperties(Collection<String> propertyNames) {
+        this.changedProperties.addAll(propertyNames);
         return this;
     }
 
@@ -187,6 +187,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType, loadCommitProps);
+        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperties, toCommitId, snapshotType, loadCommitProps);
     }
 }
