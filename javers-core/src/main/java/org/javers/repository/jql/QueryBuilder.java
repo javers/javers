@@ -194,7 +194,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Only snapshots which changed a given property.
+     * Only snapshots with changes on a given property.
      *
      * @see CdoSnapshot#getChanged()
      */
@@ -205,7 +205,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Only snapshots which changed a given properties.
+     * Only snapshots with changes on one or more properties from a given list.
      *
      * @see CdoSnapshot#getChanged()
      */

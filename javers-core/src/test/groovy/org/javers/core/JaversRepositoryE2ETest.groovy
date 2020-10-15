@@ -317,12 +317,19 @@ class JaversRepositoryE2ETest extends Specification {
             assert it.globalId.typeName == DummyAddress.name
         }
 
-        when: "withNewObjectChanges"
+        when:
         snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
                 .withChangedPropertyIn("city", "street").build())
 
         then:
         snapshots.size() == 4
+
+        when:
+        snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
+                .withChangedPropertyIn("street").build())
+
+        then:
+        snapshots.size() == 3
     }
 
     def "should query for Entity snapshots with snapshotType filter"(){
