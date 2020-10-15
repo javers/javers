@@ -189,6 +189,12 @@ class JaversCore implements Javers {
     }
 
     @Override
+    public <T> List<Shadow<T>> findShadows(List<JqlQuery> queries) {
+        queries.forEach(Validate::argumentIsNotNull);
+        return (List)queries.stream().flatMap(it -> queryRunner.queryForShadows(it).stream()).collect(toList());
+    }
+
+    @Override
     public <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query) {
         Validate.argumentIsNotNull(query);
         return (Stream)queryRunner.queryForShadowsStream(query);

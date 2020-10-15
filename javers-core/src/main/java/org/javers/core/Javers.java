@@ -375,6 +375,8 @@ public interface Javers {
      */
     <T> List<Shadow<T>> findShadows(JqlQuery query);
 
+    <T> List<Shadow<T>> findShadows(List<JqlQuery> querys);
+
     /**
      * Streamed version of {@link #findShadows(JqlQuery)}.
      * <br/><br/>

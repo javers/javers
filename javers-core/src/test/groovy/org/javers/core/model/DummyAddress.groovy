@@ -1,5 +1,6 @@
 package org.javers.core.model
 
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
 import javax.persistence.Transient
@@ -10,6 +11,7 @@ import javax.persistence.Transient
  * @author bartosz walacik
  */
 @ToString
+@EqualsAndHashCode
 class DummyAddress extends AbstractDummyAddress{
     public enum Kind {HOME, OFFICE}
 
