@@ -1,14 +1,16 @@
 package org.javers.core
 
-import org.javers.core.commit.Commit
-
 import org.javers.common.date.DateProvider
 import org.javers.common.reflection.ConcreteWithActualType
+import org.javers.core.commit.Commit
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
-import org.javers.core.examples.typeNames.*
+import org.javers.core.examples.typeNames.EntityWithRefactoredValueObject
+import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
+import org.javers.core.examples.typeNames.NewNamedValueObject
+import org.javers.core.examples.typeNames.NewValueObjectWithTypeAlias
 import org.javers.core.metamodel.annotation.TypeName
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
@@ -17,27 +19,19 @@ import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.JqlQuery
 import org.javers.repository.jql.QueryBuilder
-import org.javers.shadow.Shadow
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import javax.persistence.Id
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
+import java.time.*
 
+import static GlobalIdTestBuilder.*
 import static groovyx.gpars.GParsPool.withPool
-import static GlobalIdTestBuilder.instanceId
-import static GlobalIdTestBuilder.unboundedValueObjectId
-import static GlobalIdTestBuilder.valueObjectId
 import static java.lang.Math.abs
 import static java.time.temporal.ChronoUnit.MILLIS
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE
-import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.repository.jql.QueryBuilder.*
 
@@ -265,6 +259,50 @@ class JaversRepositoryE2ETest extends Specification {
                              unboundedValueObjectId(DummyAddress),
                              valueObjectId(1,SnapshotEntity,"valueObjectRef")
                             ]
+    }
+
+    @Unroll
+    def "should query for #what snapshot by multiple GlobalIds with limit"() {
+        given:
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.size() == 6
+        commitSeq(snapshots[0].commitMetadata) == 5
+        snapshots.each {
+            assert expectedGlobalId.contains(it.globalId)
+        }
+
+        where:
+        what << ["Entity", "Unbounded ValueObject", "Bounded ValueObject"]
+        objects << [
+                (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) }
+                        + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) }
+                        + new SnapshotEntity(id: 3), //noise
+                (1..5).collect { new DummyAddress(city: "London${it}") }
+                        + (1..5).collect { new DummyPoint(it, 2) }
+                        + new DummyPoint(6, 2), //noise
+                (1..5).collect { new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London${it}")) }
+                        + (1..5).collect { new SnapshotEntity(id: 2, valueObjectRef: new DummyAddress(city: "Paris${it}")) }
+                        + new SnapshotEntity(id: 3, valueObjectRef: new DummyAddress(city: "London1")) //noise
+        ]
+        query << [
+                [byInstanceId(1, SnapshotEntity).limit(3).build(), byInstanceId(2, SnapshotEntity).limit(3).build()],
+                [QueryBuilder.byClass(DummyAddress).limit(3).build(), QueryBuilder.byClass(DummyPoint).limit(3).build()],
+                [QueryBuilder.byValueObjectId(1, SnapshotEntity, "valueObjectRef").limit(3).build(),
+                 QueryBuilder.byValueObjectId(1, SnapshotEntity, "valueObjectRef").limit(3).build()]
+        ]
+        expectedGlobalId << [
+                [instanceId(1, SnapshotEntity), instanceId(2, SnapshotEntity)],
+                [unboundedValueObjectId(DummyAddress), unboundedValueObjectId(DummyPoint)],
+                [valueObjectId(1, SnapshotEntity, "valueObjectRef"),
+                 valueObjectId(2, SnapshotEntity, "valueObjectRef")]
+        ]
     }
 
     def "should query for ValueObject snapshots by ValueObject class and changed property"() {

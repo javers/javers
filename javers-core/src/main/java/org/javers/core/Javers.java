@@ -13,7 +13,10 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ValueObjectType;
-import org.javers.repository.jql.*;
+import org.javers.repository.jql.GlobalIdDTO;
+import org.javers.repository.jql.JqlQuery;
+import org.javers.repository.jql.QueryBuilder;
+import org.javers.repository.jql.ShadowScope;
 import org.javers.shadow.Shadow;
 
 import java.lang.reflect.Type;
@@ -459,6 +462,8 @@ public interface Javers {
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      */
     List<CdoSnapshot> findSnapshots(JqlQuery query);
+
+    List<CdoSnapshot> findSnapshots(List<JqlQuery> queries);
 
     /**
      * Latest snapshot of a given Entity instance.
