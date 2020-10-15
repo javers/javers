@@ -60,9 +60,9 @@ class SnapshotQuery {
     }
 
     private void applyQueryParams() {
-        queryParams.changedProperty().ifPresent(changedProperty -> {
-            selectBuilder.and(SNAPSHOT_CHANGED, "like", stringParam("%\"" + queryParams.changedProperty().get() +"\"%"));
-        });
+        if (queryParams.changedProperties().size() > 0) {
+            selectBuilder.and(SNAPSHOT_CHANGED + " IN (" + String.join(",", queryParams.changedProperties()) + ")");
+        }
 
         queryParams.from().ifPresent(from -> {
             selectBuilder.and(COMMIT_COMMIT_DATE, ">=", localDateTimeParam(from));

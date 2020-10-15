@@ -296,8 +296,9 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             if (!params.commitProperties().isEmpty()) {
                 query = addCommitPropertiesFilter(query, params.commitProperties());
             }
-            if (params.changedProperty().isPresent()) {
-                query = Filters.and(query, new BasicDBObject(CHANGED_PROPERTIES, params.changedProperty().get()));
+            if (params.changedProperties().size() > 0) {
+                query = Filters.and(query, Filters.or(params.changedProperties().stream()
+                        .map(it -> new BasicDBObject(CHANGED_PROPERTIES, it)).collect(Collectors.toList())));
             }
             if (params.snapshotType().isPresent()) {
                 query = Filters.and(query, new BasicDBObject(SNAPSHOT_TYPE, params.snapshotType().get().name()));

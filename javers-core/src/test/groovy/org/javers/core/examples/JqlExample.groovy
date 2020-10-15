@@ -391,6 +391,25 @@ class JqlExample extends Specification {
         assert javers.findSnapshots(query).size() == 3
     }
 
+    def "should query for changes (and snapshots) with properties filter"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit("me", new Employee(name:"bob", age:30, salary:1000) )
+        javers.commit("me", new Employee(name:"bob", age:31, salary:1100) )
+        javers.commit("me", new Employee(name:"bob", age:31, salary:1200) )
+
+        when:
+        def query = QueryBuilder.byInstanceId("bob", Employee.class)
+                .withChangedPropertyIn("salary", "age").build()
+        Changes changes = javers.findChanges(query)
+
+        then:
+        println changes.prettyPrint()
+        assert changes.size() == 3
+        assert javers.findSnapshots(query).size() == 3
+    }
+
     def "should query for changes (and snapshots) with limit filter"() {
         given:
         def javers = JaversBuilder.javers().build()
