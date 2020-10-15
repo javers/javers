@@ -12,7 +12,6 @@ import org.javers.core.model.PhoneWithShallowCategory
 import org.javers.core.model.ShallowPhone
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
-import org.javers.shadow.Shadow
 import spock.lang.Unroll
 
 import java.time.LocalDate
@@ -660,8 +659,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
         when:
         def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .withScopeDeepPlus().build())
-                .collect{(SnapshotEntity) it.get()}
+                .withScopeDeepPlus().build()).collect{it.get()}
 
         then:
         println shadows[0]
@@ -671,7 +669,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         assertThinShadowOfPhone(shadows.first().shallowPhonesMap["key"])
     }
 
-    static void assertThinShadowOfPhone(def shadow) {
+    void assertThinShadowOfPhone(def shadow) {
         assert shadow.id == 2L
         assert shadow instanceof ShallowPhone
         assert shadow.number == null
