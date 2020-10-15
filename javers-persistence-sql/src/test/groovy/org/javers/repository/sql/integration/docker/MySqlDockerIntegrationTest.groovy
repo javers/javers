@@ -2,16 +2,17 @@ package org.javers.repository.sql.integration.docker
 
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepositoryE2ETest
-import org.junit.ClassRule
 import org.testcontainers.containers.MySQLContainer
+import org.testcontainers.spock.Testcontainers
 import spock.lang.Shared
 
 import java.sql.Connection
 import java.sql.DriverManager
 
+@Testcontainers
 class MySqlDockerIntegrationTest extends JaversSqlRepositoryE2ETest {
 
-    @ClassRule @Shared
+    @Shared
     public MySQLContainer postgres = new MySQLContainer()
 
     Connection createConnection() {

@@ -30,7 +30,7 @@ class JaversAuditableAspectAsyncIntegrationTest extends Specification {
         given:
         def o = new DummyObject()
 
-        assert javersAuditableAspectAsync.lastAsyncCommit.isEmpty()
+        assert !javersAuditableAspectAsync.lastAsyncCommit.isPresent()
 
         when:
         repository.save(o)
