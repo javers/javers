@@ -10,17 +10,17 @@ import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.jql.FilterDefinition.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
-import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 import static java.time.LocalTime.MIDNIGHT;
+import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 import static org.javers.repository.jql.ShadowScope.*;
 
 /**
@@ -92,6 +92,11 @@ public class QueryBuilder {
      * @see <a href="https://github.com/javers/javers/blob/master/javers-core/src/test/groovy/org/javers/core/examples/CompositeIdExample.groovy">CompositeIdExample.groovy</a>
      */
     public static QueryBuilder byInstanceId(Object localId, Class entityClass){
+        Validate.argumentsAreNotNull(localId, entityClass);
+        return new QueryBuilder(new IdFilterDefinition(instanceId(localId, entityClass)));
+    }
+
+    public static QueryBuilder byInstanceId(List<Object> localId, Class entityClass){
         Validate.argumentsAreNotNull(localId, entityClass);
         return new QueryBuilder(new IdFilterDefinition(instanceId(localId, entityClass)));
     }

@@ -10,6 +10,7 @@ import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.util.Collections;
 import java.util.Set;
 
 abstract class FilterDefinition {
@@ -17,14 +18,18 @@ abstract class FilterDefinition {
     abstract Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper);
 
     static class IdFilterDefinition extends FilterDefinition {
-        private final GlobalIdDTO globalIdDTO;
+        private final Set<GlobalIdDTO> globalIdDTOS;
 
-        IdFilterDefinition(GlobalIdDTO globalIdDTO) {
-            this.globalIdDTO = globalIdDTO;
+        IdFilterDefinition(GlobalIdDTO globalIdDTOS) {
+            this.globalIdDTOS = Collections.singleton(globalIdDTOS);
+        }
+
+        IdFilterDefinition(Set<GlobalIdDTO> globalIdDTOS) {
+            this.globalIdDTOS = globalIdDTOS;
         }
 
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
-            return new IdFilter(globalIdFactory.createFromDto(globalIdDTO));
+            return new IdFilter(Sets.transform(globalIdDTOS, globalIdFactory::createFromDto));
         }
     }
 

@@ -686,27 +686,14 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         objects << [
                 (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) }
                         + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) }
-                        + new SnapshotEntity(id: 3), //noise
-                (1..5).collect { new DummyAddress(city: "London${it}") }
-                        + (1..5).collect { new DummyPoint(it, 2) }
-                        + new DummyPoint(6, 2), //noise
-                (1..5).collect { new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London${it}")) }
-                        + (1..5).collect { new SnapshotEntity(id: 2, valueObjectRef: new DummyAddress(city: "Paris${it}")) }
-                        + new SnapshotEntity(id: 3, valueObjectRef: new DummyAddress(city: "London1")) //noise
+                        + new SnapshotEntity(id: 3) //noise
         ]
         query << [
-                [byInstanceId(1, SnapshotEntity).limit(3).build(), byInstanceId(2, SnapshotEntity).limit(3).build()],
-                [QueryBuilder.byClass(DummyAddress).limit(3).build(), QueryBuilder.byClass(DummyPoint).limit(3).build()],
-                [QueryBuilder.byValueObjectId(1, SnapshotEntity, "valueObjectRef").limit(3).build(),
-                 QueryBuilder.byValueObjectId(1, SnapshotEntity, "valueObjectRef").limit(3).build()]
+                [byInstanceId(Arrays.asList(1, 2), SnapshotEntity).limit(6).build()]
         ]
         expectedId << [
                 (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) }
-                        + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) },
-                (1..5).collect { new DummyAddress(city: "London${it}") }
-                        + (1..5).collect { new DummyPoint(it, 2) },
-                (1..5).collect { new DummyAddress(city: "London${it}") }
-                        + (1..5).collect { new DummyAddress(city: "Paris${it}") }
+                        + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) }
         ]
     }
 

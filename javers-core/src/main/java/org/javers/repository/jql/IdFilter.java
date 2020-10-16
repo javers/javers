@@ -5,32 +5,45 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * @author bartosz.walacik
  */
 class IdFilter extends Filter {
-    private final GlobalId globalId;
+    private final Set<GlobalId> globalIds;
 
-    IdFilter(GlobalId globalId) {
-        Validate.argumentIsNotNull(globalId);
-        this.globalId = globalId;
+    IdFilter(GlobalId globalIds) {
+        Validate.argumentIsNotNull(globalIds);
+        this.globalIds = Collections.singleton(globalIds);
+    }
+
+    IdFilter(Set<GlobalId> globalIds) {
+        globalIds.forEach(Validate::argumentIsNotNull);
+        this.globalIds = globalIds;
     }
 
     GlobalId getGlobalId() {
-        return globalId;
+        return globalIds.stream().findFirst().get();
+    }
+
+    Set<GlobalId> getGlobalIds() {
+        return globalIds;
     }
 
     @Override
     public String toString() {
-        return ToStringBuilder.toString(this, "globalId", globalId);
+        return ToStringBuilder.toString(this, "globalIds", globalIds);
     }
 
     boolean isInstanceIdFilter() {
-        return globalId instanceof InstanceId;
+        return globalIds.stream()
+                .allMatch(it -> it instanceof InstanceId);
     }
 
     @Override
     boolean matches(GlobalId targetId) {
-        return globalId.equals(targetId);
+        return globalIds.contains(targetId);
     }
 }

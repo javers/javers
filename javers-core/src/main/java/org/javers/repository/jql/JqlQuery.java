@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static org.javers.repository.jql.ShadowScope.DEEP_PLUS;
 
@@ -103,6 +102,9 @@ public class JqlQuery {
 
     GlobalId getIdFilter() {
         return getFilter(IdFilter.class).get().getGlobalId();
+    }
+    Set<GlobalId> getIdFilters() {
+        return getFilter(IdFilter.class).get().getGlobalIds();
     }
 
     VoOwnerFilter getVoOwnerFilter() {
