@@ -21,7 +21,7 @@ public class Sets {
 
 
     public static Set wrapNull(Object set) {
-        if (set == null || set == MissingProperty.INSTANCE) {
+        if (set == null || set == MissingProperty.INSTANCE || !(set instanceof Set)) {
             return Collections.emptySet();
         }
         return (Set) set;
