@@ -16,7 +16,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class Lists {
 
     public static List wrapNull(Object list) {
-        if (list == null || list == MissingProperty.INSTANCE) {
+        if (list == null || list == MissingProperty.INSTANCE || !(list instanceof List)) {
             return Collections.emptyList();
         }
         return (List)list;

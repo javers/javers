@@ -13,7 +13,7 @@ import java.util.Set;
 public class Maps {
 
     public static Map wrapNull(Object map){
-        if (map == null || map == MissingProperty.INSTANCE){
+        if (map == null || map == MissingProperty.INSTANCE || !(map instanceof Map)){
             return Collections.emptyMap();
         }
         return (Map)map;
