@@ -9,7 +9,7 @@ import org.javers.core.model.SnapshotEntity
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryBuilder
 import org.javers.repository.sql.schema.JaversSchemaManager
-import org.javers.repository.sql.schema.TableNameProvider
+import org.javers.repository.sql.schema.DBNameProvider
 import spock.lang.Shared
 
 import java.sql.Connection

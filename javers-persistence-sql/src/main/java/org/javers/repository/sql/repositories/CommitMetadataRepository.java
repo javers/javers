@@ -2,8 +2,8 @@ package org.javers.repository.sql.repositories;
 
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
+import org.javers.repository.sql.schema.DBNameProvider;
 import org.javers.repository.sql.schema.SchemaNameAware;
-import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.type.Timestamp;
 
@@ -13,25 +13,30 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import org.javers.core.commit.CommitId;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
+import org.javers.repository.sql.schema.DBNameProvider;
+import org.javers.repository.sql.schema.SchemaNameAware;
+import org.javers.repository.sql.session.Session;
+import org.polyjdbc.core.type.Timestamp;
 
 /**
  * @author pawel szymczyk
  */
 public class CommitMetadataRepository extends SchemaNameAware {
 
-    public CommitMetadataRepository(TableNameProvider tableNameProvider) {
+    public CommitMetadataRepository(DBNameProvider tableNameProvider) {
         super(tableNameProvider);
     }
 
     public long save(String author, Map<String, String> properties, LocalDateTime date, Instant dateInstant, CommitId commitId, Session session) {
         long commitPk = session.insert("Commit")
                 .into(getCommitTableNameWithSchema())
-                .value(COMMIT_AUTHOR, author)
-                .value(COMMIT_COMMIT_DATE, date)
-                .value(COMMIT_COMMIT_DATE_INSTANT, UtilTypeCoreAdapters.serialize(dateInstant))
-                .value(COMMIT_COMMIT_ID, commitId.valueAsNumber())
-                .sequence(COMMIT_PK, getCommitPkSeqName().nameWithSchema())
+                .value(getCommitAuthorColumnName(), author)
+                .value(getCommitCommitDateColumnName(), date)
+                .value(getCommitCommitDateInstantColumnName(), UtilTypeCoreAdapters.serialize(dateInstant))
+                .value(getCommitCommitIdColumName(), commitId.valueAsNumber())
+                .sequence(getCommitPKColumnName(), getCommitPkSeqName().nameWithSchema())
                 .executeAndGetSequence();
 
         insertCommitProperties(commitPk, properties, session);
@@ -42,9 +47,9 @@ public class CommitMetadataRepository extends SchemaNameAware {
         for (Map.Entry<String, String> property : properties.entrySet()) {
             session.insert("CommitProperty")
                    .into(getCommitPropertyTableNameWithSchema())
-                   .value(COMMIT_PROPERTY_COMMIT_FK, commitPk)
-                   .value(COMMIT_PROPERTY_NAME, property.getKey())
-                   .value(COMMIT_PROPERTY_VALUE, property.getValue())
+                   .value(getCommitPropertyCommitFKColumnName(), commitPk)
+                   .value(getCommitPropertyNameColumnName(), property.getKey())
+                   .value(getCommitPropertyValueColumnName(), property.getValue())
                    .execute();
         }
     }
@@ -52,7 +57,7 @@ public class CommitMetadataRepository extends SchemaNameAware {
     boolean isCommitPersisted(CommitId commitId, Session session) {
         long count = session.select("count(*)")
                .from(getCommitTableNameWithSchema())
-               .and(COMMIT_COMMIT_ID, commitId.valueAsNumber())
+               .and(getCommitCommitIdColumName(), commitId.valueAsNumber())
                .queryForLong("isCommitPersisted");
 
         return count > 0;
@@ -70,7 +75,7 @@ public class CommitMetadataRepository extends SchemaNameAware {
     }
 
     private Optional<BigDecimal> selectMaxCommitId(Session session) {
-        return session.select("MAX(" + COMMIT_COMMIT_ID + ")")
+        return session.select("MAX(" + getCommitCommitIdColumName() + ")")
                 .from(getCommitTableNameWithSchema())
                 .queryForOptionalBigDecimal("max CommitId");
     }
