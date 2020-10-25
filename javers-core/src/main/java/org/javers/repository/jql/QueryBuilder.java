@@ -297,7 +297,7 @@ public class QueryBuilder {
      * By default, the limit is set to 100, which works well with small data structures.
      * <br/><br/>
      *
-     * There are four type of query output: List of Changes,
+     * There are four types of query output: List of Changes,
      * List of Snapshots, List of Shadows, and Stream of Shadows.
      *
      * Since all of Javers queries rely on <b>Snapshots</b>
@@ -309,11 +309,11 @@ public class QueryBuilder {
      *   it's the maximum size of a returned list.
      *   </li>
      *   <li>{@link Javers#findChanges(JqlQuery)} &mdash;
-     *   the size of a returned list can be <b>greater</b> then the limit, because,
+     *   the size of a returned list can be <b>greater</b> than the limit, because,
      *   typically a difference between any two Snapshots consists of many atomic Changes.
      *   </li>
      *   <li>{@link Javers#findShadows(JqlQuery)} &mdash;
-     *   the size of a returned list can be <b>less</b> then the limit and
+     *   the size of a returned list can be <b>less</b> than the limit and
      *   Shadow graphs can be incomplete,
      *   because, typically, one Shadow is reconstructed from many Snapshots.
      *   Hitting the limit in findShadows() is very likely and it's a bad thing.
@@ -321,7 +321,7 @@ public class QueryBuilder {
      *   <li>{@link Javers#findShadowsAndStream(JqlQuery)} &mdash;
      *   the resulting stream is <b>lazily loaded</b> and it's limited only by
      *   the size of your JaversRepository and your heap.
-     *   When the limit is hit, Javers repeats a given query to load next bunch of Snapshots.
+     *   When the limit is hit, Javers repeats a given query to load a next bunch of Snapshots.
      *   Shadow graphs loaded by findShadowsAndStream() are always complete,
      *   but can trigger a lot of queries.
      *   </li>

@@ -226,7 +226,7 @@ public interface Javers {
      * <br/>
      *
      * When a given {@link QueryBuilder#limit(int)} is hit &mdash; Javers creates<br/>
-     * incomplete object graphs or returns lower number of Shadows than expected.<br/>
+     * incomplete object graphs or returns a lower number of Shadows than expected.<br/>
      * <br/>
      *
      * <b>The only way to be sure that your Shadows are complete</b> is using<br/>
@@ -385,11 +385,11 @@ public interface Javers {
     <T> List<Shadow<T>> findShadows(JqlQuery query);
 
     /**
-     * Streamed version of {@link #findShadows(JqlQuery)}.
+     * The streamed version of {@link #findShadows(JqlQuery)}.
      * <br/><br/>
      *
      * The returned stream is lazy loaded. When the {@link QueryBuilder#limit(int)} is hit,
-     * Javers repeats a given query to load next bunch of Snapshots.
+     * Javers repeats a given query to load a next bunch of Snapshots.
      * <br/><br/>
      *
      * Streaming is <b>the recommended way</b> to load large Shadow graphs.
