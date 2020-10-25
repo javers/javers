@@ -13,7 +13,7 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 class QueryBuilderLimitExamples extends Specification {
 
-    def "snapshot limit with query for Changes"() {
+    def "snapshot limit with findChanges"() {
         given:
         def javers = JaversBuilder.javers().build()
 
@@ -36,7 +36,7 @@ class QueryBuilderLimitExamples extends Specification {
         changes.size() == 4
     }
 
-    def "snapshot limit with query for Shadows"() {
+    def "snapshot limit with findShadows and findShadowsAndStream"() {
         given:
         def javers = JaversBuilder.javers().build()
 
@@ -48,7 +48,7 @@ class QueryBuilderLimitExamples extends Specification {
         bob.primaryAddress.city = "New York"
         javers.commit("me", bob) // 3 snapshots are persisted
 
-        when : "snapshots limit == 2"
+        when : "findShadows() -- result is incomplete"
         def shadows = javers.findShadows(byInstanceId("Bob", Employee)
                 .limit(2).build())
 
@@ -57,9 +57,19 @@ class QueryBuilderLimitExamples extends Specification {
         then:
         shadows.size() == 1
 
-        when : "snapshots limit == 4"
+        when : "findShadows() -- result is complete"
         shadows = javers.findShadows(byInstanceId("Bob", Employee)
                 .limit(4).build())
+
+        shadows.each {println(it)}
+
+        then:
+        shadows.size() == 2
+
+        when : "findShadowsAndStream() -- result is complete"
+        shadows = javers.findShadowsAndStream(byInstanceId("Bob", Employee)
+                .limit(2).build())
+                .toArray() // casting to array loads the whole stream
 
         shadows.each {println(it)}
 
