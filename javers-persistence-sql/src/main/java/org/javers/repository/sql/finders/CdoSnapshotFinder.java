@@ -1,5 +1,14 @@
 package org.javers.repository.sql.finders;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Sets;
 import org.javers.core.json.CdoSnapshotSerialized;
@@ -13,15 +22,8 @@ import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.finders.SnapshotQuery.SnapshotDbIdentifier;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
-import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.schema.DBNameProvider;
 import org.javers.repository.sql.session.Session;
-
-import java.util.*;
-import java.util.function.Consumer;
-
-import static java.util.stream.Collectors.toList;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBAL_ID_FK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_PK;
 
 public class CdoSnapshotFinder {
 
@@ -29,12 +31,12 @@ public class CdoSnapshotFinder {
     private final CommitPropertyFinder commitPropertyFinder;
     private final CdoSnapshotsEnricher cdoSnapshotsEnricher = new CdoSnapshotsEnricher();
     private JsonConverter jsonConverter;
-    private final TableNameProvider tableNameProvider;
+    private final DBNameProvider dbNameProvider;
 
-    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameProvider tableNameProvider) {
+    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, DBNameProvider dbNameProvider) {
         this.globalIdRepository = globalIdRepository;
         this.commitPropertyFinder = commitPropertyFinder;
-        this.tableNameProvider = tableNameProvider;
+        this.dbNameProvider = dbNameProvider;
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId, Session session, boolean loadCommitProps) {
@@ -87,7 +89,7 @@ public class CdoSnapshotFinder {
 
     private List<CdoSnapshot> fetchCdoSnapshots(Consumer<SnapshotQuery> additionalFilter,
                                                 QueryParams queryParams, Session session) {
-        SnapshotQuery query = new SnapshotQuery(tableNameProvider, queryParams, session);
+        SnapshotQuery query = new SnapshotQuery(dbNameProvider, queryParams, session);
         additionalFilter.accept(query);
         List<CdoSnapshotSerialized> serializedSnapshots = query.run();
 
@@ -104,9 +106,9 @@ public class CdoSnapshotFinder {
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk, Session session) {
 
         Optional<Long> maxPrimaryKey =  session
-                .select("MAX(" + SNAPSHOT_PK + ")")
-                .from(tableNameProvider.getSnapshotTableNameWithSchema())
-                .and(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
+                .select("MAX(" + dbNameProvider.getSnapshotPKColumnName() + ")")
+                .from(dbNameProvider.getSnapshotTableNameWithSchema())
+                .and(dbNameProvider.getSnapshotGlobalIdFKColumnName(), globalIdPk)
                 .queryName("select max snapshot's PK")
                 .queryForOptionalLong();
 

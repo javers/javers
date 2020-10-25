@@ -1,8 +1,21 @@
 package org.javers.repository.sql.schema;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Map;
+
 import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.PolyJDBC;
-import org.polyjdbc.core.dialect.*;
+import org.polyjdbc.core.dialect.Dialect;
+import org.polyjdbc.core.dialect.H2Dialect;
+import org.polyjdbc.core.dialect.MsSqlDialect;
+import org.polyjdbc.core.dialect.MysqlDialect;
+import org.polyjdbc.core.dialect.OracleDialect;
+import org.polyjdbc.core.dialect.PostgresDialect;
 import org.polyjdbc.core.exception.SchemaInspectionException;
 import org.polyjdbc.core.schema.SchemaInspector;
 import org.polyjdbc.core.schema.SchemaManager;
@@ -11,12 +24,6 @@ import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.TheCloser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.*;
-import java.util.Map;
-
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_DATE_INSTANT;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_OWNER_ID_FK;
 
 /**
  * @author bartosz walacik
@@ -31,7 +38,7 @@ public class JaversSchemaManager extends SchemaNameAware {
     private final PolyJDBC polyJDBC;
     private final ConnectionProvider connectionProvider;
 
-    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, PolyJDBC polyJDBC, ConnectionProvider connectionProvider, TableNameProvider tableNameProvider) {
+    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, PolyJDBC polyJDBC, ConnectionProvider connectionProvider, DBNameProvider tableNameProvider) {
         super(tableNameProvider);
         this.dialect = dialect;
         this.schemaFactory = schemaFactory;
@@ -70,10 +77,10 @@ public class JaversSchemaManager extends SchemaNameAware {
      * JaVers 5.0 to 5.1 schema migration
      */
     private void addCommitDateInstantColumnIfNeeded() {
-        if (!columnExists(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT)){
-            addStringColumn(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT, 30);
+        if (!columnExists(getCommitTableNameWithSchema(), getCommitCommitDateInstantColumnName())){
+            addStringColumn(getCommitTableNameWithSchema(), getCommitCommitDateInstantColumnName(), 30);
         } else {
-            extendStringColumnIfNeeded(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT, 30);
+            extendStringColumnIfNeeded(getCommitTableNameWithSchema(), getCommitCommitDateInstantColumnName(), 30);
         }
     }
 
@@ -95,33 +102,34 @@ public class JaversSchemaManager extends SchemaNameAware {
      */
     @Deprecated
     private void addDbIndexOnOwnerId() {
+    	
         if (dialect instanceof OracleDialect) {
             return;
         }
 
-        addIndex(getGlobalIdTableName(), new FixedSchemaFactory.IndexedCols(GLOBAL_ID_OWNER_ID_FK));
+        addIndex(getGlobalIdTableName(), new FixedSchemaFactory.IndexedCols(getGlobalIdOwnerIDFKColumnName()));
     }
 
     /**
      * JaVers 2.5 to 2.6 schema migration
      */
     private void alterCommitIdColumnIfNeeded() {
-        ColumnType commitIdColType = getTypeOf(getCommitTableNameWithSchema(), "commit_id");
+        ColumnType commitIdColType = getTypeOf(getCommitTableNameWithSchema(), getCommitPKColumnName());
 
         if (commitIdColType.precision == 12) {
             logger.info("migrating db schema from JaVers 2.5 to 2.6 ...");
             if (dialect instanceof PostgresDialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id TYPE numeric(22,2)");
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN "+getCommitPKColumnName()+" TYPE numeric(22,2)");
             } else if (dialect instanceof H2Dialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id numeric(22,2)");
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN "+getCommitPKColumnName()+" numeric(22,2)");
             } else if (dialect instanceof MysqlDialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY commit_id numeric(22,2)");
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY "+getCommitPKColumnName()+" numeric(22,2)");
             } else if (dialect instanceof OracleDialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY commit_id number(22,2)");
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY "+getCommitPKColumnName()+" number(22,2)");
             } else if (dialect instanceof MsSqlDialect) {
-                executeSQL("drop index jv_commit_commit_id_idx on " + getCommitTableNameWithSchema());
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id numeric(22,2)");
-                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON " + getCommitTableNameWithSchema() + " (commit_id)");
+                executeSQL("drop index commit_commit_id_idx on " + getCommitTableNameWithSchema());
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN "+getCommitPKColumnName()+" numeric(22,2)");
+                executeSQL("CREATE INDEX commit_commit_id_idx ON " + getCommitTableNameWithSchema() + " ("+getCommitPKColumnName()+")");
             } else {
                 handleUnsupportedDialect();
             }

@@ -1,20 +1,21 @@
 package org.javers.repository.sql.repositories;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import java.util.Optional;
+
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.sql.SqlRepositoryConfiguration;
+import org.javers.repository.sql.schema.DBNameProvider;
 import org.javers.repository.sql.schema.SchemaNameAware;
-import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.session.InsertBuilder;
 import org.javers.repository.sql.session.SelectBuilder;
 import org.javers.repository.sql.session.Session;
-import java.util.Optional;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 public class GlobalIdRepository extends SchemaNameAware {
 
@@ -25,7 +26,7 @@ public class GlobalIdRepository extends SchemaNameAware {
             .maximumSize(1000)
             .build();
 
-    public GlobalIdRepository(TableNameProvider tableNameProvider, SqlRepositoryConfiguration configuration) {
+    public GlobalIdRepository(DBNameProvider tableNameProvider, SqlRepositoryConfiguration configuration) {
         super(tableNameProvider);
         this.disableCache = configuration.isGlobalIdCacheDisabled();
     }
@@ -66,7 +67,7 @@ public class GlobalIdRepository extends SchemaNameAware {
     }
 
     private Optional<Long> findGlobalIdPkInDB(GlobalId globalId, Session session) {
-        SelectBuilder select =  session.select(GLOBAL_ID_PK)
+        SelectBuilder select =  session.select(getGlobalIdPKColumnName())
                 .from(getGlobalIdTableNameWithSchema());
 
         if (globalId instanceof ValueObjectId) {
@@ -75,17 +76,17 @@ public class GlobalIdRepository extends SchemaNameAware {
             if (!ownerFk.isPresent()){
                 return Optional.empty();
             }
-            select.and(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment())
-                  .and(GLOBAL_ID_OWNER_ID_FK, ownerFk.get())
+            select.and(getGlobalIdFragmentColumnName(), valueObjectId.getFragment())
+                  .and(getGlobalIdOwnerIDFKColumnName(), ownerFk.get())
                   .queryName("find PK of valueObjectId");
         }
         else if (globalId instanceof InstanceId){
-            select.and(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(((InstanceId)globalId).getCdoId()))
-                  .and(GLOBAL_ID_TYPE_NAME, globalId.getTypeName())
+            select.and(getGlobalIdLocalIdColumnName(), jsonConverter.toJson(((InstanceId)globalId).getCdoId()))
+                  .and(getGlobalIdTypeNameColumnName(), globalId.getTypeName())
                   .queryName("find PK of InstanceId");
         }
         else if (globalId instanceof UnboundedValueObjectId){
-            select.and(GLOBAL_ID_TYPE_NAME, globalId.getTypeName())
+            select.and(getGlobalIdTypeNameColumnName(), globalId.getTypeName())
                   .queryName("find PK of UnboundedValueObjectId");
         }
 
@@ -99,22 +100,22 @@ public class GlobalIdRepository extends SchemaNameAware {
             insert = session.insert("ValueObjectId");
             ValueObjectId valueObjectId  = (ValueObjectId) globalId;
             long ownerFk = getOrInsertId(valueObjectId.getOwnerId(), session);
-            insert.value(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment())
-                  .value(GLOBAL_ID_OWNER_ID_FK, ownerFk);
+            insert.value(getGlobalIdFragmentColumnName(), valueObjectId.getFragment())
+                  .value(getGlobalIdOwnerIDFKColumnName(), ownerFk);
         }
         else if (globalId instanceof InstanceId) {
             insert = session.insert("InstanceId")
-                    .value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName())
-                    .value(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(((InstanceId)globalId).getCdoId()));
+                    .value(getGlobalIdTypeNameColumnName(), globalId.getTypeName())
+                    .value(getGlobalIdLocalIdColumnName(), jsonConverter.toJson(((InstanceId)globalId).getCdoId()));
 
         }
         else if (globalId instanceof UnboundedValueObjectId) {
             insert = session.insert("UnboundedValueObjectId")
-                    .value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
+                    .value(getGlobalIdTypeNameColumnName(), globalId.getTypeName());
         }
 
         return insert.into(getGlobalIdTableNameWithSchema())
-              .sequence(GLOBAL_ID_PK, getGlobalIdPkSeqName().nameWithSchema())
+              .sequence(getGlobalIdPKColumnName(), getGlobalIdPkSeqName().nameWithSchema())
               .executeAndGetSequence();
     }
 

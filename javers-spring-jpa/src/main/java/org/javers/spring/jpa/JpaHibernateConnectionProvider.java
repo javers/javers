@@ -1,7 +1,6 @@
 package org.javers.spring.jpa;
 
-import org.hibernate.Session;
-import org.hibernate.internal.SessionImpl;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.javers.repository.sql.ConnectionProvider;
 
 import javax.persistence.EntityManager;
@@ -19,7 +18,7 @@ public class JpaHibernateConnectionProvider implements ConnectionProvider{
     @Override
     public Connection getConnection() {
 
-        SessionImpl session =  (SessionImpl)entityManager.unwrap(Session.class);
+        SessionImplementor session =  entityManager.unwrap(SessionImplementor.class);
 
         return session.connection();
     }

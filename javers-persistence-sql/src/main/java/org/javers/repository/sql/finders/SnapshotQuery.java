@@ -1,14 +1,10 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.string.ToStringBuilder;
-import org.javers.core.json.CdoSnapshotSerialized;
-import org.javers.repository.api.QueryParams;
-import org.javers.repository.api.SnapshotIdentifier;
-import org.javers.repository.sql.schema.TableNameProvider;
-import org.javers.repository.sql.session.ObjectMapper;
-import org.javers.repository.sql.session.Parameter;
-import org.javers.repository.sql.session.SelectBuilder;
-import org.javers.repository.sql.session.Session;
+import static org.javers.repository.sql.session.Parameter.bigDecimalParam;
+import static org.javers.repository.sql.session.Parameter.instantParam;
+import static org.javers.repository.sql.session.Parameter.localDateTimeParam;
+import static org.javers.repository.sql.session.Parameter.longParam;
+import static org.javers.repository.sql.session.Parameter.stringParam;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,44 +13,51 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
-import static org.javers.repository.sql.session.Parameter.*;
+import org.javers.common.string.ToStringBuilder;
+import org.javers.core.json.CdoSnapshotSerialized;
+import org.javers.repository.api.QueryParams;
+import org.javers.repository.api.SnapshotIdentifier;
+import org.javers.repository.sql.schema.DBNameProvider;
+import org.javers.repository.sql.session.ObjectMapper;
+import org.javers.repository.sql.session.Parameter;
+import org.javers.repository.sql.session.SelectBuilder;
+import org.javers.repository.sql.session.Session;
 
 class SnapshotQuery {
     private final QueryParams queryParams;
     private final SelectBuilder selectBuilder;
-    private final TableNameProvider tableNameProvider;
+    private static DBNameProvider dbNameProvider = null;
     private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
 
-    public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
+    public SnapshotQuery(DBNameProvider dbNames, QueryParams queryParams, Session session) {
         this.selectBuilder = session
             .select(
-                SNAPSHOT_STATE + ", " +
-                SNAPSHOT_TYPE + ", " +
-                SNAPSHOT_VERSION + ", " +
-                SNAPSHOT_CHANGED + ", " +
-                SNAPSHOT_MANAGED_TYPE + ", " +
-                COMMIT_PK + ", " +
-                COMMIT_AUTHOR + ", " +
-                COMMIT_COMMIT_DATE + ", " +
-                COMMIT_COMMIT_DATE_INSTANT + ", " +
-                COMMIT_COMMIT_ID + ", " +
-                "g." + GLOBAL_ID_LOCAL_ID + ", " +
-                "g." + GLOBAL_ID_FRAGMENT + ", " +
-                "g." + GLOBAL_ID_OWNER_ID_FK + ", " +
-                "o." + GLOBAL_ID_LOCAL_ID + " owner_" + GLOBAL_ID_LOCAL_ID + ", " +
-                "o." + GLOBAL_ID_FRAGMENT + " owner_" + GLOBAL_ID_FRAGMENT + ", " +
-                "o." + GLOBAL_ID_TYPE_NAME + " owner_" + GLOBAL_ID_TYPE_NAME
+                dbNames.getSnapshotStateColumnName() + ", " +
+                dbNames.getSnapshotTypeColumnName() + ", " +
+                dbNames.getSnapshotVersionColumnName() + ", " +
+                dbNames.getSnapshotChangedColumnName() + ", " +
+                dbNames.getSnapshotManagedTypeColumnName() + ", " +
+                " com."+dbNames.getCommitPKColumnName() + ", " +
+                dbNames.getCommitAuthorColumnName() + ", " +
+                dbNames.getCommitCommitDateColumnName()+ ", " +
+                dbNames.getCommitCommitDateInstantColumnName()+ ", " +
+                dbNames.getCommitCommitIdColumName()+ ", " +
+                "g." + dbNames.getGlobalIdLocalIdColumnName() + ", " +
+                "g." + dbNames.getGlobalIdFragmentColumnName()+ ", " +
+                "g." + dbNames.getGlobalIdOwnerIDFKColumnName() + ", " +
+                "o." + dbNames.getGlobalIdLocalIdColumnName() + " owner_" + dbNames.getGlobalIdLocalIdColumnName() + ", " +
+                "o." + dbNames.getGlobalIdFragmentColumnName()  + " owner_" + dbNames.getGlobalIdFragmentColumnName() + ", " +
+                "o." + dbNames.getGlobalIdTypeNameColumnName()  + " owner_" + dbNames.getGlobalIdTypeNameColumnName()
             )
             .from(
-                tableNames.getSnapshotTableNameWithSchema() +
-                " INNER JOIN " + tableNames.getCommitTableNameWithSchema() + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK +
-                " INNER JOIN " + tableNames.getGlobalIdTableNameWithSchema() + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
-                " LEFT OUTER JOIN " + tableNames.getGlobalIdTableNameWithSchema() + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK)
+            		dbNames.getSnapshotTableNameWithSchema() + " snap " +
+                " INNER JOIN " + dbNames.getCommitTableNameWithSchema() + " com ON com." + dbNames.getCommitPKColumnName() + " = snap." + dbNames.getSnapshotCommitFKColumnName() +
+                " INNER JOIN " + dbNames.getGlobalIdTableNameWithSchema() + " g ON g." + dbNames.getGlobalIdPKColumnName() + " = snap." + dbNames.getSnapshotGlobalIdFKColumnName() +
+                " LEFT OUTER JOIN " + dbNames.getGlobalIdTableNameWithSchema() + " o ON o." + dbNames.getGlobalIdPKColumnName() + " = g." + dbNames.getGlobalIdOwnerIDFKColumnName())
             .queryName("snapshots");
 
         this.queryParams = queryParams;
-        this.tableNameProvider = tableNames;
+        this.dbNameProvider = dbNames;
         applyQueryParams();
     }
 
@@ -62,43 +65,44 @@ class SnapshotQuery {
         if (queryParams.changedProperties().size() > 0) {
             selectBuilder.append("AND (" +
                     queryParams.changedProperties().stream()
-                            .map(it -> SNAPSHOT_CHANGED + " LIKE '%" + it + "%'")
+                            .map(it -> dbNameProvider.getSnapshotChangedColumnName() + " LIKE '%" + it + "%'")
                             .collect(Collectors.joining(" OR ")) +
                     ")");
         }
-
+        
         queryParams.from().ifPresent(from -> {
-            selectBuilder.and(COMMIT_COMMIT_DATE, ">=", localDateTimeParam(from));
+            selectBuilder.and(dbNameProvider.getCommitCommitDateColumnName()  , ">=", localDateTimeParam(from));
         });
-
+        
         queryParams.fromInstant().ifPresent(fromInstant -> {
-            selectBuilder.and(COMMIT_COMMIT_DATE_INSTANT, ">=", instantParam(fromInstant));
+            selectBuilder.and(dbNameProvider.getCommitCommitDateInstantColumnName(), ">=", instantParam(fromInstant));
         });
-
+        
         queryParams.to().ifPresent(to -> {
-            selectBuilder.and(COMMIT_COMMIT_DATE, "<=", localDateTimeParam(to));
+            selectBuilder.and(dbNameProvider.getCommitCommitDateColumnName(), "<=", localDateTimeParam(to));
         });
-
+        
         queryParams.toInstant().ifPresent(toInstant -> {
-            selectBuilder.and(COMMIT_COMMIT_DATE_INSTANT, "<=", instantParam(toInstant));
+            selectBuilder.and(dbNameProvider.getCommitCommitDateInstantColumnName(), "<=", instantParam(toInstant));
         });
 
         queryParams.toCommitId().ifPresent(commitId -> {
-            selectBuilder.and(COMMIT_COMMIT_ID, "<=", bigDecimalParam(commitId.valueAsNumber()));
+            selectBuilder.and(dbNameProvider.getCommitCommitIdColumName(), "<=", bigDecimalParam(commitId.valueAsNumber()));
         });
 
         if (queryParams.commitIds().size() > 0) {
-            selectBuilder.and(COMMIT_COMMIT_ID + " IN (" +
+            selectBuilder.and(dbNameProvider.getCommitCommitIdColumName() + " IN (" +
                     queryParams.commitIds()
                             .stream()
                             .map(c -> c.valueAsNumber().toString())
                             .collect(Collectors.joining(",")) +
                     ")");
         }
-
-        queryParams.version().ifPresent(ver -> selectBuilder.and(SNAPSHOT_VERSION, ver));
-
-        queryParams.author().ifPresent(author -> selectBuilder.and(COMMIT_AUTHOR, author));
+        
+        
+        queryParams.version().ifPresent(ver -> selectBuilder.and(dbNameProvider.getSnapshotVersionColumnName(), ver));
+        
+        queryParams.author().ifPresent(author -> selectBuilder.and(dbNameProvider.getCommitAuthorColumnName(), author));
 
         if (queryParams.commitProperties().size() > 0) {
             for (Map.Entry<String, String> commitProperty : queryParams.commitProperties().entrySet()) {
@@ -106,19 +110,19 @@ class SnapshotQuery {
             }
         }
 
-        queryParams.snapshotType().ifPresent(snapshotType -> selectBuilder.and(SNAPSHOT_TYPE, snapshotType.name()));
+        queryParams.snapshotType().ifPresent(snapshotType -> selectBuilder.and(dbNameProvider.getSnapshotTypeColumnName(), snapshotType.name()));
     }
 
     void addSnapshotPkFilter(long snapshotPk) {
-        selectBuilder.and(SNAPSHOT_PK, snapshotPk);
+        selectBuilder.and(dbNameProvider.getSnapshotPKColumnName(), snapshotPk);
     }
 
     void addGlobalIdFilter(long globalIdPk) {
         if (!queryParams.isAggregate()) {
-            selectBuilder.and("g." + GLOBAL_ID_PK, globalIdPk);
+            selectBuilder.and("g." + dbNameProvider.getGlobalIdPKColumnName(), globalIdPk);
         }
         else {
-            selectBuilder.and("( g." + GLOBAL_ID_PK + " = ? OR g." + GLOBAL_ID_OWNER_ID_FK + " = ? )",
+            selectBuilder.and("( g." + dbNameProvider.getGlobalIdPKColumnName() + " = ? OR g." + dbNameProvider.getGlobalIdOwnerIDFKColumnName() + " = ? )",
                     longParam(globalIdPk), longParam(globalIdPk));
         }
     }
@@ -129,7 +133,7 @@ class SnapshotQuery {
         selectBuilder.append("and (");
 
         snapshotDbIdentifiers.forEach(si ->
-            selectBuilder.append("("+SNAPSHOT_GLOBAL_ID_FK+" = ? AND "+SNAPSHOT_VERSION+" = ?) OR",
+            selectBuilder.append("( snap."+dbNameProvider.getSnapshotGlobalIdFKColumnName()+" = ? AND "+ dbNameProvider.getSnapshotVersionColumnName()+" = ?) OR",
                                  longParam(si.getGlobalIdPk()), longParam(si.getVer()))
         );
 
@@ -137,12 +141,12 @@ class SnapshotQuery {
     }
 
     void addVoOwnerEntityFilter(String ownerTypeName, String fragment) {
-        selectBuilder.and("o." + GLOBAL_ID_TYPE_NAME + " = ?", Parameter.stringParam(ownerTypeName))
-                     .and("g." + GLOBAL_ID_FRAGMENT + " = ?", Parameter.stringParam(fragment));
+        selectBuilder.and("o." + dbNameProvider.getGlobalIdTypeNameColumnName() + " = ?", Parameter.stringParam(ownerTypeName))
+                     .and("g." + dbNameProvider.getGlobalIdFragmentColumnName() + " = ?", Parameter.stringParam(fragment));
     }
 
     void addManagedTypesFilter(Set<String> managedTypeNames) {
-        String basePredicate = SNAPSHOT_MANAGED_TYPE + " in (" + ToStringBuilder.join(managedTypeNames) + ")";
+        String basePredicate = dbNameProvider.getSnapshotManagedTypeColumnName() + " in (" + ToStringBuilder.join(managedTypeNames) + ")";
 
         if (!queryParams.isAggregate()) {
             selectBuilder.and(basePredicate);
@@ -151,15 +155,15 @@ class SnapshotQuery {
             selectBuilder.and(
                 "(  " + basePredicate +
                     "  OR g.owner_id_fk in ( "+
-                    "     select g1." + GLOBAL_ID_PK + " from " + snapshotTableName() + " s1 "+
-                    "     INNER JOIN " + globalIdTableName() + " g1 ON g1." + GLOBAL_ID_PK + "= s1."+ SNAPSHOT_GLOBAL_ID_FK +
+                    "     select g1." + dbNameProvider.getGlobalIdPKColumnName() + " from " + snapshotTableName() + " s1 "+
+                    "     INNER JOIN " + globalIdTableName() + " g1 ON g1." + dbNameProvider.getGlobalIdPKColumnName() + "= s1."+ dbNameProvider.getSnapshotGlobalIdFKColumnName() +
                     "     and  s1." + basePredicate + ")"+
                 ")");
         }
     }
 
     List<CdoSnapshotSerialized> run() {
-        selectBuilder.orderByDesc(SNAPSHOT_PK);
+        selectBuilder.orderByDesc(dbNameProvider.getSnapshotPKColumnName());
         selectBuilder.limit(queryParams.limit(), queryParams.skip());
         return selectBuilder.executeQuery(cdoSnapshotMapper);
     }
@@ -167,44 +171,46 @@ class SnapshotQuery {
     private void addCommitPropertyFilter(SelectBuilder selectBuilder, String propertyName, String propertyValue) {
         selectBuilder.and("EXISTS (" +
                 " SELECT * FROM " + commitPropertyTableName() +
-                " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
-                " AND " + COMMIT_PROPERTY_NAME + " = ?" +
-                " AND " + COMMIT_PROPERTY_VALUE + " = ?)",
+                " WHERE " + dbNameProvider.getCommitPropertyCommitFKColumnName() + " = " + dbNameProvider.getCommitPKColumnName() +
+                " AND " + dbNameProvider.getCommitPropertyNameColumnName() + " = ?" +
+                " AND " + dbNameProvider.getCommitPropertyValueColumnName() + " = ?)",
                 stringParam(propertyName), stringParam(propertyValue));
     }
 
     private static class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
         @Override
+      
+        
         public CdoSnapshotSerialized get(ResultSet resultSet) throws SQLException {
             return new CdoSnapshotSerialized()
-                    .withCommitAuthor(resultSet.getString(COMMIT_AUTHOR))
-                    .withCommitDate(resultSet.getTimestamp(COMMIT_COMMIT_DATE))
-                    .withCommitDateInstant(resultSet.getString(COMMIT_COMMIT_DATE_INSTANT))
-                    .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
-                    .withCommitPk(resultSet.getLong(COMMIT_PK))
-                    .withVersion(resultSet.getLong(SNAPSHOT_VERSION))
-                    .withSnapshotState(resultSet.getString(SNAPSHOT_STATE))
-                    .withChangedProperties(resultSet.getString(SNAPSHOT_CHANGED))
-                    .withSnapshotType(resultSet.getString(SNAPSHOT_TYPE))
-                    .withGlobalIdFragment(resultSet.getString(GLOBAL_ID_FRAGMENT))
-                    .withGlobalIdLocalId(resultSet.getString(GLOBAL_ID_LOCAL_ID))
-                    .withGlobalIdTypeName(resultSet.getString(SNAPSHOT_MANAGED_TYPE))
-                    .withOwnerGlobalIdFragment(resultSet.getString("owner_" + GLOBAL_ID_FRAGMENT))
-                    .withOwnerGlobalIdLocalId(resultSet.getString("owner_" + GLOBAL_ID_LOCAL_ID))
-                    .withOwnerGlobalIdTypeName(resultSet.getString("owner_" + GLOBAL_ID_TYPE_NAME));
+                    .withCommitAuthor(resultSet.getString(dbNameProvider.getCommitAuthorColumnName()))
+                    .withCommitDate(resultSet.getTimestamp(dbNameProvider.getCommitCommitDateColumnName()))
+                    .withCommitDateInstant(resultSet.getString(dbNameProvider.getCommitCommitDateInstantColumnName()))
+                    .withCommitId(resultSet.getBigDecimal(dbNameProvider.getCommitCommitIdColumName()))
+                    .withCommitPk(resultSet.getLong(dbNameProvider.getCommitPKColumnName()))
+                    .withVersion(resultSet.getLong(dbNameProvider.getSnapshotVersionColumnName()))
+                    .withSnapshotState(resultSet.getString(dbNameProvider.getSnapshotStateColumnName()))
+                    .withChangedProperties(resultSet.getString(dbNameProvider.getSnapshotChangedColumnName()))
+                    .withSnapshotType(resultSet.getString(dbNameProvider.getSnapshotTypeColumnName()))
+                    .withGlobalIdFragment(resultSet.getString(dbNameProvider.getGlobalIdFragmentColumnName()))
+                    .withGlobalIdLocalId(resultSet.getString(dbNameProvider.getGlobalIdLocalIdColumnName()))
+                    .withGlobalIdTypeName(resultSet.getString(dbNameProvider.getSnapshotManagedTypeColumnName()))
+                    .withOwnerGlobalIdFragment(resultSet.getString("owner_" + dbNameProvider.getGlobalIdFragmentColumnName()))
+                    .withOwnerGlobalIdLocalId(resultSet.getString("owner_" + dbNameProvider.getGlobalIdLocalIdColumnName()))
+                    .withOwnerGlobalIdTypeName(resultSet.getString("owner_" + dbNameProvider.getGlobalIdTypeNameColumnName()));
         }
     }
 
     private String snapshotTableName() {
-        return tableNameProvider.getSnapshotTableNameWithSchema();
+        return dbNameProvider.getSnapshotTableNameWithSchema();
     }
 
     private String globalIdTableName() {
-        return tableNameProvider.getGlobalIdTableNameWithSchema();
+        return dbNameProvider.getGlobalIdTableNameWithSchema();
     }
 
     private String commitPropertyTableName() {
-        return tableNameProvider.getCommitPropertyTableNameWithSchema();
+        return dbNameProvider.getCommitPropertyTableNameWithSchema();
     }
 
     static class SnapshotDbIdentifier {

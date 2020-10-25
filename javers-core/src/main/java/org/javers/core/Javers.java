@@ -201,28 +201,44 @@ public interface Javers {
 
     /**
      * Queries JaversRepository for object Shadows. <br/>
-     * Shadow is a historical version of a domain object restored from a snapshot.
+     * {@link Shadow} is a historical version of a domain object restored from a snapshot.
      * <br/><br/>
      *
      * For example, to get latest Shadows of "bob" Person, call:
      * <pre>
-     * List<Shadow> shadows = javers.findShadows( QueryBuilder.byInstanceId("bob", Person.class)
+     * List<Shadow> shadows = javers.findShadows(
+     *       QueryBuilder.byInstanceId("bob", Person.class)
      *      .limit(5).build() );
      * </pre>
      *
-     * Since Shadows are instances of your domain classes,
+     * Since Shadows are instances of your domain classes, <br/>
      * you can use them directly in your application:
      *
      * <pre>
      * assert shadows.get(0).get() instanceof Person.class;
      * </pre>
      *
+     * <h2>Paging & limit</h2>
+     * Remember that {@link QueryBuilder#limit(int)} limits the number of Snapshots <br/>
+     * loaded in the single JQL query and not the number of returned Shadows <br/>
+     * The situation when one Shadow is reconstructed from many Snapshots is common <br/>
+     * (for example if your Entity contains ValueObjects). <br/>
+     * <br/>
+     *
+     * When a given {@link QueryBuilder#limit(int)} is hit &mdash; Javers creates<br/>
+     * incomplete object graphs or returns a lower number of Shadows than expected.<br/>
+     * <br/>
+     *
+     * <b>The only way to be sure that your Shadows are complete</b> is using<br/>
+     * the streamed query &mdash; {@link #findShadowsAndStream(JqlQuery)}.<br/>
+     * For paging use {@link Stream#skip(long)} and {@link Stream#limit(long)}.
+     *
+     * <br/><br/>
+     *
      * <h2>Query scopes</h2>
      *
-     * <b>By default</b>, queries are run in the Shallow scope,
-     * which is the fastest one.<br/>
-     * To eagerly load all referenced objects use one of the wider scopes,
-     * Commit-deep or Deep+ :
+     * <b>By default</b>, queries are run in the Shallow scope, which is the fastest one.<br/>
+     * To eagerly load all referenced objects use one of the wider scopes, Commit-deep or Deep+ :
      *
      * <ul>
      *  <li/> {@link QueryBuilder#withScopeCommitDeep()}
@@ -230,6 +246,7 @@ public interface Javers {
      * </ul>
      *
      * We recommend the Deep+ scope as a good start.
+     * <br/><br/>
      *
      * <h2>Query scopes example</h2>
      *
@@ -359,13 +376,8 @@ public interface Javers {
      * Execution stats are also available in {@link JqlQuery#stats()}.
      *
      * @return A list of Shadows, ordered in reverse chronological order. Empty if nothing found.
-     *         Remember that {@link QueryBuilder#limit(int)}
-     *         limits the number of Snapshots loaded in the base query
-     *         and not the number of returned Shadows
-     *         (one Shadow can be reconstructed from many Snapshots).
-     *         The only correct way for paging Shadows is {@link #findShadowsAndStream(JqlQuery)}
-     *         with {@link Stream#skip(long)} and {@link Stream#limit(long)}.
      * @param <T> type of a domain object
+     * @see #findShadowsAndStream(JqlQuery)
      * @see ShadowScope
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      * @since 3.2
@@ -373,13 +385,19 @@ public interface Javers {
     <T> List<Shadow<T>> findShadows(JqlQuery query);
 
     /**
-     * Streamed version of {@link #findShadows(JqlQuery)}.
+     * The streamed version of {@link #findShadows(JqlQuery)}.
      * <br/><br/>
      *
-     * Using {@link Stream#skip(long)} and {@link Stream#limit(long)}
-     * is the only correct way for paging Shadows.
+     * The returned stream is lazy loaded. When the {@link QueryBuilder#limit(int)} is hit,
+     * Javers repeats a given query to load a next bunch of Snapshots.
+     * <br/><br/>
      *
-     * @return A stream of Shadows, ordered in reverse chronological order. Terminated stream if nothing found.
+     * Streaming is <b>the recommended way</b> to load large Shadow graphs.
+     * <br/><br/>
+     *
+     * For paging use {@link Stream#skip(long)} and {@link Stream#limit(long)}.
+     *
+     * @return A lazy loaded stream of Shadows, ordered in reverse chronological order. Terminated stream if nothing found.
      * @param <T> type of a domain object
      * @see #findShadows(JqlQuery)
      * @since 3.10
