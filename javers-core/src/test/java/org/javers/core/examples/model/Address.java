@@ -1,5 +1,8 @@
 package org.javers.core.examples.model;
 
+
+import org.javers.common.string.ToStringBuilder;
+
 /**
  * @author bartosz walacik
  */
@@ -26,5 +29,13 @@ public class Address {
 
     public String getStreet() {
         return street;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.toString(this,
+                "city", city,
+                "street", street
+        );
     }
 }

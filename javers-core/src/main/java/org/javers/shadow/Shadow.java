@@ -43,4 +43,12 @@ public class Shadow<T> {
     public T get() {
         return it;
     }
+
+    @Override
+    public String toString() {
+        return "Shadow{" +
+                "it=" + it +
+                ", commitMetadata=" + commitMetadata +
+                '}';
+    }
 }
