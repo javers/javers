@@ -25,10 +25,10 @@ import spock.lang.Unroll
 import javax.persistence.Id
 import java.time.*
 
-import static GlobalIdTestBuilder.*
 import static groovyx.gpars.GParsPool.withPool
 import static java.lang.Math.abs
 import static java.time.temporal.ChronoUnit.MILLIS
+import static org.javers.core.GlobalIdTestBuilder.*
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE
@@ -261,9 +261,13 @@ class JaversRepositoryE2ETest extends Specification {
                             ]
     }
 
-    @Unroll
-    def "should query for #what snapshot by multiple GlobalIds with limit"() {
+    def "should query for Entity snapshot by multiple GlobalIds with limit"() {
         given:
+        def objects = (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) } + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) } + new SnapshotEntity(id: 3) //noise
+        def query = byInstanceId([1,2] as Set, SnapshotEntity).limit(6).build()
+        def expectedGlobalId = [instanceId(1, SnapshotEntity), instanceId(2, SnapshotEntity)]
+
+        and:
         objects.each {
             javers.commit("author", it)
         }
@@ -273,36 +277,10 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         snapshots.size() == 6
-        commitSeq(snapshots[0].commitMetadata) == 5
+        commitSeq(snapshots[0].commitMetadata) == 10
         snapshots.each {
             assert expectedGlobalId.contains(it.globalId)
         }
-
-        where:
-        what << ["Entity", "Unbounded ValueObject", "Bounded ValueObject"]
-        objects << [
-                (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) }
-                        + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) }
-                        + new SnapshotEntity(id: 3), //noise
-                (1..5).collect { new DummyAddress(city: "London${it}") }
-                        + (1..5).collect { new DummyPoint(it, 2) }
-                        + new DummyPoint(6, 2), //noise
-                (1..5).collect { new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London${it}")) }
-                        + (1..5).collect { new SnapshotEntity(id: 2, valueObjectRef: new DummyAddress(city: "Paris${it}")) }
-                        + new SnapshotEntity(id: 3, valueObjectRef: new DummyAddress(city: "London1")) //noise
-        ]
-        query << [
-                [byInstanceId(1, SnapshotEntity).limit(3).build(), byInstanceId(2, SnapshotEntity).limit(3).build()],
-                [QueryBuilder.byClass(DummyAddress).limit(3).build(), QueryBuilder.byClass(DummyPoint).limit(3).build()],
-                [QueryBuilder.byValueObjectId(1, SnapshotEntity, "valueObjectRef").limit(3).build(),
-                 QueryBuilder.byValueObjectId(1, SnapshotEntity, "valueObjectRef").limit(3).build()]
-        ]
-        expectedGlobalId << [
-                [instanceId(1, SnapshotEntity), instanceId(2, SnapshotEntity)],
-                [unboundedValueObjectId(DummyAddress), unboundedValueObjectId(DummyPoint)],
-                [valueObjectId(1, SnapshotEntity, "valueObjectRef"),
-                 valueObjectId(2, SnapshotEntity, "valueObjectRef")]
-        ]
     }
 
     def "should query for ValueObject snapshots by ValueObject class and changed property"() {

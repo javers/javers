@@ -375,8 +375,6 @@ public interface Javers {
      */
     <T> List<Shadow<T>> findShadows(JqlQuery query);
 
-    <T> List<Shadow<T>> findShadows(List<JqlQuery> queries);
-
     /**
      * Streamed version of {@link #findShadows(JqlQuery)}.
      * <br/><br/>
@@ -464,8 +462,6 @@ public interface Javers {
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      */
     List<CdoSnapshot> findSnapshots(JqlQuery query);
-
-    List<CdoSnapshot> findSnapshots(List<JqlQuery> queries);
 
     /**
      * Latest snapshot of a given Entity instance.

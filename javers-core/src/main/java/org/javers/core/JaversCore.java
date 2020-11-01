@@ -32,7 +32,6 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static java.util.stream.Collectors.toList;
 import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -189,12 +188,6 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public <T> List<Shadow<T>> findShadows(List<JqlQuery> queries) {
-        queries.forEach(Validate::argumentIsNotNull);
-        return (List)queries.stream().flatMap(it -> queryRunner.queryForShadows(it).stream()).collect(toList());
-    }
-
-    @Override
     public <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query) {
         Validate.argumentIsNotNull(query);
         return (Stream)queryRunner.queryForShadowsStream(query);
@@ -204,12 +197,6 @@ class JaversCore implements Javers {
     public List<CdoSnapshot> findSnapshots(JqlQuery query){
         Validate.argumentIsNotNull(query);
         return queryRunner.queryForSnapshots(query);
-    }
-
-    @Override
-    public List<CdoSnapshot> findSnapshots(List<JqlQuery> queries) {
-        queries.forEach(Validate::argumentIsNotNull);
-        return queries.stream().flatMap(it -> queryRunner.queryForSnapshots(it).stream()).collect(toList());
     }
 
     @Override

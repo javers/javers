@@ -24,7 +24,7 @@ class ChangesQueryRunner {
         }
 
         if (query.isIdQuery()){
-            return repository.getChangeHistory(query.getIdFilter(), query.getQueryParams());
+            return repository.getChangeHistory(query.getIdFilters(), query.getQueryParams());
         }
 
         if (query.isClassQuery()){

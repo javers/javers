@@ -99,10 +99,7 @@ public class JqlQuery {
     Set<ManagedType> getClassFilter(){
         return getFilter(ClassFilter.class).get().getManagedTypes();
     }
-
-    GlobalId getIdFilter() {
-        return getFilter(IdFilter.class).get().getGlobalId();
-    }
+    
     Set<GlobalId> getIdFilters() {
         return getFilter(IdFilter.class).get().getGlobalIds();
     }

@@ -1,8 +1,5 @@
 package org.javers.repository.api;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -16,6 +13,7 @@ import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,7 +48,7 @@ public interface JaversRepository {
      * @param queryParams parameters constraining returned list (size limit, util from/to)
      * @return empty List if object is not versioned
      */
-    List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams);
+    List<CdoSnapshot> getStateHistory(Collection<GlobalId> globalIds, QueryParams queryParams);
 
     /**
      * Snapshots of all ValueObjects owned by given ownerEntity at given path

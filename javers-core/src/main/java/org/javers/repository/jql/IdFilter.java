@@ -24,10 +24,6 @@ class IdFilter extends Filter {
         this.globalIds = globalIds;
     }
 
-    GlobalId getGlobalId() {
-        return globalIds.stream().findFirst().get();
-    }
-
     Set<GlobalId> getGlobalIds() {
         return globalIds;
     }

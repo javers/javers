@@ -664,9 +664,14 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         assertThinShadowOfPhone(shadows.first().shallowPhonesMap["key"])
     }
 
-    @Unroll
-    def "should query for #what shadows by multiple GlobalIds with limit"() {
+    def "should query for Entity shadows by multiple GlobalIds with limit"() {
         given:
+        def objects = (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) } + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) } + new SnapshotEntity(id: 3) //noise
+
+        def query = byInstanceId([1, 2] as Set, SnapshotEntity).limit(6).build()
+        def expectedId = (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) } + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) }
+
+        and:
         objects.each {
             javers.commit("author", it)
         }
@@ -680,21 +685,6 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
             def value = it.it
             assert expectedId.contains(value)
         }
-
-        where:
-        what << ["Entity", "Unbounded ValueObject", "Bounded ValueObject"]
-        objects << [
-                (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) }
-                        + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) }
-                        + new SnapshotEntity(id: 3) //noise
-        ]
-        query << [
-                [byInstanceId(Arrays.asList(1, 2), SnapshotEntity).limit(6).build()]
-        ]
-        expectedId << [
-                (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) }
-                        + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) }
-        ]
     }
 
     void assertThinShadowOfPhone(def shadow) {
