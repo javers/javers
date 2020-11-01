@@ -5,10 +5,13 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.SnapshotType;
+import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.jql.FilterDefinition.*;
+import org.javers.shadow.Shadow;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -19,8 +22,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.time.LocalTime.MIDNIGHT;
+import static org.javers.common.collections.Lists.asList;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
+import static java.time.LocalTime.MIDNIGHT;
 import static org.javers.repository.jql.ShadowScope.*;
 
 /**
@@ -198,13 +202,24 @@ public class QueryBuilder {
     }
 
     /**
-     * Only snapshots which changed a given property.
+     * Only snapshots with changes on a given property.
      *
      * @see CdoSnapshot#getChanged()
      */
     public QueryBuilder withChangedProperty(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
-        queryParamsBuilder.changedProperty(propertyName);
+        queryParamsBuilder.changedProperties(asList(propertyName));
+        return this;
+    }
+
+    /**
+     * Only snapshots with changes on one or more properties from a given list.
+     *
+     * @see CdoSnapshot#getChanged()
+     */
+    public QueryBuilder withChangedPropertyIn(String... propertyNames) {
+        Validate.argumentIsNotNull(propertyNames);
+        queryParamsBuilder.changedProperties(asList(propertyNames));
         return this;
     }
 
@@ -283,11 +298,53 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits number of Snapshots to be fetched from JaversRepository in a single query,
-     * default is 100.
+     * Limits the number of Snapshots to be fetched from JaversRepository in a single query.
+     * By default, the limit is set to 100, which works well with small data structures.
      * <br/><br/>
      *
-     * Always choose reasonable limits to improve performance of your queries.
+     * There are four types of query output: List of Changes,
+     * List of Snapshots, List of Shadows, and Stream of Shadows.
+     *
+     * Since all of Javers queries rely on <b>Snapshots</b>
+     * in order to generate their output, the limit filter affects all of them,
+     * but in a different way:
+     *
+     * <ul>
+     *   <li>{@link Javers#findSnapshots(JqlQuery)} &mdash; the limit works intuitively,
+     *   it's the maximum size of a returned list.
+     *   </li>
+     *   <li>{@link Javers#findChanges(JqlQuery)} &mdash;
+     *   the size of a returned list can be <b>greater</b> than the limit, because,
+     *   typically a difference between any two Snapshots consists of many atomic Changes.
+     *   </li>
+     *   <li>{@link Javers#findShadows(JqlQuery)} &mdash;
+     *   the size of a returned list can be <b>less</b> than the limit and
+     *   Shadow graphs can be incomplete,
+     *   because, typically, one Shadow is reconstructed from many Snapshots.
+     *   Hitting the limit in findShadows() is very likely and it's a bad thing.
+     *   </li>
+     *   <li>{@link Javers#findShadowsAndStream(JqlQuery)} &mdash;
+     *   the resulting stream is <b>lazily loaded</b> and it's limited only by
+     *   the size of your JaversRepository and your heap.
+     *   When the limit is hit, Javers repeats a given query to load a next bunch of Snapshots.
+     *   Shadow graphs loaded by findShadowsAndStream() are always complete,
+     *   but can trigger a lot of queries.
+     *   </li>
+     * </ul>
+     *
+     * <b>We recommend</b> {@link Javers#findShadowsAndStream(JqlQuery)}
+     * as a primary method of loading Shadows.
+     * <br/><br/>
+     *
+     * See
+     * <a href="https://github.com/javers/javers/blob/master/javers-core/src/test/groovy/org/javers/core/examples/QueryBuilderLimitExamples.groovy">
+     * QueryBuilderLimitExamples.groovy
+     * </a>.
+     *
+     * @see Change
+     * @see CdoSnapshot
+     * @see Shadow
+     * @see JaversRepository
      */
     public QueryBuilder limit(int limit) {
         queryParamsBuilder.limit(limit);

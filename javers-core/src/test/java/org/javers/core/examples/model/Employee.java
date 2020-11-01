@@ -1,7 +1,7 @@
 package org.javers.core.examples.model;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.javers.common.collections.Sets;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Id;
@@ -168,11 +168,12 @@ public class Employee {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
-                .append("name", name)
-                .append("salary", salary)
-                .append("boss", boss != null ? boss.name : "")
-                .append("subordinates", subordinates.size())
-                .toString();
+        return ToStringBuilder.toString(this,
+                "name", name,
+                "salary", salary,
+                "boss", boss != null ? boss.name : "",
+                "subordinates", subordinates.size(),
+                "primaryAddress", primaryAddress
+                );
     }
 }

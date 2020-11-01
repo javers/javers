@@ -42,6 +42,7 @@ class JaversGetterFactory {
                     .filter(method -> isGetter(method) && !method.isBridge())
                     .filter(method -> !isOverridden(method, getters))
                     .map(getter -> createJaversGetter(getter, context))
+                    .filter(getter -> excludeDuplicatedProperties(getter, getters))
                     .forEach(getters::add);
             clazz = clazz.getSuperclass();
         }
@@ -51,6 +52,13 @@ class JaversGetterFactory {
             Arrays.stream(clazz.getInterfaces()).forEach(this::findAllGetters);
             clazz = clazz.getSuperclass();
         }
+    }
+
+    private boolean excludeDuplicatedProperties(JaversGetter getter, List<JaversGetter> getters) {
+        final String propertyName = getter.propertyName();
+        return getters.stream()
+                .map(JaversGetter::propertyName)
+                .noneMatch(propertyName::equals);
     }
 
     private static boolean isGetter(Method rawMethod) {

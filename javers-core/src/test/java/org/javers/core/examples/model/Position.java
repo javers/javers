@@ -8,5 +8,6 @@ public enum Position {
     Saleswoman,
     ScrumMaster,
     Townsman,
-    Hero
+    Hero,
+    Trainee
 }

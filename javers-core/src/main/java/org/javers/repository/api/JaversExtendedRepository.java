@@ -41,7 +41,7 @@ public class JaversExtendedRepository implements JaversRepository {
         List<CdoSnapshot> snapshots = getStateHistory(globalIds, queryParams);
         List<Change> changes = getChangesIntroducedBySnapshots(snapshots, queryParams.newObjectChanges());
 
-        return filterByPropertyName(changes, queryParams);
+        return filterChangesByPropertyNames(changes, queryParams);
     }
 
     public List<Change> getChangeHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
@@ -49,7 +49,7 @@ public class JaversExtendedRepository implements JaversRepository {
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClasses, queryParams);
         List<Change> changes = getChangesIntroducedBySnapshots(snapshots, queryParams.newObjectChanges());
-        return filterByPropertyName(changes, queryParams);
+        return filterChangesByPropertyNames(changes, queryParams);
     }
 
     public List<Change> getValueObjectChangeHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
@@ -170,13 +170,13 @@ public class JaversExtendedRepository implements JaversRepository {
         delegate.ensureSchema();
     }
 
-    private List<Change> filterByPropertyName(List<Change> changes, final QueryParams queryParams) {
-        if (!queryParams.changedProperty().isPresent()){
+    private List<Change> filterChangesByPropertyNames(List<Change> changes, final QueryParams queryParams) {
+        if (queryParams.changedProperties().size() == 0){
             return changes;
         }
 
         return Lists.positiveFilter(changes, input -> input instanceof PropertyChange &&
-                ((PropertyChange) input).getPropertyName().equals(queryParams.changedProperty().get()));
+                queryParams.changedProperties().contains(((PropertyChange) input).getPropertyName()));
     }
 
     private List<CdoSnapshot> skipInitial(List<CdoSnapshot> snapshots) {

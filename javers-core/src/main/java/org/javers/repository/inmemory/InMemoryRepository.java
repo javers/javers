@@ -139,8 +139,8 @@ public class InMemoryRepository implements JaversRepository {
         if (hasInstants(queryParams)) {
             snapshots = filterSnapshotsByCommitDateInstant(snapshots, queryParams);
         }
-        if (queryParams.changedProperty().isPresent()){
-            snapshots = filterByPropertyName(snapshots, queryParams.changedProperty().get());
+        if (queryParams.changedProperties().size() > 0) {
+            snapshots = filterByPropertyNames(snapshots, queryParams.changedProperties());
         }
         if (queryParams.snapshotType().isPresent()){
             snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getType() == queryParams.snapshotType().get());
@@ -261,8 +261,8 @@ public class InMemoryRepository implements JaversRepository {
         this.jsonConverter = jsonConverter;
     }
 
-    private List<CdoSnapshot> filterByPropertyName(List<CdoSnapshot> snapshots, final String propertyName){
-        return Lists.positiveFilter(snapshots, input -> input.hasChangeAt(propertyName));
+    private List<CdoSnapshot> filterByPropertyNames(List<CdoSnapshot> snapshots, final Set<String> propertyNames){
+        return Lists.positiveFilter(snapshots, input -> propertyNames.stream().anyMatch(input::hasChangeAt));
     }
 
     private List<CdoSnapshot> getAll(){
