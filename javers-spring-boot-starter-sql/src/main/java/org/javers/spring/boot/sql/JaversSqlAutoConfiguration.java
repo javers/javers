@@ -1,8 +1,8 @@
 package org.javers.spring.boot.sql;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.internal.SessionImpl;
 import org.javers.core.Javers;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
@@ -52,9 +52,9 @@ public class JaversSqlAutoConfiguration {
     @Bean
     public DialectName javersSqlDialectName() {
         SessionFactoryImplementor sessionFactory =
-                (SessionFactoryImplementor) entityManagerFactory.unwrap(SessionFactory.class);
+                entityManagerFactory.unwrap(SessionFactoryImplementor.class);
 
-        Dialect hibernateDialect = sessionFactory.getDialect();
+        Dialect hibernateDialect = sessionFactory.getJdbcServices().getDialect();
         logger.info("detected Hibernate dialect: " + hibernateDialect.getClass().getSimpleName());
 
         return dialectMapper.map(hibernateDialect);
