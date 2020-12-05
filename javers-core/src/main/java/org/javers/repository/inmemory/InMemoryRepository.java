@@ -1,10 +1,6 @@
 package org.javers.repository.inmemory;
 
 import org.javers.common.collections.Lists;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -20,6 +16,9 @@ import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,16 +60,18 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(globalId, queryParams);
+    public List<CdoSnapshot> getStateHistory(Collection<GlobalId> globalIds, QueryParams queryParams) {
+        Validate.argumentsAreNotNull(globalIds);
+        Validate.argumentsAreNotNull(queryParams);
 
         List<CdoSnapshot> filtered = new ArrayList<>();
 
         for (CdoSnapshot snapshot : getAll()) {
-            if (snapshot.getGlobalId().equals(globalId)) {
+            if (globalIds.contains(snapshot.getGlobalId())) {
                 filtered.add(snapshot);
             }
-            if (queryParams.isAggregate() && isParent(globalId, snapshot.getGlobalId())){
+
+            if (queryParams.isAggregate() && globalIds.stream().anyMatch(it -> isParent(it, snapshot.getGlobalId()))){
                 filtered.add(snapshot);
             }
         }

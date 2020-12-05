@@ -16,6 +16,7 @@ import org.javers.core.snapshot.SnapshotDiffer;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static java.util.Collections.singleton;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -33,10 +34,11 @@ public class JaversExtendedRepository implements JaversRepository {
         previousSnapshotsCalculator = new PreviousSnapshotsCalculator(input -> getSnapshots(input));
     }
 
-    public List<Change> getChangeHistory(GlobalId globalId, QueryParams queryParams) {
-        argumentsAreNotNull(globalId, queryParams);
+    public List<Change> getChangeHistory(Collection<GlobalId> globalIds, QueryParams queryParams) {
+        argumentsAreNotNull(globalIds);
+        argumentsAreNotNull(queryParams);
 
-        List<CdoSnapshot> snapshots = getStateHistory(globalId, queryParams);
+        List<CdoSnapshot> snapshots = getStateHistory(globalIds, queryParams);
         List<Change> changes = getChangesIntroducedBySnapshots(snapshots, queryParams.newObjectChanges());
 
         return filterChangesByPropertyNames(changes, queryParams);
@@ -65,7 +67,7 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
+    public List<CdoSnapshot> getStateHistory(Collection<GlobalId> globalId, QueryParams queryParams) {
         argumentsAreNotNull(globalId, queryParams);
 
         List<CdoSnapshot> snapshots = delegate.getStateHistory(globalId, queryParams);
@@ -104,7 +106,7 @@ public class JaversExtendedRepository implements JaversRepository {
     public List<CdoSnapshot> getHistoricals(GlobalId globalId, CommitId timePoint, boolean withChildValueObjects, int limit) {
         argumentsAreNotNull(globalId, timePoint);
 
-        return delegate.getStateHistory(globalId, QueryParamsBuilder
+        return delegate.getStateHistory(singleton(globalId), QueryParamsBuilder
                         .withLimit(limit)
                         .withChildValueObjects(withChildValueObjects)
                         .toCommitId(timePoint).build());
@@ -116,14 +118,14 @@ public class JaversExtendedRepository implements JaversRepository {
     public Optional<CdoSnapshot> getHistorical(GlobalId globalId, LocalDateTime timePoint) {
         argumentsAreNotNull(globalId, timePoint);
 
-        return delegate.getStateHistory(globalId, QueryParamsBuilder.withLimit(1).to(timePoint).build())
+        return delegate.getStateHistory(singleton(globalId), QueryParamsBuilder.withLimit(1).to(timePoint).build())
                 .stream().findFirst();
     }
 
     public List<CdoSnapshot> getHistoricals(GlobalId globalId, LocalDateTime timePoint, boolean withChildValueObjects, int limit) {
         argumentsAreNotNull(globalId, timePoint);
 
-        return delegate.getStateHistory(globalId, QueryParamsBuilder
+        return delegate.getStateHistory(singleton(globalId), QueryParamsBuilder
                         .withLimit(limit)
                         .withChildValueObjects(withChildValueObjects)
                         .to(timePoint).build());

@@ -13,12 +13,12 @@ import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.jql.FilterDefinition.*;
 import org.javers.shadow.Shadow;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
-import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -100,6 +100,11 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilterDefinition(instanceId(localId, entityClass)));
     }
 
+    public static QueryBuilder byInstanceId(Set<Object> localIds, Class entityClass){
+        Validate.argumentsAreNotNull(localIds, entityClass);
+        final Set<GlobalIdDTO> globalIdDTOS = localIds.stream().map(it -> instanceId(it, entityClass)).collect(Collectors.toSet());
+        return new QueryBuilder(new IdFilterDefinition(globalIdDTOS));
+    }
 
     /**
      * Query for selecting Changes, Snapshots or Shadows for a given Entity instance, identified by its type name.

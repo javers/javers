@@ -34,7 +34,7 @@ class SnapshotQueryRunner {
             result = repository.getSnapshots(query.getQueryParams());
         } else
         if (query.isIdQuery()){
-            result = repository.getStateHistory(query.getIdFilter(), query.getQueryParams());
+            result = repository.getStateHistory(query.getIdFilters(), query.getQueryParams());
         } else
         if (query.isClassQuery()){
             result = repository.getStateHistory(query.getClassFilter(), query.getQueryParams());

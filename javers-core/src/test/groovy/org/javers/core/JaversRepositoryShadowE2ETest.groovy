@@ -5,12 +5,7 @@ import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.examples.typeNames.NewEntity
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.examples.typeNames.OldEntity
-import org.javers.core.model.CategoryC
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyNetworkAddress
-import org.javers.core.model.PhoneWithShallowCategory
-import org.javers.core.model.ShallowPhone
-import org.javers.core.model.SnapshotEntity
+import org.javers.core.model.*
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Unroll
 
@@ -667,6 +662,29 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         assertThinShadowOfPhone(shadows.first().shallowPhones.first())
         assertThinShadowOfPhone(shadows.first().shallowPhonesList.first())
         assertThinShadowOfPhone(shadows.first().shallowPhonesMap["key"])
+    }
+
+    def "should query for Entity shadows by multiple GlobalIds with limit"() {
+        given:
+        def objects = (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) } + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) } + new SnapshotEntity(id: 3) //noise
+
+        def query = byInstanceId([1, 2] as Set, SnapshotEntity).limit(6).build()
+        def expectedId = (1..5).collect { new SnapshotEntity(id: 1, intProperty: it) } + (1..5).collect { new SnapshotEntity(id: 2, intProperty: it) }
+
+        and:
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        when:
+        def shadows = javers.findShadows(query)
+
+        then:
+        shadows.size() == 6
+        shadows.each {
+            def value = it.it
+            assert expectedId.contains(value)
+        }
     }
 
     void assertThinShadowOfPhone(def shadow) {
