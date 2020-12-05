@@ -2,9 +2,10 @@ package org.javers.repository.inmemory;
 
 import org.javers.common.collections.Lists;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.CommitIdGenerator;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Fake impl of JaversRepository
@@ -132,11 +132,14 @@ public class InMemoryRepository implements JaversRepository {
         if (queryParams.author().isPresent()) {
             snapshots = filterSnapshotsByAuthor(snapshots, queryParams.author().get());
         }
-        if (queryParams.hasDates()) {
+        if (hasDates(queryParams)) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
         }
-        if (queryParams.changedProperty().isPresent()){
-            snapshots = filterByPropertyName(snapshots, queryParams.changedProperty().get());
+        if (hasInstants(queryParams)) {
+            snapshots = filterSnapshotsByCommitDateInstant(snapshots, queryParams);
+        }
+        if (queryParams.changedProperties().size() > 0) {
+            snapshots = filterByPropertyNames(snapshots, queryParams.changedProperties());
         }
         if (queryParams.snapshotType().isPresent()){
             snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getType() == queryParams.snapshotType().get());
@@ -158,7 +161,33 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     private List<CdoSnapshot> filterSnapshotsByCommitDate(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
-        return Lists.positiveFilter(snapshots, snapshot -> queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate()));
+        return Lists.positiveFilter(snapshots, snapshot -> isDateInRange(queryParams, snapshot.getCommitMetadata().getCommitDate()));
+    }
+
+    public boolean isDateInRange(QueryParams q, LocalDateTime date) {
+        if (q.from().isPresent() && q.from().get().isAfter(date)){
+            return false;
+        }
+        if (q.to().isPresent() && q.to().get().isBefore(date)){
+            return false;
+        }
+
+        return true;
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByCommitDateInstant(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
+        return Lists.positiveFilter(snapshots, snapshot -> isInstantInRange(queryParams, snapshot.getCommitMetadata().getCommitDateInstant()));
+    }
+
+    private boolean isInstantInRange(QueryParams q, Instant instant) {
+        if (q.fromInstant().isPresent() && q.fromInstant().get().isAfter(instant)) {
+            return false;
+        }
+        if (q.toInstant().isPresent() && q.toInstant().get().isBefore(instant)) {
+            return false;
+        }
+
+        return true;
     }
 
     private List<CdoSnapshot> filterSnapshotsByCommitProperties(List<CdoSnapshot> snapshots, final Map<String, String> commitProperties) {
@@ -231,8 +260,8 @@ public class InMemoryRepository implements JaversRepository {
         this.jsonConverter = jsonConverter;
     }
 
-    private List<CdoSnapshot> filterByPropertyName(List<CdoSnapshot> snapshots, final String propertyName){
-        return Lists.positiveFilter(snapshots, input -> input.hasChangeAt(propertyName));
+    private List<CdoSnapshot> filterByPropertyNames(List<CdoSnapshot> snapshots, final Set<String> propertyNames){
+        return Lists.positiveFilter(snapshots, input -> propertyNames.stream().anyMatch(input::hasChangeAt));
     }
 
     private List<CdoSnapshot> getAll(){
@@ -286,5 +315,13 @@ public class InMemoryRepository implements JaversRepository {
 
     private LinkedList<CdoSnapshot> readSnapshots(GlobalId globalId) {
         return readSnapshots(globalId.value());
+    }
+
+    private boolean hasDates(QueryParams q) {
+        return q.from().isPresent() || q.to().isPresent();
+    }
+
+    public boolean hasInstants(QueryParams q) {
+        return q.fromInstant().isPresent() || q.toInstant().isPresent();
     }
 }

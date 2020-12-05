@@ -1,19 +1,27 @@
 apply plugin: 'application'
 mainClassName = "org.javers.core.selftest.Application"
 
+java {
+    registerFeature('javersLegacy') {
+        usingSourceSet(sourceSets.main)
+    }
+}
+
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.25'
-    compile "com.google.code.gson:gson:$gsonVersion"
-    compile 'org.picocontainer:picocontainer:2.15'
-    compile "io.github.classgraph:classgraph:$classgraphVersion"
+    api "org.slf4j:slf4j-api:$slf4jApiVersion"
+    api "com.google.code.gson:gson:$gsonVersion"
+    implementation 'org.picocontainer:picocontainer:2.15'
+    implementation "io.github.classgraph:classgraph:$classgraphVersion"
 
     //should be on application's classpath when using custom comparators
-    optional "joda-time:joda-time:$jodaVersion"
-    optional "com.google.guava:guava:$guavaVersion"
+    javersLegacyImplementation "joda-time:joda-time:$jodaVersion"
+    javersLegacyImplementation "com.google.guava:guava:$guavaVersion"
 
+    testCompile "joda-time:joda-time:$jodaVersion"
+    testCompile "com.google.guava:guava:$guavaVersion"
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile "com.google.guava:guava:$guavaVersion"
-    testCompile "org.mongodb:mongodb-driver:$mongoDbDriverVersion"
+    testCompile "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
     testCompile ('org.mongodb.morphia:morphia:0.108') {
         exclude group: 'org.mongodb', module: 'mongo-java-driver'
     }

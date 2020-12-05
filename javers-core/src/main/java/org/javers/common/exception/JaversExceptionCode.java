@@ -6,9 +6,16 @@ package org.javers.common.exception;
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public enum JaversExceptionCode {
+    WRONG_USAGE_OF_JAVERS_AUDITABLE_DELETE("" +
+            "The argument '%s' you have passed to a method '%s' annotated with @JaversAuditableDelete " +
+            "is not an Entity, nor a Value Object. " +
+            "If your intention is to delete by Id, provide the Entity class parameter."),
+
     MALFORMED_JAVERS_MONGODB_PROPERTIES("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
 
-    ID_TYPE_NOT_SUPPORTED("%s is not supported as the type of Id-property. Problematic class: '%s'.") ,
+    CM("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
+
+    ID_TYPE_NOT_SUPPORTED("%s %s can't be used as Id-property type. Problematic class: '%s'.") ,
 
     CLASS_EXTRACTION_ERROR(JaversException.BOOTSTRAP_ERROR + "Can't extract Class from Type '%s'.") ,
 
@@ -55,7 +62,9 @@ public enum JaversExceptionCode {
     //graph & snapshot
     VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY("found ValueObject on KEY position in Map property '%s'. Please change the key class mapping to Value or Entity"),
 
-    SNAPSHOT_STATE_VIOLATION("snapshots are immutable"),
+    SNAPSHOT_STATE_VIOLATION("attempt to update snapshot state, property '%s' already added"),
+
+    SNAPSHOT_SERIALIZATION_ERROR("error while serializing snapshot of '%s', duplicated property '%s'"),
 
     PROPERTY_NOT_FOUND("Property '%s' not found in class '%s'. If the name is correct - check annotations. Properties with @DiffIgnore or @Transient are not visible for JaVers."),
 
@@ -80,9 +89,15 @@ public enum JaversExceptionCode {
 
     COMPONENT_NOT_FOUND(JaversException.BOOTSTRAP_ERROR+"component of type '%s' not found in container") ,
 
-    NO_PUBLIC_CONSTRUCTOR(JaversException.BOOTSTRAP_ERROR+"no public constructor in class '%s'"),
+    NO_PUBLIC_CONSTRUCTOR("no public constructor in class '%s'"),
 
-    CLASS_NOT_FOUND("class not found - '%s'") ,
+    NO_PUBLIC_ZERO_ARG_CONSTRUCTOR("no public zero-argument constructor in class '%s'"),
+
+    ERROR_WHEN_INVOKING_CONSTRUCTOR("got exception when invoking constructor of class '%s'"),
+
+    CLASS_NOT_FOUND("class not found - '%s'"),
+
+    CLASS_IS_NOT_INSTANCE_OF("given class '%s' is not instance of '%s'"),
 
     CANT_EXTRACT_CHILD_VALUE_OBJECT(
             "error while extracting child ValueObject from path '%s'" +
@@ -95,7 +110,6 @@ public enum JaversExceptionCode {
             "it doesn't exists in JaversRepository"),
 
     CANT_FIND_COMMIT_HEAD_ID("can't find commit head id in JaversRepository"),
-    CANT_SAVE_ALREADY_PERSISTED_COMMIT("can't save already persisted commit '%s'"),
 
     SQL_EXCEPTION("%s\nwhile executing sql: %s"),
 

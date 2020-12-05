@@ -24,4 +24,9 @@ public class ListAsSetType extends CollectionType {
     public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         return super.mapToSet(sourceEnumerable, mapFunction, owner);
     }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return List.class;
+    }
 }

@@ -1,5 +1,7 @@
 package org.javers.core
 
+import org.javers.core.commit.Commit
+
 import org.javers.common.date.DateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.commit.CommitMetadata
@@ -13,7 +15,9 @@ import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
+import org.javers.repository.jql.JqlQuery
 import org.javers.repository.jql.QueryBuilder
+import org.javers.shadow.Shadow
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -21,6 +25,7 @@ import javax.persistence.Id
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 import static groovyx.gpars.GParsPool.withPool
@@ -32,6 +37,8 @@ import static java.time.temporal.ChronoUnit.MILLIS
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE
+import static org.javers.core.model.DummyUser.dummyUser
+import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.repository.jql.QueryBuilder.*
 
 class JaversRepositoryE2ETest extends Specification {
@@ -40,6 +47,9 @@ class JaversRepositoryE2ETest extends Specification {
     private DateProvider dateProvider
     private RandomCommitGenerator randomCommitGenerator = null
 
+    void databaseCommit(){
+    }
+
     def setup() {
         buildJaversInstance()
     }
@@ -47,7 +57,10 @@ class JaversRepositoryE2ETest extends Specification {
     void buildJaversInstance() {
         dateProvider = prepareDateProvider()
         repository = prepareJaversRepository()
+        javers = buildNextJaversInstance(repository)
+    }
 
+    Javers buildNextJaversInstance (JaversRepository repository) {
         def javersBuilder = JaversBuilder
                 .javers()
                 .withDateTimeProvider(dateProvider)
@@ -58,7 +71,7 @@ class JaversRepositoryE2ETest extends Specification {
             javersBuilder.withCustomCommitIdGenerator(randomCommitGenerator)
         }
 
-        javers = javersBuilder.build()
+        javersBuilder.build()
     }
 
     protected int commitSeq(CommitMetadata commit) {
@@ -277,6 +290,43 @@ class JaversRepositoryE2ETest extends Specification {
         when: "withNewObjectChanges"
         snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
                 .withChangedProperty("city").build())
+
+        then:
+        snapshots.size() == 3
+    }
+
+    def "should query for ValueObject snapshots by ValueObject class and changed properties"() {
+        given:
+        def objects = [
+          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London",   street: "str")) ,
+          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London 2", street: "str")) ,
+          new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris", street: "str")) ,
+          new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris", street: "str 2"))] //noise
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
+                .withChangedPropertyIn("city", "street")
+                .withSnapshotTypeUpdate().build())
+
+        then:
+        snapshots.size() == 2
+        snapshots.each {
+            assert it.globalId.typeName == DummyAddress.name
+        }
+
+        when:
+        snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
+                .withChangedPropertyIn("city", "street").build())
+
+        then:
+        snapshots.size() == 4
+
+        when:
+        snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
+                .withChangedPropertyIn("street").build())
 
         then:
         snapshots.size() == 3
@@ -704,6 +754,39 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     @Unroll
+    def "should query for Entity snapshots with UTC time range filter - #what"() {
+        given:
+        (1..5).each {
+            def entity = new SnapshotEntity(id: 1, intProperty: it)
+            def now = ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC)
+            setNow(now)
+            javers.commit('author', entity)
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+        def commitDates = snapshots.commitMetadata.commitDateInstant
+
+        then:
+        commitDates == expectedCommitDates
+
+        where:
+        what << ['util fromInstant', 'util toInstant', 'util in UTC time range']
+        query << [
+                byInstanceId(1, SnapshotEntity).fromInstant(ZonedDateTime.of(2020, 9, 26, 3, 0, 0, 0, ZoneOffset.UTC).toInstant()).build(),
+                byInstanceId(1, SnapshotEntity).toInstant(ZonedDateTime.of(2020, 9, 26, 3, 0, 0, 0, ZoneOffset.UTC).toInstant()).build(),
+                byInstanceId(1, SnapshotEntity)
+                        .fromInstant(ZonedDateTime.of(2020, 9, 26, 2, 0, 0, 0, ZoneOffset.UTC).toInstant())
+                        .toInstant(ZonedDateTime.of(2020, 9, 26, 4, 0, 0, 0, ZoneOffset.UTC).toInstant()).build()
+        ]
+        expectedCommitDates << [
+                (5..3).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC).toInstant() },
+                (3..1).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC).toInstant() },
+                (4..2).collect { ZonedDateTime.of(2020, 9, 26, it, 0, 0, 0, ZoneOffset.UTC).toInstant() }
+        ]
+    }
+
+    @Unroll
     def "should query for Entity snapshots with skipped results, #what"() {
         given:
         (19..1).each{
@@ -1068,25 +1151,26 @@ class JaversRepositoryE2ETest extends Specification {
         changes.find{it instanceof ReferenceChange}.affectedGlobalId.value() == "$sName/1#valueObjectRef"
     }
 
-    def "should provide cluster-friendly commitId generator"(){
+    def "should persist commits in multiple-instances environment"(){
         given:
         def threads = 10
-        def javersRepo = new InMemoryRepository()
         when:
         withPool threads, {
             (1..threads).collectParallel {
-                def javers = JaversBuilder.javers()
-                        .registerJaversRepository(javersRepo)
-                        .withCommitIdGenerator(CommitIdGenerator.RANDOM)
-                        .build()
-                javers.commit("author", new SnapshotEntity(id: it))
+                def jv = buildNextJaversInstance(repository)
+                jv.commit("author", new SnapshotEntity(id: it))
+                databaseCommit()
             }
         }
 
         then:
-        def javers = JaversBuilder.javers().registerJaversRepository(javersRepo).build()
+        def javers = buildNextJaversInstance(repository)
         def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().build())
-        (snapshots.collect{it -> it.commitId} as Set).size() == threads
+        snapshots.size() == threads
+        snapshots.collect{it -> it.getPropertyValue("id")} as Set == (1..threads).collect{it} as Set
+
+        println 'persisted Entity ids: ' + snapshots.collect{it -> it.getPropertyValue("id")}
+        println 'persisted commits ids: ' + snapshots.collect{it -> it.commitId}
     }
 
     def "should not persist commits with zero snapshots" () {
@@ -1133,6 +1217,9 @@ class JaversRepositoryE2ETest extends Specification {
           lastCommit = javers.commit("a", entity)
       }
 
+      println firstCommit
+      println lastCommit
+
       when:
       def snapshots = javers
               .findSnapshots(QueryBuilder.anyDomainObject()
@@ -1140,10 +1227,39 @@ class JaversRepositoryE2ETest extends Specification {
               .build())
 
       then:
+      snapshots.each {println it}
+
       snapshots.size() == 3
       snapshots.every{it.commitId == firstCommit.id || it.commitId == lastCommit.id}
     }
 
+    //CASE FOR ISSUE 958
+    def "should query by commitIds with minor numbers (parallel)"() {
+        given: "there are commits with ids 1.0 and 1.01"
+        def commitFactory = javers.commitFactory
+
+        def kazikV1 = dummyUser("Kazik").withAge(1)
+        def kazikV2 = dummyUser("Kazik").withAge(2)
+
+        Commit commit1 = commitFactory.create("author", [:], kazikV1)
+        Commit commit2 = commitFactory.create("author", [:], kazikV2)
+
+        repository.persist(commit1)
+        repository.persist(commit2)
+
+        println commit1
+        println commit2
+
+        when: "query has list of commits 1.0 and 1.01"
+        JqlQuery query = byInstanceId("Kazik", DummyUser.class.name)
+                .withCommitIds([commit1.id.valueAsNumber(),
+                                commit2.id.valueAsNumber()])
+                .build()
+        List snapshots = javers.findSnapshots(query)
+
+        then: "two snapshots are returned"
+        snapshots.size() == 2
+    }
 
     @TypeName("C")
     static class C1 {

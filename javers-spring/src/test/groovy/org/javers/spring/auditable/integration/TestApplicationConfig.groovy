@@ -1,6 +1,7 @@
 package org.javers.spring.auditable.integration
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
+import org.javers.spring.auditable.CommitPropertiesProvider
 import org.javers.spring.example.JaversSpringMongoApplicationConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -27,5 +28,15 @@ class TestApplicationConfig extends JaversSpringMongoApplicationConfig {
     @Bean(destroyMethod = "stop")
     EmbeddedMongoFactory.EmbeddedMongo embeddedMongo() {
         EmbeddedMongoFactory.create()
+    }
+
+    @Bean
+    CommitPropertiesProvider commitPropertiesProvider() {
+        return new CommitPropertiesProvider() {
+            @Override
+            Map<String, String> provideForCommittedObject(Object domainObject) {
+                return ["key":"ok"]
+            }
+        }
     }
 }

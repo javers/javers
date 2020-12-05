@@ -8,6 +8,9 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryBuilder
+import org.javers.repository.sql.schema.JaversSchemaManager
+import org.javers.repository.sql.schema.TableNameProvider
+import spock.lang.Shared
 
 import java.sql.Connection
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -16,6 +19,10 @@ import java.util.concurrent.atomic.AtomicInteger
 import static groovyx.gpars.GParsPool.withPool
 
 abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest {
+    @Shared String globalIdTableName
+    @Shared String commitTableName
+    @Shared String snapshotTableName
+    @Shared String commitPropertyTableName
 
     private ThreadLocal<Connection> connection = ThreadLocal.withInitial({createAndInitConnection()})
     private Collection<Connection> connections = new ConcurrentLinkedQueue<>()
@@ -25,6 +32,8 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
     protected abstract DialectName getDialect()
 
     protected abstract String getSchema()
+
+    @Shared JaversSchemaManager schemaManager
 
     protected Connection getConnection() {
         connection.get()
@@ -37,34 +46,45 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
         connection
     }
 
-    @Override
     def setup() {
         clearTables()
     }
 
     def cleanup() {
         connections.each {
-            it.rollback()
-            it.close()
+            if (it.isValid(1)) {
+                it.rollback()
+                it.close()
+            }
         }
     }
 
     @Override
+    void databaseCommit() {
+        getConnection().commit();
+    }
+
+    @Override
     protected JaversRepository prepareJaversRepository() {
-        SqlRepositoryBuilder
+        def repository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider({ getConnection() } as ConnectionProvider)
                 .withDialect(getDialect())
                 .withSchema(getSchema())
+                .withGlobalIdTableName(globalIdTableName)
+                .withCommitTableName(commitTableName)
+                .withSnapshotTableName(snapshotTableName)
+                .withCommitPropertyTableName(commitPropertyTableName)
                 .build()
+        this.schemaManager = repository.schemaManager
+        repository
     }
 
     def clearTables() {
-        execute("delete  from ${schemaPrefix()}jv_snapshot")
-        execute("delete  from ${schemaPrefix()}jv_commit_property")
-        execute("delete  from ${schemaPrefix()}jv_commit")
-        execute("delete  from ${schemaPrefix()}jv_commit_property")
-        execute("delete  from ${schemaPrefix()}jv_global_id")
+        execute("delete  from " + schemaManager.snapshotTableNameWithSchema)
+        execute("delete  from " + schemaManager.commitPropertyTableNameWithSchema)
+        execute("delete  from " + schemaManager.commitTableNameWithSchema)
+        execute("delete  from " + schemaManager.globalIdTableNameWithSchema)
         getConnection().commit()
     }
 
@@ -99,7 +119,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
                 [2, 11.02],
                 [1, 11.01]
         ].each {
-            sql.execute "insert into ${schemaPrefix()}jv_commit (commit_pk, commit_id) values (?,?)", it
+            sql.execute "insert into ${schemaManager.commitTableNameWithSchema} (commit_pk, commit_id) values (?,?)", it
         }
 
         when:

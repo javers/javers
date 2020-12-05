@@ -43,7 +43,7 @@ public class ReflectionUtil {
             return Class.forName(className, false, Javers.class.getClassLoader());
         }
         catch (ClassNotFoundException ex) {
-            throw new JaversException(ex);
+            throw new JaversException(JaversExceptionCode.CLASS_NOT_FOUND, className);
         }
     }
 
@@ -83,10 +83,28 @@ public class ReflectionUtil {
                 constructor.setAccessible(true);
                 return constructor.newInstance(params);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new JaversException(JaversExceptionCode.ERROR_WHEN_INVOKING_CONSTRUCTOR, clazz.getName());
             }
         }
-        throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR,clazz.getName());
+        throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR, clazz.getName());
+    }
+
+    public static Object newInstance(Class clazz) {
+        Validate.argumentIsNotNull(clazz);
+
+        for (Constructor constructor : clazz.getDeclaredConstructors()) {
+            if (isPrivate(constructor) || isProtected(constructor) || constructor.getParameterCount() > 0) {
+                continue;
+            }
+
+            try {
+                constructor.setAccessible(true);
+                return constructor.newInstance();
+            } catch (Exception e) {
+                throw new JaversException(JaversExceptionCode.ERROR_WHEN_INVOKING_CONSTRUCTOR, clazz.getName());
+            }
+        }
+        throw new JaversException(JaversExceptionCode.NO_PUBLIC_ZERO_ARG_CONSTRUCTOR, clazz.getName());
     }
 
     public static List<JaversField> getAllPersistentFields(Class methodSource) {

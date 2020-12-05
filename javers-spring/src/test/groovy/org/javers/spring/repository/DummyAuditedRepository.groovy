@@ -17,6 +17,11 @@ class DummyAuditedRepository {
     }
 
     @JaversAuditable
+    void saveAndFail(DummyObject obj) {
+        throw new RuntimeException()
+    }
+
+    @JaversAuditable
     void saveTwo(DummyObject obj, obj2){
         //... omitted
     }
@@ -26,7 +31,7 @@ class DummyAuditedRepository {
         //... omitted
     }
 
-    DummyObject find(DummyObject query){
+    DummyObject find(DummyObject query) {
         //... omitted
         null
     }
@@ -36,13 +41,26 @@ class DummyAuditedRepository {
         //... omitted
     }
 
+    @JaversAuditableDelete(entity = DummyObject)
+    void deleteById(String id) {
+    }
+
+    @JaversAuditableDelete(entity = DummyObject.class)
+    void deleteAllById(Iterable<String> ids) {
+    }
+
     @JaversAuditableDelete
-    void deleteTwo(DummyObject obj, obj2){
+    void deleteByIdNoClass(String id) {
+    }
+
+
+    @JaversAuditableDelete
+    void deleteTwo(DummyObject obj, obj2) {
         //... omitted
     }
 
     @JaversAuditableDelete
-    void deleteAll(Iterable<DummyObject> objetcs){
+    void deleteAll(Iterable<DummyObject> objetcs) {
         //... omitted
     }
 

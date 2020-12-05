@@ -5,7 +5,7 @@ import java.util.Optional;
 /**
  * @author bartosz.walacik
  */
-class DBObjectName {
+public class DBObjectName {
     private final String SCHEMA_TABLE_SEP = ".";
 
     private final Optional<String> schemaName;
@@ -16,12 +16,17 @@ class DBObjectName {
         this.localName = localName;
     }
 
-    String localName() {
+    public String localName() {
         return localName;
     }
 
-    String nameWithSchema() {
+    public String nameWithSchema() {
         return schemaName.map(n -> n + SCHEMA_TABLE_SEP + localName)
                          .orElse(localName);
+    }
+
+    @Override
+    public String toString() {
+        return nameWithSchema();
     }
 }

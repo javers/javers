@@ -5,7 +5,11 @@ interface KeyGeneratorDefinition {
     KeyGenerator createKeyGenerator();
 
     interface SequenceDefinition extends KeyGeneratorDefinition {
-        String nextFromSequenceAsSelect(String seqName);
+        String nextFromSequenceAsSQLExpression(String seqName);
+
+        default String nextFromSequenceAsSelect(String seqName) {
+            return "SELECT " + nextFromSequenceAsSQLExpression(seqName);
+        }
 
         @Override
         default KeyGenerator createKeyGenerator() {

@@ -28,7 +28,7 @@ public class CdoSnapshotStateBuilder {
         }
 
         if (properties.containsKey(propertyName)){
-            throw new JaversException(JaversExceptionCode.SNAPSHOT_STATE_VIOLATION);
+            throw new JaversException(JaversExceptionCode.SNAPSHOT_STATE_VIOLATION, propertyName);
         }
 
         properties.put(propertyName, value);
@@ -37,6 +37,10 @@ public class CdoSnapshotStateBuilder {
 
     public CdoSnapshotStateBuilder withPropertyValue(Property property, Object value){
         return withPropertyValue(property.getName(), value);
+    }
+
+    public boolean contains(Property property) {
+        return properties.containsKey(property.getName());
     }
 
     public CdoSnapshotState build() {

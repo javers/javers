@@ -19,8 +19,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * <H2>Class level</H2>
  * Add {@code DiffIgnore} to classes to mark them as ignored. <br/>
- * When a given class is ignored, all properties
- * (found in other classes) with this class as a return type are ignored.
+ * When a class is ignored, all properties
+ * (found in other classes) with this class type are ignored.
  *
  * <br/><br/>
  * <b>Warning</b>: {@code DiffIgnore} can't be mixed with {@code DiffInclude} in the same class.

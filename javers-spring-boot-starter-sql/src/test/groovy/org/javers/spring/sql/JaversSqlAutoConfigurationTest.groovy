@@ -36,13 +36,19 @@ class JaversSqlAutoConfigurationTest extends Specification {
         javersProperties.isTypeSafeValues()
         dialectName == DialectName.H2
         javersProperties.sqlSchema == "test"
-        javersProperties.isSqlSchemaManagementEnabled()
+        javersProperties.sqlSchemaManagementEnabled
         javersProperties.getCommitIdGenerator() == "random"
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"
         javersProperties.prettyPrintDateFormats.localDateTime == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd-mm-yyyy HH mm ss Z"
         javersProperties.prettyPrintDateFormats.localDate == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.localTime == "HH mm ss"
+        javersProperties.sqlGlobalIdCacheDisabled
+        javersProperties.objectAccessHook == "org.javers.spring.boot.DummySqlObjectAccessHook"
+        javersProperties.sqlGlobalIdTableName == "cust_jv_global_id"
+        javersProperties.sqlCommitTableName == "cust_jv_commit"
+        javersProperties.sqlSnapshotTableName == "cust_jv_snapshot"
+        javersProperties.sqlCommitPropertyTableName == "cust_jv_commit_property"
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {

@@ -98,4 +98,9 @@ public class MapType extends KeyValueType {
         Map sourceMap = Maps.wrapNull(source);
         return sourceMap.entrySet().stream();
     }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Map.class;
+    }
 }

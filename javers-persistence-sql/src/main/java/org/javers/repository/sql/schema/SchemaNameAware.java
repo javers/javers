@@ -2,9 +2,6 @@ package org.javers.repository.sql.schema;
 
 import java.util.Optional;
 
-/**
- * TODO should be replaced with Java8 interface with default impl
- */
 public abstract class SchemaNameAware {
     private final TableNameProvider tableNameProvider;
 
@@ -44,20 +41,16 @@ public abstract class SchemaNameAware {
         return tableNameProvider.getSnapshotTableName();
     }
 
-    protected String getCommitPkSeqWithSchema(){
-        return tableNameProvider.getCommitPkSeqWithSchema();
+    protected DBObjectName getCommitPkSeqName(){
+        return tableNameProvider.getCommitPkSeqName();
     }
 
-    protected String getSnapshotTablePkSeqWithSchema(){
-        return tableNameProvider.getSnapshotTablePkSeqWithSchema();
+    protected DBObjectName getSnapshotTablePkSeqName(){
+        return tableNameProvider.getSnapshotTablePkSeqName();
     }
 
-    protected String getGlobalIdPkSeqWithSchema() {
-        return tableNameProvider.getGlobalIdPkSeqWithSchema();
-    }
-
-    protected String getSequenceName(String pkColName){
-        return tableNameProvider.getSequenceName(pkColName);
+    protected DBObjectName getGlobalIdPkSeqName() {
+        return tableNameProvider.getGlobalIdPkSeqName();
     }
 
     protected Optional<String> getSchemaName() {

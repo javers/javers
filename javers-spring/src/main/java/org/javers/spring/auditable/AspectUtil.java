@@ -11,7 +11,7 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class AspectUtil {
-    public static Iterable<Object> collectArguments(JoinPoint jp){
+    public static List<Object> collectArguments(JoinPoint jp){
         List<Object> result = new ArrayList<>();
 
         for (Object arg: jp.getArgs()) {

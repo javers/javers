@@ -1,13 +1,20 @@
 package org.javers.spring.example;
 
-import com.mongodb.MongoClient;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
+import org.javers.spring.annotation.JaversAuditable;
+import org.javers.spring.annotation.JaversAuditableAsync;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +25,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 @Configuration
 @ComponentScan(basePackages = "org.javers.spring.repository")
@@ -47,7 +57,7 @@ public class JaversSpringMongoApplicationConfig {
     @Bean(name="realMongoClient")
     @ConditionalOnMissingBean
     public MongoClient mongo() {
-        return new MongoClient();
+        return MongoClients.create();
     }
 
     /**
@@ -61,8 +71,8 @@ public class JaversSpringMongoApplicationConfig {
     /**
      * Enables auto-audit aspect for ordinary repositories.<br/>
      *
-     * Use {@link org.javers.spring.annotation.JaversAuditable}
-     * to mark data writing methods that you want to audit.
+     * Use {@link JaversAuditable}
+     * to mark repository methods that you want to audit.
      */
     @Bean
     public JaversAuditableAspect javersAuditableAspect() {
@@ -72,13 +82,39 @@ public class JaversSpringMongoApplicationConfig {
     /**
      * Enables auto-audit aspect for Spring Data repositories. <br/>
      *
-     * Use {@link org.javers.spring.annotation.JaversSpringDataAuditable}
+     * Use {@link JaversSpringDataAuditable}
      * to annotate CrudRepositories you want to audit.
      */
     @Bean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
         return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(),
                 commitPropertiesProvider());
+    }
+
+    /**
+     * <b>INCUBATING - Javers Async API has incubating status.</b>
+     * <br/><br/>
+     *
+     * Enables asynchronous auto-audit aspect for ordinary repositories.<br/>
+     *
+     * Use {@link JaversAuditableAsync}
+     * to mark repository methods that you want to audit.
+     */
+    @Bean
+    public JaversAuditableAspectAsync javersAuditableAspectAsync() {
+        return new JaversAuditableAspectAsync(javers(), authorProvider(), commitPropertiesProvider(), javersAsyncAuditExecutor());
+    }
+
+    /**
+     * <b>INCUBATING - Javers Async API has incubating status.</b>
+     * <br/><br/>
+     */
+    @Bean
+    public ExecutorService javersAsyncAuditExecutor() {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("JaversAuditableAsync-%d")
+                .build();
+        return Executors.newFixedThreadPool(2, threadFactory);
     }
 
     /**
@@ -98,8 +134,14 @@ public class JaversSpringMongoApplicationConfig {
      */
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        final Map<String, String> rv = new HashMap<>();
-        rv.put("key", "ok");
-        return () -> Collections.unmodifiableMap(rv);
+        return new CommitPropertiesProvider() {
+            @Override
+            public Map<String, String> provideForCommittedObject(Object domainObject) {
+                if (domainObject instanceof DummyObject) {
+                    return Maps.of("dummyObject.name", ((DummyObject)domainObject).getName());
+                }
+                return Collections.emptyMap();
+            }
+        };
     }
 }

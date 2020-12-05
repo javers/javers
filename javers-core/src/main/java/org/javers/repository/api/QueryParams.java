@@ -4,6 +4,7 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.jql.QueryBuilder;
 
+import java.time.Instant;
 import java.util.*;
 
 import org.javers.core.commit.CommitId;
@@ -20,7 +21,9 @@ public class QueryParams {
     private final int limit;
     private final int skip;
     private final LocalDateTime from;
+    private final Instant fromInstant;
     private final LocalDateTime to;
+    private final Instant toInstant;
     private final CommitId toCommitId;
     private final Set<CommitId> commitIds;
     private final Long version;
@@ -28,22 +31,24 @@ public class QueryParams {
     private final Map<String, String> commitProperties;
     private final boolean aggregate;
     private final boolean newObjectChanges;
-    private final String changedProperty;
+    private final Set<String> changedProperties;
     private final SnapshotType snapshotType;
     private final boolean loadCommitProps;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps) {
+    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps) {
         this.limit = limit;
         this.skip = skip;
         this.from = from;
+        this.fromInstant = fromInstant;
         this.to = to;
+        this.toInstant = toInstant;
         this.commitIds = commitIds;
         this.version = version;
         this.author = author;
         this.commitProperties = commitProperties;
         this.aggregate = aggregate;
         this.newObjectChanges = newObjectChanges;
-        this.changedProperty = changedProperty;
+        this.changedProperties = changedProperties;
         this.toCommitId = toCommitId;
         this.snapshotType = snapshotType;
         this.loadCommitProps = loadCommitProps;
@@ -51,14 +56,14 @@ public class QueryParams {
 
     public QueryParams changeAggregate(boolean newAggregate) {
         return new QueryParams(
-                limit, skip, from, to, commitIds, version, author, commitProperties,
-                newAggregate, newObjectChanges, changedProperty, toCommitId, snapshotType, loadCommitProps);
+                limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties,
+                newAggregate, newObjectChanges, changedProperties, toCommitId, snapshotType, loadCommitProps);
     }
 
     public QueryParams nextPage() {
         return new QueryParams(
-                limit, skip+limit, from, to, commitIds, version, author, commitProperties,
-                aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType, loadCommitProps);
+                limit, skip+limit, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties,
+                aggregate, newObjectChanges, changedProperties, toCommitId, snapshotType, loadCommitProps);
     }
 
     /**
@@ -83,10 +88,22 @@ public class QueryParams {
     }
 
     /**
+     * @see QueryBuilder#fromInstant(Instant)
+     */
+    public Optional<Instant> fromInstant() { return Optional.ofNullable(fromInstant); }
+
+    /**
      * @see QueryBuilder#to(LocalDateTime)
      */
     public Optional<LocalDateTime> to() {
         return Optional.ofNullable(to);
+    }
+
+    /**
+     * @see QueryBuilder#toInstant(Instant)
+     */
+    public Optional<Instant> toInstant() {
+        return Optional.ofNullable(toInstant);
     }
 
     /**
@@ -112,10 +129,10 @@ public class QueryParams {
     }
 
     /**
-     * @see QueryBuilder#withChangedProperty(String)
+     * @see QueryBuilder#withChangedPropertyIn(String...)
      */
-    public Optional<String> changedProperty(){
-        return Optional.ofNullable(changedProperty);
+    public Set<String> changedProperties(){
+        return Collections.unmodifiableSet(changedProperties);
     }
 
     /**
@@ -162,30 +179,17 @@ public class QueryParams {
         return ToStringBuilder.toString(this,
                 "aggregate", aggregate,
                 "from", from,
+                "fromInstant", fromInstant,
                 "to", to,
+                "toInstant", toInstant,
                 "toCommitId", toCommitId,
                 "commitIds", commitIds,
-                "changedProperty", changedProperty,
+                "changeProperties", changedProperties,
                 "version", version,
                 "author", author,
                 "newObjectChanges", newObjectChanges,
                 "snapshotType", snapshotType,
                 "limit", limit,
                 "skip", skip);
-    }
-
-    public boolean hasDates() {
-        return from().isPresent() || to().isPresent();
-    }
-
-    public boolean isDateInRange(LocalDateTime date) {
-        if (from().isPresent() && from().get().isAfter(date)){
-            return false;
-        }
-        if (to().isPresent() && to().get().isBefore(date)){
-            return false;
-        }
-
-        return true;
     }
 }

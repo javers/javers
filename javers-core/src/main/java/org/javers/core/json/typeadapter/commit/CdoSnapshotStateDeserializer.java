@@ -70,7 +70,11 @@ class CdoSnapshotStateDeserializer {
 
         try {
             Type expectedJavaType = typeMapper.getDehydratedType(javersProperty.getGenericType());
-            return context.deserialize(propertyElement, expectedJavaType);
+            if (javersProperty.getType() instanceof TokenType) {
+                return deserializeValueWithTypeGuessing(propertyElement, context);
+            } else {
+                return context.deserialize(propertyElement, expectedJavaType);
+            }
         } catch (JsonSyntaxException | DateTimeParseException e) {
             logger.info("Can't deserialize type-safely the Snapshot property: "+ javersProperty +
                         ". JSON value: "+propertyElement +
@@ -80,6 +84,25 @@ class CdoSnapshotStateDeserializer {
             // can have different type than expected
             return decodePropertyValueUsingJsonType(propertyElement, context);
         }
+    }
+
+    private Object deserializeValueWithTypeGuessing(JsonElement propertyElement, JsonDeserializationContext context) {
+        if (propertyElement.isJsonPrimitive()){
+            JsonPrimitive jsonPrimitive = (JsonPrimitive) propertyElement;
+
+            if (jsonPrimitive.isString()) {
+                return jsonPrimitive.getAsString();
+            }
+            if (jsonPrimitive.isNumber()) {
+                if (jsonPrimitive.getAsString().equals(jsonPrimitive.getAsInt()+"")) {
+                    return jsonPrimitive.getAsInt();
+                }
+                if (jsonPrimitive.getAsString().equals(jsonPrimitive.getAsLong()+"")) {
+                    return jsonPrimitive.getAsLong();
+                }
+            }
+        }
+        return context.deserialize(propertyElement, Object.class);
     }
 
     private boolean unmatchedPrimitivesOnBothSides(JaversType expectedJaversType, JsonElement propertyElement) {

@@ -1,6 +1,7 @@
 package org.javers.spring.boot.mongo;
 
 import org.javers.spring.JaversSpringProperties;
+import org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -8,8 +9,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "javers")
 public class JaversMongoProperties extends JaversSpringProperties {
+    private static final String DEFAULT_OBJECT_ACCESS_HOOK = DBRefUnproxyObjectAccessHook.class.getName();
 
     private boolean documentDbCompatibilityEnabled = false;
+
+    // Set 0 to disable.
+    private int snapshotsCacheSize = 5000;
 
     private Mongodb mongodb;
 
@@ -19,6 +24,14 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     public void setDocumentDbCompatibilityEnabled(boolean documentDbCompatibilityEnabled) {
         this.documentDbCompatibilityEnabled = documentDbCompatibilityEnabled;
+    }
+
+    public int getSnapshotsCacheSize() {
+        return snapshotsCacheSize;
+    }
+
+    public void setSnapshotsCacheSize(final int cacheSize) {
+        this.snapshotsCacheSize = cacheSize;
     }
 
     public Mongodb getMongodb() {
@@ -132,5 +145,9 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     public boolean isDedicatedMongodbConfigurationEnabled() {
         return mongodb != null;
+    }
+
+    protected String defaultObjectAccessHook(){
+        return DEFAULT_OBJECT_ACCESS_HOOK;
     }
 }

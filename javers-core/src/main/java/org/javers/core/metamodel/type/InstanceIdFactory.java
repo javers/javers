@@ -68,7 +68,7 @@ class InstanceIdFactory {
         }
         if (idProperty.isPrimitiveOrValueType()) {
             PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
-            return primitiveOrValueType.smartToString(dehydratedAtomicLocalId);
+            return primitiveOrValueType.valueToString(dehydratedAtomicLocalId);
         }
 
         throw idTypeNotSupported();
@@ -76,6 +76,7 @@ class InstanceIdFactory {
 
     private JaversException idTypeNotSupported() {
         return new JaversException(JaversExceptionCode.ID_TYPE_NOT_SUPPORTED,
+                entityType.getIdProperty().getType().getClass().getSimpleName(),
                 entityType.getIdProperty().getType().getName(),
                 entityType.getBaseJavaClass().getName());
     }

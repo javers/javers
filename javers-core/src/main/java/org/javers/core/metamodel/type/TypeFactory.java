@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition;
 import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author bartosz walacik
@@ -30,8 +29,12 @@ class TypeFactory {
     private final ManagedClassFactory managedClassFactory;
     private final EntityTypeFactory entityTypeFactory;
 
-    TypeFactory(ClassScanner classScanner, TypeMapper typeMapper) {
+    private final DynamicMappingStrategy dynamicMappingStrategy;
+
+    TypeFactory(ClassScanner classScanner, TypeMapper typeMapper, DynamicMappingStrategy dynamicMappingStrategy) {
         this.classScanner = classScanner;
+
+        this.dynamicMappingStrategy = dynamicMappingStrategy;
 
         //Pico doesn't support cycles, so manual construction
         this.managedClassFactory = new ManagedClassFactory(typeMapper);
@@ -55,8 +58,7 @@ class TypeFactory {
         } else if (def instanceof ValueDefinition) {
             ValueDefinition valueDefinition = (ValueDefinition) def;
             return new ValueType(valueDefinition.getBaseJavaClass(),
-                    valueDefinition.getComparator(),
-                    valueDefinition.getToStringFunction());
+                    valueDefinition.getComparator());
         } else if (def instanceof IgnoredTypeDefinition) {
             return new IgnoredType(def.getBaseJavaClass());
         } else {
@@ -97,12 +99,16 @@ class TypeFactory {
             return jType;
         }
 
-        return inferFromAnnotations(javaRichType).map(jType -> {
-            logger.debug("javersType of '{}' inferred from annotations as {}",
-                    javaRichType.getSimpleName(), jType.getClass().getSimpleName());
-            return jType;
-        }).orElseGet(() ->  inferFromHints(javaRichType)
-                .orElseGet(() -> createDefaultType(javaRichType)));
+        Optional<JaversType> dynamicType = dynamicMappingStrategy.map(javaType);
+
+        return dynamicType
+                .orElseGet(() -> inferFromAnnotations(javaRichType).map(jType -> {
+                        logger.debug("javersType of '{}' inferred from annotations as {}",
+                        javaRichType.getSimpleName(), jType.getClass().getSimpleName());
+                        return jType;
+                })
+                .orElseGet(() -> inferFromHints(javaRichType)
+                .orElseGet(() -> createDefaultType(javaRichType))));
     }
 
     private Optional<JaversType> resolveIfTokenType(Type javaType) {

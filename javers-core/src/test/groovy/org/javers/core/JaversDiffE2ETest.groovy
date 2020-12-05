@@ -13,8 +13,13 @@ import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
+import org.javers.core.metamodel.annotation.ValueObject
 import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.type.EntityType
+import org.javers.core.metamodel.type.IgnoredType
+import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.*
+import spock.lang.Shared
 import spock.lang.Unroll
 
 import javax.persistence.EmbeddedId
@@ -136,7 +141,9 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
     def "should use custom toString function when provided for building InstanceId"(){
         given:
-        def javers = JaversBuilder.javers().registerValueWithCustomToString(DummyPoint, {x -> x.getStringId()}).build()
+        def javers = JaversBuilder.javers()
+                .registerValue(DummyPoint, {a,b -> Objects.equals(a,b)}, {x -> x.getStringId()})
+                .build()
         def left  = new DummyCompositePoint(dummyPoint: new DummyPoint(1,2), value:5)
         def right = new DummyCompositePoint(dummyPoint: new DummyPoint(1,2), value:6)
 
@@ -390,6 +397,70 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         javers.compare(left, right).changes.size() == 0
     }
 
+    def "should ignore properties with @DiffIgnored type"() {
+        given:
+        def javers = javers().build()
+        def left =  new DummyUser(name: "a",
+                                  propertyWithDiffIgnoredType: new DummyIgnoredType(value: 1),
+                                  propertyWithDiffIgnoredSubtype: new IgnoredSubType(value: 1))
+        def right = new DummyUser(name: "a",
+                                  propertyWithDiffIgnoredType: new DummyIgnoredType(value: 2),
+                                  propertyWithDiffIgnoredSubtype: new IgnoredSubType(value: 2))
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 0
+        javers.getTypeMapping(DummyIgnoredType) instanceof IgnoredType
+        javers.getTypeMapping(IgnoredSubType) instanceof IgnoredType
+    }
+
+    class Foo {
+        Bar bar
+        BarBar barBar
+    }
+
+    class Bar {
+        int value
+    }
+    class BarBar {
+        int value
+    }
+
+    def "should ignore properties with type explicitly registered as ignored" () {
+        given:
+        def javers = javers().registerIgnoredClass(Bar).build()
+        def left =  new Foo(bar:new Bar(value:1))
+        def right = new Foo(bar:new Bar(value:2))
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 0
+        javers.getTypeMapping(Bar) instanceof IgnoredType
+    }
+
+    def "should ignore properties with type registered as ignored using IgnoredClassesStrategy" () {
+        given:
+        def javers = javers().registerIgnoredClassesStrategy(
+                {c -> return c == Bar}
+        ).build()
+        def left =  new Foo(bar:new Bar(value:1), barBar: new BarBar(value:1))
+        def right = new Foo(bar:new Bar(value:2), barBar: new BarBar(value:2))
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 1
+        println diff.changes[0].propertyNameWithPath == 'barBar.value'
+
+        javers.getTypeMapping(Bar) instanceof IgnoredType
+        javers.getTypeMapping(BarBar) instanceof ValueObjectType
+    }
+
     def "should ignore properties declared in a class with @IgnoreDeclaredProperties"(){
         given:
         def javers = javers().build()
@@ -403,7 +474,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         diff.changes.size() == 1
         diff.changes[0].propertyName == "age"
     }
-
 
     def "should compare ValueObjects in Lists as Sets when ListCompareAlgorithm.SET is enabled"() {
       given:
@@ -587,13 +657,14 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         @Id int id
         List<String> propsList
         Set<String> propsSet
+        Map<String, String> propsMap
     }
 
     def "should report when a list property is added or removed"(){
       given:
       def javers = javers().build()
       def object1 = new Entity1(id:1)
-      def object2 = new Entity2(id:1, propsList: ["p"], propsSet: ["p"] as Set)
+      def object2 = new Entity2(id:1, propsList: ["p"], propsSet: ["p"] as Set, propsMap: ["k": "v"])
 
       when:
       def diff = javers.compare(object1, object2)
@@ -601,9 +672,10 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       def changes = diff.getChangesByType(PropertyChange)
 
       then:
-      changes.size() == 2
+      changes.size() == 3
       changes[0].propertyAdded
       changes[1].propertyAdded
+      changes[2].propertyAdded
 
       when:
       diff = javers.compare(object2, object1)
@@ -611,8 +683,9 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       changes = diff.getChangesByType(PropertyChange)
 
       then:
-      changes.size() == 2
+      changes.size() == 3
       changes[0].propertyRemoved
       changes[1].propertyRemoved
+      changes[2].propertyRemoved
     }
 }

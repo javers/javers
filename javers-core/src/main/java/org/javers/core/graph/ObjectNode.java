@@ -9,10 +9,9 @@ import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
-import static java.util.Collections.unmodifiableList;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**

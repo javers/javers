@@ -16,7 +16,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class Lists {
 
     public static List wrapNull(Object list) {
-        if (list == null || list == MissingProperty.INSTANCE) {
+        if (list == null || list == MissingProperty.INSTANCE || !(list instanceof List)) {
             return Collections.emptyList();
         }
         return (List)list;
@@ -39,14 +39,14 @@ public class Lists {
         if (elements == null || elements.size() == 0) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableList(new ArrayList<>(elements));
+        return unmodifiableList(new ArrayList<>(elements));
     }
 
     public static <T> List<T> immutableCopyOf(List<T> elements) {
         if (elements == null || elements.size() == 0) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableList(new ArrayList<>(elements));
+        return unmodifiableList(new ArrayList<>(elements));
     }
 
     public static <E> List<E> asList(E... elements) {
@@ -56,7 +56,7 @@ public class Lists {
     public static <E> List<E> immutableListOf(List<E> elements, E element) {
         List<E> list = new ArrayList<>(elements);
         list.add(element);
-        return Collections.unmodifiableList(list);
+        return unmodifiableList(list);
     }
 
     /**

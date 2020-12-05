@@ -2,21 +2,15 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.container.ContainerElementChange;
-import org.javers.core.diff.changetype.container.SetChange;
-import org.javers.core.diff.changetype.container.ValueAdded;
-import org.javers.core.diff.changetype.container.ValueRemoved;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.type.*;
 
 import java.util.*;
 
-import static org.javers.core.diff.appenders.CorePropertyChangeAppender.renderNotParametrizedWarningIfNeeded;
-
 /**
  * @author pawel szymczyk
  */
-class SetChangeAppender implements PropertyChangeAppender<SetChange> {
+class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     private final TypeMapper typeMapper;
 
     SetChangeAppender(TypeMapper typeMapper) {
@@ -29,11 +23,9 @@ class SetChangeAppender implements PropertyChangeAppender<SetChange> {
     }
 
     @Override
-    public SetChange calculateChanges(NodePair pair, JaversProperty property) {
-        GlobalId affectedId = pair.getGlobalId();
-
-        Set leftSet = toSet(pair.getLeftDehydratedPropertyValueAndSanitize(property));
-        Set rightSet = toSet(pair.getRightDehydratedPropertyValueAndSanitize(property));
+    protected SetChange calculateChanges(Object leftValue, Object rightValue, NodePair pair, JaversProperty property) {
+        Set leftSet = wrapValuesIfNeeded(toSet(leftValue), property);
+        Set rightSet = wrapValuesIfNeeded(toSet(rightValue), property);
 
         List<ContainerElementChange> entryChanges = calculateDiff(leftSet, rightSet);
         if (!entryChanges.isEmpty()) {
@@ -43,6 +35,10 @@ class SetChangeAppender implements PropertyChangeAppender<SetChange> {
         } else {
             return null;
         }
+    }
+
+    private Set wrapValuesIfNeeded(Set set, JaversProperty property) {
+        return HashWrapper.wrapValuesIfNeeded(set, typeMapper.getContainerItemType(property));
     }
 
     private Set toSet(Object collection) {

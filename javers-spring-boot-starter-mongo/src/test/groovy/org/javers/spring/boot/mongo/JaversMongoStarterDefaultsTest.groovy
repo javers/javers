@@ -1,6 +1,6 @@
 package org.javers.spring.boot.mongo
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoDatabase
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
@@ -13,6 +13,7 @@ import spock.lang.Specification
  */
 @SpringBootTest(classes = [TestApplication])
 class JaversMongoStarterDefaultsTest extends Specification{
+    static String DB_NAME = 'spring-mongo-default'
 
     @Autowired Javers javers
 
@@ -35,6 +36,8 @@ class JaversMongoStarterDefaultsTest extends Specification{
         javersProperties.springDataAuditableRepositoryAspectEnabled
         javersProperties.packagesToScan == ""
        !javersProperties.mongodb
+        javersProperties.objectAccessHook == "org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook"
+        javersProperties.snapshotsCacheSize == 5000
     }
 
     def "should connect to Mongo configured in spring.data.mongodb properties"(){
@@ -43,9 +46,10 @@ class JaversMongoStarterDefaultsTest extends Specification{
       javers.commit("a", dummyEntity)
       def snapshots = javers.findSnapshots(QueryBuilder.byInstance(dummyEntity).build())
 
-      MongoDatabase mongoDatabase = mongoClient.getDatabase( "spring-mongo" )
+      MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME)
 
       then:
+      javers.repository.delegate.mongoSchemaManager.mongo.name == "spring-mongo-default"
       snapshots.size() == 1
       mongoDatabase.getCollection("jv_snapshots").countDocuments() == 1
     }

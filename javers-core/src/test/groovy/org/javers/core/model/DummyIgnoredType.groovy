@@ -7,4 +7,5 @@ import org.javers.core.metamodel.annotation.DiffIgnore
  */
 @DiffIgnore
 class DummyIgnoredType {
+    int value
 }

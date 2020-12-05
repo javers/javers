@@ -18,6 +18,8 @@ import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.scanner.ClassScanner
+import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.model.DummyAddress
 import org.javers.core.graph.ObjectHasher

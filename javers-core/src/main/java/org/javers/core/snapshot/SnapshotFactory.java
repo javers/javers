@@ -1,10 +1,14 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.collections.Defaults;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.appenders.HashWrapper;
 import org.javers.core.graph.Cdo;
 import org.javers.core.graph.LiveNode;
 import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.type.CustomComparableType;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -57,7 +61,7 @@ public class SnapshotFactory {
         CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
         for (JaversProperty property : managedType.getProperties()) {
             if (typeMapper.isManagedType(property.getType()) ||
-                    typeMapper.isEnumerableOfManagedTypes(property.getType())) {
+                typeMapper.isEnumerableOfManagedTypes(property.getType())) {
                 continue;
             }
 
@@ -65,7 +69,13 @@ public class SnapshotFactory {
             if (Objects.equals(propertyValue, Defaults.defaultValue(property.getGenericType()))) {
                 continue;
             }
-            stateBuilder.withPropertyValue(property, propertyValue);
+
+            if (property.getType() instanceof CustomComparableType) {
+                String propertyValueToString = ((CustomComparableType) property.getType()).valueToString(propertyValue);
+                stateBuilder.withPropertyValue(property, propertyValueToString);
+            } else {
+                stateBuilder.withPropertyValue(property, propertyValue);
+            }
         }
         return stateBuilder.build();
     }
@@ -80,6 +90,9 @@ public class SnapshotFactory {
             Object dehydratedPropertyValue = liveNode.getDehydratedPropertyValue(property);
             if (Objects.equals(dehydratedPropertyValue, Defaults.defaultValue(property.getGenericType()))) {
                 continue;
+            }
+            if (stateBuilder.contains(property)) {
+                throw new JaversException(JaversExceptionCode.SNAPSHOT_SERIALIZATION_ERROR, liveNode.getGlobalId().value(), property);
             }
             stateBuilder.withPropertyValue(property, dehydratedPropertyValue);
         }

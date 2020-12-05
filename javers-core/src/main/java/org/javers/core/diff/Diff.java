@@ -37,11 +37,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class Diff implements Serializable {
 
-    private final List<Change> changes;
+    private final Changes changes;
     private final transient PrettyValuePrinter valuePrinter;
 
     Diff(List<Change> changes, PrettyValuePrinter valuePrinter) {
-        this.changes = changes;
+        this.changes = new Changes(changes, valuePrinter);
         this.valuePrinter = valuePrinter;
     }
 
@@ -73,10 +73,9 @@ public class Diff implements Serializable {
     /**
      * Flat list of changes
      *
-     * @return unmodifiable list
      */
-    public List<Change> getChanges() {
-        return Collections.unmodifiableList(changes);
+    public Changes getChanges() {
+        return changes;
     }
 
     /**

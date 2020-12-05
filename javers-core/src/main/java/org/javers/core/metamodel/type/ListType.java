@@ -8,10 +8,8 @@ import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
@@ -45,5 +43,10 @@ public class ListType extends CollectionType{
             .map(sourceVal -> sourceVal == null ? null : mapFunction.apply(sourceVal))
             .filter(mappedVal -> !filterNulls || mappedVal != null)
             .collect(toList()));
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return List.class;
     }
 }

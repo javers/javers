@@ -35,7 +35,7 @@ class Dialects {
 
         @Override
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
-            return (SequenceDefinition) seqName -> "SELECT " + seqName + ".nextval";
+            return (SequenceDefinition) seqName ->  seqName + ".nextval";
         }
     }
 
@@ -57,7 +57,7 @@ class Dialects {
 
         @Override
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
-            return (SequenceDefinition) seqName -> "SELECT + " + "NEXT VALUE FOR " + seqName;
+            return (SequenceDefinition) seqName -> "NEXT VALUE FOR " + seqName;
         }
 
         @Override
@@ -80,7 +80,7 @@ class Dialects {
 
         @Override
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
-            return (SequenceDefinition) seqName -> "SELECT nextval('" + seqName + "')";
+            return (SequenceDefinition) seqName -> "nextval('" + seqName + "')";
         }
     }
 
@@ -91,7 +91,17 @@ class Dialects {
 
         @Override
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
-            return (SequenceDefinition) seqName -> "SELECT "+ seqName + ".nextval from dual";
+            return new SequenceDefinition() {
+                @Override
+                public String nextFromSequenceAsSQLExpression(String seqName) {
+                    return seqName + ".nextval";
+                }
+
+                @Override
+                public String nextFromSequenceAsSelect(String seqName) {
+                    return "select "+ seqName + ".nextval from dual";
+                }
+            };
         }
 
         @Override

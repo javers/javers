@@ -3,12 +3,12 @@ javadoc {
 }
 
 dependencies {
-    compile project(':javers-spring')
-    compile project(':javers-persistence-sql')
+    api project(':javers-spring')
+    api project(':javers-persistence-sql')
 
-    optional "org.hibernate:hibernate-core:$hibernateVersion"
-    optional "org.springframework:spring-tx:$springVersion"
-    optional "org.springframework.data:spring-data-jpa:$springDataJPAVersion"
+    implementation "org.hibernate:hibernate-core:$hibernateVersion"
+    implementation "org.springframework:spring-tx:$springVersion"
+    implementation "org.springframework.data:spring-data-jpa:$springBootVersion"
 
     testCompile 'com.h2database:h2:1.4.184'
     testCompile "org.springframework:spring-orm:$springVersion"

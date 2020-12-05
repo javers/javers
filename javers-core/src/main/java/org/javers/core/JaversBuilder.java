@@ -4,7 +4,7 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
-import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.validation.Validate;
 import org.javers.core.JaversCoreProperties.PrettyPrintDateFormats;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
@@ -13,10 +13,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
-import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.custom.CustomPropertyComparator;
-import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
-import org.javers.core.diff.custom.CustomValueComparator;
+import org.javers.core.diff.custom.*;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.TailoredJaversMemberFactoryModule;
@@ -47,13 +44,16 @@ import org.javers.shadow.ShadowModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static org.javers.common.reflection.ReflectionUtil.*;
+import static org.javers.common.reflection.ReflectionUtil.findClasses;
+import static org.javers.common.reflection.ReflectionUtil.isClassPresent;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -91,6 +91,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
     private DateProvider dateProvider;
     private long bootStart = System.currentTimeMillis();
 
+    private IgnoredClassesStrategy ignoredClassesStrategy;
+
     public static JaversBuilder javers() {
         return new JaversBuilder();
     }
@@ -114,7 +116,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
             conditionalTypesPlugins.add(new GuavaAddOns());
         }
 
-        // bootstrap phase 1: container & core
+        // bootstrap pico container & core module
         bootContainer();
         addModule(new CoreJaversModule(getContainer()));
     }
@@ -130,7 +132,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     protected Javers assembleJaversInstance(){
-        // bootstrap phase 2: main modules
+        // boot main modules
         addModule(new DiffFactoryModule());
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new SnapshotModule(getContainer()));
@@ -141,13 +143,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new ShadowModule(getContainer()));
         addModule(new JqlModule(getContainer()));
 
-        // bootstrap phase 3: add-on modules
+        // boot add-ons modules
         Set<JaversType> additionalTypes = bootAddOns();
 
-        // bootstrap phase 4: TypeMapper
-        bootManagedTypeModule();
+        // boot TypeMapper module
+        addComponent(new DynamicMappingStrategy(ignoredClassesStrategy));
+        addModule(new TypeMapperModule(getContainer()));
 
-        // bootstrap phase 5: JSON beans & domain aware typeAdapters
+        // boot JSON beans & domain aware typeAdapters
         additionalTypes.addAll( bootJsonConverter() );
 
         bootDateTimeProvider();
@@ -157,6 +160,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
             typeMapper().getJaversType(c);
         }
         typeMapper().addPluginTypes(additionalTypes);
+
+        mapRegisteredClasses();
 
         bootRepository();
 
@@ -276,10 +281,33 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Comma separated list of packages.<br/>
-     * Allows you to registerType all your classes with &#64;{@link TypeName} annotation
-     * in order to use them in all kinds of JQL queries<br/>
-     * (without getting TYPE_NAME_NOT_FOUND exception).
+     * Comma separated list of packages scanned by Javers in search of
+     * your classes with the {@link TypeName} annotation.
+     * <br/><br/>
+     *
+     * It's <b>important</b> to declare here all of your packages containing classes with {@literal @}TypeName,<br/>
+     * because Javers needs <i>live</i> class definitions to properly deserialize Snapshots from {@link JaversRepository}.
+     * <br/><br/>
+     *
+     * <b>For example</b>, consider this class:
+     *
+     * <pre>
+     * {@literal @}Entity
+     * {@literal @}TypeName("Person")
+     *  class Person {
+     *     {@literal @}Id
+     *      private int id;
+     *      private String name;
+     *  }
+     * </pre>
+     *
+     * In the scenario when Javers reads a Snapshot of type named 'Person'
+     * before having a chance to map the Person class definition,
+     * the 'Person' type will be mapped to generic {@link UnknownType}.
+     * <br/><br/>
+     *
+     * Since 5.8.4, Javers logs <code>WARNING</code> when UnknownType is created
+     * because Snapshots with UnknownType can't be properly deserialized from {@link JaversRepository}.
      *
      * @param packagesToScan e.g. "my.company.domain.person, my.company.domain.finance"
      * @since 2.3
@@ -326,12 +354,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * For example, values are: BigDecimal, LocalDateTime.
      * <br/><br/>
      *
-     * Use this method if you are not willing to use {@link Value} annotation.
+     * Use this method if can't use the {@link Value} annotation.
      * <br/><br/>
      *
-     * Values are compared using default {@link Object#equals(Object)}.
-     * If you don't want to use it,
-     * registerType a custom value comparator with {@link #registerValue(Class, CustomValueComparator)}.
+     * By default, Values are compared using {@link Object#equals(Object)}.
+     * You can provide external <code>equals()</code> function
+     * by registering a {@link CustomValueComparator}.
+     * See {@link #registerValue(Class, CustomValueComparator)}.
      *
      * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
      */
@@ -343,34 +372,31 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     /**
      * Registers a {@link ValueType} with a custom comparator to be used instead of
-     * default {@link Object#equals(Object)}.
+     * {@link Object#equals(Object)}.
      * <br/><br/>
      *
-     * Given comparator is used when given Value type is:
-     * <ul>
-     *     <li/>simple property
-     *     <li/>List item
-     *     <li/>Array item
-     *     <li/>Map value
-     * </ul>
-     *
-     * Since this comparator is not aligned with {@link Object#hashCode()},
-     * it <b>is not used </b> when given Value type is:
-     *
-     * <ul>
-     *     <li/>Map key
-     *     <li/>Set item
-     * </ul>
-     *
-     * For example, BigDecimals are (by default) ValueTypes
-     * compared using {@link java.math.BigDecimal#equals(Object)}.
-     * If you want to compare them in the smarter way, ignoring trailing zeros:
+     * For example, by default, BigDecimals are Values
+     * compared using {@link java.math.BigDecimal#equals(Object)},
+     * sadly it isn't the correct mathematical equality:
      *
      * <pre>
-     * javersBuilder.registerValue(BigDecimal.class, (a,b) -> a.compareTo(b) == 0);
+     *     new BigDecimal("1.000").equals(new BigDecimal("1.00")) == false
      * </pre>
      *
+     * If you want to compare them in the right way &mdash; ignoring trailing zeros &mdash;
+     * register this comparator:
+     *
+     * <pre>
+     * JaversBuilder.javers()
+     *     .registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals())
+     *     .build();
+     * </pre>
+     *
+     * @param <T> Value Type
      * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
+     * @see <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
+     * @see BigDecimalComparatorWithFixedEquals
+     * @see CustomBigDecimalComparator
      * @since 3.3
      */
     public <T> JaversBuilder registerValue(Class<T> valueClass, CustomValueComparator<T> customValueComparator) {
@@ -386,84 +412,114 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * For complex <code>ValueType</code> classes that are used as Entity Id.
+     * Lambda-style variant of {@link #registerValue(Class, CustomValueComparator)}.
      * <br/><br/>
      *
-     * Registers a custom <code>toString</code> function that will be used for creating
-     * <code>GlobalId</code> for Entities,
-     * instead of default {@link ReflectionUtil#reflectiveToString(Object)}.
-     * <br/><br/>
-     *
-     * For example:
+     * For example, you can register the comparator for BigDecimals with fixed equals:
      *
      * <pre>
-     * class Entity {
-     *     &#64;Id Point id
-     *     String data
-     * }
-     *
-     * class Point {
-     *     double x
-     *     double y
-     *
-     *     String myToString() {
-     *         "("+ (int)x +"," +(int)y + ")"
-     *     }
-     * }
-     *
-     * def "should use custom toString function for complex Id"(){
-     *   given:
-     *     Entity entity = new Entity(
-     *     id: new Point(x: 1/3, y: 4/3))
-     *
-     *   when: "default reflectiveToString function"
-     *     def javers = JaversBuilder.javers().build()
-     *     GlobalId id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
-     *
-     *   then:
-     *     id.value() == "com.mypackage.Entity/0.3333333333,1.3333333333"
-     *
-     *   when: "custom toString function"
-     *     javers = JaversBuilder.javers()
-     *             .registerValueWithCustomToString(Point, {it.myToString()}).build()
-     *     id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
-     *
-     *   then:
-     *     id.value() == "com.mypackage.Entity/(0,1)"
-     * }
+     * Javers javers = JaversBuilder.javers()
+     *     .registerValue(BigDecimal.class, (a, b) -> a.compareTo(b) == 0,
+     *                                           a -> a.stripTrailingZeros().toString())
+     *     .build();
      * </pre>
      *
-     * For <code>ValueType</code> you can register both
-     * custom <code>toString</code> function and <code>CustomValueComparator</code>.
-     *
-     * @param toString should return String value of a given object
-     * @see ValueType
+     * @param <T> Value Type
      * @see #registerValue(Class, CustomValueComparator)
+     * @since 5.8
+     */
+    public <T> JaversBuilder registerValue(Class<T> valueClass,
+                                           BiFunction<T, T, Boolean> equalsFunction,
+                                           Function<T, String> toStringFunction) {
+        Validate.argumentsAreNotNull(valueClass, equalsFunction, toStringFunction);
+
+        return registerValue(valueClass, new CustomValueComparator<T>() {
+            @Override
+            public boolean equals(T a, T b) {
+                return equalsFunction.apply(a,b);
+            }
+
+            @Override
+            public String toString(@Nonnull T value) {
+                return toStringFunction.apply(value);
+            }
+        });
+    }
+
+    /**
+     * <b>Deprecated</b>, use {@link #registerValue(Class, CustomValueComparator)}.
+     *
+     * <br/><br/>
+     *
+     * Since this comparator is not aligned with {@link Object#hashCode()},
+     * it calculates incorrect results when a given Value is used in hashing context
+     * (when comparing Sets with Values or Maps with Values as keys).
+     *
+     * @see CustomValueComparator
+     */
+    @Deprecated
+    public <T> JaversBuilder registerValue(Class<T> valueClass, BiFunction<T, T, Boolean> equalsFunction) {
+        Validate.argumentsAreNotNull(valueClass, equalsFunction);
+
+        return registerValue(valueClass, new CustomValueComparator<T>() {
+            @Override
+            public boolean equals(T a, T b) {
+                return equalsFunction.apply(a,b);
+            }
+
+            @Override
+            public String toString(@Nonnull T value) {
+                return value.toString();
+            }
+        });
+    }
+
+    /**
+     * <b>Deprecated</b>, use {@link #registerValue(Class, CustomValueComparator)}.
+     *
+     * @see CustomValueComparator
      * @since 3.7.6
      */
-    public <T> JaversBuilder registerValueWithCustomToString(Class<T> valueClass, Function<T, String> toString) {
-        argumentsAreNotNull(valueClass, toString);
-
-        if (!clientsClassDefinitions.containsKey(valueClass)){
-            registerType(new ValueDefinition(valueClass));
-        }
-        ValueDefinition def = getClassDefinition(valueClass);
-        def.setToStringFunction((Function)toString);
-
-        return this;
+    @Deprecated
+    public <T> JaversBuilder registerValueWithCustomToString(Class<T> valueClass, Function<T, String> toStringFunction) {
+        Validate.argumentsAreNotNull(valueClass, toStringFunction);
+        return registerValue(valueClass, (a,b) -> Objects.equals(a,b), toStringFunction);
     }
 
     /**
      * Marks given class as ignored by JaVers.
      * <br/><br/>
      *
-     * Use this method if you are not willing to use {@link DiffIgnore} annotation.
+     * Use this method as an alternative to the {@link DiffIgnore} annotation.
      *
      * @see DiffIgnore
      */
     public JaversBuilder registerIgnoredClass(Class<?> ignoredClass) {
         argumentIsNotNull(ignoredClass);
         registerType(new IgnoredTypeDefinition(ignoredClass));
+        return this;
+    }
+
+    /**
+     * A dynamic version of {@link JaversBuilder#registerIgnoredClass(Class)}.
+     * <br/>
+     * Registers a custom strategy for marking certain classes as ignored.
+     * <br/><br/>
+     *
+     * For example, you can ignore classes by package naming convention:
+     *
+     * <pre>
+     * Javers javers = JaversBuilder.javers()
+     *         .registerIgnoredClassesStrategy(c -> c.getName().startsWith("com.ignore.me"))
+     *         .build();
+     * </pre>
+     *
+     * Use this method as the alternative to the {@link DiffIgnore} annotation
+     * or multiple calls of {@link JaversBuilder#registerIgnoredClass(Class)}.
+     */
+    public JaversBuilder registerIgnoredClassesStrategy(IgnoredClassesStrategy ignoredClassesStrategy) {
+        argumentIsNotNull(ignoredClassesStrategy);
+        this.ignoredClassesStrategy = ignoredClassesStrategy;
         return this;
     }
 
@@ -617,23 +673,34 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Registers a custom property comparator for a given Custom Type.
+     * Registers a {@link CustomPropertyComparator} for a given class and maps this class
+     * to {@link CustomType}.
      * <br/><br/>
      *
-     * Custom comparators are used by diff algorithm to calculate property-to-property diff
-     * and also collection-to-collection diff.
+     * <b>
+     * Custom Types are not easy to manage, use it as a last resort,<br/>
+     * only for corner cases like comparing custom Collection types.</b>
      * <br/><br/>
      *
-     * Internally, given type is mapped as {@link CustomType}.
+     * In most cases, it's better to customize the Javers' diff algorithm using
+     * much more simpler {@link CustomValueComparator},
+     * see {@link #registerValue(Class, CustomValueComparator)}.
      *
      * @param <T> Custom Type
-     * @see CustomType
-     * @see CustomPropertyComparator
+     * @see <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
      */
-    public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
+    public <T> JaversBuilder registerCustomType(Class<T> customType, CustomPropertyComparator<T, ?> comparator){
         registerType(new CustomDefinition(customType, comparator));
         bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
+    }
+
+    /**
+     * @deprecated Renamed to {@link #registerCustomType(Class, CustomPropertyComparator)}
+     */
+    @Deprecated
+    public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
+        return registerCustomType(customType, comparator);
     }
 
     /**
@@ -721,11 +788,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return additionalTypes;
     }
 
-    private void bootManagedTypeModule() {
-        addModule(new TypeMapperModule(getContainer()));
-        mapRegisteredClasses();
-    }
-
     /**
      * boots JsonConverter and registers domain aware typeAdapters
      */
@@ -744,7 +806,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         JsonConverter jsonConverter = jsonConverterBuilder.build();
         addComponent(jsonConverter);
 
-        return Lists.transform(jsonConverterBuilder.getValueTypes(), c -> new ValueType(c));
+        return Lists.transform(jsonConverterBuilder.getBuiltInValueTypes(), c -> new ValueType(c));
     }
 
     private void bootDateTimeProvider() {

@@ -1,6 +1,5 @@
 package org.javers.core.diff;
 
-import com.google.common.collect.Streams;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.PropertyChangeType;
@@ -13,6 +12,7 @@ import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * holds two versions of the same {@link ObjectNode}
@@ -106,7 +106,7 @@ public class RealNodePair implements NodePair {
                 .map(it -> it.getName()).collect(Collectors.toSet());
 
 
-        return Streams.concat(left.getManagedType().getProperties().stream(),
+        return Stream.concat(left.getManagedType().getProperties().stream(),
                               right.getManagedType().getProperties().stream().filter(it -> !leftNames.contains(it.getName())))
                        .collect(Collectors.toList());
     }

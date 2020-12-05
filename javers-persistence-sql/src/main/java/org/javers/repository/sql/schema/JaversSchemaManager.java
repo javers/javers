@@ -1,6 +1,5 @@
 package org.javers.repository.sql.schema;
 
-import com.google.common.html.HtmlEscapers;
 import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.dialect.*;
@@ -94,7 +93,12 @@ public class JaversSchemaManager extends SchemaNameAware {
     /**
      * JaVers 3.11.4 to 3.11.5 schema migration
      */
+    @Deprecated
     private void addDbIndexOnOwnerId() {
+        if (dialect instanceof OracleDialect) {
+            return;
+        }
+
         addIndex(getGlobalIdTableName(), new FixedSchemaFactory.IndexedCols(GLOBAL_ID_OWNER_ID_FK));
     }
 
@@ -216,9 +220,7 @@ public class JaversSchemaManager extends SchemaNameAware {
     }
 
     private void ensureTable(String tableName, Schema schema) {
-        String schemaName = (schema.getSchemaName() == null || schema.getSchemaName().isEmpty())
-                ? "" : schema.getSchemaName();
-
+        String schemaName = schemaFactory.getSchemaNameUsedForSchemaInspection();
         if (relationExists(tableName, schema.getSchemaName())) {
             logger.debug("table {}.{} exists", schemaName, tableName);
             return;
@@ -251,12 +253,17 @@ public class JaversSchemaManager extends SchemaNameAware {
                     }
 
                     tableSchemaName = resultSet.getString("TABLE_SCHEM");
-                } while(tableSchemaName != null && !tableSchemaName.equalsIgnoreCase("public") && !tableSchemaName.equals("") && (!(this.dialect instanceof MsSqlDialect) || !tableSchemaName.equalsIgnoreCase("dbo")));
+                } while(tableSchemaName != null
+                        && !tableSchemaName.equalsIgnoreCase("public")
+                        && !tableSchemaName.equals("")
+                        && (!(this.dialect instanceof MsSqlDialect) || !tableSchemaName.equalsIgnoreCase("dbo"))
+                        && (!(this.dialect instanceof OracleDialect) || !tableSchemaName.equalsIgnoreCase("system"))
+                );
 
                 return true;
             }
         } catch (SQLException var4) {
-            throw new SchemaInspectionException("RELATION_LOOKUP_ERROR", "Failed to obtain relation list when looking for relation " + name, var4);
+            throw new SchemaInspectionException("RELATION_LOOKUP_ERROR", "Failed to obtain tables metadata when checking table " + name, var4);
         }
     }
 
@@ -320,8 +327,13 @@ public class JaversSchemaManager extends SchemaNameAware {
 
     }
 
+    /**
+     * !! Fails on Oracle with schema
+     * @deprecated
+     */
+    @Deprecated
     private void addIndex(DBObjectName tableName, FixedSchemaFactory.IndexedCols indexedCols) {
-        String indexName = FixedSchemaFactory.createIndexName(tableName, indexedCols);
+        String indexName = schemaFactory.createIndexName(tableName, indexedCols);
 
         if (!schemaInspector.indexExists(tableName.localName(), indexName)) {
             String ddl = IndexBuilder.index(dialect, indexName)

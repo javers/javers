@@ -1,6 +1,7 @@
 package org.javers.spring.auditable.integration
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
+import com.mongodb.client.MongoClients
 import de.flapdoodle.embed.mongo.MongodExecutable
 import de.flapdoodle.embed.mongo.MongodStarter
 import de.flapdoodle.embed.mongo.config.IMongodConfig
@@ -28,7 +29,7 @@ class EmbeddedMongoFactory {
         EmbeddedMongo () {
             mongodExecutable = starter.prepare(mongodConfig)
             mongodExecutable.start()
-            mongoClient = new MongoClient(BIND_IP, PORT)
+            mongoClient = MongoClients.create("mongodb://$BIND_IP:$PORT")
         }
 
         MongoClient getClient () {

@@ -7,6 +7,7 @@ import spock.lang.Ignore
  */
 @Ignore // in MySQL SCHEMA is a synonym for DATABASE
 class MySqlIntegrationWithSchemaTest extends MySqlIntegrationTest {
+    @Override
     String getSchema() {
         return "travis_ci_test"
     }

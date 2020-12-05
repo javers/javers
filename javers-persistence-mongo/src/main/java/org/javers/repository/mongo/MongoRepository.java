@@ -42,6 +42,7 @@ import static org.javers.repository.mongo.MongoSchemaManager.*;
  */
 public class MongoRepository implements JaversRepository, ConfigurationAware {
     private final static int DEFAULT_CACHE_SIZE = 5000;
+    private final static double COMMIT_ID_PRECISION = 0.005;
 
     private static final int DESC = -1;
     private final MongoSchemaManager mongoSchemaManager;
@@ -64,8 +65,8 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
      *
      * See <a href="http://docs.aws.amazon.com/documentdb/latest/developerguide/functional-differences.html">functional differences</a>.
      */
-    public static MongoRepository mongoRepositoryWithDocumentDBCompatibility(MongoDatabase mongo) {
-        return new MongoRepository(mongo, DEFAULT_CACHE_SIZE, DOCUMENT_DB);
+    public static MongoRepository mongoRepositoryWithDocumentDBCompatibility(MongoDatabase mongo, int cacheSize) {
+        return new MongoRepository(mongo, cacheSize, DOCUMENT_DB);
     }
 
     /**
@@ -270,16 +271,21 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             if (params.from().isPresent()) {
                 query = Filters.and(query, Filters.gte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.from().get())));
             }
+            if (params.fromInstant().isPresent()) {
+                query = Filters.and(query, Filters.gte(COMMIT_DATE_INSTANT, UtilTypeCoreAdapters.serialize(params.fromInstant().get())));
+            }
             if (params.to().isPresent()) {
                 query =  Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.to().get())));
             }
+            if (params.toInstant().isPresent()) {
+                query = Filters.and(query, Filters.lte(COMMIT_DATE_INSTANT, UtilTypeCoreAdapters.serialize(params.toInstant().get())));
+            }
             if (params.toCommitId().isPresent()) {
-                BigDecimal commitId = params.toCommitId().get().valueAsNumber();
-                query = Filters.and(query, Filters.lte(COMMIT_ID, commitId));
+                query = Filters.and(query, Filters.lte(COMMIT_ID, params.toCommitId().get().valueAsNumber().doubleValue() + COMMIT_ID_PRECISION));
             }
             if (params.commitIds().size() > 0) {
-                query = Filters.in(COMMIT_ID, params.commitIds().stream()
-                        .map(CommitId::valueAsNumber).collect(Collectors.toSet()));
+                query = Filters.or(params.commitIds().stream()
+                        .map(it -> commitIdFilter(it)).collect(Collectors.toList()));
             }
             if (params.version().isPresent()) {
                 query = Filters.and(query, createVersionQuery(params.version().get()));
@@ -290,8 +296,9 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             if (!params.commitProperties().isEmpty()) {
                 query = addCommitPropertiesFilter(query, params.commitProperties());
             }
-            if (params.changedProperty().isPresent()) {
-                query = Filters.and(query, new BasicDBObject(CHANGED_PROPERTIES, params.changedProperty().get()));
+            if (params.changedProperties().size() > 0) {
+                query = Filters.and(query, Filters.or(params.changedProperties().stream()
+                        .map(it -> new BasicDBObject(CHANGED_PROPERTIES, it)).collect(Collectors.toList())));
             }
             if (params.snapshotType().isPresent()) {
                 query = Filters.and(query, new BasicDBObject(SNAPSHOT_TYPE, params.snapshotType().get().name()));
@@ -299,6 +306,17 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
         }
         return query;
+    }
+
+    private Bson commitIdFilter(CommitId commitId) {
+        if (commitId.getMinorId() > 0) {
+            commitId.valueAsNumber().doubleValue();
+            return Filters.and(
+                    Filters.gte(COMMIT_ID, commitId.valueAsNumber().doubleValue() - COMMIT_ID_PRECISION),
+                    Filters.lte(COMMIT_ID, commitId.valueAsNumber().doubleValue() + COMMIT_ID_PRECISION)
+            );
+        }
+        return Filters.eq(COMMIT_ID, commitId.getMajorId());
     }
 
     private FindIterable<Document> applyQueryParams(FindIterable<Document> findIterable, Optional<QueryParams> queryParams) {

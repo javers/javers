@@ -3,7 +3,9 @@ package org.javers.core.diff;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.PropertyChangeMetadata;
 import org.javers.core.diff.changetype.PropertyChangeType;
+import org.javers.core.graph.LiveNode;
 import org.javers.core.graph.ObjectNode;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.MissingProperty;
 import org.javers.core.metamodel.property.Property;
@@ -45,10 +47,10 @@ public interface NodePair {
     }
 
     default Object sanitize(Object value, JaversType expectedType) {
-
         //all Enumerables (except Arrays) are sanitized
         if (expectedType instanceof EnumerableType && !(expectedType instanceof ArrayType)) {
-            if (value == null || !expectedType.isInstance(value)) {
+            EnumerableType enumerableType = (EnumerableType)expectedType;
+            if (value == null || !enumerableType.getEnumerableInterface().isAssignableFrom(value.getClass())) {
                 return ((EnumerableType)expectedType).empty();
             }
         }

@@ -63,7 +63,7 @@ abstract class SpringBootAuditableIntegrationBaseTest extends Specification {
     }
 
     EmployeeEntity createEmployee() {
-        DepartmentEntity departmentEntity = new DepartmentEntity()
+        DepartmentEntity departmentEntity = new DepartmentEntity(id:UUID.randomUUID())
         EmployeeEntity employeeEntity = new EmployeeEntity()
         employeeEntity.setId(UUID.randomUUID())
         employeeEntity.setDepartment(departmentEntity)

@@ -3,6 +3,7 @@ package org.javers.repository.sql.session;
 import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.ConnectionProvider;
+import org.javers.repository.sql.session.KeyGenerator.SequenceAllocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,11 +65,11 @@ public class Session implements AutoCloseable {
         Validate.argumentsAreNotNull(queryName, parameters, tableName);
 
         if (dialect.supportsSequences() && sequenceName != null) {
-            long newId = keyGenerator.generateKey(sequenceName, this);
+            String nextFromSequenceExpression = ((SequenceAllocation) keyGenerator).nextFromSequenceAsSQLExpression(sequenceName);
 
             Insert insertQuery = new Insert(
                     queryName,
-                    Lists.add(parameters, new Parameter.LongParameter(primaryKeyFieldName, newId)),
+                    Lists.add(parameters, new Parameter.InlinedParameter(primaryKeyFieldName, nextFromSequenceExpression + " * 100")),
                     tableName);
 
             execute(insertQuery);

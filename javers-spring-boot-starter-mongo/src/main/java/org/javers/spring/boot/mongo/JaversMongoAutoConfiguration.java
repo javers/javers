@@ -1,17 +1,18 @@
 package org.javers.spring.boot.mongo;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoDatabase;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
-import org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -20,6 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClas
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -41,14 +43,14 @@ public class JaversMongoAutoConfiguration {
     private JaversMongoProperties javersMongoProperties;
 
     @Autowired
-    private MongoClient mongoClient; //from spring-boot-starter-data-mongodb
+    private ApplicationContext applicationContext;
 
     @Autowired
     private MongoProperties mongoProperties; //from spring-boot-starter-data-mongodb
 
     @Autowired
-    @Qualifier("javersMongoClientOptions")
-    private Optional<MongoClientOptions> mongoClientOptions;
+    @Qualifier("javersMongoClientSettings")
+    private Optional<MongoClientSettings> mongoClientSettings;
 
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
@@ -62,30 +64,52 @@ public class JaversMongoAutoConfiguration {
         return JaversBuilder.javers()
                 .registerJaversRepository(javersRepository)
                 .withProperties(javersMongoProperties)
-                .withObjectAccessHook(new DBRefUnproxyObjectAccessHook())
+                .withObjectAccessHook(javersMongoProperties.createObjectAccessHookInstance())
                 .build();
     }
 
     private MongoDatabase initJaversMongoDatabase() {
         if (!javersMongoProperties.isDedicatedMongodbConfigurationEnabled()) {
-            MongoDatabase mongoDatabase = mongoClient.getDatabase( mongoProperties.getMongoClientDatabase() );
+            MongoDatabase mongoDatabase = getDefaultMongoDatabase();
             logger.info("connecting Javers to Mongo database '{}' configured in spring.data.mongodb properties",
                         mongoDatabase.getName());
             return mongoDatabase;
         } else {
-            MongoDatabase mongoDatabase = JaversDedicatedMongoFactory.createMongoDatabase(javersMongoProperties, mongoClientOptions);
+            MongoDatabase mongoDatabase = JaversDedicatedMongoFactory
+                    .createMongoDatabase(javersMongoProperties, mongoClientSettings);
             logger.info("connecting Javers to Mongo database '{}' configured in javers.mongodb properties",
-                        mongoDatabase.getName());
+                    mongoDatabase.getName());
             return mongoDatabase;
         }
     }
 
-    private MongoRepository createMongoRepository(MongoDatabase mongoDatabase) {
-        if (javersMongoProperties.isDocumentDbCompatibilityEnabled()){
-            logger.info("enabling Amazon DocumentDB compatibility");
-            return mongoRepositoryWithDocumentDBCompatibility(mongoDatabase);
+    //from the spring-boot-starter-data-mongodb
+    private MongoDatabase getDefaultMongoDatabase() {
+        if (getBean(com.mongodb.client.MongoClient.class).isPresent()) {
+            return getBean(com.mongodb.client.MongoClient.class).get().getDatabase(mongoProperties.getMongoClientDatabase());
         }
-        return new MongoRepository(mongoDatabase);
+        if (getBean(com.mongodb.MongoClient.class).isPresent()) {
+            return getBean(com.mongodb.MongoClient.class).get().getDatabase(mongoProperties.getMongoClientDatabase());
+        }
+        throw new JaversException(
+                JaversExceptionCode.RUNTIME_EXCEPTION,
+                "Can't fins the default mongoClient bean. It should be crated by the spring-boot-starter-data-mongodb");
+    }
+
+    private <T> Optional<T> getBean(Class<T> ofType) {
+        try {
+            return Optional.of(applicationContext.getBean(ofType));
+        } catch (BeansException e) {
+            return Optional.empty();
+        }
+    }
+
+    private MongoRepository createMongoRepository(MongoDatabase mongoDatabase) {
+        if (javersMongoProperties.isDocumentDbCompatibilityEnabled()) {
+            logger.info("enabling Amazon DocumentDB compatibility");
+            return mongoRepositoryWithDocumentDBCompatibility(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
+        }
+        return new MongoRepository(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
     }
 
     @Bean(name = "SpringSecurityAuthorProvider")
@@ -110,13 +134,19 @@ public class JaversMongoAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    public JaversAuditableAspect javersAuditableAspect(
+            Javers javers,
+            AuthorProvider authorProvider,
+            CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
     }
 
     @Bean
     @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(
+            Javers javers,
+            AuthorProvider authorProvider,
+            CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
     }
 }

@@ -12,16 +12,24 @@ import static org.javers.repository.sql.SqlRepositoryBuilder.sqlRepository
 
 class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
 
+    @Override
     Connection createConnection() {
         DriverManager.getConnection("jdbc:h2:mem:test")
     }
 
+    @Override
     DialectName getDialect() {
         DialectName.H2
     }
 
+    @Override
     String getSchema() {
         return null
+    }
+
+    @Override
+    boolean useRandomCommitIdGenerator() {
+        false
     }
 
     def "should fail when schema is not created"(){
@@ -31,6 +39,10 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
                 .withConnectionProvider({ DriverManager.getConnection("jdbc:h2:mem:empty-test") } as ConnectionProvider)
                 .withSchemaManagementEnabled(false)
                 .withDialect(getDialect())
+                .withGlobalIdTableName(globalIdTableName)
+                .withCommitTableName(commitTableName)
+                .withSnapshotTableName(snapshotTableName)
+                .withCommitPropertyTableName(commitPropertyTableName)
                 .build()).build()
 
         when:
@@ -52,9 +64,9 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
 
         when:
         clearTables()
-        execute("alter sequence  ${schemaPrefix()}jv_commit_pk_seq restart with 1")
-        execute("alter sequence  ${schemaPrefix()}jv_global_id_pk_seq restart with 1")
-        execute("alter sequence  ${schemaPrefix()}jv_snapshot_pk_seq restart with 1")
+        execute("alter sequence "+ schemaManager.commitPkSeqName +" restart with 1")
+        execute("alter sequence "+ schemaManager.globalIdPkSeqName +" restart with 1")
+        execute("alter sequence "+ schemaManager.snapshotTablePkSeqName +" restart with 1")
         def sqlRepository = (JaversSqlRepository) repository
         sqlRepository.evictSequenceAllocationCache()
         sqlRepository.evictCache()

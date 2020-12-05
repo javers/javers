@@ -7,6 +7,7 @@ import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.jql.JqlQuery;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,13 +29,13 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @since 3.9
  */
-public class Changes extends AbstractList<Change> {
+public class Changes extends AbstractList<Change> implements Serializable {
     private final List<Change> changes;
     private final transient PrettyValuePrinter valuePrinter;
 
     public Changes(List<Change> changes, PrettyValuePrinter valuePrinter) {
         Validate.argumentsAreNotNull(changes, valuePrinter);
-        this.changes = changes;
+        this.changes = Collections.unmodifiableList(changes);
         this.valuePrinter = valuePrinter;
     }
 

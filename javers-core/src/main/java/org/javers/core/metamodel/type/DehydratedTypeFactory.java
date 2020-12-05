@@ -4,6 +4,7 @@ import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.object.GlobalId;
 
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.List;
 
 /**
@@ -21,7 +22,10 @@ class DehydratedTypeFactory {
     }
 
     //recursive
-    public Type build(Type givenType){
+    public Type build(Type givenType) {
+        if (givenType instanceof TypeVariable) {
+            return Object.class;
+        }
         final ClassType javersType = mapper.getJaversClassType(givenType);
 
         //for Generics, we have list of type arguments to dehydrate

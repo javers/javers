@@ -5,6 +5,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.metamodel.annotation.Value;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
@@ -35,9 +36,9 @@ public class TypeMapper {
 
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 
-    public TypeMapper(ClassScanner classScanner, JaversCoreConfiguration javersCoreConfiguration) {
+    public TypeMapper(ClassScanner classScanner, JaversCoreConfiguration javersCoreConfiguration, DynamicMappingStrategy dynamicMappingStrategy) {
         //Pico doesn't support cycles, so manual construction
-        TypeFactory typeFactory = new TypeFactory(classScanner, this);
+        TypeFactory typeFactory = new TypeFactory(classScanner, this, dynamicMappingStrategy);
 
         engine.registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
         this.typeFactory = typeFactory;
@@ -65,6 +66,11 @@ public class TypeMapper {
         JaversType keyType = getJaversType(Integer.class);
         JaversType valueType = getJaversType(containerType.getItemType());
         return new MapContentType(keyType, valueType);
+    }
+
+    public JaversType getContainerItemType(JaversProperty property) {
+        ContainerType containerType = property.getType();
+        return getJaversType(containerType.getItemType());
     }
 
     /**

@@ -35,12 +35,18 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javersProperties.packagesToScan == ""
         dialectName == DialectName.H2
         javersProperties.sqlSchema == null
-        javersProperties.isSqlSchemaManagementEnabled()
+        javersProperties.sqlSchemaManagementEnabled
         javersProperties.commitIdGenerator == "synchronized_sequence"
         javersProperties.prettyPrintDateFormats.localDateTime == "dd MMM yyyy, HH:mm:ss"
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd MMM yyyy, HH:mm:ssZ"
         javersProperties.prettyPrintDateFormats.localDate == "dd MMM yyyy"
         javersProperties.prettyPrintDateFormats.localTime == "HH:mm:ss"
+        !javersProperties.sqlGlobalIdCacheDisabled
+        javersProperties.objectAccessHook == "org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook"
+        javersProperties.sqlGlobalIdTableName == null
+        javersProperties.sqlCommitTableName == null
+        javersProperties.sqlSnapshotTableName == null
+        javersProperties.sqlCommitPropertyTableName == null
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath"() {
