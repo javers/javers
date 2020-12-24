@@ -152,8 +152,8 @@ public class JaversSchemaManager extends SchemaNameAware {
     }
 
     private boolean executeSQL(String sql) {
-        try {
-            Statement stmt = connectionProvider.getConnection().createStatement();
+        try (Connection connection = connectionProvider.getConnection()) {
+            Statement stmt = connection.createStatement();
 
             logger.info("executing schema migration SQL:\n" + sql);
 
