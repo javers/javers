@@ -1144,11 +1144,13 @@ class JaversRepositoryE2ETest extends Specification {
 
         when: "changes query"
         def changes = javers.findChanges(query)
+        println changes.prettyPrint()
 
         then:
         changes.find{it instanceof ListChange}.affectedGlobalId.value() == "$sName/1"
         changes.find{it instanceof ValueChange}.affectedGlobalId.value() == "$sName/1#valueObjectRef"
-        changes.find{it instanceof ReferenceChange}.affectedGlobalId.value() == "$sName/1#valueObjectRef"
+
+        //TODO expected newObjectChanges on networkAddress
     }
 
     def "should persist commits in multiple-instances environment"(){

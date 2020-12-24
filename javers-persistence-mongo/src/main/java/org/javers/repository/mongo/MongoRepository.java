@@ -12,7 +12,7 @@ import org.bson.conversions.Bson;
 import org.javers.common.string.RegexEscape;
 import org.javers.common.validation.Validate;
 import org.javers.core.CommitIdGenerator;
-import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -25,7 +25,6 @@ import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.repository.api.*;
 import org.javers.repository.mongo.model.MongoHeadId;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,7 +46,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private static final int DESC = -1;
     private final MongoSchemaManager mongoSchemaManager;
     private JsonConverter jsonConverter;
-    private JaversCoreConfiguration coreConfiguration;
+    private CoreConfiguration coreConfiguration;
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
     private final LatestSnapshotCache cache;
     private MongoDialect mongoDialect;
@@ -152,7 +151,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     }
 
     @Override
-    public void setConfiguration(JaversCoreConfiguration coreConfiguration) {
+    public void setConfiguration(CoreConfiguration coreConfiguration) {
         this.coreConfiguration = coreConfiguration;
     }
 

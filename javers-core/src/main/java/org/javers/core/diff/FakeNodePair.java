@@ -15,40 +15,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-class FakeNodePair implements NodePair {
+abstract class FakeNodePair implements NodePair {
 
-    private final ObjectNode right;
+    final ObjectNode real;
+
     private final Optional<CommitMetadata> commitMetadata;
 
-    public FakeNodePair(ObjectNode right, Optional<CommitMetadata> commitMetadata) {
-        this.right = right;
+    FakeNodePair(ObjectNode real, Optional<CommitMetadata> commitMetadata) {
+        this.real = real;
         this.commitMetadata = commitMetadata;
     }
 
     @Override
     public ManagedType getManagedType() {
-        return right.getManagedType();
+        return real.getManagedType();
     }
 
     @Override
     public boolean isNullOnBothSides(Property property) {
-        return right.getPropertyValue(property) == null;
+        return real.getPropertyValue(property) == null;
     }
 
     @Override
     public GlobalId getGlobalId() {
-        return right.getGlobalId();
+        return real.getGlobalId();
     }
 
-    @Override
-    public ObjectNode getRight() {
-        return right;
-    }
-
-    @Override
-    public ObjectNode getLeft() {
-        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED, "FakeNodePair.getLeft()");
-    }
 
     @Override
     public Object getLeftDehydratedPropertyValueAndSanitize(JaversProperty property) {
@@ -61,35 +53,6 @@ class FakeNodePair implements NodePair {
     }
 
     @Override
-    public Object getLeftPropertyValue(Property property) {
-        return Defaults.defaultValue(property.getGenericType());
-    }
-
-    @Override
-    public Object getRightPropertyValue(Property property) {
-        return right.getPropertyValue(property);
-    }
-    @Override
-    public GlobalId getRightReference(Property property) {
-         return right.getReference(property);
-    }
-
-    @Override
-    public GlobalId getLeftReference(Property property) {
-        return null;
-    }
-
-    @Override
-    public List<GlobalId> getRightReferences(JaversProperty property) {
-        return right.getReferences(property);
-    }
-
-    @Override
-    public List<GlobalId> getLeftReferences(JaversProperty property) {
-        return Collections.emptyList();
-    }
-
-    @Override
     public Optional<CommitMetadata> getCommitMetadata() {
         return commitMetadata;
     }
@@ -97,5 +60,10 @@ class FakeNodePair implements NodePair {
     @Override
     public PropertyChangeType getChangeType(JaversProperty property) {
         return PropertyChangeType.PROPERTY_VALUE_CHANGED;
+    }
+
+    @Override
+    public ObjectNode getFirst() {
+        return real;
     }
 }

@@ -4,7 +4,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
-import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
@@ -34,9 +34,9 @@ public class DiffFactory {
     private final List<NodeChangeAppender> nodeChangeAppenders;
     private final List<PropertyChangeAppender> propertyChangeAppender;
     private final LiveGraphFactory graphFactory;
-    private final JaversCoreConfiguration javersCoreConfiguration;
+    private final CoreConfiguration javersCoreConfiguration;
 
-    public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, LiveGraphFactory graphFactory, JaversCoreConfiguration javersCoreConfiguration) {
+    public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, LiveGraphFactory graphFactory, CoreConfiguration javersCoreConfiguration) {
         this.typeMapper = typeMapper;
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.graphFactory = graphFactory;
@@ -112,10 +112,15 @@ public class DiffFactory {
             diff.addChanges(appender.getChangeSet(graphPair));
         }
 
-        //calculate snapshot of NewObjects
-        if (javersCoreConfiguration.isNewObjectsSnapshot()) {
+        //calculate snapshot of NewObjects and RemovedObjects
+        if (javersCoreConfiguration.isNewObjectsChanges()) {
             for (ObjectNode node : graphPair.getOnlyOnRight()) {
-                FakeNodePair pair = new FakeNodePair(node, graphPair.getCommitMetadata());
+                FakeNodePair pair = new FakeLeftNodePair(node, graphPair.getCommitMetadata());
+                appendPropertyChanges(diff, pair);
+            }
+
+            for (ObjectNode node : graphPair.getOnlyOnLeft()) {
+                FakeNodePair pair = new FakeRightNodePair(node, graphPair.getCommitMetadata());
                 appendPropertyChanges(diff, pair);
             }
         }
@@ -152,7 +157,7 @@ public class DiffFactory {
 
             final Change change = appender.calculateChanges(pair, property);
             if (change != null) {
-                diff.addChange(change, pair.getRight().wrappedCdo());
+                diff.addChange(change, pair.getFirst().wrappedCdo());
             }
             break;
         }

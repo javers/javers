@@ -234,6 +234,8 @@ public class QueryBuilder {
      * It means one NewObject change for each initial snapshot
      * and the full set of initial PropertyChanges with null on the left side
      * and initial property value on the right.
+     *
+     * //TODO
      */
     public QueryBuilder withNewObjectChanges() {
         queryParamsBuilder.newObjectChanges(true);

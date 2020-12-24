@@ -195,7 +195,8 @@ class JaversCommitE2ETest extends Specification {
                     .hasValueChangeAt("intProperty", 2, 5)
     }
 
-    def "should support new object reference, deep in the graph"() {
+    //TODO added values?
+    def "should generate NewObject for added ValueObject"() {
         given:
         def javers = javers().build()
         def user = dummyUser().withDetails()
@@ -212,14 +213,10 @@ class JaversCommitE2ETest extends Specification {
                     .hasSnapshot(instanceId(1, DummyUserDetails),[id:1,dummyAddress:voId,addressList:[],integerList:[]])
                     .hasSnapshot(voId,[city:"Tokyo"])
                     .hasNewObject(voId)
-                    .hasReferenceChangeAt("dummyAddress",null,voId)
-
+                    .hasChanges(1)
     }
 
-    //not sure about that.
-    // We know that object was removed when concerning the local context of LiveGraph and SnapshotGraph
-    // but we don't know if it was removed 'globally'
-    def "should generate only ReferenceChange for removed objects"() {
+    def "should not record ObjectRemoved for removed ValueObject"() {
         given:
         def javers = javers().build()
         def user = dummyUser().withDetails(5).withAddress("Tokyo")
@@ -234,8 +231,7 @@ class JaversCommitE2ETest extends Specification {
         CommitAssert.assertThat(commit)
                     .hasSnapshots(1)
                     .hasSnapshot(instanceId(5, DummyUserDetails))
-                    .hasChanges(1)
-                    .hasReferenceChangeAt("dummyAddress",voId,null)
+                    .hasChanges(0)
     }
 
     def "should support new object added to List, deep in the graph"() {

@@ -87,6 +87,11 @@ public class RealNodePair implements NodePair {
         return left;
     }
 
+    @Override
+    public ObjectNode getFirst() {
+        return left;
+    }
+
     boolean sameClass() {
         return right.getManagedType().getBaseJavaType() == left.getManagedType().getBaseJavaType();
     }

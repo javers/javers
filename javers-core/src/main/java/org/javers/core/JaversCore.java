@@ -52,9 +52,9 @@ class JaversCore implements Javers {
     private final JaversExtendedRepository repository;
     private final QueryRunner queryRunner;
     private final GlobalIdFactory globalIdFactory;
-    private final JaversCoreConfiguration configuration;
+    private final CoreConfiguration configuration;
 
-    JaversCore(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, QueryRunner queryRunner, GlobalIdFactory globalIdFactory, JaversCoreConfiguration javersCoreConfiguration) {
+    JaversCore(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, QueryRunner queryRunner, GlobalIdFactory globalIdFactory, CoreConfiguration javersCoreConfiguration) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;

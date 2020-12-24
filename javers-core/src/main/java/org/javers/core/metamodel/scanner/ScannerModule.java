@@ -2,12 +2,11 @@ package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Lists;
 import org.javers.core.JaversBuilder;
-import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.MappingStyle;
 import org.javers.core.pico.LateInstantiatingModule;
 import org.picocontainer.MutablePicoContainer;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
@@ -17,7 +16,7 @@ import java.util.Collection;
 public class ScannerModule extends LateInstantiatingModule {
     private static final Logger logger = JaversBuilder.logger;
 
-    public ScannerModule(JaversCoreConfiguration configuration, MutablePicoContainer container) {
+    public ScannerModule(CoreConfiguration configuration, MutablePicoContainer container) {
         super(configuration, container);
     }
 

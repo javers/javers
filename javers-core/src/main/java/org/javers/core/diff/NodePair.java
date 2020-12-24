@@ -22,6 +22,8 @@ public interface NodePair {
 
     ObjectNode getLeft();
 
+    ObjectNode getFirst();
+
     List<JaversProperty> getProperties();
 
     Object getLeftPropertyValue(Property property);

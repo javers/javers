@@ -4,7 +4,7 @@ import org.javers.common.collections.Consumer;
 import org.javers.common.collections.Pair;
 import org.javers.common.validation.Validate;
 import org.javers.core.CommitIdGenerator;
-import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.*;
@@ -33,9 +33,9 @@ class ShadowQueryRunner {
     private final SnapshotQueryRunner snapshotQueryRunner;
     private final JaversExtendedRepository repository;
     private final ShadowFactory shadowFactory;
-    private final JaversCoreConfiguration javersCoreConfiguration;
+    private final CoreConfiguration javersCoreConfiguration;
 
-    ShadowQueryRunner(QueryCompiler queryCompiler, SnapshotQueryRunner snapshotQueryRunner, JaversExtendedRepository repository, ShadowFactory shadowFactory, JaversCoreConfiguration javersCoreConfiguration) {
+    ShadowQueryRunner(QueryCompiler queryCompiler, SnapshotQueryRunner snapshotQueryRunner, JaversExtendedRepository repository, ShadowFactory shadowFactory, CoreConfiguration javersCoreConfiguration) {
         this.queryCompiler = queryCompiler;
         this.snapshotQueryRunner = snapshotQueryRunner;
         this.repository = repository;

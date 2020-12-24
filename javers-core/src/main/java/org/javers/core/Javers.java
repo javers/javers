@@ -26,8 +26,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
-
 /**
+ * TODO
+ * - setting or removing reference to ValueObject no longer generates a
+ *   ReferenceChange with null on left/right and ValueObjectId on right/left
+ *
  * Facade to JaVers instance.<br>
  * Should be constructed by {@link JaversBuilder} provided with your domain model configuration.
  * <br/><br/>
