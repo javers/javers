@@ -28,10 +28,17 @@ import java.util.stream.Stream;
 
 /**
  * TODO
- * 1 setting or removing reference to ValueObject no longer generates a
+ * 1 In compare(), removed object (objects Only on Left)
+ *   generate terminal ValueChanges (changes from value to null)
+ *   if javerscore property !withRemovedObjectChanges! is true
+ *
+ * 2 setting or removing reference to ValueObject no longer generates a
  *   ReferenceChange with null on left/right and ValueObjectId on right/left
  *
- * 2 terminal Snapshots in findChanges() generate terminal ValueChanges (changes from value to null)
+ * 3 terminal Snapshots in findChanges() generate terminal ValueChanges (changes from value to null)
+ *
+ * 4 Defaults ...
+ *
  * TODO
  *
  *

@@ -67,13 +67,22 @@ class SnapshotDifferIntegrationTest extends Specification {
         javers.commitShallowDelete("some.login", user)
 
         when:
-        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz", DummyUser).build())
 
         then:
-        changes.size() == 1
-        changes[0] instanceof ObjectRemoved
-        changes[0].affectedGlobalId == instanceId("kaz",DummyUser)
-        changes[0].commitMetadata.get().id.majorId == 2
+        changes.getChangesByType(ObjectRemoved).size() == 1
+        with(changes.getChangesByType(ObjectRemoved)[0]) {
+            assert it.affectedGlobalId == instanceId("kaz", DummyUser)
+            assert it.commitMetadata.get().id.majorId == 2
+        }
+
+        changes.getChangesByType(ValueChange).size() == 1
+        with(changes.getChangesByType(ValueChange)[0]) {
+            assert it.affectedGlobalId == instanceId("kaz", DummyUser)
+            assert it.commitMetadata.get().id.majorId == 2
+            assert it.left == 'kaz'
+            assert it.right == null
+        }
     }
 
     @Unroll

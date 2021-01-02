@@ -9,7 +9,6 @@ import org.javers.core.metamodel.annotation.Id
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
-//TODO
 class ValueObjectRefChangeCase extends Specification {
 
     class Employee{
@@ -24,33 +23,72 @@ class ValueObjectRefChangeCase extends Specification {
         private String street
     }
 
-   
-    def "should generate ValueChanges in findChanges() when Entity is added " () {
+    //TODO change defaults and ?UNIFY
+    def "should generate initial ValueChanges in findChanges() when Entity is added "() {
+
         given:
-        //TODO UNIFY
-        def javers = JaversBuilder.javers().withNewObjectsChanges(true).build()
+        def javers = JaversBuilder
+                .javers()
+                .build()
 
         when:
-        javers.commit("me", new Employee(id: "1", name:"mine"))
+        javers.commit("me", new Employee(id: "1", name: "mine"))
 
         def changes = javers
-            .findChanges( QueryBuilder.byInstanceId("1", Employee)
-            //.withNewObjectChanges(true)
-            .build() )
+                .findChanges(QueryBuilder.byInstanceId("1", Employee)
+                        .withNewObjectChanges(true)
+                        .build())
 
         println changes.prettyPrint()
 
         then:
         changes.getChangesByType(ValueChange).size() == 2
+        with(changes.getChangesByType(ValueChange).find { it.propertyName == "id" }) {
+            assert it.left == null
+            assert it.right == "1"
+        }
+        with(changes.getChangesByType(ValueChange).find { it.propertyName == "name" }) {
+            assert it.left == null
+            assert it.right == "mine"
+        }
     }
 
-    def "should generate ValueChanges in findChanges() when Entity is removed " () {
-
-    }
-
-    def "should generate ValueChanges when null is changed to Entity" () {
+    //TODO change defaults and ?UNIFY
+    def "should generate terminal ValueChanges in findChanges() when Entity is removed " () {
         given:
-        // TODO withNewObjectChanges should be true by default
+        def javers = JaversBuilder
+                .javers()
+                .build()
+
+        when:
+        javers.commit("me", new Employee(id: "1", name:"mine"))
+        javers.commitShallowDelete("me", new Employee(id: "1", name:"mine"))
+
+        def changes = javers
+                .findChanges( QueryBuilder.byInstanceId("1", Employee)
+                .withNewObjectChanges(true)
+                .build() )
+
+        println changes.prettyPrint()
+        def lastCommitChanges = changes.findAll{it.commitMetadata.get().id.majorId==2}
+        def lastCommitValueChanges = lastCommitChanges.findAll{it instanceof ValueChange}
+
+        then:
+        lastCommitChanges.size() == 3
+        lastCommitValueChanges.size() == 2
+        with(lastCommitValueChanges.find { it.propertyName == "id"}) {
+            assert it.left == "1"
+            assert it.right == null
+        }
+        with(lastCommitValueChanges.find {it.propertyName == "name"}) {
+            assert it.left == "mine"
+            assert it.right == null
+        }
+    }
+
+    // TODO withNewObjectChanges should be true by default
+    def "should generate ValueChanges in compare() when null is changed to Entity" () {
+        given:
         def javers = JaversBuilder.javers().withNewObjectsChanges(true).build()
 
         when:
@@ -73,7 +111,6 @@ class ValueObjectRefChangeCase extends Specification {
         }
 
         diff.getChangesByType(ValueChange).forEach {
-            assert it instanceof ValueChange
             assert it.left == null
             assert it.right != null
         }
@@ -89,9 +126,9 @@ class ValueObjectRefChangeCase extends Specification {
         }
     }
 
-    def "should generate ValueChanges when Entity is changed to null" () {
+    // TODO withNewObjectChanges should be true by default
+    def "should generate ValueChanges in compare() when Entity is changed to null" () {
         given:
-        // TODO withNewObjectChanges should be true by default
         def javers = JaversBuilder.javers().withNewObjectsChanges(true).build()
 
         when:
@@ -114,7 +151,6 @@ class ValueObjectRefChangeCase extends Specification {
         }
 
         diff.getChangesByType(ValueChange).forEach {
-            assert it instanceof ValueChange
             assert it.left != null
             assert it.right == null
         }
@@ -130,10 +166,13 @@ class ValueObjectRefChangeCase extends Specification {
         }
     }
 
-    def "should generate ValueChanges when null is changed to ValueObject"() {
+    // TODO withNewObjectChanges should be true by default
+    def "should generate ValueChanges in compare() when null is changed to ValueObject"() {
         given:
-        // TODO withNewObjectChanges should be true by default
-        def javers = JaversBuilder.javers().withNewObjectsChanges(true).build()
+        def javers = JaversBuilder
+                .javers()
+                .withNewObjectsChanges(true)
+                .build()
 
         when:
         def diff = javers.compare(new Employee(id: "1", address: null),
@@ -159,10 +198,13 @@ class ValueObjectRefChangeCase extends Specification {
         }
     }
 
-    def "should generate ValueChanges when ValueObject is changed to null"() {
+    // TODO withNewObjectChanges should be true by default
+    def "should generate ValueChanges in compare() when ValueObject is changed to null"() {
         given:
-        // TODO withNewObjectChanges should be true by default
-        def javers = JaversBuilder.javers().withNewObjectsChanges(true).build()
+        def javers = JaversBuilder
+                .javers()
+                .withNewObjectsChanges(true)
+                .build()
 
         when:
         def diff = javers.compare(

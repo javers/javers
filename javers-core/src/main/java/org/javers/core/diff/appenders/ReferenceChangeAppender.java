@@ -16,7 +16,6 @@ class ReferenceChangeAppender implements PropertyChangeAppender<ReferenceChange>
     @Override
     public boolean supports(JaversType propertyType) {
         return propertyType instanceof ManagedType && ! (propertyType instanceof ValueObjectType);
-        //change!
     }
 
     @Override
