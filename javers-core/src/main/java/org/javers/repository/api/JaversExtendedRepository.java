@@ -182,7 +182,6 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     private List<Change> getChangesIntroducedBySnapshots(List<CdoSnapshot> snapshots, boolean newObjectChanges) {
-        //TODO unify with core diff algorithm
         return snapshotDiffer.calculateDiffs(newObjectChanges ? snapshots : skipInitial(snapshots), previousSnapshotsCalculator.calculate(snapshots));
     }
 

@@ -38,9 +38,11 @@ public class SnapshotDiffer {
         for (CdoSnapshot snapshot : snapshots) {
             if (snapshot.isInitial()) {
                 addInitialChanges(changes, snapshot);
-            } else if (snapshot.isTerminal()) {
+            }
+            if (snapshot.isTerminal()) {
                 addTerminalChanges(changes, snapshot);
-            } else {
+            }
+            if (snapshot.isUpdate() || snapshot.isTerminal()) {
                 CdoSnapshot previousSnapshot = previousSnapshots.get(SnapshotIdentifier.from(snapshot).previous());
                 addChanges(changes, previousSnapshot, snapshot);
             }
@@ -49,13 +51,12 @@ public class SnapshotDiffer {
     }
 
     private void addInitialChanges(List<Change> changes, CdoSnapshot initialSnapshot) {
+        //TODO unify with core diff algorithm?
         CdoSnapshot emptySnapshot = CdoSnapshotBuilder.emptyCopyOf(initialSnapshot).build();
         Diff diff = diffFactory.create(snapshotGraph(emptySnapshot), snapshotGraph(initialSnapshot),
             commitMetadata(initialSnapshot));
-        NewObject newObjectChange =
-            new NewObject(initialSnapshot.getGlobalId(), empty(), of(initialSnapshot.getCommitMetadata()));
         changes.addAll(diff.getChanges());
-        changes.add(newObjectChange);
+        changes.add(new NewObject(initialSnapshot.getGlobalId(), empty(), of(initialSnapshot.getCommitMetadata())));
     }
 
     private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot) {

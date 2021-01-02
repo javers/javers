@@ -28,10 +28,14 @@ import java.util.stream.Stream;
 
 /**
  * TODO
- * - setting or removing reference to ValueObject no longer generates a
+ * 1 setting or removing reference to ValueObject no longer generates a
  *   ReferenceChange with null on left/right and ValueObjectId on right/left
  *
- * Facade to JaVers instance.<br>
+ * 2 terminal Snapshots in findChanges() generate terminal ValueChanges (changes from value to null)
+ * TODO
+ *
+ *
+ * A JaVers instance.<br>
  * Should be constructed by {@link JaversBuilder} provided with your domain model configuration.
  * <br/><br/>
  *
