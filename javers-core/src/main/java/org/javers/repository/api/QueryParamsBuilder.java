@@ -25,7 +25,6 @@ public class QueryParamsBuilder {
     private Long version;
     private String author;
     private boolean aggregate;
-    private boolean newObjectChanges;
     private Map<String, String> commitProperties = new HashMap<>();
     private Set<String> changedProperties = new HashSet<>();
     private SnapshotType snapshotType;
@@ -151,14 +150,6 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryBuilder#withNewObjectChanges(boolean)
-     */
-    public QueryParamsBuilder newObjectChanges(boolean newObjectChanges) {
-        this.newObjectChanges = newObjectChanges;
-        return this;
-    }
-
-    /**
      * @see QueryBuilder#withSnapshotType(SnapshotType)
      */
     public QueryParamsBuilder withSnapshotType(SnapshotType snapshotType) {
@@ -187,6 +178,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperties, toCommitId, snapshotType, loadCommitProps);
+        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps);
     }
 }

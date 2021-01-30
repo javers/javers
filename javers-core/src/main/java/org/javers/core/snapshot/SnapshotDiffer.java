@@ -35,7 +35,7 @@ public class SnapshotDiffer {
         List<Change> changes = new ArrayList<>();
         for (CdoSnapshot snapshot : snapshots) {
             if (snapshot.isInitial()) {
-                addInitialChanges(changes, snapshot);
+                changes.addAll(addInitialChanges(snapshot));
             }
             if (snapshot.isTerminal()) {
                 addTerminalChanges(changes, snapshot);
@@ -48,11 +48,10 @@ public class SnapshotDiffer {
         return changes;
     }
 
-    private void addInitialChanges(List<Change> changes, CdoSnapshot initialSnapshot) {
-        Diff diff = diffFactory.create(emptySnapshotGraph(), snapshotGraph(initialSnapshot),
-            commitMetadata(initialSnapshot));
-        changes.addAll(diff.getChanges());
-        changes.add(new NewObject(initialSnapshot.getGlobalId(), empty(), of(initialSnapshot.getCommitMetadata())));
+    private List<Change> addInitialChanges(CdoSnapshot initialSnapshot) {
+        Diff initialDiff = diffFactory.create(emptySnapshotGraph(), snapshotGraph(initialSnapshot),
+                commitMetadata(initialSnapshot));
+        return initialDiff.getChanges();
     }
 
     private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot) {

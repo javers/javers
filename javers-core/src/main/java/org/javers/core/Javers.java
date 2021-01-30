@@ -27,20 +27,38 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 /**
- * 1 In javers.compare(), removed object (objects only on left)
- *   generate terminal ValueChanges (changes from value to null)
- *   if the javersProperties.removedObjectChanges flag is enabled (it's enabled by default)
+ * 0 add sth about unification
  *
- * 2 The javersProperties.newObjectChanges flag is enabled by default. It means
- *   that in javers.compare(), added objects (objects only on right)
- *   by default generate initial ValueChanges (changes from null to value)
+ * 0  The javers.newObjectChanges flag is now enabled by default.
+ *   When enabled, <code>Javers.compare()</code>
+ *   and <code>Javers.findChanges()</code>
+ *   generate additional set of initial ValueChanges for each NewObject.
  *
- * 3 The javersProperties.newObjectSnapshot flag is renamed to newObjectChanges
+ *   Initial ValueChange is a change with null on left and a property value on right.
+ *
+ *   In <code>Javers.compare()</code>, a NewObject is generated for each object only on right.
+ *   In <code>Javers.findChanges()</code>, a NewObject is generated for each initial Snapshot.
+ *
+ *   You can disabled the javers.newObjectChanges flag in <code>JaversBuilder</code>
+ *   or in `application.yml` (if you are using the Javers Spring Boot starter):
+ *
+ *   <pre>
+ *   javers:
+ *     newObjectChanges: false
+ *   </pre>
+ *
+ * 0 In <code>Javers.findChanges()</code>, a NewObject change is always generated for each initial Snapshot
+ *   (it can't be disabled by the javers.newObjectChanges)
+ *
+ * 0 The QueryBuilder.withNewObjectChanges() method is now deprecated and has no effect.
+ *
+ * 3 The javers.newObjectSnapshot flag is renamed to javers.newObjectChanges
  *
  * 2 setting or removing reference to ValueObject no longer generates a
  *   ReferenceChange with null on left/right and ValueObjectId on right/left
  *
- * 3 terminal Snapshots in findChanges() generate terminal ValueChanges (changes from value to null)
+ *   //TODO
+ * 3 Terminal Snapshots in findChanges() generate terminal ValueChanges (changes from value to null)
  *
  * 4 Defaults ...
  *
@@ -628,4 +646,6 @@ public interface Javers {
      * @since 1.4.1
      */
     Property getProperty(PropertyChange propertyChange);
+
+    CoreConfiguration getCoreConfiguration();
 }

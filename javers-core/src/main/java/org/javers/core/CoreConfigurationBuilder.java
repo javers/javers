@@ -14,6 +14,8 @@ class CoreConfigurationBuilder {
 
     private ListCompareAlgorithm listCompareAlgorithm = ListCompareAlgorithm.SIMPLE;
 
+    private boolean prettyPrint = true;
+
     private boolean newObjectChanges = true;
 
     private boolean removedObjectChanges = true;
@@ -37,8 +39,14 @@ class CoreConfigurationBuilder {
                 newObjectChanges,
                 commitIdGenerator,
                 customCommitIdGenerator,
-                removedObjectChanges
+                removedObjectChanges,
+                prettyPrint
                 );
+    }
+
+    CoreConfigurationBuilder withPrettyPrint(boolean prettyPrint) {
+        this.prettyPrint = prettyPrint;
+        return this;
     }
 
     CoreConfigurationBuilder withMappingStyle(MappingStyle mappingStyle) {

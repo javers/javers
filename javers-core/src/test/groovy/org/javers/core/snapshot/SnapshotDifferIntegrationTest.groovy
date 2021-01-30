@@ -23,36 +23,25 @@ import static org.javers.core.model.DummyUser.dummyUser
  */
 class SnapshotDifferIntegrationTest extends Specification {
 
-    def "shouldn't add NewObject changes to change history by default"() {
-        given:
-        def javers = javers().build()
-        javers.commit("some.login", new DummyAddress("London"))   //initial commit
-        javers.commit("some.login", new DummyAddress("London 1")) //change commit
-
-        when:
-        def changes = javers.findChanges(
-            QueryBuilder.byClass(DummyAddress).build())
-
-        then:
-        changes.size() == 1
-        changes[0] instanceof ValueChange
-    }
-
-    def "should add NewObject changes to change history for initial commit when required"() {
+    def "should add NewObject changes to change history for initial commit"() {
         given:
         def javers = javers().build()
         def user = new DummyUser("kaz")
         javers.commit("some.login", user) //initial commit
 
         when:
-        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).withNewObjectChanges(true).build())
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
 
         then:
         changes.size() == 2
-        changes[0] instanceof ValueChange //initial value
-        changes[0].left == null
-        changes[0].right == "kaz"
-        changes[1] instanceof NewObject
+
+        with(changes.getChangesByType(ValueChange)[0]) {
+            assert it.left == null
+            assert it.right == "kaz"
+        }
+
+        changes.getChangesByType(NewObject).size() == 1
+
         changes.each {
             assert it.affectedGlobalId == instanceId("kaz",DummyUser)
             assert it.commitMetadata.get().id.majorId == 1
@@ -68,16 +57,16 @@ class SnapshotDifferIntegrationTest extends Specification {
 
         when:
         def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz", DummyUser).build())
+        def lastCommitChanges = changes.findAll{it.commitMetadata.get().id.majorId==2}
 
         then:
-        changes.getChangesByType(ObjectRemoved).size() == 1
-        with(changes.getChangesByType(ObjectRemoved)[0]) {
+        lastCommitChanges.size() == 2
+        with(lastCommitChanges.find { it instanceof ObjectRemoved}) {
             assert it.affectedGlobalId == instanceId("kaz", DummyUser)
             assert it.commitMetadata.get().id.majorId == 2
         }
 
-        changes.getChangesByType(ValueChange).size() == 1
-        with(changes.getChangesByType(ValueChange)[0]) {
+        with(lastCommitChanges.find { it instanceof ValueChange}) {
             assert it.affectedGlobalId == instanceId("kaz", DummyUser)
             assert it.commitMetadata.get().id.majorId == 2
             assert it.left == 'kaz'

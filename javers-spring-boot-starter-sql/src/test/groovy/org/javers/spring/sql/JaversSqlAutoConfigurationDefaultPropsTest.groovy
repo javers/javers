@@ -1,6 +1,9 @@
 package org.javers.spring.sql
 
-
+import org.javers.core.CommitIdGenerator
+import org.javers.core.Javers
+import org.javers.core.MappingStyle
+import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.repository.sql.DialectName
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -16,6 +19,8 @@ import spock.lang.Specification
 @SpringBootTest(classes = [TestApplication])
 class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
 
+    @Autowired Javers javers
+
     @Autowired
     DialectName dialectName
 
@@ -27,16 +32,18 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
 
     def "should provide default props"() {
         expect:
-        javersProperties.getAlgorithm() == "simple"
-        javersProperties.getMappingStyle() == "field"
-        !javersProperties.isNewObjectSnapshot()
-        javersProperties.isPrettyPrint()
+        javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.SIMPLE
+        javers.coreConfiguration.mappingStyle == MappingStyle.FIELD
+        javers.coreConfiguration.newObjectChanges
+        javers.coreConfiguration.removedObjectChanges
+        javers.coreConfiguration.prettyPrint
+        javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.SYNCHRONIZED_SEQUENCE
+
         !javersProperties.isTypeSafeValues()
         javersProperties.packagesToScan == ""
         dialectName == DialectName.H2
         javersProperties.sqlSchema == null
         javersProperties.sqlSchemaManagementEnabled
-        javersProperties.commitIdGenerator == "synchronized_sequence"
         javersProperties.prettyPrintDateFormats.localDateTime == "dd MMM yyyy, HH:mm:ss"
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd MMM yyyy, HH:mm:ssZ"
         javersProperties.prettyPrintDateFormats.localDate == "dd MMM yyyy"

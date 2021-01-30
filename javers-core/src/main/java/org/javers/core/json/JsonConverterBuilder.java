@@ -20,7 +20,7 @@ public class JsonConverterBuilder {
     private static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     private boolean typeSafeValues = false;
-    private boolean prettyPrint = true;
+    private boolean prettyPrint;
     private final GsonBuilder gsonBuilder;
     private final List<Class> builtInValueTypes = new ArrayList<>();
 

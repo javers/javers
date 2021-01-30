@@ -22,25 +22,21 @@ class NewObjectChangesE2ETest extends Specification {
         private String street
     }
 
-    //TODO change defaults
     def "should generate initial ValueChanges in findChanges() when Entity is added "() {
 
         given:
-        def javers = JaversBuilder
-                .javers()
-                .build()
+        def javers = JaversBuilder.javers().build()
 
         when:
         javers.commit("me", new Employee(id: "1", name: "mine"))
 
-        def changes = javers
-                .findChanges(QueryBuilder.byInstanceId("1", Employee)
-                        .withNewObjectChanges(true)
-                        .build())
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("1", Employee).build())
 
         println changes.prettyPrint()
 
         then:
+        changes.size() == 3
+        changes.getChangesByType(NewObject).size() == 1
         changes.getChangesByType(ValueChange).size() == 2
         with(changes.getChangesByType(ValueChange).find { it.propertyName == "id" }) {
             assert it.left == null
@@ -52,7 +48,27 @@ class NewObjectChangesE2ETest extends Specification {
         }
     }
 
+    def "should not generate initial ValueChanges in findChanges() when disabled"() {
+
+        given:
+        def javers = JaversBuilder.javers()
+                .withNewObjectChanges(false)
+                .build()
+
+        when:
+        javers.commit("me", new Employee(id: "1", name: "mine"))
+
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("1", Employee).build())
+
+        println changes.prettyPrint()
+
+        then:
+        changes.size() == 1
+        changes.getChangesByType(NewObject).size() == 1
+    }
+
     //TODO change defaults
+    //TODO add negative test
     def "should generate terminal ValueChanges in findChanges() when Entity is removed " () {
         given:
         def javers = JaversBuilder
@@ -65,7 +81,7 @@ class NewObjectChangesE2ETest extends Specification {
 
         def changes = javers
                 .findChanges( QueryBuilder.byInstanceId("1", Employee)
-                .withNewObjectChanges(true)
+                .withNewObjectChanges(true) //TODO .withRemovedObjectChanges(true)
                 .build() )
 
         println changes.prettyPrint()

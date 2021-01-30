@@ -28,19 +28,15 @@ class JaversMongoStarterDefaultsTest extends Specification{
 
     def "should provide default configuration"() {
         expect:
-        javers.configuration.listCompareAlgorithm == ListCompareAlgorithm.SIMPLE
-        javers.configuration.mappingStyle == MappingStyle.FIELD
-        javers.configuration.newObjectChanges
-        javers.configuration.removedObjectChanges
-        javers.configuration.commitIdGenerator == CommitIdGenerator.SYNCHRONIZED_SEQUENCE
+        javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.SIMPLE
+        javers.coreConfiguration.mappingStyle == MappingStyle.FIELD
+        javers.coreConfiguration.newObjectChanges
+        javers.coreConfiguration.removedObjectChanges
+        javers.coreConfiguration.prettyPrint
+        javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.SYNCHRONIZED_SEQUENCE
 
-        javersProperties.algorithm == "simple"
-        javersProperties.mappingStyle == "field"
-        javersProperties.newObjectChanges
-        javersProperties.removedObjectChanges
-        javersProperties.commitIdGenerator=="synchronized_sequence"
-       !javersProperties.prettyPrint
        !javersProperties.typeSafeValues
+        javersProperties.packagesToScan == ""
        !javersProperties.documentDbCompatibilityEnabled
         javersProperties.auditableAspectEnabled
         javersProperties.springDataAuditableRepositoryAspectEnabled

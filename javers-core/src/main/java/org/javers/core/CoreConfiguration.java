@@ -19,6 +19,8 @@ public class CoreConfiguration {
 
     private final ListCompareAlgorithm listCompareAlgorithm;
 
+    private boolean prettyPrint;
+
     private final boolean newObjectChanges;
 
     private final boolean removedObjectChanges;
@@ -27,7 +29,7 @@ public class CoreConfiguration {
 
     private final Supplier<CommitId> customCommitIdGenerator;
 
-    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean newObjectChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean removedObjectChanges) {
+    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean newObjectChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean removedObjectChanges, boolean prettyPrint) {
         this.prettyValuePrinter = prettyValuePrinter;
         this.mappingStyle = mappingStyle;
         this.listCompareAlgorithm = listCompareAlgorithm;
@@ -35,6 +37,7 @@ public class CoreConfiguration {
         this.commitIdGenerator = commitIdGenerator;
         this.customCommitIdGenerator = customCommitIdGenerator;
         this.removedObjectChanges = removedObjectChanges;
+        this.prettyPrint = prettyPrint;
     }
 
     public PrettyValuePrinter getPrettyValuePrinter() {
@@ -63,5 +66,9 @@ public class CoreConfiguration {
 
     public Supplier<CommitId> getCustomCommitIdGenerator() {
         return customCommitIdGenerator;
+    }
+
+    public boolean isPrettyPrint() {
+        return prettyPrint;
     }
 }

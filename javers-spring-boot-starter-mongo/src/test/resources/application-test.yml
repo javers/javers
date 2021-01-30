@@ -3,7 +3,7 @@ javers:
   mappingStyle: bean
   newObjectChanges: false
   removedObjectChanges: false
-  prettyPrint: true
+  prettyPrint: false
   typeSafeValues: true
   packagesToScan: org.javers.spring.boot
   commitIdGenerator: random

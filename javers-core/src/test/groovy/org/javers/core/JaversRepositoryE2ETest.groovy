@@ -64,6 +64,7 @@ class JaversRepositoryE2ETest extends Specification {
         def javersBuilder = JaversBuilder
                 .javers()
                 .withDateTimeProvider(dateProvider)
+                .withNewObjectChanges(false)
                 .registerJaversRepository(repository)
 
         if (useRandomCommitIdGenerator()) {

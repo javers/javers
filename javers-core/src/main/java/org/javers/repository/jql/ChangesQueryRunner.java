@@ -20,7 +20,7 @@ class ChangesQueryRunner {
         queryCompiler.compile(query);
 
         if (query.isAnyDomainObjectQuery()) {
-            return repository.getChanges(query.isNewObjectChanges(), query.getQueryParams());
+            return repository.getChanges(query.getQueryParams());
         }
 
         if (query.isIdQuery()){

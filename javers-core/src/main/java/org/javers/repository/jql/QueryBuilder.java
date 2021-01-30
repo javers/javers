@@ -219,26 +219,23 @@ public class QueryBuilder {
     }
 
     /**
-     * See javadoc in {@link #withNewObjectChanges()}
+     * Since Javers 6.0 this method is <b>deprecated</b> and has no effect.
+     * <br/><br/>
+     *
+     * Since Javers 6.0, the newObjectChanges flag can be set only on a Javers instance level,
+     * see {@link org.javers.core.JaversBuilder#withNewObjectChanges(boolean)}.
      */
+    @Deprecated
     public QueryBuilder withNewObjectChanges(boolean newObjectChanges) {
-        queryParamsBuilder.newObjectChanges(newObjectChanges);
         return this;
     }
 
     /**
      * Since Javers 6.0 this method is <b>deprecated</b> and has no effect.
+     * <br/><br/>
      *
-     * //TODO
-     * Affects changes query only.
-     * When switched on, additional changes are generated for the initial snapshot
-     * (the first commit of a given object). Off by default.
-     * <br/>
-     * It means one NewObject change for each initial snapshot
-     * and the full set of initial PropertyChanges with null on the left side
-     * and initial property value on the right.
-     *
-     * //TODO
+     * Since Javers 6.0, the newObjectChanges flag can be set only on a Javers instance level,
+     * see {@link org.javers.core.JaversBuilder#withNewObjectChanges(boolean)}.
      */
     @Deprecated
     public QueryBuilder withNewObjectChanges() {

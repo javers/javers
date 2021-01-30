@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
@@ -13,6 +14,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
+import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.custom.*;
 import org.javers.core.graph.GraphFactoryModule;
@@ -41,6 +43,7 @@ import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.inmemory.InMemoryRepository;
 import org.javers.repository.jql.JqlModule;
+import org.javers.repository.jql.JqlQuery;
 import org.javers.shadow.ShadowModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,7 +171,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
         mapRegisteredClasses();
 
-        bootRepository(coreConfiguration);
+        bootRepository();
 
         return getContainerComponent(JaversCore.class);
     }
@@ -329,7 +332,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 			scanTypeName(c);
 		}
 		long delta = System.currentTimeMillis() - start;
-        logger.info("  found {} ManagedClasse(s) with @TypeName in {} ms", scan.size(), delta);
+        logger.info("  found {} ManagedClass(es) with @TypeName in {} ms", scan.size(), delta);
 
 		return this;
     }
@@ -607,10 +610,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * </pre>
      * </li></ul>
      *
+     * @see GsonBuilder#setPrettyPrinting()
      * @param prettyPrint default true
      */
     public JaversBuilder withPrettyPrint(boolean prettyPrint) {
-        jsonConverterBuilder().prettyPrint(prettyPrint);
+        this.coreConfigurationBuilder.withPrettyPrint(prettyPrint);
         return this;
     }
 
@@ -657,13 +661,28 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
+     * Enabled by default since Javers 6.0.
+     * <br/><br/>
+     *
      * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
-     * generates additional set of initial ValueChanges for each added object (object only on right).
+     * and {@link Javers#findChanges(JqlQuery)}
+     * generate additional set of initial {@link ValueChange}s for each {@link NewObject}.
      * <br/>
      * Initial {@link ValueChange} is a change with null on left and a property value on right.
      * <br/><br/>
      *
-     * Enabled by default since Javers 6.0
+     * In <code>Javers.compare()</code>, a NewObject is generated for each object only on right.
+     * <br/>
+     * In <code>Javers.findChanges()</code>, a NewObject is generated for each initial Snapshot.
+     * <br/><br/>
+     *
+     * In Javers Spring Boot starter you can disabled it in `application.yml`:
+     *
+     * <pre>
+     * javers:
+     *   newObjectChanges: false
+     * </pre>
+     *
      */
     public JaversBuilder withNewObjectChanges(boolean newObjectsChanges){
         configurationBuilder().withNewObjectChanges(newObjectsChanges);
@@ -671,6 +690,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
+     * //TODO unify
      * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
      * generates additional set of terminal ValueChanges for each removed object (object only on left).
      * <br/>
@@ -839,6 +859,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     private Collection<JaversType> bootJsonConverter() {
         JsonConverterBuilder jsonConverterBuilder = jsonConverterBuilder();
+        jsonConverterBuilder.prettyPrint(coreConfiguration().isPrettyPrint());
 
         addModule(new ChangeTypeAdaptersModule(getContainer()));
         addModule(new CommitTypeAdaptersModule(getContainer()));
@@ -862,7 +883,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addComponent(dateProvider);
     }
 
-    private void bootRepository(CoreConfiguration coreConfiguration){
+    private void bootRepository(){
+        CoreConfiguration coreConfiguration = coreConfiguration();
         if (repository == null){
             logger.info("using fake InMemoryRepository, register actual Repository implementation via JaversBuilder.registerJaversRepository()");
             repository = new InMemoryRepository();
@@ -882,5 +904,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private <T extends ClientsClassDefinition> T getClassDefinition(Class<?> baseJavaClass) {
         return (T)clientsClassDefinitions.get(baseJavaClass);
+    }
+
+    private CoreConfiguration coreConfiguration() {
+        return getContainerComponent(CoreConfiguration.class);
     }
 }

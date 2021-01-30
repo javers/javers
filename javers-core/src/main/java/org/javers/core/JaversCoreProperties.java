@@ -17,7 +17,7 @@ public abstract class JaversCoreProperties {
     private Boolean removedObjectChanges;
     private Boolean prettyPrint;
     private Boolean typeSafeValues;
-    private String packagesToScan;
+    private String packagesToScan = "";
     private PrettyPrintDateFormats prettyPrintDateFormats = new PrettyPrintDateFormats();
 
     public String getAlgorithm() {

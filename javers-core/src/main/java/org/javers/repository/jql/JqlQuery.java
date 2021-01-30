@@ -133,10 +133,6 @@ public class JqlQuery {
         return filter.matches(globalId);
     }
 
-    boolean isNewObjectChanges() {
-        return queryParams.newObjectChanges();
-    }
-
     boolean isAnyDomainObjectQuery() {
         return hasFilter(AnyDomainObjectFilter.class);
     }

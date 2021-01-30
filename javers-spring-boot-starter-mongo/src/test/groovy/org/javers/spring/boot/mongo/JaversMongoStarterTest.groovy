@@ -35,18 +35,19 @@ class JaversMongoStarterTest extends Specification{
 
     def "shouldReadConfigurationFromYml"() {
         expect:
-        javers.configuration.listCompareAlgorithm == ListCompareAlgorithm.LEVENSHTEIN_DISTANCE
-        javers.configuration.mappingStyle == MappingStyle.BEAN
-       !javers.configuration.newObjectChanges
-       !javers.configuration.removedObjectChanges
-        javers.configuration.commitIdGenerator == CommitIdGenerator.RANDOM
+        javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.LEVENSHTEIN_DISTANCE
+        javers.coreConfiguration.mappingStyle == MappingStyle.BEAN
+       !javers.coreConfiguration.newObjectChanges
+       !javers.coreConfiguration.removedObjectChanges
+       !javers.coreConfiguration.prettyPrint
+        javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
 
         javersProperties.algorithm == "levenshtein_distance"
+        javersProperties.packagesToScan == "org.javers.spring.boot"
         javersProperties.mappingStyle == "bean"
        !javersProperties.newObjectChanges
        !javersProperties.removedObjectChanges
         javersProperties.commitIdGenerator=="random"
-        javersProperties.prettyPrint
         javersProperties.typeSafeValues
         javersProperties.documentDbCompatibilityEnabled == true
         javersProperties.objectAccessHook == "org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook"

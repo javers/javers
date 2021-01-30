@@ -254,7 +254,8 @@ class JaversCore implements Javers {
         return managedType.getProperty(propertyChange.getPropertyName());
     }
 
-    public CoreConfiguration getConfiguration() {
+    @Override
+    public CoreConfiguration getCoreConfiguration() {
         return configuration;
     }
 

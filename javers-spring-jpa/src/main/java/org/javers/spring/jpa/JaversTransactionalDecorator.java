@@ -4,6 +4,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Changes;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.Javers;
 import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
@@ -175,6 +176,11 @@ public class JaversTransactionalDecorator implements InitializingBean, Javers {
     @Override
     public void afterPropertiesSet() throws Exception {
        ensureSchema();
+    }
+
+    @Override
+    public CoreConfiguration getCoreConfiguration() {
+        return delegate.getCoreConfiguration();
     }
 
     private void ensureSchema() {

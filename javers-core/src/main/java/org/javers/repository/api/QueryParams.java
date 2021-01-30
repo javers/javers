@@ -30,12 +30,11 @@ public class QueryParams {
     private final String author;
     private final Map<String, String> commitProperties;
     private final boolean aggregate;
-    private final boolean newObjectChanges;
     private final Set<String> changedProperties;
     private final SnapshotType snapshotType;
     private final boolean loadCommitProps;
 
-    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps) {
+    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps) {
         this.limit = limit;
         this.skip = skip;
         this.from = from;
@@ -47,7 +46,6 @@ public class QueryParams {
         this.author = author;
         this.commitProperties = commitProperties;
         this.aggregate = aggregate;
-        this.newObjectChanges = newObjectChanges;
         this.changedProperties = changedProperties;
         this.toCommitId = toCommitId;
         this.snapshotType = snapshotType;
@@ -57,13 +55,13 @@ public class QueryParams {
     public QueryParams changeAggregate(boolean newAggregate) {
         return new QueryParams(
                 limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties,
-                newAggregate, newObjectChanges, changedProperties, toCommitId, snapshotType, loadCommitProps);
+                newAggregate, changedProperties, toCommitId, snapshotType, loadCommitProps);
     }
 
     public QueryParams nextPage() {
         return new QueryParams(
                 limit, skip+limit, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties,
-                aggregate, newObjectChanges, changedProperties, toCommitId, snapshotType, loadCommitProps);
+                aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps);
     }
 
     /**
@@ -167,13 +165,6 @@ public class QueryParams {
         return Optional.ofNullable(snapshotType);
     }
 
-    /**
-     * @see QueryBuilder#withNewObjectChanges(boolean)
-     */
-    public boolean newObjectChanges() {
-        return newObjectChanges;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.toString(this,
@@ -187,7 +178,6 @@ public class QueryParams {
                 "changeProperties", changedProperties,
                 "version", version,
                 "author", author,
-                "newObjectChanges", newObjectChanges,
                 "snapshotType", snapshotType,
                 "limit", limit,
                 "skip", skip);

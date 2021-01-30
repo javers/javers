@@ -1,7 +1,8 @@
 javers:
   algorithm: levenshtein_distance
   mappingStyle: bean
-  newObjectSnapshot: false
+  newObjectChanges: false
+  removedObjectChanges: false
   prettyPrint: false
   typeSafeValues: true
   dialect: H2
