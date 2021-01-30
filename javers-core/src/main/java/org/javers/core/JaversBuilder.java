@@ -13,6 +13,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
+import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.custom.*;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.graph.ObjectAccessHook;
@@ -656,29 +657,41 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * // TODO
-     *
      * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
-     * generates additional 'Snapshots' of new objects (objects added in currentVersion graph).
+     * generates additional set of initial ValueChanges for each added object (object only on right).
      * <br/>
-     * For each new object, state of its properties is captured and returned as a Set of PropertyChanges.
-     * These Changes have null at the left side and a current property value at the right side.
+     * Initial {@link ValueChange} is a change with null on left and a property value on right.
      * <br/><br/>
      *
-     * Enabled by default Since Javers 6.0
+     * Enabled by default since Javers 6.0
      */
-    public JaversBuilder withNewObjectsChanges(boolean newObjectsSnapshot){
-        configurationBuilder().withNewObjectsChanges(newObjectsSnapshot);
+    public JaversBuilder withNewObjectChanges(boolean newObjectsChanges){
+        configurationBuilder().withNewObjectChanges(newObjectsChanges);
         return this;
     }
 
     /**
-     * Use {@link #withNewObjectsChanges(boolean)}
-     * @deprecated
+     * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
+     * generates additional set of terminal ValueChanges for each removed object (object only on left).
+     * <br/>
+     * Terminal {@link ValueChange} is a change with a property value on left and null on right.
+     * <br/><br/>
+     *
+     * Enabled by default.
+     *
+     * @since 6.0
+     */
+    public JaversBuilder withRemovedObjectChanges(boolean removedObjectsChanges){
+        configurationBuilder().withRemovedObjectChanges(removedObjectsChanges);
+        return this;
+    }
+
+    /**
+     * Use {@link #withNewObjectChanges(boolean)}
      */
     @Deprecated
     public JaversBuilder withNewObjectsSnapshot(boolean newObjectsChanges){
-        return this.withNewObjectsChanges(newObjectsChanges);
+        return this.withNewObjectChanges(newObjectsChanges);
     }
 
     public JaversBuilder withObjectAccessHook(ObjectAccessHook objectAccessHook) {
@@ -756,14 +769,32 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     public JaversBuilder withProperties(JaversCoreProperties javersProperties) {
-        this.withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
-            .withCommitIdGenerator(CommitIdGenerator.valueOf(javersProperties.getCommitIdGenerator().toUpperCase()))
-            .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
-            .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
-            .withPrettyPrint(javersProperties.isPrettyPrint())
-            .withTypeSafeValues(javersProperties.isTypeSafeValues())
-            .withPackagesToScan(javersProperties.getPackagesToScan())
-            .withPrettyPrintDateFormats(javersProperties.getPrettyPrintDateFormats());
+        if (javersProperties.getMappingStyle() != null) {
+            withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()));
+        }
+        if (javersProperties.getCommitIdGenerator() != null) {
+            withCommitIdGenerator(CommitIdGenerator.valueOf(javersProperties.getCommitIdGenerator().toUpperCase()));
+        }
+        if (javersProperties.getPackagesToScan() != null) {
+            withPackagesToScan(javersProperties.getPackagesToScan());
+        }
+        if (javersProperties.isTypeSafeValues() != null) {
+            withTypeSafeValues(javersProperties.isTypeSafeValues());
+        }
+        if (javersProperties.getAlgorithm() != null) {
+            withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()));
+        }
+        if (javersProperties.isPrettyPrint() != null) {
+            withPrettyPrint(javersProperties.isPrettyPrint());
+        }
+        if (javersProperties.isNewObjectChanges() != null) {
+            withNewObjectChanges(javersProperties.isNewObjectChanges());
+        }
+        if (javersProperties.isRemovedObjectChanges() != null) {
+            withRemovedObjectChanges(javersProperties.isRemovedObjectChanges());
+        }
+
+        withPrettyPrintDateFormats(javersProperties.getPrettyPrintDateFormats());
         return this;
     }
 

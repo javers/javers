@@ -1,6 +1,5 @@
-package org.javers.core.cases
+package org.javers.core
 
-import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
@@ -9,7 +8,7 @@ import org.javers.core.metamodel.annotation.Id
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
-class ValueObjectRefChangeCase extends Specification {
+class NewObjectChangesE2ETest extends Specification {
 
     class Employee{
         @Id String id
@@ -23,7 +22,7 @@ class ValueObjectRefChangeCase extends Specification {
         private String street
     }
 
-    //TODO change defaults and ?UNIFY
+    //TODO change defaults
     def "should generate initial ValueChanges in findChanges() when Entity is added "() {
 
         given:
@@ -53,7 +52,7 @@ class ValueObjectRefChangeCase extends Specification {
         }
     }
 
-    //TODO change defaults and ?UNIFY
+    //TODO change defaults
     def "should generate terminal ValueChanges in findChanges() when Entity is removed " () {
         given:
         def javers = JaversBuilder
@@ -86,10 +85,22 @@ class ValueObjectRefChangeCase extends Specification {
         }
     }
 
-    // TODO withNewObjectChanges should be true by default
-    def "should generate ValueChanges in compare() when null is changed to Entity" () {
+    def "should not generate initial ValueChanges in compare() when disabled" () {
         given:
-        def javers = JaversBuilder.javers().withNewObjectsChanges(true).build()
+        def javers = JaversBuilder.javers().withNewObjectChanges(false).build()
+
+        when:
+        def diff = javers.compare(
+                new Employee(id: "1"),
+                new Employee(id: "1", ref: new Employee(id: "2", name:"mine")))
+
+        then:
+        diff.changes.size() == 2
+    }
+
+    def "should generate initial ValueChanges in compare() when null is changed to Entity" () {
+        given:
+        def javers = JaversBuilder.javers().build()
 
         when:
         def diff = javers.compare(
@@ -102,12 +113,12 @@ class ValueObjectRefChangeCase extends Specification {
         diff.changes.size() == 4
 
         with(diff.getChangesByType(NewObject)[0]) {
-            assert it.affectedGlobalId.value() == 'org.javers.core.cases.ValueObjectRefChangeCase$Employee/2'
+            assert it.affectedGlobalId.value() == 'org.javers.core.NewObjectChangesE2ETest$Employee/2'
         }
 
         with(diff.getChangesByType(ReferenceChange)[0]) {
             assert it.left == null
-            assert it.right.value() == 'org.javers.core.cases.ValueObjectRefChangeCase$Employee/2'
+            assert it.right.value() == 'org.javers.core.NewObjectChangesE2ETest$Employee/2'
         }
 
         diff.getChangesByType(ValueChange).forEach {
@@ -126,15 +137,27 @@ class ValueObjectRefChangeCase extends Specification {
         }
     }
 
-    // TODO withNewObjectChanges should be true by default
-    def "should generate ValueChanges in compare() when Entity is changed to null" () {
+    def "should not generate terminal ValueChanges in compare() when disabled" () {
         given:
-        def javers = JaversBuilder.javers().withNewObjectsChanges(true).build()
+        def javers = JaversBuilder.javers().withRemovedObjectChanges(false).build()
 
         when:
         def diff = javers.compare(
                 new Employee(id: "1", ref: new Employee(id: "2", name:"mine")),
-                new Employee(id: "1"),)
+                new Employee(id: "1"))
+
+        then:
+        diff.changes.size() == 2
+    }
+
+    def "should generate terminal ValueChanges in compare() when Entity is changed to null" () {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        when:
+        def diff = javers.compare(
+                new Employee(id: "1", ref: new Employee(id: "2", name:"mine")),
+                new Employee(id: "1"))
 
         println diff.prettyPrint()
 
@@ -142,11 +165,11 @@ class ValueObjectRefChangeCase extends Specification {
         diff.changes.size() == 4
 
         with(diff.getChangesByType(ObjectRemoved)[0]) {
-            assert it.affectedGlobalId.value() == 'org.javers.core.cases.ValueObjectRefChangeCase$Employee/2'
+            assert it.affectedGlobalId.value() == 'org.javers.core.NewObjectChangesE2ETest$Employee/2'
         }
 
         with(diff.getChangesByType(ReferenceChange)[0]) {
-            assert it.left.value() == 'org.javers.core.cases.ValueObjectRefChangeCase$Employee/2'
+            assert it.left.value() == 'org.javers.core.NewObjectChangesE2ETest$Employee/2'
             assert it.right == null
         }
 
@@ -166,12 +189,10 @@ class ValueObjectRefChangeCase extends Specification {
         }
     }
 
-    // TODO withNewObjectChanges should be true by default
     def "should generate ValueChanges in compare() when null is changed to ValueObject"() {
         given:
         def javers = JaversBuilder
                 .javers()
-                .withNewObjectsChanges(true)
                 .build()
 
         when:
@@ -185,7 +206,7 @@ class ValueObjectRefChangeCase extends Specification {
         diff.getChangesByType(ValueChange).size() == 2
 
         with(diff.getChangesByType(NewObject)[0]) {
-            assert it.affectedGlobalId.value() == 'org.javers.core.cases.ValueObjectRefChangeCase$Employee/1#address'
+            assert it.affectedGlobalId.value() == 'org.javers.core.NewObjectChangesE2ETest$Employee/1#address'
         }
 
         with(diff.getChangesByType(ValueChange).find {it.propertyName == "street"}) {
@@ -198,12 +219,10 @@ class ValueObjectRefChangeCase extends Specification {
         }
     }
 
-    // TODO withNewObjectChanges should be true by default
     def "should generate ValueChanges in compare() when ValueObject is changed to null"() {
         given:
         def javers = JaversBuilder
                 .javers()
-                .withNewObjectsChanges(true)
                 .build()
 
         when:
@@ -217,7 +236,7 @@ class ValueObjectRefChangeCase extends Specification {
         diff.changes.size() == 2
 
         with(diff.getChangesByType(ObjectRemoved)[0]) {
-            assert it.affectedGlobalId.value() == 'org.javers.core.cases.ValueObjectRefChangeCase$Employee/1#address'
+            assert it.affectedGlobalId.value() == 'org.javers.core.NewObjectChangesE2ETest$Employee/1#address'
         }
 
         with(diff.getChangesByType(ValueChange)[0]) {

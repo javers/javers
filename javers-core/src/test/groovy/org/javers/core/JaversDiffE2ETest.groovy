@@ -184,7 +184,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
     def "should create properties snapshot of NewObject only when configured"() {
         given:
-        def javers = JaversBuilder.javers().withNewObjectsSnapshot(true).build()
+        def javers = JaversBuilder.javers().withNewObjectsChanges(true).build()
         def left =  new DummyUser(name: "kazik")
         def right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
 

@@ -227,6 +227,9 @@ public class QueryBuilder {
     }
 
     /**
+     * Since Javers 6.0 this method is <b>deprecated</b> and has no effect.
+     *
+     * //TODO
      * Affects changes query only.
      * When switched on, additional changes are generated for the initial snapshot
      * (the first commit of a given object). Off by default.
@@ -237,8 +240,8 @@ public class QueryBuilder {
      *
      * //TODO
      */
+    @Deprecated
     public QueryBuilder withNewObjectChanges() {
-        queryParamsBuilder.newObjectChanges(true);
         return this;
     }
 

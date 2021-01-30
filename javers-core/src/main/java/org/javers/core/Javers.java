@@ -27,10 +27,15 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 /**
- * TODO
- * 1 In compare(), removed object (objects Only on Left)
+ * 1 In javers.compare(), removed object (objects only on left)
  *   generate terminal ValueChanges (changes from value to null)
- *   if javerscore property !withRemovedObjectChanges! is true
+ *   if the javersProperties.removedObjectChanges flag is enabled (it's enabled by default)
+ *
+ * 2 The javersProperties.newObjectChanges flag is enabled by default. It means
+ *   that in javers.compare(), added objects (objects only on right)
+ *   by default generate initial ValueChanges (changes from null to value)
+ *
+ * 3 The javersProperties.newObjectSnapshot flag is renamed to newObjectChanges
  *
  * 2 setting or removing reference to ValueObject no longer generates a
  *   ReferenceChange with null on left/right and ValueObjectId on right/left
@@ -40,7 +45,7 @@ import java.util.stream.Stream;
  * 4 Defaults ...
  *
  * TODO
- *
+ *\
  *
  * A JaVers instance.<br>
  * Should be constructed by {@link JaversBuilder} provided with your domain model configuration.

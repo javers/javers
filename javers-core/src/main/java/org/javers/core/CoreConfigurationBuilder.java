@@ -14,7 +14,9 @@ class CoreConfigurationBuilder {
 
     private ListCompareAlgorithm listCompareAlgorithm = ListCompareAlgorithm.SIMPLE;
 
-    private boolean newObjectsChanges = false;
+    private boolean newObjectChanges = true;
+
+    private boolean removedObjectChanges = true;
 
     private CommitIdGenerator commitIdGenerator = CommitIdGenerator.SYNCHRONIZED_SEQUENCE;
 
@@ -32,9 +34,10 @@ class CoreConfigurationBuilder {
                 prettyValuePrinter,
                 mappingStyle,
                 listCompareAlgorithm,
-                newObjectsChanges,
+                newObjectChanges,
                 commitIdGenerator,
-                customCommitIdGenerator
+                customCommitIdGenerator,
+                removedObjectChanges
                 );
     }
 
@@ -59,8 +62,13 @@ class CoreConfigurationBuilder {
         return this;
     }
 
-    CoreConfigurationBuilder withNewObjectsChanges(boolean newObjectsSnapshot) {
-        this.newObjectsChanges = newObjectsSnapshot;
+    CoreConfigurationBuilder withNewObjectChanges(boolean newObjectChanges) {
+        this.newObjectChanges = newObjectChanges;
+        return this;
+    }
+
+    CoreConfigurationBuilder withRemovedObjectChanges(boolean removedObjectChanges) {
+        this.removedObjectChanges = removedObjectChanges;
         return this;
     }
 

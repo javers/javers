@@ -254,6 +254,10 @@ class JaversCore implements Javers {
         return managedType.getProperty(propertyChange.getPropertyName());
     }
 
+    public CoreConfiguration getConfiguration() {
+        return configuration;
+    }
+
     private static class CommitWithTimestamp {
         private Commit commit;
         private Long timestamp;

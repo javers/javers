@@ -1,6 +1,9 @@
 package org.javers.spring.boot.mongo
 
+import org.javers.core.CommitIdGenerator
 import org.javers.core.Javers
+import org.javers.core.MappingStyle
+import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.metamodel.type.EntityType
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -32,12 +35,19 @@ class JaversMongoStarterTest extends Specification{
 
     def "shouldReadConfigurationFromYml"() {
         expect:
+        javers.configuration.listCompareAlgorithm == ListCompareAlgorithm.LEVENSHTEIN_DISTANCE
+        javers.configuration.mappingStyle == MappingStyle.BEAN
+       !javers.configuration.newObjectChanges
+       !javers.configuration.removedObjectChanges
+        javers.configuration.commitIdGenerator == CommitIdGenerator.RANDOM
+
         javersProperties.algorithm == "levenshtein_distance"
         javersProperties.mappingStyle == "bean"
-        !javersProperties.newObjectSnapshot
-        !javersProperties.prettyPrint
+       !javersProperties.newObjectChanges
+       !javersProperties.removedObjectChanges
+        javersProperties.commitIdGenerator=="random"
+        javersProperties.prettyPrint
         javersProperties.typeSafeValues
-        javersProperties.commitIdGenerator == "random"
         javersProperties.documentDbCompatibilityEnabled == true
         javersProperties.objectAccessHook == "org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook"
         javersProperties.snapshotsCacheSize == 100

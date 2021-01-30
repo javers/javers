@@ -67,9 +67,9 @@ public abstract class Change implements Serializable {
     }
 
     /**
-     * Affected domain object (Cdo).
+     * Affected domain object.
      * Depending on concrete Change type,
-     * it could be new Object, removed Object or new version of changed Object.
+     * it could be a new Object, removed Object or a new version of a changed Object.
      * <br/><br/>
      *
      * <b>Optional</b> - available only for freshly generated diff.

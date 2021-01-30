@@ -10,13 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class JaversCoreProperties {
-    private String algorithm = "simple";
-    private String commitIdGenerator = "synchronized_sequence";
-    private String mappingStyle = "field";
-    private boolean newObjectSnapshot = false;
-    private boolean prettyPrint = true;
-    private boolean typeSafeValues = false;
-    private String packagesToScan = "";
+    private String algorithm;
+    private String commitIdGenerator;
+    private String mappingStyle;
+    private Boolean newObjectChanges;
+    private Boolean removedObjectChanges;
+    private Boolean prettyPrint;
+    private Boolean typeSafeValues;
+    private String packagesToScan;
     private PrettyPrintDateFormats prettyPrintDateFormats = new PrettyPrintDateFormats();
 
     public String getAlgorithm() {
@@ -31,15 +32,23 @@ public abstract class JaversCoreProperties {
         return mappingStyle;
     }
 
-    public boolean isNewObjectSnapshot() {
-        return newObjectSnapshot;
+    /**
+     * Use {@link #isNewObjectChanges()}
+     */
+    @Deprecated
+    public Boolean isNewObjectSnapshot() {
+        return isNewObjectChanges();
     }
 
-    public boolean isPrettyPrint() {
+    public Boolean isNewObjectChanges() {
+        return newObjectChanges;
+    }
+
+    public Boolean isPrettyPrint() {
         return prettyPrint;
     }
 
-    public boolean isTypeSafeValues() {
+    public Boolean isTypeSafeValues() {
         return typeSafeValues;
     }
 
@@ -59,15 +68,23 @@ public abstract class JaversCoreProperties {
         this.mappingStyle = mappingStyle;
     }
 
-    public void setNewObjectSnapshot(boolean newObjectSnapshot) {
-        this.newObjectSnapshot = newObjectSnapshot;
+    public void setNewObjectChanges(Boolean newObjectChanges) {
+        this.newObjectChanges = newObjectChanges;
     }
 
-    public void setPrettyPrint(boolean prettyPrint) {
+    /**
+     * Use {@link #setNewObjectChanges(Boolean)}
+     */
+    @Deprecated
+    public void setNewObjectSnapshot(Boolean newObjectSnapshot) {
+        setNewObjectChanges(newObjectSnapshot);
+    }
+
+    public void setPrettyPrint(Boolean prettyPrint) {
         this.prettyPrint = prettyPrint;
     }
 
-    public void setTypeSafeValues(boolean typeSafeValues) {
+    public void setTypeSafeValues(Boolean typeSafeValues) {
         this.typeSafeValues = typeSafeValues;
     }
 
@@ -77,6 +94,14 @@ public abstract class JaversCoreProperties {
 
     public PrettyPrintDateFormats getPrettyPrintDateFormats() {
         return prettyPrintDateFormats;
+    }
+
+    public Boolean isRemovedObjectChanges() {
+        return removedObjectChanges;
+    }
+
+    public void setRemovedObjectChanges(Boolean removedObjectChanges) {
+        this.removedObjectChanges = removedObjectChanges;
     }
 
     public static class PrettyPrintDateFormats {

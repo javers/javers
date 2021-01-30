@@ -29,7 +29,7 @@ public class CdoSnapshotBuilder {
     private CdoSnapshotBuilder() {
     }
 
-    public static CdoSnapshotBuilder emptyCopyOf(CdoSnapshot snapshot){
+    static CdoSnapshotBuilder emptyCopyOf(CdoSnapshot snapshot){
         return cdoSnapshot()
                 .withGlobalId(snapshot.getGlobalId())
                 .withManagedType(snapshot.getManagedType())

@@ -38,7 +38,7 @@ class CaseAsyncCommit extends Specification {
 
       when:
       waitFlag.set(false)
-      logger.info "waiting for future competition ...."
+      logger.info "waiting for a future competition ...."
       while(executor.completedTaskCount < 3) {}
 
       def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1,SnapshotEntity).build()).get(0)

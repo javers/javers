@@ -2,7 +2,10 @@ package org.javers.spring.boot.mongo
 
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoDatabase
+import org.javers.core.CommitIdGenerator
 import org.javers.core.Javers
+import org.javers.core.MappingStyle
+import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.repository.jql.QueryBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -25,16 +28,23 @@ class JaversMongoStarterDefaultsTest extends Specification{
 
     def "should provide default configuration"() {
         expect:
+        javers.configuration.listCompareAlgorithm == ListCompareAlgorithm.SIMPLE
+        javers.configuration.mappingStyle == MappingStyle.FIELD
+        javers.configuration.newObjectChanges
+        javers.configuration.removedObjectChanges
+        javers.configuration.commitIdGenerator == CommitIdGenerator.SYNCHRONIZED_SEQUENCE
+
         javersProperties.algorithm == "simple"
         javersProperties.mappingStyle == "field"
-       !javersProperties.newObjectSnapshot
-        javersProperties.prettyPrint
+        javersProperties.newObjectChanges
+        javersProperties.removedObjectChanges
+        javersProperties.commitIdGenerator=="synchronized_sequence"
+       !javersProperties.prettyPrint
        !javersProperties.typeSafeValues
-        javersProperties.commitIdGenerator == "synchronized_sequence"
        !javersProperties.documentDbCompatibilityEnabled
         javersProperties.auditableAspectEnabled
         javersProperties.springDataAuditableRepositoryAspectEnabled
-        javersProperties.packagesToScan == ""
+       !javersProperties.packagesToScan
        !javersProperties.mongodb
         javersProperties.objectAccessHook == "org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook"
         javersProperties.snapshotsCacheSize == 5000

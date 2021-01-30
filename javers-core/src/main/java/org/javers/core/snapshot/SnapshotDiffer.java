@@ -8,9 +8,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
-import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 
 import java.util.*;
@@ -51,9 +49,7 @@ public class SnapshotDiffer {
     }
 
     private void addInitialChanges(List<Change> changes, CdoSnapshot initialSnapshot) {
-        //TODO unify with core diff algorithm?
-        CdoSnapshot emptySnapshot = CdoSnapshotBuilder.emptyCopyOf(initialSnapshot).build();
-        Diff diff = diffFactory.create(snapshotGraph(emptySnapshot), snapshotGraph(initialSnapshot),
+        Diff diff = diffFactory.create(emptySnapshotGraph(), snapshotGraph(initialSnapshot),
             commitMetadata(initialSnapshot));
         changes.addAll(diff.getChanges());
         changes.add(new NewObject(initialSnapshot.getGlobalId(), empty(), of(initialSnapshot.getCommitMetadata())));
@@ -71,6 +67,10 @@ public class SnapshotDiffer {
 
     private SnapshotGraph snapshotGraph(CdoSnapshot snapshot) {
         return new SnapshotGraph(Sets.asSet(new SnapshotNode(snapshot)));
+    }
+
+    private SnapshotGraph emptySnapshotGraph() {
+        return new SnapshotGraph(Collections.emptySet());
     }
 
     private Optional<CommitMetadata> commitMetadata(CdoSnapshot snapshot) {

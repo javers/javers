@@ -19,19 +19,22 @@ public class CoreConfiguration {
 
     private final ListCompareAlgorithm listCompareAlgorithm;
 
-    private final boolean newObjectsChanges;
+    private final boolean newObjectChanges;
+
+    private final boolean removedObjectChanges;
 
     private final CommitIdGenerator commitIdGenerator;
 
     private final Supplier<CommitId> customCommitIdGenerator;
 
-    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean newObjectsChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator) {
+    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean newObjectChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean removedObjectChanges) {
         this.prettyValuePrinter = prettyValuePrinter;
         this.mappingStyle = mappingStyle;
         this.listCompareAlgorithm = listCompareAlgorithm;
-        this.newObjectsChanges = newObjectsChanges;
+        this.newObjectChanges = newObjectChanges;
         this.commitIdGenerator = commitIdGenerator;
         this.customCommitIdGenerator = customCommitIdGenerator;
+        this.removedObjectChanges = removedObjectChanges;
     }
 
     public PrettyValuePrinter getPrettyValuePrinter() {
@@ -46,8 +49,12 @@ public class CoreConfiguration {
         return listCompareAlgorithm;
     }
 
-    public boolean isNewObjectsChanges() {
-        return newObjectsChanges;
+    public boolean isNewObjectChanges() {
+        return newObjectChanges;
+    }
+
+    public boolean isRemovedObjectChanges() {
+        return removedObjectChanges;
     }
 
     public CommitIdGenerator getCommitIdGenerator() {
