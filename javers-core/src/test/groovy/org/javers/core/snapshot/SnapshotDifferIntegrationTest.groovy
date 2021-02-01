@@ -23,7 +23,7 @@ import static org.javers.core.model.DummyUser.dummyUser
  */
 class SnapshotDifferIntegrationTest extends Specification {
 
-    def "should add NewObject changes to change history for initial commit"() {
+    def "should add NewObjectChanges to change history for initial commit"() {
         given:
         def javers = javers().build()
         def user = new DummyUser("kaz")

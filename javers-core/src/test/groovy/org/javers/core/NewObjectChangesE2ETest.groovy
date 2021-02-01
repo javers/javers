@@ -63,8 +63,7 @@ class NewObjectChangesE2ETest extends Specification {
         println changes.prettyPrint()
 
         then:
-        changes.size() == 1
-        changes.getChangesByType(NewObject).size() == 1
+        changes.size() == 0
     }
 
     //TODO change defaults
@@ -111,7 +110,8 @@ class NewObjectChangesE2ETest extends Specification {
                 new Employee(id: "1", ref: new Employee(id: "2", name:"mine")))
 
         then:
-        diff.changes.size() == 2
+        diff.changes.size() == 1
+        diff.changes[0] instanceof ReferenceChange
     }
 
     def "should generate initial ValueChanges in compare() when null is changed to Entity" () {
@@ -163,7 +163,8 @@ class NewObjectChangesE2ETest extends Specification {
                 new Employee(id: "1"))
 
         then:
-        diff.changes.size() == 2
+        diff.changes.size() == 1
+        diff.changes[0] instanceof ReferenceChange
     }
 
     def "should generate terminal ValueChanges in compare() when Entity is changed to null" () {

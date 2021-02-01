@@ -27,8 +27,11 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 /**
- * 0 add sth about unification
+ * 0 Changes in the diff algorithm.
+ * add sth about unification
  *
+ *
+ *  //TODO exa,mple
  * 0  The javers.newObjectChanges flag is now enabled by default.
  *   When enabled, <code>Javers.compare()</code>
  *   and <code>Javers.findChanges()</code>
@@ -46,9 +49,6 @@ import java.util.stream.Stream;
  *   javers:
  *     newObjectChanges: false
  *   </pre>
- *
- * 0 In <code>Javers.findChanges()</code>, a NewObject change is always generated for each initial Snapshot
- *   (it can't be disabled by the javers.newObjectChanges)
  *
  * 0 The QueryBuilder.withNewObjectChanges() method is now deprecated and has no effect.
  *

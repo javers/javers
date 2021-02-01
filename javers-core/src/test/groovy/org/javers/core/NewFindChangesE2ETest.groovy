@@ -22,7 +22,6 @@ class NewFindChangesE2ETest extends Specification {
 
       then:
       changes.getChangesByType(PropertyChange).size() == 8
-      changes.getChangesByType(NewObject).size() == 2
     }
 
     def "should return changes grouped by commit"(){
@@ -37,7 +36,7 @@ class NewFindChangesE2ETest extends Specification {
         List<ChangesByCommit> changesByCommit = changes.groupByCommit()
 
         then:
-        changesByCommit.size() == 4
+        changesByCommit.size() == 3
 
         changesByCommit[0].commit.id.majorId == 4
         changesByCommit[0].get().size() == 4
@@ -47,9 +46,6 @@ class NewFindChangesE2ETest extends Specification {
 
         changesByCommit[2].commit.id.majorId == 2
         changesByCommit[2].get().size() == 4
-
-        changesByCommit[3].commit.id.majorId == 1
-        changesByCommit[3].get().size() == 4
     }
 
     def "should return changes grouped by commit and by entity object"(){
@@ -66,7 +62,7 @@ class NewFindChangesE2ETest extends Specification {
         List<ChangesByObject> changesByObject = changesByCommit[0].groupByObject()
 
         then:
-        changesByCommit.size() == 4
+        changesByCommit.size() == 3
 
         changesByObject.size() == 1
         changesByObject[0].get().size() == 4

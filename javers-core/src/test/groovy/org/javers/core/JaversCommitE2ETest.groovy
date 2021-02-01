@@ -195,7 +195,6 @@ class JaversCommitE2ETest extends Specification {
                     .hasValueChangeAt("intProperty", 2, 5)
     }
 
-    //TODO added values?
     def "should generate NewObject for added ValueObject"() {
         given:
         def javers = javers().build()
@@ -216,6 +215,7 @@ class JaversCommitE2ETest extends Specification {
                     .hasChanges(1)
     }
 
+    //TODO not sure about that.
     def "should not record ObjectRemoved for removed ValueObject"() {
         given:
         def javers = javers().build()
