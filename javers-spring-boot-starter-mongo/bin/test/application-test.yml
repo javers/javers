@@ -1,0 +1,18 @@
+javers:
+  algorithm: levenshtein_distance
+  mappingStyle: bean
+  newObjectSnapshot: false
+  prettyPrint: false
+  typeSafeValues: true
+  packagesToScan: org.javers.spring.boot
+  commitIdGenerator: random
+  documentDbCompatibilityEnabled: true
+  objectAccessHook: org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook
+  snapshotsCacheSize: 100
+  asyncCommitExecutorThreadCount: 1
+  auditableAspectAsyncEnabled: false
+
+spring:
+  data:
+    mongodb:
+      database: spring-mongo
