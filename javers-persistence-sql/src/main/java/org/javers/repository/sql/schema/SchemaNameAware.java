@@ -4,9 +4,11 @@ import java.util.Optional;
 
 public abstract class SchemaNameAware {
     private final TableNameProvider tableNameProvider;
+    private final ColumnNameProvider columnNameProvider;
 
-    protected SchemaNameAware(TableNameProvider tableNameProvider) {
+    protected SchemaNameAware(TableNameProvider tableNameProvider, ColumnNameProvider columnNameProvider) {
         this.tableNameProvider = tableNameProvider;
+        this.columnNameProvider = columnNameProvider;
     }
 
     protected String getCommitTableNameWithSchema() {
@@ -55,5 +57,89 @@ public abstract class SchemaNameAware {
 
     protected Optional<String> getSchemaName() {
         return tableNameProvider.getSchemaName();
+    }
+    
+    protected String getGlobalIdPKName() {
+    	return columnNameProvider.getGlobalIdPKName();
+    }
+    
+    protected String getGlobalIdLocalIdName() {
+    	return columnNameProvider.getGlobalIdLocalIdName();
+    }
+    
+    protected String getGlobalIdFragmentName() {
+    	return columnNameProvider.getGlobalIdFragmentName();
+    }
+    
+    protected String getGlobalIdTypeName() {
+    	return columnNameProvider.getGlobalIdTypeName();
+    }
+    
+    protected String getGlobalIdOwnerIDFKName() {
+    	return columnNameProvider.getGlobalIdOwnerIDFKName();
+    }
+    
+    protected String getCommitPKName() {
+    	return columnNameProvider.getCommitPKName();
+    }
+    
+    protected String getCommitAuthorName() {
+    	return columnNameProvider.getCommitAuthorName();
+    }
+    
+    protected String getCommitDateName() {
+    	return columnNameProvider.getCommitDateName();
+    }
+    
+    protected String getCommitInstantName() {
+    	return columnNameProvider.getCommitInstantName();
+    }
+    
+    protected String getCommitIdName() {
+    	return columnNameProvider.getCommitIdName();
+    }
+    
+    protected String getCommitPropertyCommitFKName() {
+    	return columnNameProvider.getCommitPropertyCommitFKName();
+    }
+    
+    protected String getCommitPropertyName() {
+    	return columnNameProvider.getCommitPropertyName();
+    }
+
+    protected String getCommitPropertyValueName() {
+    	return columnNameProvider.getCommitPropertyValueName();
+    }
+    
+    protected String getSnapshotPKName() {
+    	return columnNameProvider.getSnapshotPKName();
+    }
+    
+    protected String getSnapshotCommitFKName() {
+    	return columnNameProvider.getSnapshotCommitFKName();
+    }
+    
+    protected String getSnapshotGlobalIDName() {
+    	return columnNameProvider.getSnapshotGlobalIDName();
+    }
+    
+    protected String getSnapshotTypeName() {
+    	return columnNameProvider.getSnapshotTypeName();
+    }
+
+    protected String getSnapshotVersionName() {
+    	return columnNameProvider.getSnapshotVersionName();
+    }
+    
+    protected String getSnapshotStateName() {
+    	return columnNameProvider.getSnapshotStateName();
+    }
+    
+    protected String getSnapshotChangedName() {
+    	return columnNameProvider.getSnapshotChangedName();
+    }
+    
+    protected String getSnapshotManagedTypeName() {
+    	return columnNameProvider.getSnapshotManagedTypeName();
     }
 }
