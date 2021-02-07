@@ -2,7 +2,6 @@ package org.javers.repository.sql.repositories;
 
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.repository.sql.schema.ColumnNameProvider;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.session.Session;
@@ -16,8 +15,8 @@ public class CdoSnapshotRepository extends SchemaNameAware {
     private JsonConverter jsonConverter;
     private final GlobalIdRepository globalIdRepository;
 
-    public CdoSnapshotRepository(GlobalIdRepository globalIdRepository, TableNameProvider tableNameProvider, ColumnNameProvider columnNameProvider) {
-        super(tableNameProvider, columnNameProvider);
+    public CdoSnapshotRepository(GlobalIdRepository globalIdRepository, TableNameProvider tableNameProvider) {
+        super(tableNameProvider);
         this.globalIdRepository = globalIdRepository;
     }
 
@@ -27,14 +26,14 @@ public class CdoSnapshotRepository extends SchemaNameAware {
 
             session.insert("Snapshot")
                     .into(getSnapshotTableNameWithSchema())
-                    .value(getSnapshotTypeName(), cdoSnapshot.getType().toString())
-                    .value(getSnapshotGlobalIDName(), globalIdPk)
-                    .value(getSnapshotCommitFKName(), commitIdPk)
-                    .value(getSnapshotVersionName(), cdoSnapshot.getVersion())
-                    .value(getSnapshotStateName(), jsonConverter.toJson(cdoSnapshot.getState()))
-                    .value(getSnapshotChangedName(), jsonConverter.toJson(cdoSnapshot.getChanged()))
-                    .value(getSnapshotManagedTypeName(), cdoSnapshot.getManagedType().getName())
-                    .sequence(getSnapshotPKName(), getSnapshotTablePkSeqName().nameWithSchema())
+                    .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
+                    .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
+                    .value(SNAPSHOT_COMMIT_FK, commitIdPk)
+                    .value(SNAPSHOT_VERSION, cdoSnapshot.getVersion())
+                    .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
+                    .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged()))
+                    .value(SNAPSHOT_MANAGED_TYPE, cdoSnapshot.getManagedType().getName())
+                    .sequence(SNAPSHOT_PK, getSnapshotTablePkSeqName().nameWithSchema())
                     .execute();
         }
     }

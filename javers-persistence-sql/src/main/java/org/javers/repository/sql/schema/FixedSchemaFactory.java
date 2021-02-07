@@ -1,8 +1,6 @@
 package org.javers.repository.sql.schema;
 
 import com.google.gson.internal.LinkedHashTreeMap;
-
-import org.javers.repository.sql.SqlRepositoryConfiguration;
 import org.polyjdbc.core.dialect.*;
 import org.polyjdbc.core.schema.model.LongAttributeBuilder;
 import org.polyjdbc.core.schema.model.RelationBuilder;
@@ -17,18 +15,39 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class FixedSchemaFactory extends SchemaNameAware {
-	
     private static final int MAX_INDEX_KEY_LEN_IN_MYSQL = 191;
 
-    private final static int ORACLE_MAX_NAME_LEN = 40;
+    public static final String GLOBAL_ID_PK =         "global_id_pk";
+    public static final String GLOBAL_ID_LOCAL_ID =   "local_id";
+    public static final String GLOBAL_ID_FRAGMENT =   "fragment";     //since 1.2
+    public static final String GLOBAL_ID_TYPE_NAME =  "type_name";    //since 2.0
+    public static final String GLOBAL_ID_OWNER_ID_FK ="owner_id_fk";  //since 1.2
+
+    public static final String COMMIT_PK =            "commit_pk";
+    public static final String COMMIT_AUTHOR =        "author";
+    public static final String COMMIT_COMMIT_DATE =   "commit_date";
+    public static final String COMMIT_COMMIT_DATE_INSTANT =   "commit_date_instant";
+    public static final String COMMIT_COMMIT_ID =     "commit_id";
+    public static final String COMMIT_PROPERTY_COMMIT_FK =  "commit_fk";
+    public static final String COMMIT_PROPERTY_NAME =       "property_name";
+    public static final String COMMIT_PROPERTY_VALUE =      "property_value";
+
+    public static final String SNAPSHOT_PK =           "snapshot_pk";
+    public static final String SNAPSHOT_COMMIT_FK =    "commit_fk";
+    public static final String SNAPSHOT_GLOBAL_ID_FK = "global_id_fk";
+    public static final String SNAPSHOT_TYPE =         "type";
+    public static final String SNAPSHOT_VERSION =      "version";
+    public static final String SNAPSHOT_STATE =        "state";
+    public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v 1.2
+    public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";       //since 2.0
+
+    private final static int ORACLE_MAX_NAME_LEN = 30;
 
     private final Dialect dialect;
-    private final SqlRepositoryConfiguration configuration;
-    
-    public FixedSchemaFactory(Dialect dialect, TableNameProvider tableNameProvider, SqlRepositoryConfiguration configuration, ColumnNameProvider columnNameProvider) {
-        super(tableNameProvider, columnNameProvider);
+
+    public FixedSchemaFactory(Dialect dialect, TableNameProvider tableNameProvider) {
+        super(tableNameProvider);
         this.dialect = dialect;
-        this.configuration = configuration;
     }
 
     Map<String, Schema> allTablesSchema(Dialect dialect) {
@@ -46,18 +65,18 @@ public class FixedSchemaFactory extends SchemaNameAware {
         DBObjectName tableName = getSnapshotTableName();
         Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(getSnapshotPKName(), schema, relationBuilder, getSnapshotTablePkSeqName().localName());
-        relationBuilder.withAttribute().string(getSnapshotTypeName()).withMaxLength(200).and()
-                       .withAttribute().longAttr(getSnapshotVersionName()).and()
-                       .withAttribute().text(getSnapshotStateName()).and()
-                       .withAttribute().text(getSnapshotChangedName()).and()
-                       .withAttribute().string(getSnapshotManagedTypeName()).withMaxLength(200).and();
-        foreignKey(tableName, getSnapshotGlobalIDName(), false, getGlobalIdTableNameWithSchema(), getGlobalIdPKName(), relationBuilder);
-        foreignKey(tableName, getSnapshotCommitFKName(), false, getCommitTableNameWithSchema(), getCommitPKName(), relationBuilder);
+        primaryKey(SNAPSHOT_PK, schema, relationBuilder, getSnapshotTablePkSeqName().localName());
+        relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
+                       .withAttribute().longAttr(SNAPSHOT_VERSION).and()
+                       .withAttribute().text(SNAPSHOT_STATE).and()
+                       .withAttribute().text(SNAPSHOT_CHANGED).and()
+                       .withAttribute().string(SNAPSHOT_MANAGED_TYPE).withMaxLength(200).and();
+        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, false, getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
+        foreignKey(tableName, SNAPSHOT_COMMIT_FK, false, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
-        columnsIndex(tableName, schema, getSnapshotGlobalIDName());
-        columnsIndex(tableName, schema, getSnapshotCommitFKName());
+        columnsIndex(tableName, schema, SNAPSHOT_GLOBAL_ID_FK);
+        columnsIndex(tableName, schema, SNAPSHOT_COMMIT_FK);
 
         return schema;
     }
@@ -66,15 +85,15 @@ public class FixedSchemaFactory extends SchemaNameAware {
         DBObjectName tableName = getCommitTableName();
         Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(getCommitPKName(), schema, relationBuilder, getCommitPkSeqName().localName());
+        primaryKey(COMMIT_PK, schema, relationBuilder, getCommitPkSeqName().localName());
         relationBuilder
-                .withAttribute().string(getCommitAuthorName()).withMaxLength(200).and()
-                .withAttribute().timestamp(getCommitDateName()).and()
-                .withAttribute().string(getCommitInstantName()).withMaxLength(30).and()
-                .withAttribute().number(getCommitIdName()).withIntegerPrecision(22).withDecimalPrecision(2).and()
+                .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
+                .withAttribute().timestamp(COMMIT_COMMIT_DATE).and()
+                .withAttribute().string(COMMIT_COMMIT_DATE_INSTANT).withMaxLength(30).and()
+                .withAttribute().number(COMMIT_COMMIT_ID).withIntegerPrecision(22).withDecimalPrecision(2).and()
                 .build();
 
-        columnsIndex(tableName, schema, getCommitIdName());
+        columnsIndex(tableName, schema, COMMIT_COMMIT_ID);
 
         return schema;
     }
@@ -84,22 +103,22 @@ public class FixedSchemaFactory extends SchemaNameAware {
         Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
         relationBuilder
-            .primaryKey(tableName.localName() + "_pk").using(getCommitPropertyCommitFKName(), getCommitPropertyName()).and()
-            .withAttribute().string(getCommitPropertyName()).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).notNull().and()
-            .withAttribute().string(getCommitPropertyValueName()).withMaxLength(600).and();
-        foreignKey(tableName, getCommitPropertyCommitFKName(), true, getCommitTableNameWithSchema(), getCommitPKName(), relationBuilder);
+            .primaryKey(tableName.localName() + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
+            .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).notNull().and()
+            .withAttribute().string(COMMIT_PROPERTY_VALUE).withMaxLength(600).and();
+        foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, true, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
-        columnsIndex(tableName, schema, getCommitPropertyCommitFKName());
+        columnsIndex(tableName, schema, COMMIT_PROPERTY_COMMIT_FK);
 
         // Add index prefix length for MySql
         if (dialect instanceof MysqlDialect) {
             columnsIndex(tableName, schema, new IndexedCols(
-                    new String[]{getCommitPropertyName(), getCommitPropertyValueName()},
+                    new String[]{COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE},
                     new int[]{0, MAX_INDEX_KEY_LEN_IN_MYSQL}));
         }
         else {
-            columnsIndex(tableName, schema, getCommitPropertyName(), getCommitPropertyValueName());
+            columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE);
         }
 
         return schema;
@@ -111,16 +130,16 @@ public class FixedSchemaFactory extends SchemaNameAware {
         Schema schema = emptySchema(dialect);
 
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(getGlobalIdPKName(), schema, relationBuilder, getGlobalIdPkSeqName().localName());
+        primaryKey(GLOBAL_ID_PK, schema, relationBuilder, getGlobalIdPkSeqName().localName());
         relationBuilder
-                .withAttribute().string(getGlobalIdLocalIdName()).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
-                .withAttribute().string(getGlobalIdFragmentName()).withMaxLength(200).and()
-                .withAttribute().string(getGlobalIdTypeName()).withMaxLength(200).and();
-        foreignKey(tableName, getGlobalIdOwnerIDFKName(), false, getGlobalIdTableNameWithSchema(), getGlobalIdPKName(), relationBuilder);
+                .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
+                .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and()
+                .withAttribute().string(GLOBAL_ID_TYPE_NAME).withMaxLength(200).and();
+        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, false, getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
         relationBuilder.build();
 
-        columnsIndex(tableName, schema, getGlobalIdLocalIdName());
-        columnsIndex(tableName, schema, getGlobalIdOwnerIDFKName());
+        columnsIndex(tableName, schema, GLOBAL_ID_LOCAL_ID);
+        columnsIndex(tableName, schema, GLOBAL_ID_OWNER_ID_FK);
 
         return schema;
     }

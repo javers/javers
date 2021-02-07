@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.Map;
 
-
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_DATE_INSTANT;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_OWNER_ID_FK;
 
 /**
  * @author bartosz walacik
@@ -30,8 +31,8 @@ public class JaversSchemaManager extends SchemaNameAware {
     private final PolyJDBC polyJDBC;
     private final ConnectionProvider connectionProvider;
 
-    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, PolyJDBC polyJDBC, ConnectionProvider connectionProvider, TableNameProvider tableNameProvider, ColumnNameProvider columnNameProvider) {
-        super(tableNameProvider, columnNameProvider);
+    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, PolyJDBC polyJDBC, ConnectionProvider connectionProvider, TableNameProvider tableNameProvider) {
+        super(tableNameProvider);
         this.dialect = dialect;
         this.schemaFactory = schemaFactory;
         this.polyJDBC = polyJDBC;
@@ -69,10 +70,10 @@ public class JaversSchemaManager extends SchemaNameAware {
      * JaVers 5.0 to 5.1 schema migration
      */
     private void addCommitDateInstantColumnIfNeeded() {
-        if (!columnExists(getCommitTableNameWithSchema(), this.schemaFactory.getCommitInstantName())){
-            addStringColumn(getCommitTableNameWithSchema(), this.schemaFactory.getCommitInstantName(), 30);
+        if (!columnExists(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT)){
+            addStringColumn(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT, 30);
         } else {
-            extendStringColumnIfNeeded(getCommitTableNameWithSchema(), this.schemaFactory.getCommitInstantName(), 30);
+            extendStringColumnIfNeeded(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT, 30);
         }
     }
 
@@ -98,7 +99,7 @@ public class JaversSchemaManager extends SchemaNameAware {
             return;
         }
 
-        addIndex(getGlobalIdTableName(), new FixedSchemaFactory.IndexedCols(this.schemaFactory.getGlobalIdOwnerIDFKName() ));
+        addIndex(getGlobalIdTableName(), new FixedSchemaFactory.IndexedCols(GLOBAL_ID_OWNER_ID_FK));
     }
 
     /**
