@@ -117,87 +117,87 @@ public class DBNameProvider {
         return new DBObjectName(configuration.getSchemaNameAsOptional(), name);
     }
     
-    String getGlobalIdPKColunmName() {
+    public String getGlobalIdPKColunmName() {
         return configuration.getGlobalIdPKColunmName().orElse(GLOBAL_ID_PK);
     }
     
-    String getGlobalIdLocalIdColumnName() {
+    public String getGlobalIdLocalIdColumnName() {
         return configuration.getGlobalIdLocalIdColumnName().orElse(GLOBAL_ID_LOCAL_ID);
     }
 
-    String getGlobalIdFragmentColumnName() {
+    public String getGlobalIdFragmentColumnName() {
         return configuration.getGlobalIdFragmentColumnName().orElse(GLOBAL_ID_FRAGMENT);
     }
     
-    String getGlobalIdTypeNameColumnName() {
+    public String getGlobalIdTypeNameColumnName() {
         return configuration.getGlobalIdTypeNameColumnName().orElse(GLOBAL_ID_TYPE_NAME);
     }
     
-    String getGlobalIdOwnerIDFKColumnName() {
+    public String getGlobalIdOwnerIDFKColumnName() {
         return configuration.getGlobalIdOwnerIDFKColumnName().orElse(GLOBAL_ID_OWNER_ID_FK);
     }
     
-    String getCommitPKColumnName() {
+    public String getCommitPKColumnName() {
         return configuration.getCommitPKColumnName().orElse(COMMIT_PK);
     }
 
-    String getCommitAuthorColumnName() {
+    public String getCommitAuthorColumnName() {
         return configuration.getCommitAuthorColumnName().orElse(COMMIT_AUTHOR);
     }
     
-    String getCommitCommitDateColumnName() {
+    public String getCommitCommitDateColumnName() {
         return configuration.getCommitCommitDateColumnName().orElse(COMMIT_COMMIT_DATE);
     }
     
-    String getCommitCommitDateInstantColumnName() {
+    public String getCommitCommitDateInstantColumnName() {
         return configuration.getCommitCommitDateInstantColumnName().orElse(COMMIT_COMMIT_DATE_INSTANT);
     }
     
-    String getCommitCommitIdColumName() {
+    public String getCommitCommitIdColumName() {
         return configuration.getCommitCommitIdColumName().orElse(COMMIT_COMMIT_ID);
     }
     
-    String getCommitPropertyCommitFKColumnName() {
+    public String getCommitPropertyCommitFKColumnName() {
         return configuration.getCommitPropertyCommitFKColumnName().orElse(COMMIT_PROPERTY_COMMIT_FK);
     }
     
-    String getCommitPropertyNameColumnName() {
+    public String getCommitPropertyNameColumnName() {
         return configuration.getCommitPropertyNameColumnName().orElse(COMMIT_PROPERTY_NAME);
     }
 
-    String getCommitPropertyValueColumnName() {
+    public String getCommitPropertyValueColumnName() {
         return configuration.getCommitPropertyValueColumnName().orElse(COMMIT_PROPERTY_VALUE);
     }    
     
-    String getSnapshotPKColumnName() {
+    public String getSnapshotPKColumnName() {
         return configuration.getSnapshotPKColumnName().orElse(SNAPSHOT_PK);
     }
 
-    String getSnapshotCommitFKColumnName() {
+    public String getSnapshotCommitFKColumnName() {
         return configuration.getSnapshotCommitFKColumnName().orElse(SNAPSHOT_COMMIT_FK);
     }
     
-    String getSnapshotGlobalIdFKColumnName() {
+    public String getSnapshotGlobalIdFKColumnName() {
         return configuration.getSnapshotGlobalIdFKColumnName().orElse(SNAPSHOT_GLOBAL_ID_FK);
     }
     
-    String getSnapshotTypeColumnName() {
+    public String getSnapshotTypeColumnName() {
         return configuration.getSnapshotTypeColumnName().orElse(SNAPSHOT_TYPE);
     }
     
-    String getSnapshotVersionColumnName() {
+    public String getSnapshotVersionColumnName() {
         return configuration.getSnapshotVersionColumnName().orElse(SNAPSHOT_VERSION);
     }
 
-    String getSnapshotStateColumnName() {
+    public String getSnapshotStateColumnName() {
         return configuration.getSnapshotStateColumnName().orElse(SNAPSHOT_STATE);
     }
     
-    String getSnapshotChangedColumnName() {
+    public String getSnapshotChangedColumnName() {
         return configuration.getSnapshotChangedColumnName().orElse(SNAPSHOT_CHANGED);
     }
     
-    String getSnapshotManagedTypeColumnName() {
+    public String getSnapshotManagedTypeColumnName() {
         return configuration.getSnapshotManagedTypeColumnName().orElse(SNAPSHOT_MANAGED_TYPE);
     }
 }

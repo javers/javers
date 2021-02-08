@@ -1,21 +1,20 @@
 package org.javers.repository.sql.finders;
 
-import com.google.common.base.Joiner;
-import org.javers.repository.sql.schema.DBNameProvider;
-import org.javers.repository.sql.session.Session;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import org.javers.repository.sql.schema.DBNameProvider;
+import org.javers.repository.sql.session.Session;
+
+import com.google.common.base.Joiner;
 
 public class CommitPropertyFinder {
 
-    private final DBNameProvider tableNameProvider;
+    private final DBNameProvider dbNameProvider;
 
-    public CommitPropertyFinder(DBNameProvider tableNameProvider) {
-        this.tableNameProvider = tableNameProvider;
+    public CommitPropertyFinder(DBNameProvider dbNameProvider) {
+        this.dbNameProvider = dbNameProvider;
     }
 
     List<CommitPropertyDTO> findCommitPropertiesOfSnaphots(Collection<Long> commitPKs, Session session) {
@@ -23,13 +22,13 @@ public class CommitPropertyFinder {
             return Collections.emptyList();
         }
 
-        return session.select(COMMIT_PROPERTY_COMMIT_FK + ", " + COMMIT_PROPERTY_NAME + ", " + COMMIT_PROPERTY_VALUE)
-               .from(tableNameProvider.getCommitPropertyTableNameWithSchema())
+        return session.select(dbNameProvider.getCommitPropertyCommitFKColumnName() + ", " +  dbNameProvider.getCommitPropertyNameColumnName() + ", " + dbNameProvider.getCommitPropertyValueColumnName())
+               .from(dbNameProvider.getCommitPropertyTableNameWithSchema())
                .queryName("commit properties")
-               .and(COMMIT_PROPERTY_COMMIT_FK + " in (" + Joiner.on(",").join(commitPKs) + ")")
+               .and(dbNameProvider.getCommitPropertyCommitFKColumnName() + " in (" + Joiner.on(",").join(commitPKs) + ")")
                .executeQuery(resultSet -> new CommitPropertyDTO(
-                       resultSet.getLong(COMMIT_PROPERTY_COMMIT_FK),
-                       resultSet.getString(COMMIT_PROPERTY_NAME),
-                       resultSet.getString(COMMIT_PROPERTY_VALUE)));
+                       resultSet.getLong(dbNameProvider.getCommitPropertyCommitFKColumnName()),
+                       resultSet.getString(dbNameProvider.getCommitPropertyNameColumnName()),
+                       resultSet.getString(dbNameProvider.getCommitPropertyValueColumnName())));
     }
 }

@@ -1,14 +1,12 @@
 package org.javers.repository.sql.repositories;
 
-import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.repository.sql.schema.SchemaNameAware;
-import org.javers.repository.sql.schema.DBNameProvider;
-import org.javers.repository.sql.session.Session;
-
 import java.util.List;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.sql.schema.DBNameProvider;
+import org.javers.repository.sql.schema.SchemaNameAware;
+import org.javers.repository.sql.session.Session;
 
 public class CdoSnapshotRepository extends SchemaNameAware {
 
@@ -26,14 +24,14 @@ public class CdoSnapshotRepository extends SchemaNameAware {
 
             session.insert("Snapshot")
                     .into(getSnapshotTableNameWithSchema())
-                    .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
-                    .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
-                    .value(SNAPSHOT_COMMIT_FK, commitIdPk)
-                    .value(SNAPSHOT_VERSION, cdoSnapshot.getVersion())
-                    .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
-                    .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged()))
-                    .value(SNAPSHOT_MANAGED_TYPE, cdoSnapshot.getManagedType().getName())
-                    .sequence(SNAPSHOT_PK, getSnapshotTablePkSeqName().nameWithSchema())
+                    .value(getSnapshotTypeColumnName(), cdoSnapshot.getType().toString())
+                    .value(getSnapshotGlobalIdFKColumnName(), globalIdPk)
+                    .value(getSnapshotCommitFKColumnName(), commitIdPk)
+                    .value(getSnapshotVersionColumnName(), cdoSnapshot.getVersion())
+                    .value(getSnapshotStateColumnName(), jsonConverter.toJson(cdoSnapshot.getState()))
+                    .value(getSnapshotChangedColumnName(), jsonConverter.toJson(cdoSnapshot.getChanged()))
+                    .value(getSnapshotManagedTypeColumnName(), cdoSnapshot.getManagedType().getName())
+                    .sequence(getSnapshotPKColumnName(), getSnapshotTablePkSeqName().nameWithSchema())
                     .execute();
         }
     }
