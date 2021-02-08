@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
  * @author Ian Agius
  */
 public class DBNameProvider {
-    private static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
+    /*private static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
     private static final String COMMIT_PK_SEQ =        "jv_commit_pk_seq";
-    private static final String GLOBAL_ID_PK_SEQ =     "jv_global_id_pk_seq";
+    private static final String GLOBAL_ID_PK_SEQ =     "jv_global_id_pk_seq";*/
 
 
     private static final String DEFAULT_GLOBAL_ID_TABLE_NAME = "jv_global_id";
@@ -74,15 +74,15 @@ public class DBNameProvider {
     }
 
     public DBObjectName getSnapshotTablePkSeqName() {
-        return fullDbName(SNAPSHOT_TABLE_PK_SEQ);
+        return fullDbName(getSnapshotTableName().localName()+"_pk_seq");
     }
 
     public DBObjectName getGlobalIdPkSeqName() {
-        return fullDbName(GLOBAL_ID_PK_SEQ);
+        return fullDbName(getGlobalIdTableName().localName()+"_pk_seq");
     }
 
     public DBObjectName getCommitPkSeqName() {
-        return fullDbName(COMMIT_PK_SEQ);
+        return fullDbName(getCommitTableName().localName()+"_pk_seq");
     }
 
     /**
