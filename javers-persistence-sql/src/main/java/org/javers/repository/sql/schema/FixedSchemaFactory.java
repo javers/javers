@@ -17,30 +17,6 @@ import java.util.Map;
 public class FixedSchemaFactory extends SchemaNameAware {
     private static final int MAX_INDEX_KEY_LEN_IN_MYSQL = 191;
 
-    /*public static final String GLOBAL_ID_PK =         "global_id_pk";
-    public static final String GLOBAL_ID_LOCAL_ID =   "local_id";
-    public static final String GLOBAL_ID_FRAGMENT =   "fragment";     //since 1.2
-    public static final String GLOBAL_ID_TYPE_NAME =  "type_name";    //since 2.0
-    public static final String GLOBAL_ID_OWNER_ID_FK ="owner_id_fk";  //since 1.2
-
-    public static final String COMMIT_PK =            "commit_pk";
-    public static final String COMMIT_AUTHOR =        "author";
-    public static final String COMMIT_COMMIT_DATE =   "commit_date";
-    public static final String COMMIT_COMMIT_DATE_INSTANT =   "commit_date_instant";
-    public static final String COMMIT_COMMIT_ID =     "commit_id";
-    public static final String COMMIT_PROPERTY_COMMIT_FK =  "commit_fk";
-    public static final String COMMIT_PROPERTY_NAME =       "property_name";
-    public static final String COMMIT_PROPERTY_VALUE =      "property_value";
-
-    public static final String SNAPSHOT_PK =           "snapshot_pk";
-    public static final String SNAPSHOT_COMMIT_FK =    "commit_fk";
-    public static final String SNAPSHOT_GLOBAL_ID_FK = "global_id_fk";
-    public static final String SNAPSHOT_TYPE =         "type";
-    public static final String SNAPSHOT_VERSION =      "version";
-    public static final String SNAPSHOT_STATE =        "state";
-    public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v 1.2
-    public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";       //since 2.0*/
-
     private final static int ORACLE_MAX_NAME_LEN = 30;
 
     private final Dialect dialect;

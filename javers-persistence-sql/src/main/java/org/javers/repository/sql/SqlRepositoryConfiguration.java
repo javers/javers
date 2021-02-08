@@ -40,46 +40,71 @@ public class SqlRepositoryConfiguration {
     private final String snapshotStateColumnName;
     private final String snapshotChangedColumnName;
     private final String snapshotManagedTypeColumnName;
-    
-    SqlRepositoryConfiguration(boolean globalIdCacheDisabled, String schemaName,
-                                      boolean schemaManagementEnabled, String globalIdTableName,
-                                      String commitTableName,
-                                      String snapshotTableName, String commitPropertyTableName) {
-        Validate.argumentCheck(schemaName == null || !schemaName.isEmpty(),"schemaName should be null or non-empty");
-
-        this.globalIdCacheDisabled = globalIdCacheDisabled;
-        this.schemaName = schemaName;
-        this.schemaManagementEnabled = schemaManagementEnabled;
-        this.globalIdTableName = globalIdTableName;
-        this.commitTableName = commitTableName;
-        this.snapshotTableName = snapshotTableName;
-        this.commitPropertyTableName = commitPropertyTableName;
-        this.globalIdPKColunmName = null;
-        this.globalIdLocalIdColumnName = null;
-        this.globalIdFragmentColumnName = null;
-        this.globalIdTypeNameColumnName = null;
-        this.globalIdOwnerIDFKColumnName = null;
         
-        this.commitPKColumnName = null;
-        this.commitAuthorColumnName = null;
-        this.commitCommitDateColumnName = null;
-        this.commitCommitDateInstantColumnName = null;
-        this.commitCommitIdColumName = null;
-        this.commitPropertyCommitFKColumnName = null;
-        this.commitPropertyNameColumnName = null;
-        this.commitPropertyValueColumnName = null;
-        
-        this.snapshotPKColumnName = null;
-        this.snapshotCommitFKColumnName = null;
-        this.snapshotGlobalIdFKColumnName = null;
-        this.snapshotTypeColumnName = null;
-        this.snapshotVersionColumnName = null;
-        this.snapshotStateColumnName = null;
-        this.snapshotChangedColumnName = null;
-        this.snapshotManagedTypeColumnName = null;
-    }
+    SqlRepositoryConfiguration(boolean globalIdCacheDisabled, 
+    						   String schemaName,
+    						   boolean schemaManagementEnabled,
+    						   String globalIdTableName,
+    						   String commitTableName,
+    						   String snapshotTableName, 
+    						   String commitPropertyTableName,
+    						   String globalIdPKColunmName,
+    						   String globalIdLocalIdColumnName,
+    						   String globalIdFragmentColumnName,
+    						   String globalIdTypeNameColumnName,
+    						   String globalIdOwnerIDFKColumnName,
+    						   String commitPKColumnName,
+							   String commitAuthorColumnName,
+							   String commitCommitDateColumnName,
+							   String commitCommitDateInstantColumnName,
+							   String commitCommitIdColumName,
+							   String commitPropertyCommitFKColumnName,
+							   String commitPropertyNameColumnName,
+							   String commitPropertyValueColumnName,
+							   String snapshotPKColumnName,
+							   String snapshotCommitFKColumnName,
+							   String snapshotGlobalIdFKColumnName,
+							   String snapshotTypeColumnName,
+							   String snapshotVersionColumnName,
+							   String snapshotStateColumnName,
+							   String snapshotChangedColumnName,
+							   String snapshotManagedTypeColumnName
+    						   ) {
+		Validate.argumentCheck(schemaName == null || !schemaName.isEmpty(),"schemaName should be null or non-empty");
+		
+		this.globalIdCacheDisabled = globalIdCacheDisabled;
+		this.schemaName = schemaName;
+		this.schemaManagementEnabled = schemaManagementEnabled;
+		this.globalIdTableName = globalIdTableName;
+		this.commitTableName = commitTableName;
+		this.snapshotTableName = snapshotTableName;
+		this.commitPropertyTableName = commitPropertyTableName;
+		this.globalIdPKColunmName = globalIdPKColunmName;
+		this.globalIdLocalIdColumnName = globalIdLocalIdColumnName;
+		this.globalIdFragmentColumnName = globalIdFragmentColumnName;
+		this.globalIdTypeNameColumnName = globalIdTypeNameColumnName;
+		this.globalIdOwnerIDFKColumnName = globalIdOwnerIDFKColumnName;
+		
+		this.commitPKColumnName = commitPKColumnName;
+		this.commitAuthorColumnName = commitAuthorColumnName;
+		this.commitCommitDateColumnName = commitCommitDateColumnName;
+		this.commitCommitDateInstantColumnName = commitCommitDateInstantColumnName;
+		this.commitCommitIdColumName = commitCommitIdColumName;
+		this.commitPropertyCommitFKColumnName = commitPropertyCommitFKColumnName;
+		this.commitPropertyNameColumnName = commitPropertyNameColumnName;
+		this.commitPropertyValueColumnName = commitPropertyValueColumnName;
+		
+		this.snapshotPKColumnName = snapshotPKColumnName;
+		this.snapshotCommitFKColumnName = snapshotCommitFKColumnName;
+		this.snapshotGlobalIdFKColumnName = snapshotGlobalIdFKColumnName;
+		this.snapshotTypeColumnName = snapshotTypeColumnName;
+		this.snapshotVersionColumnName = snapshotVersionColumnName;
+		this.snapshotStateColumnName = snapshotStateColumnName;
+		this.snapshotChangedColumnName = snapshotChangedColumnName;
+		this.snapshotManagedTypeColumnName = snapshotManagedTypeColumnName;
+	}
 
-    public boolean isGlobalIdCacheDisabled() {
+	public boolean isGlobalIdCacheDisabled() {
         return globalIdCacheDisabled;
     }
 

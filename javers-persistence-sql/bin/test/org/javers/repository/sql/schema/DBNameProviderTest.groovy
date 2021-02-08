@@ -8,7 +8,34 @@ class DBNameProviderTest extends Specification {
     def "should provide default names without schema" () {
         when:
         def names = new DBNameProvider(
-                new SqlRepositoryConfiguration(false, null, true, null, null, null, null))
+                new SqlRepositoryConfiguration(false, 
+						null,
+						true,
+						null,
+						null,
+						null, 
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null))
 
         then:
         names.commitTableNameWithSchema == "jv_commit"
@@ -26,7 +53,34 @@ class DBNameProviderTest extends Specification {
     def "should provide default names with schema" () {
         when:
         def names = new DBNameProvider(
-                new SqlRepositoryConfiguration(false, 's', true, null, null, null, null))
+		new SqlRepositoryConfiguration(false, 
+						's',
+						true,
+						null,
+						null,
+						null, 
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null))
 
         then:
         names.commitTableNameWithSchema == "s.jv_commit"
@@ -44,7 +98,34 @@ class DBNameProviderTest extends Specification {
     def "should provide custom table names" () {
         when:
         def names = new DBNameProvider(
-                new SqlRepositoryConfiguration(false, null, true, "g", "c", "s", "cp"))
+		new SqlRepositoryConfiguration(false, 
+						null,
+						true,
+						"g",
+						"c",
+						"s", 
+						"cp",
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null))
 
         then:
         names.commitTableNameWithSchema == "c"

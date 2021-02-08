@@ -1,5 +1,7 @@
 package org.javers.repository.sql;
 
+import static org.javers.common.string.Strings.isNonEmpty;
+
 import org.javers.core.AbstractContainerBuilder;
 import org.javers.repository.sql.pico.JaversSqlModule;
 import org.javers.repository.sql.session.SessionFactory;
@@ -7,11 +9,6 @@ import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.PolyJDBCBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import static org.javers.common.string.Strings.isNonEmpty;
 
 /**
  * @author bartosz walacik
@@ -30,6 +27,30 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private String commitTableName;
     private String snapshotTableName;
     private String commitPropertyTableName;
+    
+    private String globalIdPKColunmName;
+    private String globalIdLocalIdColumnName;
+    private String globalIdFragmentColumnName;
+    private String globalIdTypeNameColumnName;
+    private String globalIdOwnerIDFKColumnName;
+
+    private String commitPKColumnName;
+    private String commitAuthorColumnName;
+    private String commitCommitDateColumnName;
+    private String commitCommitDateInstantColumnName;
+    private String commitCommitIdColumName;
+    private String commitPropertyCommitFKColumnName;
+    private String commitPropertyNameColumnName;
+    private String commitPropertyValueColumnName;
+    
+    private String snapshotPKColumnName;
+    private String snapshotCommitFKColumnName;
+    private String snapshotGlobalIdFKColumnName;
+    private String snapshotTypeColumnName;
+    private String snapshotVersionColumnName;
+    private String snapshotStateColumnName;
+    private String snapshotChangedColumnName;
+    private String snapshotManagedTypeColumnName;
 
     public SqlRepositoryBuilder() {
     }
@@ -103,6 +124,153 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         }
         return this;
     }
+    
+    public SqlRepositoryBuilder withGlobalIdPKColunmName(String globalIdPKColunmName) {
+        if(isNonEmpty(globalIdPKColunmName)) {
+            this.globalIdPKColunmName = globalIdPKColunmName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withGlobalIdLocalIdColumnName(String globalIdLocalIdColumnName) {
+        if(isNonEmpty(globalIdLocalIdColumnName)) {
+            this.globalIdLocalIdColumnName = globalIdLocalIdColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withGlobalIdFragmentColumnName(String globalIdFragmentColumnName) {
+        if(isNonEmpty(globalIdFragmentColumnName)) {
+            this.globalIdFragmentColumnName = globalIdFragmentColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withGlobalIdTypeNameColumnName(String globalIdTypeNameColumnName) {
+        if(isNonEmpty(globalIdTypeNameColumnName)) {
+            this.globalIdTypeNameColumnName = globalIdTypeNameColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withGlobalIdOwnerIDFKColumnName(String globalIdOwnerIDFKColumnName) {
+        if(isNonEmpty(globalIdOwnerIDFKColumnName)) {
+            this.globalIdOwnerIDFKColumnName = globalIdOwnerIDFKColumnName;
+        }
+        return this;
+    }
+
+    public SqlRepositoryBuilder withCommitPKColumnName(String commitPKColumnName) {
+        if(isNonEmpty(commitPKColumnName)) {
+            this.commitPKColumnName = commitPKColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withCommitAuthorColumnName(String commitAuthorColumnName) {
+        if(isNonEmpty(commitAuthorColumnName)) {
+            this.commitAuthorColumnName = commitAuthorColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withCommitCommitDateColumnName(String commitCommitDateColumnName) {
+        if(isNonEmpty(commitCommitDateColumnName)) {
+            this.commitCommitDateColumnName = commitCommitDateColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withCommitCommitDateInstantColumnName(String commitCommitDateInstantColumnName) {
+        if(isNonEmpty(commitCommitDateInstantColumnName)) {
+            this.commitCommitDateInstantColumnName = commitCommitDateInstantColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withCommitCommitIdColumName(String commitCommitIdColumName) {
+        if(isNonEmpty(commitCommitIdColumName)) {
+            this.commitCommitIdColumName = commitCommitIdColumName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withCommitPropertyCommitFKColumnName(String commitPropertyCommitFKColumnName) {
+        if(isNonEmpty(commitPropertyCommitFKColumnName)) {
+            this.commitPropertyCommitFKColumnName = commitPropertyCommitFKColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withCommitPropertyNameColumnName(String commitPropertyNameColumnName) {
+        if(isNonEmpty(commitPropertyNameColumnName)) {
+            this.commitPropertyNameColumnName = commitPropertyNameColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withCommitPropertyValueColumnName(String commitPropertyValueColumnName) {
+        if(isNonEmpty(commitPropertyValueColumnName)) {
+            this.commitPropertyValueColumnName = commitPropertyValueColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withSnapshotPKColumnName(String snapshotPKColumnName) {
+        if(isNonEmpty(snapshotPKColumnName)) {
+            this.snapshotPKColumnName = snapshotPKColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withSnapshotCommitFKColumnName(String snapshotCommitFKColumnName) {
+        if(isNonEmpty(snapshotCommitFKColumnName)) {
+            this.snapshotCommitFKColumnName = snapshotCommitFKColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withSnapshotGlobalIdFKColumnName(String snapshotGlobalIdFKColumnName) {
+        if(isNonEmpty(snapshotGlobalIdFKColumnName)) {
+            this.snapshotGlobalIdFKColumnName = snapshotGlobalIdFKColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withSnapshotTypeColumnName(String snapshotTypeColumnName) {
+        if(isNonEmpty(snapshotTypeColumnName)) {
+            this.snapshotTypeColumnName = snapshotTypeColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withSnapshotVersionColumnName(String snapshotVersionColumnName) {
+        if(isNonEmpty(snapshotTypeColumnName)) {
+            this.snapshotVersionColumnName = snapshotVersionColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withSnapshotStateColumnName(String snapshotStateColumnName) {
+        if(isNonEmpty(snapshotStateColumnName)) {
+            this.snapshotStateColumnName = snapshotStateColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withSnapshotChangedColumnName(String snapshotChangedColumnName) {
+        if(isNonEmpty(snapshotChangedColumnName)) {
+            this.snapshotChangedColumnName = snapshotChangedColumnName;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withSnapshotManagedTypeColumnName(String snapshotManagedTypeColumnName) {
+        if(isNonEmpty(snapshotManagedTypeColumnName)) {
+            this.snapshotManagedTypeColumnName = snapshotManagedTypeColumnName;
+        }
+        return this;
+    }
 
     public JaversSqlRepository build() {
         logger.info("starting SqlRepository...");
@@ -112,8 +280,35 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         bootContainer();
 
         SqlRepositoryConfiguration config =
-                new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName, schemaManagementEnabled,
-                        globalIdTableName, commitTableName, snapshotTableName, commitPropertyTableName);
+                new SqlRepositoryConfiguration(globalIdCacheDisabled, 
+											   schemaName,
+											   schemaManagementEnabled,
+											   globalIdTableName,
+											   commitTableName,
+											   snapshotTableName, 
+											   commitPropertyTableName,
+											   globalIdPKColunmName,
+											   globalIdLocalIdColumnName,
+											   globalIdFragmentColumnName,
+											   globalIdTypeNameColumnName,
+											   globalIdOwnerIDFKColumnName,
+											   commitPKColumnName,
+											   commitAuthorColumnName,
+											   commitCommitDateColumnName,
+											   commitCommitDateInstantColumnName,
+											   commitCommitIdColumName,
+											   commitPropertyCommitFKColumnName,
+											   commitPropertyNameColumnName,
+											   commitPropertyValueColumnName,
+											   snapshotPKColumnName,
+											   snapshotCommitFKColumnName,
+											   snapshotGlobalIdFKColumnName,
+											   snapshotTypeColumnName,
+											   snapshotVersionColumnName,
+											   snapshotStateColumnName,
+											   snapshotChangedColumnName,
+											   snapshotManagedTypeColumnName);
+
         addComponent(config);
 
         PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
