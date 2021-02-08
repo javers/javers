@@ -1,7 +1,7 @@
 package org.javers.repository.sql.finders;
 
 import com.google.common.base.Joiner;
-import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.schema.DBNameProvider;
 import org.javers.repository.sql.session.Session;
 
 import java.util.Collection;
@@ -12,9 +12,9 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CommitPropertyFinder {
 
-    private final TableNameProvider tableNameProvider;
+    private final DBNameProvider tableNameProvider;
 
-    public CommitPropertyFinder(TableNameProvider tableNameProvider) {
+    public CommitPropertyFinder(DBNameProvider tableNameProvider) {
         this.tableNameProvider = tableNameProvider;
     }
 

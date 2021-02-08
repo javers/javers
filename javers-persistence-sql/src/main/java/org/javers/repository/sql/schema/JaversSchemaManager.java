@@ -31,7 +31,7 @@ public class JaversSchemaManager extends SchemaNameAware {
     private final PolyJDBC polyJDBC;
     private final ConnectionProvider connectionProvider;
 
-    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, PolyJDBC polyJDBC, ConnectionProvider connectionProvider, TableNameProvider tableNameProvider) {
+    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, PolyJDBC polyJDBC, ConnectionProvider connectionProvider, DBNameProvider tableNameProvider) {
         super(tableNameProvider);
         this.dialect = dialect;
         this.schemaFactory = schemaFactory;

@@ -3,9 +3,9 @@ package org.javers.repository.sql.schema;
 import java.util.Optional;
 
 public abstract class SchemaNameAware {
-    private final TableNameProvider tableNameProvider;
+    private final DBNameProvider tableNameProvider;
 
-    protected SchemaNameAware(TableNameProvider tableNameProvider) {
+    protected SchemaNameAware(DBNameProvider tableNameProvider) {
         this.tableNameProvider = tableNameProvider;
     }
 

@@ -3,7 +3,7 @@ package org.javers.repository.sql.repositories;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.repository.sql.schema.SchemaNameAware;
-import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.schema.DBNameProvider;
 import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.type.Timestamp;
 
@@ -20,7 +20,7 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
  */
 public class CommitMetadataRepository extends SchemaNameAware {
 
-    public CommitMetadataRepository(TableNameProvider tableNameProvider) {
+    public CommitMetadataRepository(DBNameProvider tableNameProvider) {
         super(tableNameProvider);
     }
 

@@ -9,7 +9,7 @@ import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.sql.SqlRepositoryConfiguration;
 import org.javers.repository.sql.schema.SchemaNameAware;
-import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.schema.DBNameProvider;
 import org.javers.repository.sql.session.InsertBuilder;
 import org.javers.repository.sql.session.SelectBuilder;
 import org.javers.repository.sql.session.Session;
@@ -25,7 +25,7 @@ public class GlobalIdRepository extends SchemaNameAware {
             .maximumSize(1000)
             .build();
 
-    public GlobalIdRepository(TableNameProvider tableNameProvider, SqlRepositoryConfiguration configuration) {
+    public GlobalIdRepository(DBNameProvider tableNameProvider, SqlRepositoryConfiguration configuration) {
         super(tableNameProvider);
         this.disableCache = configuration.isGlobalIdCacheDisabled();
     }

@@ -3,7 +3,7 @@ package org.javers.repository.sql.repositories;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.sql.schema.SchemaNameAware;
-import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.schema.DBNameProvider;
 import org.javers.repository.sql.session.Session;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public class CdoSnapshotRepository extends SchemaNameAware {
     private JsonConverter jsonConverter;
     private final GlobalIdRepository globalIdRepository;
 
-    public CdoSnapshotRepository(GlobalIdRepository globalIdRepository, TableNameProvider tableNameProvider) {
+    public CdoSnapshotRepository(GlobalIdRepository globalIdRepository, DBNameProvider tableNameProvider) {
         super(tableNameProvider);
         this.globalIdRepository = globalIdRepository;
     }

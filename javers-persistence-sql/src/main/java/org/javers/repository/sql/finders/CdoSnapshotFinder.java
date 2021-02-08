@@ -13,7 +13,7 @@ import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.finders.SnapshotQuery.SnapshotDbIdentifier;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
-import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.schema.DBNameProvider;
 import org.javers.repository.sql.session.Session;
 
 import java.util.*;
@@ -29,9 +29,9 @@ public class CdoSnapshotFinder {
     private final CommitPropertyFinder commitPropertyFinder;
     private final CdoSnapshotsEnricher cdoSnapshotsEnricher = new CdoSnapshotsEnricher();
     private JsonConverter jsonConverter;
-    private final TableNameProvider tableNameProvider;
+    private final DBNameProvider tableNameProvider;
 
-    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameProvider tableNameProvider) {
+    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, DBNameProvider tableNameProvider) {
         this.globalIdRepository = globalIdRepository;
         this.commitPropertyFinder = commitPropertyFinder;
         this.tableNameProvider = tableNameProvider;

@@ -4,7 +4,7 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.SnapshotIdentifier;
-import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.schema.DBNameProvider;
 import org.javers.repository.sql.session.ObjectMapper;
 import org.javers.repository.sql.session.Parameter;
 import org.javers.repository.sql.session.SelectBuilder;
@@ -23,10 +23,10 @@ import static org.javers.repository.sql.session.Parameter.*;
 class SnapshotQuery {
     private final QueryParams queryParams;
     private final SelectBuilder selectBuilder;
-    private final TableNameProvider tableNameProvider;
+    private final DBNameProvider tableNameProvider;
     private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
 
-    public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
+    public SnapshotQuery(DBNameProvider tableNames, QueryParams queryParams, Session session) {
         this.selectBuilder = session
             .select(
                 SNAPSHOT_STATE + ", " +

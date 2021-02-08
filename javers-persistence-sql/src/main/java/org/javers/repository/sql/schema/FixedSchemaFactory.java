@@ -45,7 +45,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
     private final Dialect dialect;
 
-    public FixedSchemaFactory(Dialect dialect, TableNameProvider tableNameProvider) {
+    public FixedSchemaFactory(Dialect dialect, DBNameProvider tableNameProvider) {
         super(tableNameProvider);
         this.dialect = dialect;
     }
