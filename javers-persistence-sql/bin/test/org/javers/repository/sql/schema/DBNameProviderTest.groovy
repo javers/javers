@@ -129,13 +129,13 @@ class DBNameProviderTest extends Specification {
 
         then:
         names.commitTableNameWithSchema == "c"
-        names.commitPkSeqName.toString() == "jv_commit_pk_seq"
+        names.commitPkSeqName.toString() == "c_pk_seq"
 
         names.globalIdTableNameWithSchema == "g"
-        names.globalIdPkSeqName.toString() == "jv_global_id_pk_seq"
+        names.globalIdPkSeqName.toString() == "g_pk_seq"
 
         names.snapshotTableNameWithSchema == "s"
-        names.snapshotTablePkSeqName.toString() == "jv_snapshot_pk_seq"
+        names.snapshotTablePkSeqName.toString() == "s_pk_seq"
 
         names.commitPropertyTableNameWithSchema == "cp"
     }
@@ -174,13 +174,13 @@ class DBNameProviderTest extends Specification {
 
 	then:
 	names.commitTableNameWithSchema == "c"
-	names.commitPkSeqName.toString() == "jv_commit_pk_seq"
+	names.commitPkSeqName.toString() == "c_pk_seq"
 
 	names.globalIdTableNameWithSchema == "g"
-	names.globalIdPkSeqName.toString() == "jv_global_id_pk_seq"
+	names.globalIdPkSeqName.toString() == "g_pk_seq"
 
 	names.snapshotTableNameWithSchema == "s"
-	names.snapshotTablePkSeqName.toString() == "jv_snapshot_pk_seq"
+	names.snapshotTablePkSeqName.toString() == "s_pk_seq"
 
 	names.commitPropertyTableNameWithSchema == "cp"
 
