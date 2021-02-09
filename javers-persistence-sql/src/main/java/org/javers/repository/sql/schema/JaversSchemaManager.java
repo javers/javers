@@ -114,22 +114,22 @@ public class JaversSchemaManager extends SchemaNameAware {
      * JaVers 2.5 to 2.6 schema migration
      */
     private void alterCommitIdColumnIfNeeded() {
-        ColumnType commitIdColType = getTypeOf(getCommitTableNameWithSchema(), "commit_id");
+        ColumnType commitIdColType = getTypeOf(getCommitTableNameWithSchema(), getCommitPKColumnName());
 
         if (commitIdColType.precision == 12) {
             logger.info("migrating db schema from JaVers 2.5 to 2.6 ...");
             if (dialect instanceof PostgresDialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id TYPE numeric(22,2)");
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN "+getCommitPKColumnName()+" TYPE numeric(22,2)");
             } else if (dialect instanceof H2Dialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id numeric(22,2)");
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN "+getCommitPKColumnName()+" numeric(22,2)");
             } else if (dialect instanceof MysqlDialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY commit_id numeric(22,2)");
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY "+getCommitPKColumnName()+" numeric(22,2)");
             } else if (dialect instanceof OracleDialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY commit_id number(22,2)");
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY "+getCommitPKColumnName()+" number(22,2)");
             } else if (dialect instanceof MsSqlDialect) {
                 executeSQL("drop index jv_commit_commit_id_idx on " + getCommitTableNameWithSchema());
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id numeric(22,2)");
-                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON " + getCommitTableNameWithSchema() + " (commit_id)");
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN "+getCommitPKColumnName()+" numeric(22,2)");
+                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON " + getCommitTableNameWithSchema() + " ("+getCommitPKColumnName()+")");
             } else {
                 handleUnsupportedDialect();
             }
