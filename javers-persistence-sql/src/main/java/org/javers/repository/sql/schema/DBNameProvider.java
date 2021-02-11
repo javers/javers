@@ -74,15 +74,15 @@ public class DBNameProvider {
     }
 
     public DBObjectName getSnapshotTablePkSeqName() {
-        return fullDbName(getSnapshotTableName().localName()+"_pk_seq");
+        return fullDbName("SQ_"+getSnapshotTableName().localName());
     }
 
     public DBObjectName getGlobalIdPkSeqName() {
-        return fullDbName(getGlobalIdTableName().localName()+"_pk_seq");
+        return fullDbName("SQ_"+getGlobalIdTableName().localName());
     }
 
     public DBObjectName getCommitPkSeqName() {
-        return fullDbName(getCommitTableName().localName()+"_pk_seq");
+        return fullDbName("SQ_"+getCommitTableName().localName());
     }
 
     /**

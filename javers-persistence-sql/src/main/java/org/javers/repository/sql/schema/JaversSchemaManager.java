@@ -127,9 +127,9 @@ public class JaversSchemaManager extends SchemaNameAware {
             } else if (dialect instanceof OracleDialect) {
                 executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY "+getCommitPKColumnName()+" number(22,2)");
             } else if (dialect instanceof MsSqlDialect) {
-                executeSQL("drop index jv_commit_commit_id_idx on " + getCommitTableNameWithSchema());
+                executeSQL("drop index commit_commit_id_idx on " + getCommitTableNameWithSchema());
                 executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN "+getCommitPKColumnName()+" numeric(22,2)");
-                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON " + getCommitTableNameWithSchema() + " ("+getCommitPKColumnName()+")");
+                executeSQL("CREATE INDEX commit_commit_id_idx ON " + getCommitTableNameWithSchema() + " ("+getCommitPKColumnName()+")");
             } else {
                 handleUnsupportedDialect();
             }

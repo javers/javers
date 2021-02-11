@@ -107,8 +107,8 @@ subprojects {
 
                 pom {
                     name = 'JaVers Library'
-                    description = 'JaVers - object auditing and diff framework for Java'
-                    url = 'http://javers.org'
+                    description = 'JaVers - alterated by Gustavo Figueiredo - Change table column name by configuration'
+                    url = 'https://github.com/gustavodsf/javers'
                     licenses {
                         license {
                             name = 'The Apache Software License, Version 2.0'
@@ -117,15 +117,15 @@ subprojects {
                     }
                     developers {
                         developer {
-                            id = 'javers'
-                            name = 'JaVers Core Team'
-                            email = 'javers@javers.org'
+                            id = 'gustavodsf'
+                            name = 'Gustavo Figueiredo'
+                            email = 'gustavodsf1@gmail.com'
                         }
                     }
                     scm {
-                        connection = 'scm:git:https://github.com/javers/javers.git'
-                        developerConnection = 'scm:git:https://github.com/javers/javers.git'
-                        url = 'https://github.com/javers/javers'
+                        connection = 'scm:git:https://github.com/gustavodsf/javers.git'
+                        developerConnection = 'scm:git:https://github.com/gustavodsf/javers.git'
+                        url = 'https://github.com/gustavodsf/javers'
                     }
                 }
             }
@@ -154,7 +154,7 @@ subprojects {
 
     //io.codearte.gradle
     nexusStaging {
-        packageGroup = 'org.javers'
+        packageGroup = 'com.github.gustavodsf'
         numberOfRetries = 50
         delayBetweenRetriesInMillis = 5000
     }

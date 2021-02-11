@@ -164,7 +164,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder, String seqNameLocal) {
         relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
-                .primaryKey("jv_"+pkColName).using(pkColName).and();
+                .primaryKey(pkColName).using(pkColName).and();
         schema.addSequence(seqNameLocal).build();
     }
 
