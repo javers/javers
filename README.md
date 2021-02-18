@@ -99,7 +99,7 @@ javers.sqlCommitTableName=my_commit
 javers.sqlSnapshotTableName=my_snapshot
 javers.sqlCommitPropertyTableName=my_commit_property
 ```
-#### Column Name
+##### Column Name
 > We have add the following configurations
 ```
 javers.sqlGlobalIdPKColunmName= global_pk
