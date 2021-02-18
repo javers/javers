@@ -79,7 +79,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
         relationBuilder
-            .primaryKey(tableName.localName() + "_pk").using(getCommitPropertyCommitFKColumnName(), getCommitPropertyNameColumnName()).and()
+            .primaryKey(tableName.localName()).using(getCommitPropertyCommitFKColumnName(), getCommitPropertyNameColumnName()).and()
             .withAttribute().string(getCommitPropertyNameColumnName()).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).notNull().and()
             .withAttribute().string(getCommitPropertyValueColumnName()).withMaxLength(600).and();
         foreignKey(tableName, getCommitPropertyCommitFKColumnName(), true, getCommitTableNameWithSchema(), getCommitPKColumnName(), relationBuilder);

@@ -51,10 +51,34 @@ public class DBNameProvider {
 
     public DBNameProvider(SqlRepositoryConfiguration configuration) {
         this.configuration = configuration;
-        logger.info("Commit table:           {}", getCommitTableNameWithSchema());
-        logger.info("CommitProperty table:   {}", getCommitPropertyTableNameWithSchema());
-        logger.info("GlobalId table:         {}", getGlobalIdTableNameWithSchema());
-        logger.info("Snapshot table:         {}", getSnapshotTableNameWithSchema());
+        // Table Names
+        logger.info("Commit table:               {}", getCommitTableNameWithSchema());
+        logger.info("CommitProperty table:       {}", getCommitPropertyTableNameWithSchema());
+        logger.info("GlobalId table:             {}", getGlobalIdTableNameWithSchema());
+        logger.info("Snapshot table:             {}", getSnapshotTableNameWithSchema());
+        // Column Names
+		logger.info("GLOBAL_ID_PK:               {}", getGlobalIdPKColunmName());
+		logger.info("GLOBAL_ID_LOCAL_ID:         {}", getGlobalIdLocalIdColumnName());
+		logger.info("GLOBAL_ID_FRAGMENT:         {}", getGlobalIdFragmentColumnName());
+		logger.info("GLOBAL_ID_TYPE_NAME:        {}", getGlobalIdTypeNameColumnName());
+		logger.info("GLOBAL_ID_OWNER_ID_FK:      {}", getGlobalIdOwnerIDFKColumnName());
+		logger.info("COMMIT_PK:                  {}", getCommitPKColumnName());
+		logger.info("COMMIT_AUTHOR:              {}", getCommitAuthorColumnName());
+		logger.info("COMMIT_COMMIT_DATE:         {}", getCommitCommitDateColumnName());
+		logger.info("COMMIT_COMMIT_DATE_INSTANT: {}", getCommitCommitDateInstantColumnName());
+		logger.info("COMMIT_COMMIT_ID:           {}", getCommitCommitIdColumName());
+		logger.info("COMMIT_PROPERTY_COMMIT_FK:  {}", getCommitPropertyCommitFKColumnName());
+		logger.info("COMMIT_PROPERTY_NAME:       {}", getCommitPropertyNameColumnName());
+		logger.info("COMMIT_PROPERTY_VALUE:      {}", getCommitPropertyValueColumnName());
+		logger.info("SNAPSHOT_PK:                {}", getSnapshotPKColumnName());
+		logger.info("SNAPSHOT_COMMIT_FK:         {}", getSnapshotCommitFKColumnName());
+		logger.info("SNAPSHOT_GLOBAL_ID_FK:      {}", getSnapshotGlobalIdFKColumnName());
+		logger.info("SNAPSHOT_TYPE:              {}", getSnapshotTypeColumnName());
+		logger.info("SNAPSHOT_VERSION:           {}", getSnapshotVersionColumnName());
+		logger.info("SNAPSHOT_STATE:             {}", getSnapshotStateColumnName());
+		logger.info("SNAPSHOT_CHANGED:           {}", getSnapshotChangedColumnName());
+		logger.info("SNAPSHOT_MANAGED_TYPE:      {}", getSnapshotManagedTypeColumnName());
+
     }
 
     public String getGlobalIdTableNameWithSchema() {
@@ -74,15 +98,15 @@ public class DBNameProvider {
     }
 
     public DBObjectName getSnapshotTablePkSeqName() {
-        return fullDbName("SQ_"+getSnapshotTableName().localName());
+        return fullDbName("SQ_"+getSnapshotPKColumnName());
     }
 
     public DBObjectName getGlobalIdPkSeqName() {
-        return fullDbName("SQ_"+getGlobalIdTableName().localName());
+        return fullDbName("SQ_"+getGlobalIdPKColunmName());
     }
 
     public DBObjectName getCommitPkSeqName() {
-        return fullDbName("SQ_"+getCommitTableName().localName());
+        return fullDbName("SQ_"+getCommitPKColumnName());
     }
 
     /**
