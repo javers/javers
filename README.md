@@ -91,17 +91,17 @@ JaVers is licensed under Apache License Version 2.0, see the LICENSE file.
 ### This repo is a customization of javers 
 In a project of [CESAR](https://www.cesar.org.br/) the client has a specific rule of the database creation, so we needed to customizes the names of the entire database, so we needed to add this type of configuration to javers. So your have to add the configuration below on your application.properties
 
+##### Table Name
 > Change table name already exist
-
-# Nome Tabela
+```
 javers.sqlGlobalIdTableName=my_global_id
 javers.sqlCommitTableName=my_commit
 javers.sqlSnapshotTableName=my_snapshot
 javers.sqlCommitPropertyTableName=my_commit_property
-
+```
+#### Column Name
 > We have add the following configurations
-
-# Nome Coluna
+```
 javers.sqlGlobalIdPKColunmName= global_pk
 javers.sqlGlobalIdLocalIdColumnName= global_id_local
 javers.sqlGlobalIdFragmentColumnName= global_fragment
@@ -123,3 +123,4 @@ javers.sqlSnapshotVersionColumnName= snapshot_version
 javers.sqlSnapshotStateColumnName= snapshot_state
 javers.sqlSnapshotChangedColumnName= snapshot_changed
 javers.sqlSnapshotManagedTypeColumnName= snapshot_managed_type
+```
