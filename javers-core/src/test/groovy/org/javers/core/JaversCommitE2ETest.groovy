@@ -212,7 +212,7 @@ class JaversCommitE2ETest extends Specification {
                     .hasSnapshot(instanceId(1, DummyUserDetails),[id:1,dummyAddress:voId,addressList:[],integerList:[]])
                     .hasSnapshot(voId,[city:"Tokyo"])
                     .hasNewObject(voId)
-                    .hasChanges(1)
+                    .hasChanges(2)
     }
 
     //TODO not sure about that.

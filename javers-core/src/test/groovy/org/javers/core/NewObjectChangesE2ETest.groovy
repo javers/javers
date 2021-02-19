@@ -63,11 +63,31 @@ class NewObjectChangesE2ETest extends Specification {
         println changes.prettyPrint()
 
         then:
-        changes.size() == 0
+        changes.size() == 1
+        changes.getChangesByType(NewObject).size() == 1
     }
 
-    //TODO change defaults
-    //TODO add negative test
+    def "should not generate terminal ValueChanges in findChanges() when disabled"() {
+        given:
+        def javers = JaversBuilder
+                .javers().withRemovedObjectChanges(false)
+                .build()
+
+        when:
+        javers.commit("me", new Employee(id: "1", name:"mine"))
+        javers.commitShallowDelete("me", new Employee(id: "1", name:"mine"))
+
+        def changes = javers
+                .findChanges( QueryBuilder.byInstanceId("1", Employee).build() )
+
+        println changes.prettyPrint()
+        def lastCommitChanges = changes.findAll{it.commitMetadata.get().id.majorId==2}
+
+        then:
+        lastCommitChanges.size() == 1
+        lastCommitChanges[0] instanceof ObjectRemoved
+    }
+
     def "should generate terminal ValueChanges in findChanges() when Entity is removed " () {
         given:
         def javers = JaversBuilder
@@ -80,7 +100,6 @@ class NewObjectChangesE2ETest extends Specification {
 
         def changes = javers
                 .findChanges( QueryBuilder.byInstanceId("1", Employee)
-                .withNewObjectChanges(true) //TODO .withRemovedObjectChanges(true)
                 .build() )
 
         println changes.prettyPrint()
@@ -98,20 +117,6 @@ class NewObjectChangesE2ETest extends Specification {
             assert it.left == "mine"
             assert it.right == null
         }
-    }
-
-    def "should not generate initial ValueChanges in compare() when disabled" () {
-        given:
-        def javers = JaversBuilder.javers().withNewObjectChanges(false).build()
-
-        when:
-        def diff = javers.compare(
-                new Employee(id: "1"),
-                new Employee(id: "1", ref: new Employee(id: "2", name:"mine")))
-
-        then:
-        diff.changes.size() == 1
-        diff.changes[0] instanceof ReferenceChange
     }
 
     def "should generate initial ValueChanges in compare() when null is changed to Entity" () {
@@ -153,6 +158,21 @@ class NewObjectChangesE2ETest extends Specification {
         }
     }
 
+    def "should not generate initial ValueChanges in compare() when disabled" () {
+        given:
+        def javers = JaversBuilder.javers().withNewObjectChanges(false).build()
+
+        when:
+        def diff = javers.compare(
+                new Employee(id: "1"),
+                new Employee(id: "1", ref: new Employee(id: "2", name:"mine")))
+
+        then:
+        diff.changes.size() == 2
+        diff.changes.getChangesByType(ReferenceChange).size() == 1
+        diff.changes.getChangesByType(NewObject).size() == 1
+    }
+
     def "should not generate terminal ValueChanges in compare() when disabled" () {
         given:
         def javers = JaversBuilder.javers().withRemovedObjectChanges(false).build()
@@ -163,8 +183,9 @@ class NewObjectChangesE2ETest extends Specification {
                 new Employee(id: "1"))
 
         then:
-        diff.changes.size() == 1
-        diff.changes[0] instanceof ReferenceChange
+        diff.changes.size() == 2
+        diff.changes.getChangesByType(ReferenceChange).size() == 1
+        diff.changes.getChangesByType(ObjectRemoved).size() == 1
     }
 
     def "should generate terminal ValueChanges in compare() when Entity is changed to null" () {

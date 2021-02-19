@@ -2,6 +2,7 @@ package org.javers.core.snapshot;
 
 import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
@@ -19,9 +20,11 @@ import static java.util.Optional.of;
 public class SnapshotDiffer {
 
     private final DiffFactory diffFactory;
+    private final CoreConfiguration javersCoreConfiguration;
 
-    public SnapshotDiffer(DiffFactory diffFactory) {
+    public SnapshotDiffer(DiffFactory diffFactory, CoreConfiguration javersCoreConfiguration) {
         this.diffFactory = diffFactory;
+        this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
     /**
@@ -38,9 +41,10 @@ public class SnapshotDiffer {
                 changes.addAll(addInitialChanges(snapshot));
             }
             if (snapshot.isTerminal()) {
-                addTerminalChanges(changes, snapshot);
+                CdoSnapshot previousSnapshot = previousSnapshots.get(SnapshotIdentifier.from(snapshot).previous());
+                addTerminalChanges(changes, snapshot, previousSnapshot);
             }
-            if (snapshot.isUpdate() || snapshot.isTerminal()) {
+            if (snapshot.isUpdate()) {
                 CdoSnapshot previousSnapshot = previousSnapshots.get(SnapshotIdentifier.from(snapshot).previous());
                 addChanges(changes, previousSnapshot, snapshot);
             }
@@ -49,18 +53,20 @@ public class SnapshotDiffer {
     }
 
     private List<Change> addInitialChanges(CdoSnapshot initialSnapshot) {
-        Diff initialDiff = diffFactory.create(emptySnapshotGraph(), snapshotGraph(initialSnapshot),
-                commitMetadata(initialSnapshot));
+        Diff initialDiff = diffFactory.create(emptySnapshotGraph(), snapshotGraph(initialSnapshot), commitMetadata(initialSnapshot));
         return initialDiff.getChanges();
     }
 
-    private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot) {
+    private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot, CdoSnapshot previousSnapshot) {
         changes.add(new ObjectRemoved(terminalSnapshot.getGlobalId(), empty(), of(terminalSnapshot.getCommitMetadata())));
+        if (previousSnapshot != null && javersCoreConfiguration.isRemovedObjectChanges()) {
+            Diff terminalDiff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(terminalSnapshot), commitMetadata(terminalSnapshot));
+            changes.addAll(terminalDiff.getChanges());
+        }
     }
 
     private void addChanges(List<Change> changes, CdoSnapshot previousSnapshot, CdoSnapshot currentSnapshot) {
-        Diff diff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(currentSnapshot),
-            commitMetadata(currentSnapshot));
+        Diff diff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(currentSnapshot), commitMetadata(currentSnapshot));
         changes.addAll(diff.getChanges());
     }
 

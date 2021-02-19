@@ -27,13 +27,13 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 /**
- * 0 Changes in the diff algorithm.
- * add sth about unification
+ *  Changes in the diff algorithm concerning initial and terminal ValueChanges.
  *
+ * // TODO sth about unification
+ * // TODO example
  *
- *  //TODO exa,mple
  * 0  The javers.newObjectChanges flag is now enabled by default.
- *   When enabled, <code>Javers.compare()</code>
+ *   and when enabled, <code>Javers.compare()</code>
  *   and <code>Javers.findChanges()</code>
  *   generate additional set of initial ValueChanges for each NewObject.
  *
@@ -50,7 +50,12 @@ import java.util.stream.Stream;
  *     newObjectChanges: false
  *   </pre>
  *
- * 0 The QueryBuilder.withNewObjectChanges() method is now deprecated and has no effect.
+ * 0 The javers.removedObjectChanges flag is added (enabled by default).
+ *
+ * 0 In <code>Javers.findChanges()</code>, a NewObject change is always generated for each initial Snapshot
+ *   (it can't be disabled by the javers.newObjectChanges)
+ *
+ * 0 QueryBuilder.withNewObjectChanges() method is now deprecated and has no effect.
  *
  * 3 The javers.newObjectSnapshot flag is renamed to javers.newObjectChanges
  *
@@ -60,10 +65,7 @@ import java.util.stream.Stream;
  *   //TODO
  * 3 Terminal Snapshots in findChanges() generate terminal ValueChanges (changes from value to null)
  *
- * 4 Defaults ...
  *
- * TODO
- *\
  *
  * A JaVers instance.<br>
  * Should be constructed by {@link JaversBuilder} provided with your domain model configuration.

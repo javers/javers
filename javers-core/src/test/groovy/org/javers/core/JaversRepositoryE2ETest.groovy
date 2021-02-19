@@ -5,7 +5,6 @@ import org.javers.core.commit.Commit
 import org.javers.common.date.DateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.commit.CommitMetadata
-import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
@@ -17,7 +16,6 @@ import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.JqlQuery
 import org.javers.repository.jql.QueryBuilder
-import org.javers.shadow.Shadow
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -37,7 +35,6 @@ import static java.time.temporal.ChronoUnit.MILLIS
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE
-import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.repository.jql.QueryBuilder.*
 
@@ -140,7 +137,7 @@ class JaversRepositoryE2ETest extends Specification {
       javers.commit("author",s)
 
       then:
-      javers.findChanges(QueryBuilder.anyDomainObject().build()).size() == 15
+      javers.findChanges(QueryBuilder.anyDomainObject().build()).getChangesByType(ValueChange).size() == 15
     }
 
     def "should query for ValueObject changes by owning Entity class"() {
@@ -161,6 +158,8 @@ class JaversRepositoryE2ETest extends Specification {
 
         when:
         def changes = javers.findChanges(QueryBuilder.byValueObject(SnapshotEntity, "valueObjectRef").build())
+
+        println changes.prettyPrint()
 
         then:
         changes.size() == 2
