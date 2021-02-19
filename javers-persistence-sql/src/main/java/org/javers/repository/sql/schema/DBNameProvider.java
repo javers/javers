@@ -42,9 +42,6 @@ public class DBNameProvider {
     public static final String SNAPSHOT_STATE =        "state";
     public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v 1.2
     public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";       //since 2.0
-
-    
-
     
     private static final Logger logger = LoggerFactory.getLogger(DBNameProvider.class);
     private final SqlRepositoryConfiguration configuration;

@@ -32,12 +32,12 @@ class SnapshotQuery {
     public SnapshotQuery(DBNameProvider dbNames, QueryParams queryParams, Session session) {
         this.selectBuilder = session
             .select(
-				"s." + dbNames.getSnapshotStateColumnName() + ", " +
-				"s." + dbNames.getSnapshotTypeColumnName() + ", " +
-				"s." + dbNames.getSnapshotVersionColumnName() + ", " +
-				"s." + dbNames.getSnapshotChangedColumnName() + ", " +
-				"s." + dbNames.getSnapshotManagedTypeColumnName() + ", " +
-                dbNames.getCommitPKColumnName() + ", " +
+                dbNames.getSnapshotStateColumnName() + ", " +
+                dbNames.getSnapshotTypeColumnName() + ", " +
+                dbNames.getSnapshotVersionColumnName() + ", " +
+                dbNames.getSnapshotChangedColumnName() + ", " +
+                dbNames.getSnapshotManagedTypeColumnName() + ", " +
+                " com."+dbNames.getCommitPKColumnName() + ", " +
                 dbNames.getCommitAuthorColumnName() + ", " +
                 dbNames.getCommitCommitDateColumnName()+ ", " +
                 dbNames.getCommitCommitDateInstantColumnName()+ ", " +
@@ -50,9 +50,9 @@ class SnapshotQuery {
                 "o." + dbNames.getGlobalIdTypeNameColumnName()  + " owner_" + dbNames.getGlobalIdTypeNameColumnName()
             )
             .from(
-            		dbNames.getSnapshotTableNameWithSchema() + " s "+
-                " INNER JOIN " + dbNames.getCommitTableNameWithSchema() + " ON " + dbNames.getCommitPKColumnName() + " = s." + dbNames.getSnapshotCommitFKColumnName() +
-                " INNER JOIN " + dbNames.getGlobalIdTableNameWithSchema() + " g ON g." + dbNames.getGlobalIdPKColunmName() + " = s." + dbNames.getSnapshotGlobalIdFKColumnName() +
+            		dbNames.getSnapshotTableNameWithSchema() + " snap " +
+                " INNER JOIN " + dbNames.getCommitTableNameWithSchema() + " com ON com." + dbNames.getCommitPKColumnName() + " = snap." + dbNames.getSnapshotCommitFKColumnName() +
+                " INNER JOIN " + dbNames.getGlobalIdTableNameWithSchema() + " g ON g." + dbNames.getGlobalIdPKColunmName() + " = snap." + dbNames.getSnapshotGlobalIdFKColumnName() +
                 " LEFT OUTER JOIN " + dbNames.getGlobalIdTableNameWithSchema() + " o ON o." + dbNames.getGlobalIdPKColunmName() + " = g." + dbNames.getGlobalIdOwnerIDFKColumnName())
             .queryName("snapshots");
 
@@ -133,7 +133,7 @@ class SnapshotQuery {
         selectBuilder.append("and (");
 
         snapshotDbIdentifiers.forEach(si ->
-            selectBuilder.append("("+dbNameProvider.getSnapshotGlobalIdFKColumnName()+" = ? AND "+ dbNameProvider.getSnapshotVersionColumnName()+" = ?) OR",
+            selectBuilder.append("( snap."+dbNameProvider.getSnapshotGlobalIdFKColumnName()+" = ? AND "+ dbNameProvider.getSnapshotVersionColumnName()+" = ?) OR",
                                  longParam(si.getGlobalIdPk()), longParam(si.getVer()))
         );
 
