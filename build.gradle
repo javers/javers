@@ -41,8 +41,8 @@ subprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    project.group = project.findProperty('myGroup')
-    project.version = project.findProperty('myVersion')
+    project.group = 'org.javers'
+    project.version = scmVersion.version
 
     repositories {
         mavenCentral()
@@ -107,8 +107,8 @@ subprojects {
 
                 pom {
                     name = 'JaVers Library'
-                    description = 'JaVers - alterated by Gustavo Figueiredo - Change table column name by configuration'
-                    url = 'https://github.com/gustavodsf/javers'
+                    description = 'JaVers - object auditing and diff framework for Java'
+                    url = 'http://javers.org'
                     licenses {
                         license {
                             name = 'The Apache Software License, Version 2.0'
@@ -117,23 +117,22 @@ subprojects {
                     }
                     developers {
                         developer {
-                            id = 'gustavodsf'
-                            name = 'Gustavo Figueiredo'
-                            email = 'gustavodsf1@gmail.com'
+                            id = 'javers'
+                            name = 'JaVers Core Team'
+                            email = 'javers@javers.org'
                         }
                     }
                     scm {
-                        connection = 'scm:git:https://github.com/gustavodsf/javers.git'
-                        developerConnection = 'scm:git:https://github.com/gustavodsf/javers.git'
-                        url = 'https://github.com/gustavodsf/javers'
+                        connection = 'scm:git:https://github.com/javers/javers.git'
+                        developerConnection = 'scm:git:https://github.com/javers/javers.git'
+                        url = 'https://github.com/javers/javers'
                     }
                 }
             }
         }
         repositories {
-            maven { 
-                // def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                def releasesRepoUrl = "https://oss.sonatype.org/content/groups/public/"
+            maven {
+                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
                 def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                 credentials {
@@ -155,7 +154,7 @@ subprojects {
 
     //io.codearte.gradle
     nexusStaging {
-        packageGroup = 'com.github.gustavodsf'
+        packageGroup = 'org.javers'
         numberOfRetries = 50
         delayBetweenRetriesInMillis = 5000
     }
