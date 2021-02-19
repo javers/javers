@@ -1,7 +1,6 @@
 package org.javers.core
 
 import org.javers.core.diff.Change
-import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee

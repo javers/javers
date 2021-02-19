@@ -5,7 +5,9 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
+
 import org.javers.core.diff.changetype.PropertyChange;
+
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
@@ -27,46 +29,49 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 /**
- *  Changes in the diff algorithm concerning initial and terminal ValueChanges.
+ *  Changes in the diff algorithm for initial and terminal ValueChanges.
  *
- * // TODO sth about unification
- * // TODO example
+ *  In 6.0, both <code>Javers.compare()</code> and <code>Javers.findChanges()</code> methods
+ *  use unified and consistent algorithm concerning initial and terminal ValueChanges.
  *
- * 0  The javers.newObjectChanges flag is now enabled by default.
- *   and when enabled, <code>Javers.compare()</code>
- *   and <code>Javers.findChanges()</code>
- *   generate additional set of initial ValueChanges for each NewObject.
+ *  Initial and terminal ValueChanges are additional sets
+ *  of changes generated for each new object and removed object to capture their state.
  *
- *   Initial ValueChange is a change with null on left and a property value on right.
+ *  Initial {@link ValueChange} is a change with null on left and a property value on right
+ *  and is generated for each property of {@link NewObject}.
  *
- *   In <code>Javers.compare()</code>, a NewObject is generated for each object only on right.
- *   In <code>Javers.findChanges()</code>, a NewObject is generated for each initial Snapshot.
+ *  Terminal {@link ValueChange} is a change with a property value on left and null on right
+ *  and is generated for each property of {@link ObjectRemoved}.
  *
- *   You can disabled the javers.newObjectChanges flag in <code>JaversBuilder</code>
- *   or in `application.yml` (if you are using the Javers Spring Boot starter):
+ *  Generating of initial and terminal ValueChanges is enabled by default.
+ *  You can disable it using JaversBuilder.withTerminalValueChanges() and JaversBuilder.withInitialValueChanges().
+ *  Or in `application.yml`, if you are using Javers Spring Boot:
  *
- *   <pre>
- *   javers:
- *     newObjectChanges: false
- *   </pre>
+  * <pre>
+  * javers:
+  *   initialValueChanges: false
+  *   terminalValueChanges: false
+  * </pre>
+  *
+ *
+ *  Detailed change log
  *
  * 0 The javers.removedObjectChanges flag is added (enabled by default).
  *
  * 0 In <code>Javers.findChanges()</code>, a NewObject change is always generated for each initial Snapshot
- *   (it can't be disabled by the javers.newObjectChanges)
+ *   (it can't be disabled by the javers.initialValueChanges flag).
  *
  * 0 QueryBuilder.withNewObjectChanges() method is now deprecated and has no effect.
  *
- * 3 The javers.newObjectSnapshot flag is renamed to javers.newObjectChanges
+ * 0 The javers.newObjectSnapshot flag is renamed to javers.initialValueChanges
  *
- * 2 setting or removing reference to ValueObject no longer generates a
+ * 0 The javers.terminalValueChanges flag is added.
+ *
+ * 0 setting or removing reference to ValueObject no longer generates a
  *   ReferenceChange with null on left/right and ValueObjectId on right/left
- *
- *   //TODO
- * 3 Terminal Snapshots in findChanges() generate terminal ValueChanges (changes from value to null)
- *
- *
- *
+ */
+
+/**
  * A JaVers instance.<br>
  * Should be constructed by {@link JaversBuilder} provided with your domain model configuration.
  * <br/><br/>

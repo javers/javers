@@ -15,6 +15,7 @@ import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.custom.*;
 import org.javers.core.graph.GraphFactoryModule;
@@ -666,43 +667,23 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
      * and {@link Javers#findChanges(JqlQuery)}
-     * generate additional set of initial {@link ValueChange}s for each {@link NewObject}.
-     * <br/>
-     * Initial {@link ValueChange} is a change with null on left and a property value on right.
+     * generate additional set of initial Value Changes for each New Object to capture their state.
      * <br/><br/>
      *
-     * In <code>Javers.compare()</code>, a NewObject is generated for each object only on right.
-     * <br/>
-     * In <code>Javers.findChanges()</code>, a NewObject is generated for each initial Snapshot.
-     * <br/><br/>
+     * Initial {@link ValueChange} is a change with null on left and a property value on right
+     * and is generated for each property of {@link NewObject}.
+     * <br
      *
-     * In Javers Spring Boot starter you can disabled it in `application.yml`:
+     * In Javers Spring Boot starter you can disabled initial Value Changes in `application.yml`:
      *
      * <pre>
      * javers:
-     *   newObjectChanges: false
+     *   initialValueChanges: false
      * </pre>
-     *
      */
+    //TODO rename withInitialValueChanges
     public JaversBuilder withNewObjectChanges(boolean newObjectsChanges){
         configurationBuilder().withNewObjectChanges(newObjectsChanges);
-        return this;
-    }
-
-    /**
-     * //TODO unify
-     * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
-     * generates additional set of terminal ValueChanges for each removed object (object only on left).
-     * <br/>
-     * Terminal {@link ValueChange} is a change with a property value on left and null on right.
-     * <br/><br/>
-     *
-     * Enabled by default.
-     *
-     * @since 6.0
-     */
-    public JaversBuilder withRemovedObjectChanges(boolean removedObjectsChanges){
-        configurationBuilder().withRemovedObjectChanges(removedObjectsChanges);
         return this;
     }
 
@@ -710,8 +691,35 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * Use {@link #withNewObjectChanges(boolean)}
      */
     @Deprecated
-    public JaversBuilder withNewObjectsSnapshot(boolean newObjectsChanges){
-        return this.withNewObjectChanges(newObjectsChanges);
+    public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
+        return this.withNewObjectChanges(newObjectsSnapshot);
+    }
+
+    /**
+     * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
+     * generates additional set of terminal Value Changes for each Removed Object to capture their state.
+     * <br/><br/>
+     *
+     * Terminal {@link ValueChange} is a change with a property value on left and null on right
+     * and is generated for each property of {@link ObjectRemoved}.
+     * <br/><br/>
+     *
+     * Enabled by default.
+     * <br/><br/>
+     *
+     * In Javers Spring Boot starter you can disabled terminal Value Changes in `application.yml`:
+     *
+     * <pre>
+     * javers:
+     *   terminalValueChanges: false
+     * </pre>
+     *
+     * @since 6.0
+     */
+    //TODO rename to withTerminalValueChanges
+    public JaversBuilder withRemovedObjectChanges(boolean removedObjectsChanges){
+        configurationBuilder().withRemovedObjectChanges(removedObjectsChanges);
+        return this;
     }
 
     public JaversBuilder withObjectAccessHook(ObjectAccessHook objectAccessHook) {
