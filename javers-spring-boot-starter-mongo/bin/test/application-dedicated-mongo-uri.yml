@@ -1,3 +1,0 @@
-javers:
-  mongodb:
-    uri: mongodb://localhost:32001/javers-dedicated
