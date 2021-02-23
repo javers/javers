@@ -16,7 +16,7 @@ public class JaversSqlProperties extends JaversSpringProperties {
     private String sqlSnapshotTableName;
     private String sqlCommitPropertyTableName;
     
-    private String sqlGlobalIdPKColunmName;
+    private String sqlGlobalIdPKColumnName;
     private String sqlGlobalIdLocalIdColumnName;
     private String sqlGlobalIdFragmentColumnName;
     private String sqlGlobalIdTypeNameColumnName;
@@ -100,12 +100,12 @@ public class JaversSqlProperties extends JaversSpringProperties {
         this.sqlCommitPropertyTableName = sqlCommitPropertyTableName;
     }
 
-	public String getSqlGlobalIdPKColunmName() {
-		return sqlGlobalIdPKColunmName;
+	public String getSqlGlobalIdPKColumnName() {
+		return sqlGlobalIdPKColumnName;
 	}
 
-	public void setSqlGlobalIdPKColunmName(String sqlGlobalIdPKColunmName) {
-		this.sqlGlobalIdPKColunmName = sqlGlobalIdPKColunmName;
+	public void setSqlGlobalIdPKColumnName(String sqlGlobalIdPKColumnName) {
+		this.sqlGlobalIdPKColumnName = sqlGlobalIdPKColumnName;
 	}
 
 	public String getSqlGlobalIdLocalIdColumnName() {

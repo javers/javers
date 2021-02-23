@@ -52,8 +52,8 @@ class SnapshotQuery {
             .from(
             		dbNames.getSnapshotTableNameWithSchema() + " snap " +
                 " INNER JOIN " + dbNames.getCommitTableNameWithSchema() + " com ON com." + dbNames.getCommitPKColumnName() + " = snap." + dbNames.getSnapshotCommitFKColumnName() +
-                " INNER JOIN " + dbNames.getGlobalIdTableNameWithSchema() + " g ON g." + dbNames.getGlobalIdPKColunmName() + " = snap." + dbNames.getSnapshotGlobalIdFKColumnName() +
-                " LEFT OUTER JOIN " + dbNames.getGlobalIdTableNameWithSchema() + " o ON o." + dbNames.getGlobalIdPKColunmName() + " = g." + dbNames.getGlobalIdOwnerIDFKColumnName())
+                " INNER JOIN " + dbNames.getGlobalIdTableNameWithSchema() + " g ON g." + dbNames.getGlobalIdPKColumnName() + " = snap." + dbNames.getSnapshotGlobalIdFKColumnName() +
+                " LEFT OUTER JOIN " + dbNames.getGlobalIdTableNameWithSchema() + " o ON o." + dbNames.getGlobalIdPKColumnName() + " = g." + dbNames.getGlobalIdOwnerIDFKColumnName())
             .queryName("snapshots");
 
         this.queryParams = queryParams;
@@ -119,10 +119,10 @@ class SnapshotQuery {
 
     void addGlobalIdFilter(long globalIdPk) {
         if (!queryParams.isAggregate()) {
-            selectBuilder.and("g." + dbNameProvider.getGlobalIdPKColunmName(), globalIdPk);
+            selectBuilder.and("g." + dbNameProvider.getGlobalIdPKColumnName(), globalIdPk);
         }
         else {
-            selectBuilder.and("( g." + dbNameProvider.getGlobalIdPKColunmName() + " = ? OR g." + dbNameProvider.getGlobalIdOwnerIDFKColumnName() + " = ? )",
+            selectBuilder.and("( g." + dbNameProvider.getGlobalIdPKColumnName() + " = ? OR g." + dbNameProvider.getGlobalIdOwnerIDFKColumnName() + " = ? )",
                     longParam(globalIdPk), longParam(globalIdPk));
         }
     }
@@ -155,8 +155,8 @@ class SnapshotQuery {
             selectBuilder.and(
                 "(  " + basePredicate +
                     "  OR g.owner_id_fk in ( "+
-                    "     select g1." + dbNameProvider.getGlobalIdPKColunmName() + " from " + snapshotTableName() + " s1 "+
-                    "     INNER JOIN " + globalIdTableName() + " g1 ON g1." + dbNameProvider.getGlobalIdPKColunmName() + "= s1."+ dbNameProvider.getSnapshotGlobalIdFKColumnName() +
+                    "     select g1." + dbNameProvider.getGlobalIdPKColumnName() + " from " + snapshotTableName() + " s1 "+
+                    "     INNER JOIN " + globalIdTableName() + " g1 ON g1." + dbNameProvider.getGlobalIdPKColumnName() + "= s1."+ dbNameProvider.getSnapshotGlobalIdFKColumnName() +
                     "     and  s1." + basePredicate + ")"+
                 ")");
         }

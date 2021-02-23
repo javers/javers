@@ -28,7 +28,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private String snapshotTableName;
     private String commitPropertyTableName;
     
-    private String globalIdPKColunmName;
+    private String globalIdPKColumnName;
     private String globalIdLocalIdColumnName;
     private String globalIdFragmentColumnName;
     private String globalIdTypeNameColumnName;
@@ -125,9 +125,9 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         return this;
     }
     
-    public SqlRepositoryBuilder withGlobalIdPKColunmName(String globalIdPKColunmName) {
-        if(isNonEmpty(globalIdPKColunmName)) {
-            this.globalIdPKColunmName = globalIdPKColunmName;
+    public SqlRepositoryBuilder withGlobalIdPKColumnName(String globalIdPKColumnName) {
+        if(isNonEmpty(globalIdPKColumnName)) {
+            this.globalIdPKColumnName = globalIdPKColumnName;
         }
         return this;
     }
@@ -287,7 +287,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 											   commitTableName,
 											   snapshotTableName, 
 											   commitPropertyTableName,
-											   globalIdPKColunmName,
+											   globalIdPKColumnName,
 											   globalIdLocalIdColumnName,
 											   globalIdFragmentColumnName,
 											   globalIdTypeNameColumnName,

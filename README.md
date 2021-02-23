@@ -102,7 +102,7 @@ javers.sqlCommitPropertyTableName=my_commit_property
 ##### Column Name
 > We have add the following configurations
 ```
-javers.sqlGlobalIdPKColunmName= global_pk
+javers.sqlGlobalIdPKColumnName= global_pk
 javers.sqlGlobalIdLocalIdColumnName= global_id_local
 javers.sqlGlobalIdFragmentColumnName= global_fragment
 javers.sqlGlobalIdTypeNameColumnName= global_type_name

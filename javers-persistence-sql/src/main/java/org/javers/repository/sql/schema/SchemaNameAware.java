@@ -57,8 +57,8 @@ public abstract class SchemaNameAware {
         return dbNameProvider.getSchemaName();
     }
     
-    protected String getGlobalIdPKColunmName() {
-        return dbNameProvider.getGlobalIdPKColunmName();
+    protected String getGlobalIdPKColumnName() {
+        return dbNameProvider.getGlobalIdPKColumnName();
     }
     
     protected String getGlobalIdLocalIdColumnName() {

@@ -17,7 +17,7 @@ public class SqlRepositoryConfiguration {
     private final String snapshotTableName;
     private final String commitPropertyTableName;
     
-    private final String globalIdPKColunmName;
+    private final String globalIdPKColumnName;
     private final String globalIdLocalIdColumnName;
     private final String globalIdFragmentColumnName;
     private final String globalIdTypeNameColumnName;
@@ -42,33 +42,33 @@ public class SqlRepositoryConfiguration {
     private final String snapshotManagedTypeColumnName;
         
     SqlRepositoryConfiguration(boolean globalIdCacheDisabled, 
-    						   String schemaName,
-    						   boolean schemaManagementEnabled,
-    						   String globalIdTableName,
-    						   String commitTableName,
-    						   String snapshotTableName, 
-    						   String commitPropertyTableName,
-    						   String globalIdPKColunmName,
-    						   String globalIdLocalIdColumnName,
-    						   String globalIdFragmentColumnName,
-    						   String globalIdTypeNameColumnName,
-    						   String globalIdOwnerIDFKColumnName,
-    						   String commitPKColumnName,
-							   String commitAuthorColumnName,
-							   String commitCommitDateColumnName,
-							   String commitCommitDateInstantColumnName,
-							   String commitCommitIdColumName,
-							   String commitPropertyCommitFKColumnName,
-							   String commitPropertyNameColumnName,
-							   String commitPropertyValueColumnName,
-							   String snapshotPKColumnName,
-							   String snapshotCommitFKColumnName,
-							   String snapshotGlobalIdFKColumnName,
-							   String snapshotTypeColumnName,
-							   String snapshotVersionColumnName,
-							   String snapshotStateColumnName,
-							   String snapshotChangedColumnName,
-							   String snapshotManagedTypeColumnName
+									String schemaName,
+									boolean schemaManagementEnabled,
+									String globalIdTableName,
+									String commitTableName,
+									String snapshotTableName, 
+									String commitPropertyTableName,
+									String globalIdPKColumnName,
+									String globalIdLocalIdColumnName,
+									String globalIdFragmentColumnName,
+									String globalIdTypeNameColumnName,
+									String globalIdOwnerIDFKColumnName,
+    						  String commitPKColumnName,
+									String commitAuthorColumnName,
+									String commitCommitDateColumnName,
+									String commitCommitDateInstantColumnName,
+									String commitCommitIdColumName,
+									String commitPropertyCommitFKColumnName,
+									String commitPropertyNameColumnName,
+									String commitPropertyValueColumnName,
+									String snapshotPKColumnName,
+									String snapshotCommitFKColumnName,
+									String snapshotGlobalIdFKColumnName,
+									String snapshotTypeColumnName,
+									String snapshotVersionColumnName,
+									String snapshotStateColumnName,
+									String snapshotChangedColumnName,
+									String snapshotManagedTypeColumnName
     						   ) {
 		Validate.argumentCheck(schemaName == null || !schemaName.isEmpty(),"schemaName should be null or non-empty");
 		
@@ -79,7 +79,7 @@ public class SqlRepositoryConfiguration {
 		this.commitTableName = commitTableName;
 		this.snapshotTableName = snapshotTableName;
 		this.commitPropertyTableName = commitPropertyTableName;
-		this.globalIdPKColunmName = globalIdPKColunmName;
+		this.globalIdPKColumnName = globalIdPKColumnName;
 		this.globalIdLocalIdColumnName = globalIdLocalIdColumnName;
 		this.globalIdFragmentColumnName = globalIdFragmentColumnName;
 		this.globalIdTypeNameColumnName = globalIdTypeNameColumnName;
@@ -139,8 +139,8 @@ public class SqlRepositoryConfiguration {
         return Optional.ofNullable(commitPropertyTableName);
     }
 
-	public Optional<String> getGlobalIdPKColunmName() {
-		return Optional.ofNullable(globalIdPKColunmName);
+	public Optional<String> getGlobalIdPKColumnName() {
+		return Optional.ofNullable(globalIdPKColumnName);
 	}
 
 	public Optional<String> getGlobalIdLocalIdColumnName() {

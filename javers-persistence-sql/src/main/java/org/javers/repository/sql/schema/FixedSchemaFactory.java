@@ -47,7 +47,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
                        .withAttribute().text(getSnapshotStateColumnName()).and()
                        .withAttribute().text(getSnapshotChangedColumnName()).and()
                        .withAttribute().string(getSnapshotManagedTypeColumnName()).withMaxLength(200).and();
-        foreignKey(tableName, getSnapshotGlobalIdFKColumnName(), false, getGlobalIdTableNameWithSchema(), getGlobalIdPKColunmName(), relationBuilder);
+        foreignKey(tableName, getSnapshotGlobalIdFKColumnName(), false, getGlobalIdTableNameWithSchema(), getGlobalIdPKColumnName(), relationBuilder);
         foreignKey(tableName, getSnapshotCommitFKColumnName(), false, getCommitTableNameWithSchema(), getCommitPKColumnName(), relationBuilder);
         relationBuilder.build();
 
@@ -106,12 +106,12 @@ public class FixedSchemaFactory extends SchemaNameAware {
         Schema schema = emptySchema(dialect);
 
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
-        primaryKey(getGlobalIdPKColunmName() , schema, relationBuilder, getGlobalIdPkSeqName().localName());
+        primaryKey(getGlobalIdPKColumnName() , schema, relationBuilder, getGlobalIdPkSeqName().localName());
         relationBuilder
                 .withAttribute().string(getGlobalIdLocalIdColumnName()).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
                 .withAttribute().string(getGlobalIdFragmentColumnName()).withMaxLength(200).and()
                 .withAttribute().string(getGlobalIdTypeNameColumnName()).withMaxLength(200).and();
-        foreignKey(tableName, getGlobalIdOwnerIDFKColumnName(), false, getGlobalIdTableNameWithSchema(), getGlobalIdPKColunmName(), relationBuilder);
+        foreignKey(tableName, getGlobalIdOwnerIDFKColumnName(), false, getGlobalIdTableNameWithSchema(), getGlobalIdPKColumnName(), relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, getGlobalIdLocalIdColumnName());

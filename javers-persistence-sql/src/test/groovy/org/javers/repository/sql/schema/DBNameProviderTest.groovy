@@ -184,7 +184,7 @@ class DBNameProviderTest extends Specification {
 
 	names.commitPropertyTableNameWithSchema == "cp"
 
-	names.globalIdPKColunmName == "a"
+	names.globalIdPKColumnName == "a"
 	names.globalIdLocalIdColumnName == "b"
 	names.globalIdFragmentColumnName == "c"
 	names.globalIdTypeNameColumnName == "d"
@@ -241,7 +241,7 @@ class DBNameProviderTest extends Specification {
 
         then:
 
-    	names.globalIdPKColunmName == "global_id_pk"
+  names.globalIdPKColumnName == "global_id_pk"
 	names.globalIdLocalIdColumnName == "local_id"
 	names.globalIdFragmentColumnName == "fragment"
 	names.globalIdTypeNameColumnName == "type_name"

@@ -54,27 +54,27 @@ public class DBNameProvider {
         logger.info("GlobalId table:             {}", getGlobalIdTableNameWithSchema());
         logger.info("Snapshot table:             {}", getSnapshotTableNameWithSchema());
         // Column Names
-		logger.info("GLOBAL_ID_PK:               {}", getGlobalIdPKColunmName());
-		logger.info("GLOBAL_ID_LOCAL_ID:         {}", getGlobalIdLocalIdColumnName());
-		logger.info("GLOBAL_ID_FRAGMENT:         {}", getGlobalIdFragmentColumnName());
-		logger.info("GLOBAL_ID_TYPE_NAME:        {}", getGlobalIdTypeNameColumnName());
-		logger.info("GLOBAL_ID_OWNER_ID_FK:      {}", getGlobalIdOwnerIDFKColumnName());
-		logger.info("COMMIT_PK:                  {}", getCommitPKColumnName());
-		logger.info("COMMIT_AUTHOR:              {}", getCommitAuthorColumnName());
-		logger.info("COMMIT_COMMIT_DATE:         {}", getCommitCommitDateColumnName());
-		logger.info("COMMIT_COMMIT_DATE_INSTANT: {}", getCommitCommitDateInstantColumnName());
-		logger.info("COMMIT_COMMIT_ID:           {}", getCommitCommitIdColumName());
-		logger.info("COMMIT_PROPERTY_COMMIT_FK:  {}", getCommitPropertyCommitFKColumnName());
-		logger.info("COMMIT_PROPERTY_NAME:       {}", getCommitPropertyNameColumnName());
-		logger.info("COMMIT_PROPERTY_VALUE:      {}", getCommitPropertyValueColumnName());
-		logger.info("SNAPSHOT_PK:                {}", getSnapshotPKColumnName());
-		logger.info("SNAPSHOT_COMMIT_FK:         {}", getSnapshotCommitFKColumnName());
-		logger.info("SNAPSHOT_GLOBAL_ID_FK:      {}", getSnapshotGlobalIdFKColumnName());
-		logger.info("SNAPSHOT_TYPE:              {}", getSnapshotTypeColumnName());
-		logger.info("SNAPSHOT_VERSION:           {}", getSnapshotVersionColumnName());
-		logger.info("SNAPSHOT_STATE:             {}", getSnapshotStateColumnName());
-		logger.info("SNAPSHOT_CHANGED:           {}", getSnapshotChangedColumnName());
-		logger.info("SNAPSHOT_MANAGED_TYPE:      {}", getSnapshotManagedTypeColumnName());
+		logger.debug("GLOBAL_ID_PK:               {}", getGlobalIdPKColumnName());
+		logger.debug("GLOBAL_ID_LOCAL_ID:         {}", getGlobalIdLocalIdColumnName());
+		logger.debug("GLOBAL_ID_FRAGMENT:         {}", getGlobalIdFragmentColumnName());
+		logger.debug("GLOBAL_ID_TYPE_NAME:        {}", getGlobalIdTypeNameColumnName());
+		logger.debug("GLOBAL_ID_OWNER_ID_FK:      {}", getGlobalIdOwnerIDFKColumnName());
+		logger.debug("COMMIT_PK:                  {}", getCommitPKColumnName());
+		logger.debug("COMMIT_AUTHOR:              {}", getCommitAuthorColumnName());
+		logger.debug("COMMIT_COMMIT_DATE:         {}", getCommitCommitDateColumnName());
+		logger.debug("COMMIT_COMMIT_DATE_INSTANT: {}", getCommitCommitDateInstantColumnName());
+		logger.debug("COMMIT_COMMIT_ID:           {}", getCommitCommitIdColumName());
+		logger.debug("COMMIT_PROPERTY_COMMIT_FK:  {}", getCommitPropertyCommitFKColumnName());
+		logger.debug("COMMIT_PROPERTY_NAME:       {}", getCommitPropertyNameColumnName());
+		logger.debug("COMMIT_PROPERTY_VALUE:      {}", getCommitPropertyValueColumnName());
+		logger.debug("SNAPSHOT_PK:                {}", getSnapshotPKColumnName());
+		logger.debug("SNAPSHOT_COMMIT_FK:         {}", getSnapshotCommitFKColumnName());
+		logger.debug("SNAPSHOT_GLOBAL_ID_FK:      {}", getSnapshotGlobalIdFKColumnName());
+		logger.debug("SNAPSHOT_TYPE:              {}", getSnapshotTypeColumnName());
+		logger.debug("SNAPSHOT_VERSION:           {}", getSnapshotVersionColumnName());
+		logger.debug("SNAPSHOT_STATE:             {}", getSnapshotStateColumnName());
+		logger.debug("SNAPSHOT_CHANGED:           {}", getSnapshotChangedColumnName());
+		logger.debug("SNAPSHOT_MANAGED_TYPE:      {}", getSnapshotManagedTypeColumnName());
 
     }
 
@@ -99,7 +99,7 @@ public class DBNameProvider {
     }
 
     public DBObjectName getGlobalIdPkSeqName() {
-        return fullDbName("SQ_"+getGlobalIdPKColunmName());
+        return fullDbName("SQ_"+getGlobalIdPKColumnName());
     }
 
     public DBObjectName getCommitPkSeqName() {
@@ -138,8 +138,8 @@ public class DBNameProvider {
         return new DBObjectName(configuration.getSchemaNameAsOptional(), name);
     }
     
-    public String getGlobalIdPKColunmName() {
-        return configuration.getGlobalIdPKColunmName().orElse(GLOBAL_ID_PK);
+    public String getGlobalIdPKColumnName() {
+        return configuration.getGlobalIdPKColumnName().orElse(GLOBAL_ID_PK);
     }
     
     public String getGlobalIdLocalIdColumnName() {

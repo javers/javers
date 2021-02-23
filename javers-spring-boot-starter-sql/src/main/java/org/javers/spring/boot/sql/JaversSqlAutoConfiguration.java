@@ -77,7 +77,7 @@ public class JaversSqlAutoConfiguration {
                 .withCommitTableName(javersSqlProperties.getSqlCommitTableName())
                 .withSnapshotTableName(javersSqlProperties.getSqlSnapshotTableName())
                 .withCommitPropertyTableName(javersSqlProperties.getSqlCommitPropertyTableName())
-                .withGlobalIdPKColunmName(javersSqlProperties.getSqlGlobalIdPKColunmName())
+                .withGlobalIdPKColumnName(javersSqlProperties.getSqlGlobalIdPKColumnName())
                 .withGlobalIdLocalIdColumnName(javersSqlProperties.getSqlGlobalIdLocalIdColumnName())
                 .withGlobalIdFragmentColumnName(javersSqlProperties.getSqlGlobalIdFragmentColumnName())
                 .withGlobalIdTypeNameColumnName(javersSqlProperties.getSqlGlobalIdTypeNameColumnName())

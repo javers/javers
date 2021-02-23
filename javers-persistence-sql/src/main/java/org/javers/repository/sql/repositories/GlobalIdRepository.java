@@ -67,7 +67,7 @@ public class GlobalIdRepository extends SchemaNameAware {
     }
 
     private Optional<Long> findGlobalIdPkInDB(GlobalId globalId, Session session) {
-        SelectBuilder select =  session.select(getGlobalIdPKColunmName())
+        SelectBuilder select =  session.select(getGlobalIdPKColumnName())
                 .from(getGlobalIdTableNameWithSchema());
 
         if (globalId instanceof ValueObjectId) {
@@ -115,7 +115,7 @@ public class GlobalIdRepository extends SchemaNameAware {
         }
 
         return insert.into(getGlobalIdTableNameWithSchema())
-              .sequence(getGlobalIdPKColunmName(), getGlobalIdPkSeqName().nameWithSchema())
+              .sequence(getGlobalIdPKColumnName(), getGlobalIdPkSeqName().nameWithSchema())
               .executeAndGetSequence();
     }
 
