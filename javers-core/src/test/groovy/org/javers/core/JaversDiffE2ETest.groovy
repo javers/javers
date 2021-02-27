@@ -496,9 +496,8 @@ class JaversDiffE2ETest extends AbstractDiffTest {
        println diff.prettyPrint()
 
        then:
-       diff.changes.size() == 4
+       diff.changes.size() == 3
 
-       diff.getChangesByType(NewObject).size() == 1
        diff.getChangesByType(ListChange).size() == 1
 
        def lChange = diff.getChangesByType(ListChange)[0]

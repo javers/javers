@@ -147,7 +147,7 @@ class JaversCommitE2ETest extends Specification {
                     .hasSnapshot(cdoId,  [id:1, valueObjectRef:voId])
                     .hasSnapshot(voId,   [city : "London"])
                     .hasNewObject(cdoId)
-                    .hasNewObject(voId)
+                    .hasValueChangeAt('city', null, 'London')
     }
 
     def "should detect reference change"() {
@@ -175,7 +175,7 @@ class JaversCommitE2ETest extends Specification {
     def "should detect changes on referenced node even if root is new"() {
         given:
         def oldRef = new SnapshotEntity(id: 2, intProperty:2)
-        def javers = javers().build()
+        def javers = javers().withNewObjectChanges(false).build()
         javers.commit("user",oldRef)
 
         def cdo = new SnapshotEntity(id: 1, entityRef: oldRef)
@@ -191,6 +191,7 @@ class JaversCommitE2ETest extends Specification {
                     .hasSnapshots(2)
                     .hasSnapshot(cdoId,    [id:1, entityRef:oldRefId ])
                     .hasSnapshot(oldRefId, [id:2, intProperty:5])
+                    .hasChanges(2)
                     .hasNewObject(cdoId)
                     .hasValueChangeAt("intProperty", 2, 5)
     }
@@ -211,11 +212,10 @@ class JaversCommitE2ETest extends Specification {
                     .hasSnapshots(2)
                     .hasSnapshot(instanceId(1, DummyUserDetails),[id:1,dummyAddress:voId,addressList:[],integerList:[]])
                     .hasSnapshot(voId,[city:"Tokyo"])
-                    .hasNewObject(voId)
-                    .hasChanges(2)
+                    .hasChanges(1)
+                    .hasValueChangeAt("city", null, "Tokyo")
     }
 
-    //TODO not sure about that.
     def "should not record ObjectRemoved for removed ValueObject"() {
         given:
         def javers = javers().build()
@@ -251,7 +251,7 @@ class JaversCommitE2ETest extends Specification {
                     .hasSnapshot(instanceId(5, DummyUserDetails))
                     .hasSnapshot(addedVoId)
                     .hasListReferenceAddedAt("addressList",addedVoId)
-                    .hasNewObject(addedVoId)
+                    .hasChanges(2)
     }
 
     def "should support object removed from List, deep in the graph"() {

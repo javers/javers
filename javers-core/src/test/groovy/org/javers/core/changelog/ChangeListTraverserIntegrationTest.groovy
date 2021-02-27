@@ -32,15 +32,16 @@ class ChangeListTraverserIntegrationTest extends Specification {
         with(callbackMock) {
             1 * beforeChangeList()
 
-            2 * onCommit(_)
-            7 * beforeChange(_)
-            7 * afterChange(_)
+            3 * onCommit(_)
+            10 * beforeChange(_)
+            10 * afterChange(_)
 
+            1 * onNewObject(_)
             1 * onObjectRemoved(_)
 
             1 * onAffectedObject(_)
-            6 * onPropertyChange(_)
-            6 * onValueChange(_)
+            8 * onPropertyChange(_)
+            8 * onValueChange(_)
 
             1 * afterChangeList()
 
