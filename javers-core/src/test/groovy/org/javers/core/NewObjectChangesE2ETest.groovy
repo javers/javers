@@ -240,18 +240,14 @@ class NewObjectChangesE2ETest extends Specification {
         println diff.prettyPrint()
 
         then:
-        diff.changes.size() == 3
+        diff.changes.size() == 2
         diff.getChangesByType(ValueChange).size() == 2
 
-        with(diff.getChangesByType(NewObject)[0]) {
-            assert it.affectedGlobalId.value() == 'org.javers.core.NewObjectChangesE2ETest$Employee/1#address'
-        }
-
-        with(diff.getChangesByType(ValueChange).find {it.propertyName == "street"}) {
+        with(diff.changes.find {it.propertyName == "street"}) {
             assert it.left == null
             assert it.right == "x"
         }
-        with(diff.getChangesByType(ValueChange).find {it.propertyName == "city"}) {
+        with(diff.changes.find {it.propertyName == "city"}) {
             assert it.left == null
             assert it.right == "Paris"
         }
@@ -271,13 +267,10 @@ class NewObjectChangesE2ETest extends Specification {
         println diff.prettyPrint()
 
         then:
-        diff.changes.size() == 2
+        diff.changes.size() == 1
 
-        with(diff.getChangesByType(ObjectRemoved)[0]) {
-            assert it.affectedGlobalId.value() == 'org.javers.core.NewObjectChangesE2ETest$Employee/1#address'
-        }
-
-        with(diff.getChangesByType(ValueChange)[0]) {
+        with(diff.changes[0]) {
+            assert it instanceof ValueChange
             assert it.propertyName == "city"
             assert it.left == "Berlin"
             assert it.right == null

@@ -5,6 +5,7 @@ import org.javers.core.commit.Commit
 import org.javers.common.date.DateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.commit.CommitMetadata
+import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
@@ -405,9 +406,10 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).build())
 
         then:
-        changes.size() == 2
+        changes.size() == 4
         commitSeq(changes[0].commitMetadata.get()) == 5
-        changes.each {assert it instanceof ValueChange}
+        changes.getChangesByType(ValueChange).size() == 2
+        changes.getChangesByType(NewObject).size() == 2
     }
 
     def "should query for Entity snapshots by Entity class"() {
@@ -488,7 +490,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         expect:
         javers.findSnapshots(byInstance(new SnapshotEntity(id:1)).build()).size() == 2
-        javers.findChanges(byInstance(new SnapshotEntity(id:1)).build()).size() == 1
+        javers.findChanges(byInstance(new SnapshotEntity(id:1)).build()).size() == 2
     }
 
     def "should query for Entity snapshots and changes by GlobalId and changed property"() {
@@ -1100,9 +1102,10 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(query)
 
         then:
-        changes.size() == 2
+        changes.size() == 3
         changes[0].affectedGlobalId.value() == "$sName/1#valueObjectRef/networkAddress"
         changes[1].affectedGlobalId.value() == "$sName/1#valueObjectRef"
+        changes[2].affectedGlobalId.value() == "$sName/1"
     }
 
     def "should query withChildValueObjects for snapshots and changes by Entity type"() {
@@ -1320,8 +1323,7 @@ class JaversRepositoryE2ETest extends Specification {
       def changes = javers.findChanges(QueryBuilder.byInstanceId(1, "C").build())
 
       then:
-      println changes.prettyPrint()
-      changes.size() == 5
+      changes.size() == 6
       changes[0] instanceof ValueChange
     }
 }

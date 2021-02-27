@@ -6,8 +6,10 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 
+import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.diff.changetype.PropertyChange;
 
+import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
@@ -29,10 +31,11 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 /**
- *  Changes in the diff algorithm for initial and terminal ValueChanges.
+ *  Changes in the diff algorithm.
  *
  *  In 6.0, both <code>Javers.compare()</code> and <code>Javers.findChanges()</code> methods
- *  use unified and consistent algorithm concerning initial and terminal ValueChanges.
+ *  use unified and consistent algorithm concerning
+ *  NewObject, ObjectRemoved, initial and terminal ValueChanges.
  *
  *  Initial and terminal ValueChanges are additional sets
  *  of changes generated for each new object and removed object to capture their state.
@@ -53,22 +56,25 @@ import java.util.stream.Stream;
   *   terminalValueChanges: false
   * </pre>
   *
- *
- *  Detailed change log
- *
- * 0 The javers.removedObjectChanges flag is added (enabled by default).
- *
- * 0 In <code>Javers.findChanges()</code>, a NewObject change is always generated for each initial Snapshot
+  * New or removed ValueObjects no longer generate
+  * {@link NewObject}, {@link ObjectRemoved} nor {@link ReferenceChange}.
+  * These changes were considered rather useless.
+  * Instead, a state of new or removed ValueObjects
+  *  is captured by initial and terminal ValueChanges.
+  *
+  * New or removed Entities always generate
+  * {@link NewObject}/{@link ObjectRemoved} changes (it can't be disabled).
+  *
+  * Detailed change log:
+  *
+  * 0 The javers.terminalValueChanges flag is added (enabled by default).
+  *
+  * 0 In <code>Javers.findChanges()</code>, a NewObject change is always generated for each initial Snapshot
  *   (it can't be disabled by the javers.initialValueChanges flag).
  *
  * 0 QueryBuilder.withNewObjectChanges() method is now deprecated and has no effect.
  *
- * 0 The javers.newObjectSnapshot flag is renamed to javers.initialValueChanges
- *
- * 0 The javers.terminalValueChanges flag is added.
- *
- * 0 setting or removing reference to ValueObject no longer generates a
- *   ReferenceChange with null on left/right and ValueObjectId on right/left
+ * 0 The javers.newObjectSnapshot flag is renamed to javers.initialValueChanges (enabled by default)
  */
 
 /**

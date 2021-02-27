@@ -585,7 +585,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def diff = javers.compare(object1, object2)
 
         then:
-        println diff.prettyPrint()
         diff.changes.size() == 3
 
         def vChange = diff.changes.find{it.propertyValueChanged}
@@ -626,7 +625,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
         when:
         def diff = javers.compare(object1, object2)
-        println diff.prettyPrint()
         def changes = diff.getChangesByType(PropertyChange)
 
         then:
@@ -669,7 +667,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
       when:
       def diff = javers.compare(object1, object2)
-      println diff.prettyPrint()
       def changes = diff.getChangesByType(PropertyChange)
 
       then:
@@ -680,7 +677,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
       when:
       diff = javers.compare(object2, object1)
-      println diff.prettyPrint()
       changes = diff.getChangesByType(PropertyChange)
 
       then:
