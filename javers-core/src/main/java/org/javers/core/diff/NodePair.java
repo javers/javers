@@ -30,10 +30,12 @@ public interface NodePair {
 
     Object getRightPropertyValue(Property property);
 
+    // TODO remove?
     default Object getRightDehydratedPropertyValue(JaversProperty property) {
         return getRight().getDehydratedPropertyValue(property);
     }
 
+    // TODO remove?
     default Object getLeftDehydratedPropertyValue(JaversProperty property) {
         return getLeft().getDehydratedPropertyValue(property);
     }
