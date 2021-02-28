@@ -30,6 +30,14 @@ public interface NodePair {
 
     Object getRightPropertyValue(Property property);
 
+    default Object getRightDehydratedPropertyValue(JaversProperty property) {
+        return getRight().getDehydratedPropertyValue(property);
+    }
+
+    default Object getLeftDehydratedPropertyValue(JaversProperty property) {
+        return getLeft().getDehydratedPropertyValue(property);
+    }
+
     GlobalId getRightReference(Property property);
 
     GlobalId getLeftReference(Property property);
@@ -41,11 +49,11 @@ public interface NodePair {
     ManagedType getManagedType();
 
     default Object getRightDehydratedPropertyValueAndSanitize(JaversProperty property) {
-        return sanitize(getRight().getDehydratedPropertyValue(property), property.getType());
+        return sanitize(getRightDehydratedPropertyValue(property), property.getType());
     }
 
     default Object getLeftDehydratedPropertyValueAndSanitize(JaversProperty property) {
-        return sanitize(getLeft().getDehydratedPropertyValue(property), property.getType());
+        return sanitize(getLeftDehydratedPropertyValue(property), property.getType());
     }
 
     default Object sanitize(Object value, JaversType expectedType) {

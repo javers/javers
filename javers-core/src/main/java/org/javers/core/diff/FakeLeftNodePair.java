@@ -58,4 +58,9 @@ class FakeLeftNodePair extends FakeNodePair {
     public GlobalId getLeftReference(Property property) {
         return null;
     }
+
+    @Override
+    public Object getLeftDehydratedPropertyValue(JaversProperty property) {
+        return Defaults.defaultValue(property.getGenericType());
+    }
 }

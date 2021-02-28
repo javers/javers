@@ -222,8 +222,9 @@ public class QueryBuilder {
      * Since Javers 6.0 this method is <b>deprecated</b> and has no effect.
      * <br/><br/>
      *
-     * Since Javers 6.0, the newObjectChanges flag can be set only on a Javers instance level,
-     * see {@link org.javers.core.JaversBuilder#withNewObjectChanges(boolean)}.
+     * The <code>newObjectChanges</code> flag is now renamed to <code>initialValueChanges</code>
+     * and can be set only on a Javers instance level.<br/>
+     * See {@link org.javers.core.JaversBuilder#withNewObjectChanges(boolean)}.
      */
     @Deprecated
     public QueryBuilder withNewObjectChanges(boolean newObjectChanges) {
