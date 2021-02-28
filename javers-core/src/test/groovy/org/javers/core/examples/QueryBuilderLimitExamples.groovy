@@ -30,10 +30,10 @@ class QueryBuilderLimitExamples extends Specification {
         def changes = javers.findChanges(byInstanceId("Bob", Employee)
                 .limit(2).build())
 
-        print(changes.prettyPrint())
+        println changes.prettyPrint()
 
         then:
-        changes.size() == 4
+        changes.size() == 8
     }
 
     def "snapshot limit with findShadows and findShadowsAndStream"() {
