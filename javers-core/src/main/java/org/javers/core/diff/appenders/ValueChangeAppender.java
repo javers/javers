@@ -2,6 +2,7 @@ package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.graph.FakeNode;
 import org.javers.core.metamodel.type.*;
 
 /**
@@ -36,6 +37,7 @@ class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
             }
         }
 
+        // TODO pair.getLeft() instanceof FakeNode));
         return new ValueChange(pair.createPropertyChangeMetadata(property), leftValue, rightValue);
     }
 

@@ -9,6 +9,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.diff.changetype.ObjectRemoved;
+import org.javers.core.graph.FakeNode;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectGraph;
 import org.javers.core.graph.ObjectNode;
@@ -115,14 +116,14 @@ public class DiffFactory {
         //calculate snapshot of NewObjects and RemovedObjects
         if (javersCoreConfiguration.isNewObjectChanges()) {
             for (ObjectNode node : graphPair.getOnlyOnRight()) {
-                FakeNodePair pair = new FakeLeftNodePair(node, graphPair.getCommitMetadata());
+                NodePair pair = new RealNodePair(new FakeNode(node.getCdo()), node, graphPair.getCommitMetadata());
                 appendPropertyChanges(diff, pair);
             }
         }
 
         if (javersCoreConfiguration.isRemovedObjectChanges()) {
             for (ObjectNode node : graphPair.getOnlyOnLeft()) {
-                FakeNodePair pair = new FakeRightNodePair(node, graphPair.getCommitMetadata());
+                NodePair pair = new RealNodePair(node, new FakeNode(node.getCdo()), graphPair.getCommitMetadata());
                 appendPropertyChanges(diff, pair);
             }
         }
