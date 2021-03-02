@@ -1,0 +1,18 @@
+javadoc {
+    failOnError = false
+}
+
+dependencies {
+    api project(':javers-spring')
+    api project(':javers-persistence-sql')
+
+    implementation "org.hibernate:hibernate-core:$hibernateVersion"
+    implementation "org.springframework:spring-tx:$springVersion"
+    implementation "org.springframework.data:spring-data-jpa:$springBootVersion"
+
+    testCompile 'com.h2database:h2:1.4.184'
+    testCompile "org.springframework:spring-orm:$springVersion"
+    testCompile "org.springframework:spring-test:$springVersion"
+    testCompile "org.spockframework:spock-spring:$spockVersion"
+    testCompile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+}

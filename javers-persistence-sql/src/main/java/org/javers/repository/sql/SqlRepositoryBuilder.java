@@ -51,6 +51,12 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private String snapshotStateColumnName;
     private String snapshotChangedColumnName;
     private String snapshotManagedTypeColumnName;
+    
+    private String  primaryKeyIndicator;
+    private String  foreignKeyIndicator;
+    private String  sequenceIndicator;
+    private String  indexIndicator;
+    private boolean isSuffix;
 
     public SqlRepositoryBuilder() {
     }
@@ -271,6 +277,39 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         }
         return this;
     }
+    
+    public SqlRepositoryBuilder withPrimaryKeyIndicator(String primaryKeyIndicator) {
+        if(isNonEmpty(primaryKeyIndicator)) {
+            this.primaryKeyIndicator = primaryKeyIndicator;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withForeignKeyIndicator(String foreignKeyIndicator) {
+        if(isNonEmpty(foreignKeyIndicator)) {
+            this.foreignKeyIndicator = foreignKeyIndicator;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withSequenceIndicator (String sequenceIndicator) {
+        if(isNonEmpty(sequenceIndicator)) {
+            this.sequenceIndicator = sequenceIndicator;
+        }
+        return this;
+    }
+ 
+    public SqlRepositoryBuilder withIndexIndicator (String indexIndicator) {
+        if(isNonEmpty(indexIndicator)) {
+            this.indexIndicator = indexIndicator;
+        }
+        return this;
+    }
+    
+    public SqlRepositoryBuilder withIsSuffix (boolean isSuffix) {
+        this.isSuffix = isSuffix;
+        return this;
+    }
 
     public JaversSqlRepository build() {
         logger.info("starting SqlRepository...");
@@ -307,7 +346,12 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 											   snapshotVersionColumnName,
 											   snapshotStateColumnName,
 											   snapshotChangedColumnName,
-											   snapshotManagedTypeColumnName);
+											   snapshotManagedTypeColumnName,
+										       primaryKeyIndicator,
+										       foreignKeyIndicator,
+										       sequenceIndicator,
+										       indexIndicator,
+										       isSuffix);
 
         addComponent(config);
 

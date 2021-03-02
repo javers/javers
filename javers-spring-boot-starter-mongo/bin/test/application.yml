@@ -1,0 +1,4 @@
+spring:
+  data:
+    mongodb:
+      database: spring-mongo-default

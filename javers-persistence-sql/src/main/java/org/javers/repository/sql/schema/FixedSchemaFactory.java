@@ -28,12 +28,10 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
     Map<String, Schema> allTablesSchema(Dialect dialect) {
         Map<String, Schema> schema = new LinkedHashTreeMap<>();
-
-        schema.put(getGlobalIdTableName().localName(), globalIdTableSchema(dialect));
-        schema.put(getCommitTableName().localName(),    commitTableSchema(dialect));
+        schema.put(getGlobalIdTableName().localName()      , globalIdTableSchema(dialect));
+        schema.put(getCommitTableName().localName()        , commitTableSchema(dialect));
         schema.put(getCommitPropertyTableName().localName(), commitPropertiesTableSchema(dialect));
-        schema.put(getSnapshotTableName().localName(),  snapshotTableSchema(dialect));
-
+        schema.put(getSnapshotTableName().localName()      , snapshotTableSchema(dialect));
         return schema;
     }
 
@@ -119,12 +117,24 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
         return schema;
     }
+    
+    String getSchemaNameUsedForSchemaInspection() {
+        String schemaName = getSchemaName().orElse("");
+        return schemaName.isEmpty() ? "" : schemaName;
+    }
 
     Schema emptySchema(Dialect dialect) {
         return getSchemaName().map(s -> new Schema(dialect, s)).orElse(new Schema(dialect));
     }
+    
+    private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder, String seqNameLocal) {
+        relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
+                .primaryKey(pkColName).using(pkColName).and();
+        schema.addSequence(seqNameLocal).build();
+    }
 
-    private void foreignKey(DBObjectName tableName, String fkColName, boolean isPartOfPrimaryKey, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
+    private void foreignKey(DBObjectName tableName, String fkColName, boolean isPartOfPrimaryKey, 
+    						String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
         LongAttributeBuilder longAttributeBuilder = relationBuilder
                 .withAttribute().longAttr(fkColName);
         if (isPartOfPrimaryKey && (dialect instanceof DB2Dialect || dialect instanceof DB2400Dialect)) {
@@ -147,11 +157,6 @@ public class FixedSchemaFactory extends SchemaNameAware {
                 .build();
     }
 
-    String getSchemaNameUsedForSchemaInspection() {
-        String schemaName = getSchemaName().orElse("");
-        return schemaName.isEmpty() ? "" : schemaName;
-    }
-
     String createIndexName(DBObjectName tableName, IndexedCols indexedCols) {
         String indexName = tableName.localName() + "_" + indexedCols.concatenatedColNames() + "_idx";
 
@@ -160,12 +165,6 @@ public class FixedSchemaFactory extends SchemaNameAware {
             return indexName.substring(0, ORACLE_MAX_NAME_LEN);
         }
         return indexName;
-    }
-
-    private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder, String seqNameLocal) {
-        relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
-                .primaryKey(pkColName).using(pkColName).and();
-        schema.addSequence(seqNameLocal).build();
     }
 
     static class IndexedCols {

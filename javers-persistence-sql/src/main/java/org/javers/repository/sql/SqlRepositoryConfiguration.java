@@ -40,68 +40,87 @@ public class SqlRepositoryConfiguration {
     private final String snapshotStateColumnName;
     private final String snapshotChangedColumnName;
     private final String snapshotManagedTypeColumnName;
+    
+    private final String  primaryKeyIndicator;
+    private final String  foreignKeyIndicator;
+    private final String  sequenceIndicator;
+    private final String  indexIndicator;
+    private final boolean isSuffix;
+    
         
     SqlRepositoryConfiguration(boolean globalIdCacheDisabled, 
-									String schemaName,
-									boolean schemaManagementEnabled,
-									String globalIdTableName,
-									String commitTableName,
-									String snapshotTableName, 
-									String commitPropertyTableName,
-									String globalIdPKColumnName,
-									String globalIdLocalIdColumnName,
-									String globalIdFragmentColumnName,
-									String globalIdTypeNameColumnName,
-									String globalIdOwnerIDFKColumnName,
-    						  String commitPKColumnName,
-									String commitAuthorColumnName,
-									String commitCommitDateColumnName,
-									String commitCommitDateInstantColumnName,
-									String commitCommitIdColumName,
-									String commitPropertyCommitFKColumnName,
-									String commitPropertyNameColumnName,
-									String commitPropertyValueColumnName,
-									String snapshotPKColumnName,
-									String snapshotCommitFKColumnName,
-									String snapshotGlobalIdFKColumnName,
-									String snapshotTypeColumnName,
-									String snapshotVersionColumnName,
-									String snapshotStateColumnName,
-									String snapshotChangedColumnName,
-									String snapshotManagedTypeColumnName
+							   String  schemaName,
+							   boolean schemaManagementEnabled,
+							   String  globalIdTableName,
+							   String  commitTableName,
+							   String  snapshotTableName, 
+							   String  commitPropertyTableName,
+							   String  globalIdPKColumnName,
+							   String  globalIdLocalIdColumnName,
+							   String  globalIdFragmentColumnName,
+							   String  globalIdTypeNameColumnName,
+							   String  globalIdOwnerIDFKColumnName,
+							   String  commitPKColumnName,
+							   String  commitAuthorColumnName,
+							   String  commitCommitDateColumnName,
+							   String  commitCommitDateInstantColumnName,
+							   String  commitCommitIdColumName,
+							   String  commitPropertyCommitFKColumnName,
+							   String  commitPropertyNameColumnName,
+							   String  commitPropertyValueColumnName,
+							   String  snapshotPKColumnName,
+							   String  snapshotCommitFKColumnName,
+							   String  snapshotGlobalIdFKColumnName,
+							   String  snapshotTypeColumnName,
+							   String  snapshotVersionColumnName,
+							   String  snapshotStateColumnName,
+							   String  snapshotChangedColumnName,
+							   String  snapshotManagedTypeColumnName,
+							   String  primaryKeyIndicator,
+							   String  foreignKeyIndicator,
+							   String  sequenceIndicator,
+							   String  indexIndicator,
+							   boolean isSuffix
     						   ) {
 		Validate.argumentCheck(schemaName == null || !schemaName.isEmpty(),"schemaName should be null or non-empty");
 		
-		this.globalIdCacheDisabled = globalIdCacheDisabled;
-		this.schemaName = schemaName;
-		this.schemaManagementEnabled = schemaManagementEnabled;
-		this.globalIdTableName = globalIdTableName;
-		this.commitTableName = commitTableName;
-		this.snapshotTableName = snapshotTableName;
-		this.commitPropertyTableName = commitPropertyTableName;
-		this.globalIdPKColumnName = globalIdPKColumnName;
-		this.globalIdLocalIdColumnName = globalIdLocalIdColumnName;
-		this.globalIdFragmentColumnName = globalIdFragmentColumnName;
-		this.globalIdTypeNameColumnName = globalIdTypeNameColumnName;
+		this.globalIdCacheDisabled       = globalIdCacheDisabled;
+		this.schemaName                  = schemaName;
+		this.schemaManagementEnabled     = schemaManagementEnabled;
+		this.globalIdTableName           = globalIdTableName;
+		this.commitTableName             = commitTableName;
+		this.snapshotTableName           = snapshotTableName;
+		this.commitPropertyTableName     = commitPropertyTableName;
+		this.globalIdPKColumnName        = globalIdPKColumnName;
+		this.globalIdLocalIdColumnName   = globalIdLocalIdColumnName;
+		this.globalIdFragmentColumnName  = globalIdFragmentColumnName;
+		this.globalIdTypeNameColumnName  = globalIdTypeNameColumnName;
 		this.globalIdOwnerIDFKColumnName = globalIdOwnerIDFKColumnName;
 		
-		this.commitPKColumnName = commitPKColumnName;
-		this.commitAuthorColumnName = commitAuthorColumnName;
-		this.commitCommitDateColumnName = commitCommitDateColumnName;
+		this.commitPKColumnName                = commitPKColumnName;
+		this.commitAuthorColumnName            = commitAuthorColumnName;
+		this.commitCommitDateColumnName        = commitCommitDateColumnName;
 		this.commitCommitDateInstantColumnName = commitCommitDateInstantColumnName;
-		this.commitCommitIdColumName = commitCommitIdColumName;
-		this.commitPropertyCommitFKColumnName = commitPropertyCommitFKColumnName;
-		this.commitPropertyNameColumnName = commitPropertyNameColumnName;
-		this.commitPropertyValueColumnName = commitPropertyValueColumnName;
+		this.commitCommitIdColumName           = commitCommitIdColumName;
+		this.commitPropertyCommitFKColumnName  = commitPropertyCommitFKColumnName;
+		this.commitPropertyNameColumnName      = commitPropertyNameColumnName;
+		this.commitPropertyValueColumnName     = commitPropertyValueColumnName;
 		
-		this.snapshotPKColumnName = snapshotPKColumnName;
-		this.snapshotCommitFKColumnName = snapshotCommitFKColumnName;
-		this.snapshotGlobalIdFKColumnName = snapshotGlobalIdFKColumnName;
-		this.snapshotTypeColumnName = snapshotTypeColumnName;
-		this.snapshotVersionColumnName = snapshotVersionColumnName;
-		this.snapshotStateColumnName = snapshotStateColumnName;
-		this.snapshotChangedColumnName = snapshotChangedColumnName;
+		this.snapshotPKColumnName          = snapshotPKColumnName;
+		this.snapshotCommitFKColumnName    = snapshotCommitFKColumnName;
+		this.snapshotGlobalIdFKColumnName  = snapshotGlobalIdFKColumnName;
+		this.snapshotTypeColumnName        = snapshotTypeColumnName;
+		this.snapshotVersionColumnName     = snapshotVersionColumnName;
+		this.snapshotStateColumnName       = snapshotStateColumnName;
+		this.snapshotChangedColumnName     = snapshotChangedColumnName;
 		this.snapshotManagedTypeColumnName = snapshotManagedTypeColumnName;
+		
+	    this.primaryKeyIndicator = primaryKeyIndicator;
+	    this.foreignKeyIndicator = foreignKeyIndicator;
+	    this.sequenceIndicator   = sequenceIndicator;
+	    this.indexIndicator      = indexIndicator;
+	    this.isSuffix            = isSuffix;
+	    
 	}
 
 	public boolean isGlobalIdCacheDisabled() {
@@ -221,5 +240,25 @@ public class SqlRepositoryConfiguration {
 
 	public Optional<String> getSnapshotManagedTypeColumnName() {
 		return Optional.ofNullable(snapshotManagedTypeColumnName);
+	}
+
+	public Optional<String> getPrimaryKeyIndicator() {
+		return Optional.ofNullable(primaryKeyIndicator);
+	}
+
+	public Optional<String> getForeginKeyIndicator() {
+		return Optional.ofNullable(foreignKeyIndicator);
+	}
+
+	public Optional<String> getSequenceIndicator() {
+		return Optional.ofNullable(sequenceIndicator);
+	}
+	
+	public Optional<String> getIndexIndicator() {
+		return Optional.ofNullable(indexIndicator);
+	}
+
+	public Optional<Boolean> getIsSuffix() {
+		return Optional.ofNullable(isSuffix);
 	}
 }

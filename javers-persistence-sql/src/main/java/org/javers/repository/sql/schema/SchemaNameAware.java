@@ -140,4 +140,20 @@ public abstract class SchemaNameAware {
     protected String getSnapshotManagedTypeColumnName() {
         return dbNameProvider.getSnapshotManagedTypeColumnName();
     }
+    
+    protected String getPrimaryKeyIndicator() {
+        return dbNameProvider.getPrimaryKeyIndicator();
+    }
+    
+    protected String getForeignKeyIndicator() {
+        return dbNameProvider.getForeginKeyIndicator();
+    }
+    
+    protected String getSequenceIndicator() {
+        return dbNameProvider.getSequenceIndicator();
+    }
+    
+    protected Boolean getIsSuffix() {
+        return dbNameProvider.getIsSuffix();
+    }
 }

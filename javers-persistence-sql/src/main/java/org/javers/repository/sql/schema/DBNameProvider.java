@@ -14,34 +14,42 @@ public class DBNameProvider {
     private static final String GLOBAL_ID_PK_SEQ =     "jv_global_id_pk_seq";*/
 
 
-    private static final String DEFAULT_GLOBAL_ID_TABLE_NAME = "jv_global_id";
-    private static final String DEFAULT_SNAPSHOT_TABLE_NAME =   "jv_snapshot";
-    private static final String DEFAULT_COMMIT_TABLE_NAME =    "jv_commit";
+    private static final String DEFAULT_GLOBAL_ID_TABLE_NAME       = "jv_global_id";
+    private static final String DEFAULT_SNAPSHOT_TABLE_NAME        = "jv_snapshot";
+    private static final String DEFAULT_COMMIT_TABLE_NAME          = "jv_commit";
     private static final String DEFAULT_COMMIT_PROPERTY_TABLE_NAME = "jv_commit_property";
 
-    public static final String GLOBAL_ID_PK =         "global_id_pk";
-    public static final String GLOBAL_ID_LOCAL_ID =   "local_id";
-    public static final String GLOBAL_ID_FRAGMENT =   "fragment";     //since 1.2
-    public static final String GLOBAL_ID_TYPE_NAME =  "type_name";    //since 2.0
-    public static final String GLOBAL_ID_OWNER_ID_FK ="owner_id_fk";  //since 1.2
+    public static final String GLOBAL_ID_PK          = "global_id_pk";
+    public static final String GLOBAL_ID_LOCAL_ID    = "local_id";
+    public static final String GLOBAL_ID_FRAGMENT    = "fragment";     //since 1.2
+    public static final String GLOBAL_ID_TYPE_NAME   = "type_name";    //since 2.0
+    public static final String GLOBAL_ID_OWNER_ID_FK = "owner_id_fk";  //since 1.2
 
-    public static final String COMMIT_PK =            "commit_pk";
-    public static final String COMMIT_AUTHOR =        "author";
-    public static final String COMMIT_COMMIT_DATE =   "commit_date";
-    public static final String COMMIT_COMMIT_DATE_INSTANT =   "commit_date_instant";
-    public static final String COMMIT_COMMIT_ID =     "commit_id";
-    public static final String COMMIT_PROPERTY_COMMIT_FK =  "commit_fk";
-    public static final String COMMIT_PROPERTY_NAME =       "property_name";
-    public static final String COMMIT_PROPERTY_VALUE =      "property_value";
+    public static final String COMMIT_PK                  = "commit_pk";
+    public static final String COMMIT_AUTHOR              = "author";
+    public static final String COMMIT_COMMIT_DATE         = "commit_date";
+    public static final String COMMIT_COMMIT_DATE_INSTANT = "commit_date_instant";
+    public static final String COMMIT_COMMIT_ID           = "commit_id";
+    public static final String COMMIT_PROPERTY_COMMIT_FK  = "commit_fk";
+    public static final String COMMIT_PROPERTY_NAME       = "property_name";
+    public static final String COMMIT_PROPERTY_VALUE      = "property_value";
 
-    public static final String SNAPSHOT_PK =           "snapshot_pk";
-    public static final String SNAPSHOT_COMMIT_FK =    "commit_fk";
+    public static final String SNAPSHOT_PK           = "snapshot_pk";
+    public static final String SNAPSHOT_COMMIT_FK    = "commit_fk";
     public static final String SNAPSHOT_GLOBAL_ID_FK = "global_id_fk";
-    public static final String SNAPSHOT_TYPE =         "type";
-    public static final String SNAPSHOT_VERSION =      "version";
-    public static final String SNAPSHOT_STATE =        "state";
-    public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v 1.2
+    public static final String SNAPSHOT_TYPE         = "type";
+    public static final String SNAPSHOT_VERSION      = "version";
+    public static final String SNAPSHOT_STATE        = "state";
+    public static final String SNAPSHOT_CHANGED      = "changed_properties"; //since v 1.2
     public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";       //since 2.0
+
+    
+    public static final String PRIMARY_KEY_INDICATOR = "pk";
+    public static final String FOREIGN_KEY_INDICATOR = "fk";
+    public static final String SEQUENCE_INDICATOR    = "seq";
+    public static final String INDEX_INDICATOR       = "idx";
+    public static final Boolean IS_SUFFIX = true;
+
     
     private static final Logger logger = LoggerFactory.getLogger(DBNameProvider.class);
     private final SqlRepositoryConfiguration configuration;
@@ -75,6 +83,12 @@ public class DBNameProvider {
 		logger.debug("SNAPSHOT_STATE:             {}", getSnapshotStateColumnName());
 		logger.debug("SNAPSHOT_CHANGED:           {}", getSnapshotChangedColumnName());
 		logger.debug("SNAPSHOT_MANAGED_TYPE:      {}", getSnapshotManagedTypeColumnName());
+		// ACESSORIES
+		logger.debug("PRIMARY_KEY_INDICATOR:      {}", getPrimaryKeyIndicator());
+		logger.debug("FOREIGN_KEY_INDICATOR:      {}", getForeginKeyIndicator());
+		logger.debug("SEQUENCE_INDICATOR:         {}", getSequenceIndicator());
+		logger.debug("INDEX_INDICATOR:            {}", getIndexIndicator());
+		logger.debug("IS_SUFFIX:                  {}", getIsSuffix());
 
     }
 
@@ -95,15 +109,28 @@ public class DBNameProvider {
     }
 
     public DBObjectName getSnapshotTablePkSeqName() {
-        return fullDbName("SQ_"+getSnapshotPKColumnName());
+    	if(this.getIsSuffix()) {
+    		return fullDbName(getSnapshotPKColumnName() + "_" + getSequenceIndicator());
+    	} else {
+    		return fullDbName(getSequenceIndicator() + "_" + getSnapshotPKColumnName());
+    	}
+        
     }
 
     public DBObjectName getGlobalIdPkSeqName() {
-        return fullDbName("SQ_"+getGlobalIdPKColumnName());
+    	if(this.getIsSuffix()) {
+    		return fullDbName(getGlobalIdPKColumnName() + "_" + getSequenceIndicator());
+    	} else {
+    		return fullDbName(getSequenceIndicator() + "_" + getGlobalIdPKColumnName());
+    	}
     }
 
     public DBObjectName getCommitPkSeqName() {
-        return fullDbName("SQ_"+getCommitPKColumnName());
+    	if(this.getIsSuffix()) {
+    		return fullDbName(getCommitPKColumnName() + "_" + getSequenceIndicator());
+    	} else {
+    		return fullDbName(getSequenceIndicator() + "_" + getCommitPKColumnName());
+    	}
     }
 
     /**
@@ -221,4 +248,24 @@ public class DBNameProvider {
     public String getSnapshotManagedTypeColumnName() {
         return configuration.getSnapshotManagedTypeColumnName().orElse(SNAPSHOT_MANAGED_TYPE);
     }
+    
+    public String getPrimaryKeyIndicator() {
+    	return configuration.getPrimaryKeyIndicator().orElse(PRIMARY_KEY_INDICATOR);
+    }
+    
+	public String getForeginKeyIndicator() {
+		return configuration.getForeginKeyIndicator().orElse(FOREIGN_KEY_INDICATOR);
+	}
+	
+	public String getSequenceIndicator() {
+		return configuration.getSequenceIndicator().orElse(SEQUENCE_INDICATOR);
+	}
+	
+	public String getIndexIndicator() {
+		return configuration.getIndexIndicator().orElse(INDEX_INDICATOR);
+	}
+	
+	public Boolean getIsSuffix() {
+		return configuration.getIsSuffix().orElse(IS_SUFFIX);
+	}
 }
