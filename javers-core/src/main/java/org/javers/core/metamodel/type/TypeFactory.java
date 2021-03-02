@@ -43,18 +43,20 @@ class TypeFactory {
     }
 
     JaversType create(ClientsClassDefinition def) {
-        return create(def, classScanner.scan(def.getBaseJavaClass()));
+        return create(def, null);
     }
 
-    JaversType create(ClientsClassDefinition def, ClassScan scan) {
+    JaversType create(ClientsClassDefinition def, ClassScan scanMaybe) {
+        Supplier<ClassScan> lazyScan = () -> scanMaybe != null ? scanMaybe : classScanner.scan(def.getBaseJavaClass());
+
         if (def instanceof CustomDefinition) {
             return new CustomType(def.getBaseJavaClass(), ((CustomDefinition) def).getComparator());
         } else if (def instanceof EntityDefinition) {
-            EntityType newType = entityTypeFactory.createEntity((EntityDefinition) def, scan);
+            EntityType newType = entityTypeFactory.createEntity((EntityDefinition) def, lazyScan.get());
             saveHints(newType);
             return newType;
         } else if (def instanceof ValueObjectDefinition) {
-            return createValueObject((ValueObjectDefinition) def, scan);
+            return createValueObject((ValueObjectDefinition) def, lazyScan.get());
         } else if (def instanceof ValueDefinition) {
             ValueDefinition valueDefinition = (ValueDefinition) def;
             return new ValueType(valueDefinition.getBaseJavaClass(),
