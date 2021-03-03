@@ -146,7 +146,7 @@ public abstract class SchemaNameAware {
     }
     
     protected String getForeignKeyIndicator() {
-        return dbNameProvider.getForeginKeyIndicator();
+        return dbNameProvider.getForeignKeyIndicator();
     }
     
     protected String getSequenceIndicator() {

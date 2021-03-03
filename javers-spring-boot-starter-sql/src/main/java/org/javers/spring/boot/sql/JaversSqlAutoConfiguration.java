@@ -98,6 +98,11 @@ public class JaversSqlAutoConfiguration {
                 .withSnapshotStateColumnName(javersSqlProperties.getSqlSnapshotStateColumnName())
                 .withSnapshotChangedColumnName(javersSqlProperties.getSqlSnapshotChangedColumnName())
                 .withSnapshotManagedTypeColumnName(javersSqlProperties.getSqlSnapshotManagedTypeColumnName())
+                .withPrimaryKeyIndicator(javersSqlProperties.getSqlPrimaryKeyIndicator())
+                .withForeignKeyIndicator(javersSqlProperties.getSqlForeignKeyIndicator())
+                .withSequenceIndicator(javersSqlProperties.getSqlSequenceIndicator())
+                .withIndexIndicator(javersSqlProperties.getSqlIndexIndicator())
+                .withIsSuffix(javersSqlProperties.getSqlIsSuffix())
                 .build();
     }
 

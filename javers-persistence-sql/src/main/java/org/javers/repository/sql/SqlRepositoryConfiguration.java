@@ -115,11 +115,11 @@ public class SqlRepositoryConfiguration {
 		this.snapshotChangedColumnName     = snapshotChangedColumnName;
 		this.snapshotManagedTypeColumnName = snapshotManagedTypeColumnName;
 		
-	    this.primaryKeyIndicator = primaryKeyIndicator;
-	    this.foreignKeyIndicator = foreignKeyIndicator;
-	    this.sequenceIndicator   = sequenceIndicator;
-	    this.indexIndicator      = indexIndicator;
-	    this.isSuffix            = isSuffix;
+		this.primaryKeyIndicator = primaryKeyIndicator;
+		this.foreignKeyIndicator = foreignKeyIndicator;
+		this.sequenceIndicator   = sequenceIndicator;
+		this.indexIndicator      = indexIndicator;
+		this.isSuffix            = isSuffix;
 	    
 	}
 
@@ -246,7 +246,7 @@ public class SqlRepositoryConfiguration {
 		return Optional.ofNullable(primaryKeyIndicator);
 	}
 
-	public Optional<String> getForeginKeyIndicator() {
+	public Optional<String> getForeignKeyIndicator() {
 		return Optional.ofNullable(foreignKeyIndicator);
 	}
 
@@ -261,4 +261,5 @@ public class SqlRepositoryConfiguration {
 	public Optional<Boolean> getIsSuffix() {
 		return Optional.ofNullable(isSuffix);
 	}
+
 }

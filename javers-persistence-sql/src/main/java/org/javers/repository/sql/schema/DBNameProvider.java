@@ -83,9 +83,9 @@ public class DBNameProvider {
 		logger.debug("SNAPSHOT_STATE:             {}", getSnapshotStateColumnName());
 		logger.debug("SNAPSHOT_CHANGED:           {}", getSnapshotChangedColumnName());
 		logger.debug("SNAPSHOT_MANAGED_TYPE:      {}", getSnapshotManagedTypeColumnName());
-		// ACESSORIES
+		// ACCESSORIES
 		logger.debug("PRIMARY_KEY_INDICATOR:      {}", getPrimaryKeyIndicator());
-		logger.debug("FOREIGN_KEY_INDICATOR:      {}", getForeginKeyIndicator());
+		logger.debug("FOREIGN_KEY_INDICATOR:      {}", getForeignKeyIndicator());
 		logger.debug("SEQUENCE_INDICATOR:         {}", getSequenceIndicator());
 		logger.debug("INDEX_INDICATOR:            {}", getIndexIndicator());
 		logger.debug("IS_SUFFIX:                  {}", getIsSuffix());
@@ -253,8 +253,8 @@ public class DBNameProvider {
     	return configuration.getPrimaryKeyIndicator().orElse(PRIMARY_KEY_INDICATOR);
     }
     
-	public String getForeginKeyIndicator() {
-		return configuration.getForeginKeyIndicator().orElse(FOREIGN_KEY_INDICATOR);
+	public String getForeignKeyIndicator() {
+		return configuration.getForeignKeyIndicator().orElse(FOREIGN_KEY_INDICATOR);
 	}
 	
 	public String getSequenceIndicator() {
