@@ -16,7 +16,6 @@ import java.util.Map;
  */
 public class FixedSchemaFactory extends SchemaNameAware {
     private static final int MAX_INDEX_KEY_LEN_IN_MYSQL = 191;
-
     private final static int ORACLE_MAX_NAME_LEN = 30;
 
     private final Dialect dialect;
@@ -75,9 +74,17 @@ public class FixedSchemaFactory extends SchemaNameAware {
     private Schema commitPropertiesTableSchema(Dialect dialect) {
         DBObjectName tableName = getCommitPropertyTableName();
         Schema schema = emptySchema(dialect);
+
+    	String pkName = tableName.localName();
+    	if(getIsSuffix()) {
+    		pkName = pkName + "_" + tableName.localName();
+    	} else {
+    		pkName = tableName.localName() + "_" + pkName;
+    	}
+    	
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
         relationBuilder
-            .primaryKey(tableName.localName()).using(getCommitPropertyCommitFKColumnName(), getCommitPropertyNameColumnName()).and()
+            .primaryKey(pkName).using(getCommitPropertyCommitFKColumnName(), getCommitPropertyNameColumnName()).and()
             .withAttribute().string(getCommitPropertyNameColumnName()).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).notNull().and()
             .withAttribute().string(getCommitPropertyValueColumnName()).withMaxLength(600).and();
         foreignKey(tableName, getCommitPropertyCommitFKColumnName(), true, getCommitTableNameWithSchema(), getCommitPKColumnName(), relationBuilder);
@@ -128,20 +135,35 @@ public class FixedSchemaFactory extends SchemaNameAware {
     }
     
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder, String seqNameLocal) {
-        relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
-                .primaryKey(pkColName).using(pkColName).and();
+
+    	String pkName = pkColName;
+    	if(getIsSuffix()) {
+    		pkName = pkName + "_" + getPrimaryKeyIndicator();
+    	} else {
+    		pkName = getPrimaryKeyIndicator() + "_" + pkName;
+    	}
+
+        relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT")
+        			   .notNull().and().primaryKey(pkColName).using(pkColName).and();
         schema.addSequence(seqNameLocal).build();
     }
 
     private void foreignKey(DBObjectName tableName, String fkColName, boolean isPartOfPrimaryKey, 
     						String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
-        LongAttributeBuilder longAttributeBuilder = relationBuilder
-                .withAttribute().longAttr(fkColName);
+
+    	String fkName = tableName.localName() + "_" + fkColName;
+    	if(getIsSuffix()) {
+    		fkName = fkName + "_" + getForeignKeyIndicator();
+    	} else {
+    		fkName = getForeignKeyIndicator() + "_" + fkName;
+    	}
+
+        LongAttributeBuilder longAttributeBuilder = relationBuilder.withAttribute().longAttr(fkColName);
         if (isPartOfPrimaryKey && (dialect instanceof DB2Dialect || dialect instanceof DB2400Dialect)) {
             longAttributeBuilder.notNull();
         }
         longAttributeBuilder.and()
-                .foreignKey(tableName.localName() + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
+                .foreignKey(fkName).on(fkColName).references(targetTableName, targetPkColName).and();
     }
 
     private void columnsIndex(DBObjectName tableName, Schema schema, String... colNames){
@@ -158,8 +180,13 @@ public class FixedSchemaFactory extends SchemaNameAware {
     }
 
     String createIndexName(DBObjectName tableName, IndexedCols indexedCols) {
-        String indexName = tableName.localName() + "_" + indexedCols.concatenatedColNames() + "_idx";
-
+    	String indexName = tableName.localName() + "_" + indexedCols.concatenatedColNames();
+    	if(getIsSuffix()) {
+    		indexName = indexName + "_" + getIndexIndicator();
+    	} else {
+    		indexName = getIndexIndicator() + "_" + indexName; 
+    	}
+        
         if (dialect instanceof OracleDialect && indexName.length() > ORACLE_MAX_NAME_LEN)
         {
             return indexName.substring(0, ORACLE_MAX_NAME_LEN);

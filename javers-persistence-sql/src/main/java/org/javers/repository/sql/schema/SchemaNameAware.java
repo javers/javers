@@ -153,6 +153,10 @@ public abstract class SchemaNameAware {
         return dbNameProvider.getSequenceIndicator();
     }
     
+    protected String getIndexIndicator() {
+        return dbNameProvider.getIndexIndicator();
+    }
+    
     protected Boolean getIsSuffix() {
         return dbNameProvider.getIsSuffix();
     }
