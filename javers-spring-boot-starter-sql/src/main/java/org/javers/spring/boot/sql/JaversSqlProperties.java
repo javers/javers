@@ -13,12 +13,7 @@ public class JaversSqlProperties extends JaversSpringProperties {
     private String sqlSchema;
     private String sqlGlobalIdTableName;
     private String sqlCommitTableName;
-    private String sqlCommitIdPKColumnName;
-    private String sqlCommitAuthorColumnName;
-    private String sqlCommitDateColumnName;
-    private String sqlCommitInstantColumnName;
-    private String sqlCommitIdColumnName;
-    
+    private String sqlSnapshotTableName;
     private String sqlCommitPropertyTableName;
     
     private String sqlGlobalIdPKColumnName;

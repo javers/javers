@@ -25,13 +25,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     private String globalIdTableName;
     private String commitTableName;
-    private String commitIdPKColumnName;
-    private String commitAuthorColumnName;
-    private String commitDateColumnName;
-    private String commitInstantColumnName;
-    private String commitIdColumnName;
-    
-    
+    private String snapshotTableName;
     private String commitPropertyTableName;
     
     private String globalIdPKColumnName;

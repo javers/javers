@@ -14,13 +14,7 @@ public class SqlRepositoryConfiguration {
 
     private final String globalIdTableName;
     private final String commitTableName;
-    private final String commitIdPKColumnName;
-    private final String commitAuthorColumnName;
-    private final String commitDateColumnName;
-    private final String commitInstantColumnName;
-    private final String commitIdColumnName;
-    
-    
+    private final String snapshotTableName;
     private final String commitPropertyTableName;
     
     private final String globalIdPKColumnName;
@@ -252,15 +246,7 @@ public class SqlRepositoryConfiguration {
 		return Optional.ofNullable(primaryKeyIndicator);
 	}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 	public Optional<String> getForeignKeyIndicator() {
-=======
-	public Optional<String> getForeginKeyIndicator() {
->>>>>>> e49f659e... feat: add prefix and suffix
-=======
-	public Optional<String> getForeignKeyIndicator() {
->>>>>>> a87ddab8... fix: some problem
 		return Optional.ofNullable(foreignKeyIndicator);
 	}
 
@@ -275,12 +261,5 @@ public class SqlRepositoryConfiguration {
 	public Optional<Boolean> getIsSuffix() {
 		return Optional.ofNullable(isSuffix);
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
->>>>>>> e49f659e... feat: add prefix and suffix
-=======
-
->>>>>>> a87ddab8... fix: some problem
 }
