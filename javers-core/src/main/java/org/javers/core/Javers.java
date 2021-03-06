@@ -75,6 +75,11 @@ import java.util.stream.Stream;
  * 0 QueryBuilder.withNewObjectChanges() method is now deprecated and has no effect.
  *
  * 0 The javers.newObjectSnapshot flag is renamed to javers.initialValueChanges (enabled by default)
+ *
+ * - Minor bug fixed - https://github.com/javers/javers/issues/911
+ *
+ * - The {@link Javers#findShadows(JqlQuery)} method is <b>deprecated</b>
+ *   in favour of {@link Javers#findShadowsAndStream(JqlQuery)}.
  */
 
 /**
@@ -123,7 +128,7 @@ public interface Javers {
      * Async version of {@link #commit(String, Object)}
      * <br/><br/>
      *
-     * <b>Important!</b> Async Javers commits work seamless with MongoDB.
+     * <b>Important!</b> Async Javers commits work seamlessly with MongoDB.
      * If you are using SQL repository &mdash; take extra care about transaction management.
      *
      * @param executor ExecutorService to be used to process commit() asynchronously.
@@ -250,44 +255,58 @@ public interface Javers {
     Diff initial(Object newDomainObject);
 
     /**
-     * Queries JaversRepository for object Shadows. <br/>
-     * {@link Shadow} is a historical version of a domain object restored from a snapshot.
+     * <b>Deprecated</b>, use {@link Javers#findShadowsAndStream(JqlQuery)}.
      * <br/><br/>
      *
-     * For example, to get latest Shadows of "bob" Person, call:
+     * This method is <b>deprecated</b> because when {@link QueryBuilder#limit(int)} is hit
+     * &mdash; Javers might create incomplete object graphs or return a lower number
+     * of Shadows than expected.
+     * <br/><br/>
+     *
+     *See {@link QueryBuilder#limit(int)}
+     */
+    @Deprecated
+    <T> List<Shadow<T>> findShadows(JqlQuery query);
+
+    /**
+     * Queries a JaversRepository for {@link Shadow}s. <br/>
+     * Shadows are historical version of domain objects
+     * which are restored from persisted snapshots.
+     * <br/><br/>
+     *
+     * For example, to get latest 5 Shadows of "bob" Person, call:
+     * <br/><br/>
+     *
      * <pre>
-     * List<Shadow> shadows = javers.findShadows(
-     *       QueryBuilder.byInstanceId("bob", Person.class)
-     *      .limit(5).build() );
+     * Stream<Shadow<Person>> shadows = javers.findShadowsAndStream(
+     *     QueryBuilder.byInstanceId("bob", Person.class).build()).limit(5);
      * </pre>
      *
      * Since Shadows are instances of your domain classes, <br/>
      * you can use them directly in your application:
+     * <br/><br/>
      *
      * <pre>
      * assert shadows.get(0).get() instanceof Person.class;
      * </pre>
      *
-     * <h2>Paging & limit</h2>
-     * Remember that {@link QueryBuilder#limit(int)} limits the number of Snapshots <br/>
-     * loaded in the single JQL query and not the number of returned Shadows <br/>
-     * The situation when one Shadow is reconstructed from many Snapshots is common <br/>
-     * (for example if your Entity contains ValueObjects). <br/>
-     * <br/>
-     *
-     * When a given {@link QueryBuilder#limit(int)} is hit &mdash; Javers creates<br/>
-     * incomplete object graphs or returns a lower number of Shadows than expected.<br/>
-     * <br/>
-     *
-     * <b>The only way to be sure that your Shadows are complete</b> is using<br/>
-     * the streamed query &mdash; {@link #findShadowsAndStream(JqlQuery)}.<br/>
-     * For paging use {@link Stream#skip(long)} and {@link Stream#limit(long)}.
-     *
+     * <h2><b>Paging & limit</b></h2>
+     * Since <code>findShadowsAndStream()</code> returns a lazy loaded stream of Shadows,<br/>
+     * for paging and limit simply use {@link Stream#skip(long)} and {@link Stream#limit(long)}.
      * <br/><br/>
      *
-     * <h2>Query scopes</h2>
+     * When the {@link QueryBuilder#limit(int)} is hit,
+     * <br/>
+     * Javers repeats a given query to load a next bunch of Shadows.
+     * <br/>
+     * Shadow graphs loaded by findShadowsAndStream() are always complete
+     * <br/>
+     * (according to a selected {@link ShadowScope}) but can trigger a lot of DB queries.
+     * <br/><br/>
      *
-     * <b>By default</b>, queries are run in the Shallow scope, which is the fastest one.<br/>
+     * <h2><b>Query scopes</b></h2>
+     * <b>By default</b>, Shadow queries are run in the Shallow scope, which is the fastest one
+     * .<br/>
      * To eagerly load all referenced objects use one of the wider scopes, Commit-deep or Deep+ :
      *
      * <ul>
@@ -295,18 +314,19 @@ public interface Javers {
      *  <li/> {@link QueryBuilder#withScopeDeepPlus(int)}
      * </ul>
      *
-     * We recommend the Deep+ scope as a good start.
+     * We recommend the Deep+ scope as a good start (see {@link ShadowScope}).
      * <br/><br/>
      *
-     * <h2>Query scopes example</h2>
+     * <h2><b>Query scopes example</b></h2>
      *
      * To understand Shadow query scopes, you need to understand how JaVers commit works.<br/>
      * Remember that JaVers reuses existing snapshots and creates a fresh one
      * only if a given object is changed.<br/>
      * The way how objects are committed affects shadow query results.
+     * <br/><br/>
      *
-     * <h3>For example, we have four Entities in the object graph, joined by references:</h3>
-     *
+     * For example, let's say we have four Entities in the object graph, joined by references:
+     * <br/><br/>
      * <pre>
      * // E1 -> E2 -> E3 -> E4
      * def e4 = new Entity(id:4)
@@ -315,10 +335,11 @@ public interface Javers {
      * def e1 = new Entity(id:1, ref:e2)
      * </pre>
      *
-     * <h3>In the first scenario, our four entities are committed in three commits:</h3>
+     * <h3><b>In the first scenario, our four entities are committed in three commits:</b></h3>
      *
      * In Shallow scope, referenced entities are not loaded.
      * But they all can be loaded using Deep+3 scope.
+     * <br/><br/>
      *
      *<pre>
      *given:
@@ -327,9 +348,8 @@ public interface Javers {
      *  javers.commit("author", e1) // commit 3.0 with snapshots of e1 and e2
      *
      *when: 'shallow scope query'
-     *  def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *                      .build())
-     *  def shadowE1 = shadows.get(0).get()
+     *  def shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity).build())
+     *  def shadowE1 = shadows.findFirst().get().get()
      *
      *then: 'only e1 is loaded'
      *  shadowE1 instanceof Entity
@@ -337,9 +357,9 @@ public interface Javers {
      *  shadowE1.ref == null
      *
      *when: 'commit-deep scope query'
-     *  shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *  shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity)
      *                  .withScopeCommitDeep().build())
-     *  shadowE1 = shadows.get(0).get()
+     *  shadowE1 = shadows.findFirst().get().get()
      *
      *then: 'only e1 and e2 are loaded, both was committed in commit 3.0'
      *  shadowE1.id == 1
@@ -347,9 +367,9 @@ public interface Javers {
      *  shadowE1.ref.ref == null
      *
      *when: 'deep+1 scope query'
-     *  shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *  shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity)
      *                  .withScopeDeepPlus(1).build())
-     *  shadowE1 = shadows.get(0).get()
+     *  shadowE1 = shadows.findFirst().get().get()
      *
      *then: 'only e1 + e2 are loaded'
      *  shadowE1.id == 1
@@ -357,9 +377,9 @@ public interface Javers {
      *  shadowE1.ref.ref == null
      *
      *when: 'deep+3 scope query'
-     *  shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *  shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity)
      *                  .withScopeDeepPlus(3).build())
-     *  shadowE1 = shadows.get(0).get()
+     *  shadowE1 = shadows.findFirst().get().get()
      *
      *then: 'all object are loaded'
      *  shadowE1.id == 1
@@ -368,19 +388,20 @@ public interface Javers {
      *  shadowE1.ref.ref.ref.id == 4
      *</pre>
      *
-     * <h3>In the second scenario, our four entities are committed in the single commit:</h3>
+     * <h3><b>In the second scenario, our four entities are committed in the single commit:</b></h3>
      *
-     * Shallow scope works in the same way.
-     * Commit-deep scope is enough to load the full graph.
+     * Shallow scope works in the same way as in the first example,<br/>
+     * but commit-deep scope is enough to load the full graph.
+     * <br/><br/>
      *
      *<pre>
      *given:
      *  javers.commit("author", e1) //commit 1.0 with snapshots of e1, e2, e3 and e4
      *
      *when: 'commit-deep scope query'
-     *  shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *  shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity)
      *                  .withScopeCommitDeep().build())
-     *  shadowE1 = shadows.get(0).get()
+     *  shadowE1 = shadows.findFirst().get().get()
      *
      *then: 'all object are loaded'
      *  shadowE1.id == 1
@@ -389,18 +410,23 @@ public interface Javers {
      *  shadowE1.ref.ref.ref.id == 4
      *</pre>
      *
-     * <h2>Performance & Profiling</h2>
-     * Each Shadow query executes one or more Snapshot queries (depending on the scope)
-     * and complexity of an object graph.
-     * If you are having
-     * performance issues, check with debug mode how your Shadow query is executed
-     * and then, try to reduce the scope.
+     * <h2><b>Performance & Profiling</b></h2>
+     * Each Shadow query executes one or more DB queries (Snapshot queries).<br/>
+     * The number of executed DB queries depends on: selected {@link ShadowScope}, <br/>
+     * complexity of your object graphs, and obviously on {@link Stream#limit(long)}.
+     * <br/><br/>
+     *
+     * If you are having performance issues, set the
+     * <code>org.javers.JQL</code> logger to <code>DEBUG</code> level <br/>
+     * and check how your Shadow query is executed. <br/>
+     * Then, try to reduce the scope.<br/><br/>
      *
      *<pre>
      *&lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
      *</pre>
      *
-     * Example debug for a Shadow query execution:
+     * <b<>Example debug log for a Shadow query execution:</b>
+     * <br/><br/>
      *
      *<pre>
      *DEBUG org.javers.JQL - SHALLOW query: 1 snapshots loaded (entities: 1, valueObjects: 0)
@@ -425,31 +451,10 @@ public interface Javers {
      *
      * Execution stats are also available in {@link JqlQuery#stats()}.
      *
-     * @return A list of Shadows, ordered in reverse chronological order. Empty if nothing found.
+     * @return A lazy loaded stream of Shadows, ordered in reverse chronological order.
+     *         Terminated stream if nothing found.
      * @param <T> type of a domain object
-     * @see #findShadowsAndStream(JqlQuery)
      * @see ShadowScope
-     * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
-     * @since 3.2
-     */
-    <T> List<Shadow<T>> findShadows(JqlQuery query);
-
-    /**
-     * The streamed version of {@link #findShadows(JqlQuery)}.
-     * <br/><br/>
-     *
-     * The returned stream is lazy loaded. When the {@link QueryBuilder#limit(int)} is hit,
-     * Javers repeats a given query to load a next bunch of Snapshots.
-     * <br/><br/>
-     *
-     * Streaming is <b>the recommended way</b> to load large Shadow graphs.
-     * <br/><br/>
-     *
-     * For paging use {@link Stream#skip(long)} and {@link Stream#limit(long)}.
-     *
-     * @return A lazy loaded stream of Shadows, ordered in reverse chronological order. Terminated stream if nothing found.
-     * @param <T> type of a domain object
-     * @see #findShadows(JqlQuery)
      * @since 3.10
      */
     <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query);

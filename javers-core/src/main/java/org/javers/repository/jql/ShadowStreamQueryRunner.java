@@ -23,7 +23,7 @@ class ShadowStreamQueryRunner {
     Stream<Shadow> queryForShadowsStream(JqlQuery query) {
 
         if (query.getQueryParams().skip() > 0) {
-            throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "skip can't be set on a JqlStreamQuery. Use Stream.skip() on a resulting Stream.");
+            throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "QueryBuilder.skip() can't be used with findShadowsAndStream(). Use Stream.skip() on a resulting Stream.");
         }
 
         int characteristics = IMMUTABLE | ORDERED;

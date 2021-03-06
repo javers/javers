@@ -1,6 +1,7 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Sets;
+import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
@@ -297,42 +298,44 @@ public class QueryBuilder {
 
     /**
      * Limits the number of Snapshots to be fetched from JaversRepository in a single query.
-     * By default, the limit is set to 100, which works well with small data structures.
+     * By default, the limit is set to 100.
      * <br/><br/>
      *
-     * There are four types of query output: List of Changes,
-     * List of Snapshots, List of Shadows, and Stream of Shadows.
+     * There are four types of JQL query output: List of Changes,
+     * List of Snapshots, Stream of Shadows, and List of Shadows (deprecated).
+     * <br/><br/>
      *
      * Since all of Javers queries rely on <b>Snapshots</b>
-     * in order to generate their output, the limit filter affects all of them,
+     * in order to generate their output, the snapshotLimit() filter affects all of them,
      * but in a different way:
      *
      * <ul>
-     *   <li>{@link Javers#findSnapshots(JqlQuery)} &mdash; the limit works intuitively,
+     *   <li>{@link Javers#findSnapshots(JqlQuery)} &mdash; the snapshotLimit() works intuitively,
      *   it's the maximum size of a returned list.
      *   </li>
+     *
      *   <li>{@link Javers#findChanges(JqlQuery)} &mdash;
-     *   the size of a returned list can be <b>greater</b> than the limit, because,
+     *   the size of a returned list can be <b>greater</b> than the snapshotLimit(), because,
      *   typically a difference between any two Snapshots consists of many atomic Changes.
      *   </li>
-     *   <li>{@link Javers#findShadows(JqlQuery)} &mdash;
-     *   the size of a returned list can be <b>less</b> than the limit and
-     *   Shadow graphs can be incomplete,
-     *   because, typically, one Shadow is reconstructed from many Snapshots.
-     *   Hitting the limit in findShadows() is very likely and it's a bad thing.
-     *   </li>
+
      *   <li>{@link Javers#findShadowsAndStream(JqlQuery)} &mdash;
-     *   the resulting stream is <b>lazily loaded</b> and it's limited only by
-     *   the size of your JaversRepository and your heap.
-     *   When the limit is hit, Javers repeats a given query to load a next bunch of Snapshots.
+     *   the resulting stream is <b>lazily loaded</b> and is limited only by
+     *   {@link Stream#limit(long)}.
+     *   The snapshotLimit() sets only the maximum size of a single query.
+     *   When it's hit, Javers repeats a given query to load a next bunch of Snapshots.
      *   Shadow graphs loaded by findShadowsAndStream() are always complete,
-     *   but can trigger a lot of queries.
+     *   but can trigger a lot of DB queries.
+     *   </li>
+     *
+     *   <li>{@link Javers#findShadows(JqlQuery)} &mdash;
+     *   the size of a returned list can be <b>less</b> than the snapshotLimit() and
+     *   Shadow graphs can be incomplete.
+     *   Typically, one Shadow is reconstructed from many Snapshots, so
+     *   hitting the snapshotLimit() in findShadows() is very likely and it's a bad thing.
+     *   <b>That's why {@link Javers#findShadows(JqlQuery)} is deprecated.</b>
      *   </li>
      * </ul>
-     *
-     * <b>We recommend</b> {@link Javers#findShadowsAndStream(JqlQuery)}
-     * as a primary method of loading Shadows.
-     * <br/><br/>
      *
      * See
      * <a href="https://github.com/javers/javers/blob/master/javers-core/src/test/groovy/org/javers/core/examples/QueryBuilderLimitExamples.groovy">
@@ -350,13 +353,14 @@ public class QueryBuilder {
     }
 
     /**
-     * Sets the number of Snapshots to skip.
-     * Use skip() and limit() for paging Snapshots and Changes.
+     * Sets the number of Snapshots to skip.<br/>
+     * Use skip() and snapshotLimit() for paging Snapshots and Changes.
      * <br/><br/>
      *
      * For paging Shadows use {@link Javers#findShadowsAndStream(JqlQuery)}
      * with {@link Stream#skip(long)} and {@link Stream#limit(long)}.
-     *  <br/><br/>
+     *
+     * @throws JaversException MALFORMED_JQL when used with {@link Javers#findShadowsAndStream(JqlQuery)}
      */
     public QueryBuilder skip(int skip) {
         queryParamsBuilder.skip(skip);
