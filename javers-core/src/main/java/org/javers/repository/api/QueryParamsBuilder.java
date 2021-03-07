@@ -31,6 +31,28 @@ public class QueryParamsBuilder {
     private boolean loadCommitProps = true;
     private Integer snapshotQueryLimit;
 
+    public static QueryParamsBuilder copy(QueryParams that) {
+        QueryParamsBuilder copy =  new QueryParamsBuilder(that.limit())
+                .skip(that.skip());
+
+        that.from().ifPresent(it -> copy.from(it));
+        that.to().ifPresent(it -> copy.to(it));
+        that.fromInstant().ifPresent(it -> copy.fromInstant(it));
+        that.toInstant().ifPresent(it -> copy.toInstant(it));
+        that.toCommitId().ifPresent((it -> copy.toCommitId(it)));
+        copy.commitIds = that.commitIds();
+        that.version().ifPresent((it -> copy.version(it)));
+        that.author().ifPresent((it -> copy.author(it)));
+        copy.withChildValueObjects(that.isAggregate());
+        copy.commitProperties = that.commitProperties();
+        copy.changedProperties = that.changedProperties();
+        that.snapshotType().ifPresent((it -> copy.withSnapshotType(it)));
+        copy.loadCommitProps = that.isLoadCommitProps();
+        that.snapshotQueryLimit().ifPresent((it -> copy.snapshotQueryLimit(it)));
+
+        return copy;
+    }
+
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
         this.skip = 0;
@@ -46,10 +68,12 @@ public class QueryParamsBuilder {
         return new QueryParamsBuilder(limit);
     }
 
+
+
     /**
      * @see QueryBuilder#snapshotQueryLimit(int)
      */
-    public QueryParamsBuilder withSnapshotQueryLimit(int snapshotQueryLimit) {
+    public QueryParamsBuilder snapshotQueryLimit(Integer snapshotQueryLimit) {
         this.snapshotQueryLimit = snapshotQueryLimit;
         return this;
     }
@@ -140,7 +164,9 @@ public class QueryParamsBuilder {
      * @see QueryBuilder#withCommitIds(Collection)
      */
     public QueryParamsBuilder commitIds(Collection<CommitId> commitIds) {
-        this.commitIds.addAll(commitIds);
+        if (commitIds != null) {
+            this.commitIds.addAll(commitIds);
+        }
         return this;
     }
 

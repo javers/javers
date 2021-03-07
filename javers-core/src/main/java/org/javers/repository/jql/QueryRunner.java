@@ -34,10 +34,6 @@ public class QueryRunner {
         return shadowStreamQueryRunner.queryForShadowsStream(query);
     }
 
-    public List<Shadow> queryForShadows(JqlQuery query) {
-        return shadowQueryRunner.queryForShadows(query);
-    }
-
     public Optional<CdoSnapshot> runQueryForLatestSnapshot(GlobalIdDTO globalId) {
         return snapshotQueryRunner.runQueryForLatestSnapshot(globalId);
     }

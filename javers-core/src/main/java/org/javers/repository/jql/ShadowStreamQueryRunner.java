@@ -1,8 +1,6 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Pair;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.shadow.Shadow;
@@ -21,6 +19,7 @@ class ShadowStreamQueryRunner {
     }
 
     Stream<Shadow> queryForShadowsStream(JqlQuery query) {
+        int shadowsLimit = query.getQueryParams().limit();
 
         int characteristics = IMMUTABLE | ORDERED;
         StreamQuery streamQuery = new StreamQuery(query);
@@ -33,7 +32,7 @@ class ShadowStreamQueryRunner {
             stream = stream.skip(query.getQueryParams().skip());
         }
 
-        return stream.limit(query.getQueryParams().limit());
+        return stream.limit(shadowsLimit);
     }
 
     class StreamQuery {
@@ -43,6 +42,10 @@ class ShadowStreamQueryRunner {
 
         StreamQuery(JqlQuery initialQuery) {
             Validate.argumentIsNotNull(initialQuery);
+            int snapshotBatchSize = initialQuery.getQueryParams().hasSnapshotQueryLimit()
+                    ? initialQuery.getQueryParams().snapshotQueryLimit().get()
+                    : 100;
+            initialQuery.changeLimit(snapshotBatchSize);
             this.awaitingQuery = initialQuery;
         }
 

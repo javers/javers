@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -184,7 +185,7 @@ class JaversCore implements Javers {
     @Override
     public <T> List<Shadow<T>> findShadows(JqlQuery query) {
         Validate.argumentIsNotNull(query);
-        return (List)queryRunner.queryForShadows(query);
+        return (List)findShadowsAndStream(query).collect(Collectors.toList());
     }
 
     @Override

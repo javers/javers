@@ -44,27 +44,26 @@ public class QueryParams {
         this.fromInstant = fromInstant;
         this.to = to;
         this.toInstant = toInstant;
-        this.commitIds = commitIds;
+        this.commitIds = Collections.unmodifiableSet(commitIds);
         this.version = version;
         this.author = author;
-        this.commitProperties = commitProperties;
+        this.commitProperties = Collections.unmodifiableMap(commitProperties);
         this.aggregate = aggregate;
-        this.changedProperties = changedProperties;
+        this.changedProperties = Collections.unmodifiableSet(changedProperties);
+
         this.toCommitId = toCommitId;
         this.snapshotType = snapshotType;
         this.loadCommitProps = loadCommitProps;
     }
 
     public QueryParams changeAggregate(boolean newAggregate) {
-        return new QueryParams(
-                limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties,
-                newAggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
+        return QueryParamsBuilder.copy(this)
+                .withChildValueObjects(newAggregate).build();
     }
 
     public QueryParams nextPage() {
-        return new QueryParams(
-                limit, skip + limit, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties,
-                aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
+        return QueryParamsBuilder.copy(this)
+                .skip(skip + limit).build();
     }
 
     /**

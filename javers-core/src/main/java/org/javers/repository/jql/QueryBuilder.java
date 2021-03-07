@@ -297,10 +297,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits the number of Snapshots to be fetched from a JaversRepository <br/>
-     * in a single DB query in
-     * {@link Javers#findShadows(JqlQuery)} and {@link Javers#findShadowsAndStream(JqlQuery)}.
-     * 100 by default.
+     * Works only with {@link Javers#findShadows(JqlQuery)} and {@link Javers#findShadowsAndStream(JqlQuery)}.
+     * <br/>
+     * Limits the number of Snapshots to be fetched from a JaversRepository in a single DB query
+     * <br/>
+     * &mdash; 100 by default.
      * <br/><br/>
      *
      * In {@link Javers#findSnapshots(JqlQuery)} and {@link Javers#findChanges(JqlQuery)}
@@ -308,8 +309,8 @@ public class QueryBuilder {
      *
      * @throws JaversException MALFORMED_JQL if used with {@link Javers#findSnapshots(JqlQuery)} or {@link Javers#findChanges(JqlQuery)}
      */
-    public QueryBuilder snapshotQueryLimit(int snapshotQueryLimit) {
-        queryParamsBuilder.withSnapshotQueryLimit(snapshotQueryLimit);
+    public QueryBuilder snapshotQueryLimit(Integer snapshotQueryLimit) {
+        queryParamsBuilder.snapshotQueryLimit(snapshotQueryLimit);
         return this;
     }
 

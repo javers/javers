@@ -43,10 +43,6 @@ class ShadowQueryRunner {
         this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
-    List<Shadow> queryForShadows(JqlQuery query) {
-        return queryForShadows(query, Collections.emptyList()).left();
-    }
-
     Pair<List<Shadow>, List<CdoSnapshot>> queryForShadows(JqlQuery query, List<CdoSnapshot> gapsFilledInPreviousQuery) {
         List<CdoSnapshot> coreSnapshots = queryForCoreSnapshots(query);
 

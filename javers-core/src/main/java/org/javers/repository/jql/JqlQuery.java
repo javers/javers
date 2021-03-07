@@ -11,6 +11,7 @@ import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.QueryParams;
+import org.javers.repository.api.QueryParamsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +116,13 @@ public class JqlQuery {
             return Optional.of((T)filter);
         }
         return Optional.empty();
+    }
+
+    void changeLimit(int newLimit) {
+        queryParams = QueryParamsBuilder.copy(queryParams)
+                .limit(newLimit)
+                .snapshotQueryLimit(null)
+                .build();
     }
 
     void aggregateIfEntityQuery() {
