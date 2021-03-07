@@ -297,9 +297,28 @@ public class QueryBuilder {
     }
 
     /**
+     * Limits the number of Snapshots to be fetched from a JaversRepository <br/>
+     * in a single DB query in
+     * {@link Javers#findShadows(JqlQuery)} and {@link Javers#findShadowsAndStream(JqlQuery)}.
+     * 100 by default.
+     * <br/><br/>
+     *
+     * In {@link Javers#findSnapshots(JqlQuery)} and {@link Javers#findChanges(JqlQuery)}
+     * simply use {@link #limit(int)}.
+     *
+     * @throws JaversException MALFORMED_JQL if used with {@link Javers#findSnapshots(JqlQuery)} or {@link Javers#findChanges(JqlQuery)}
+     */
+    public QueryBuilder snapshotQueryLimit(int snapshotQueryLimit) {
+        queryParamsBuilder.withSnapshotQueryLimit(snapshotQueryLimit);
+        return this;
+    }
+
+    /**
      * Limits the number of Snapshots to be fetched from JaversRepository in a single query.
      * By default, the limit is set to 100.
      * <br/><br/>
+     *
+     * TODO
      *
      * There are four types of JQL query output: List of Changes,
      * List of Snapshots, Stream of Shadows, and List of Shadows (deprecated).
@@ -341,11 +360,6 @@ public class QueryBuilder {
      * <a href="https://github.com/javers/javers/blob/master/javers-core/src/test/groovy/org/javers/core/examples/QueryBuilderLimitExamples.groovy">
      * QueryBuilderLimitExamples.groovy
      * </a>.
-     *
-     * @see Change
-     * @see CdoSnapshot
-     * @see Shadow
-     * @see JaversRepository
      */
     public QueryBuilder limit(int limit) {
         queryParamsBuilder.limit(limit);
@@ -353,17 +367,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Sets the number of Snapshots to skip.<br/>
-     * Use skip() and limit() for paging Snapshots, Changes.
+     * Sets the number of Snapshots or Shadows to skip.<br/>
+     * Use skip() and limit() for paging.
      * <br/><br/>
      *
-     * {@link Javers#findShadowsAndStream(JqlQuery)}
-     *
-     * For paging Shadows you can also use
-     * {@link Stream#skip(long)} and {@link Stream#limit(long)}
-     * on the stream
-     *
-     * with
+     * See {@link #limit(int)}
      */
     public QueryBuilder skip(int skip) {
         queryParamsBuilder.skip(skip);

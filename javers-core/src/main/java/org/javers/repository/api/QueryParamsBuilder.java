@@ -29,6 +29,7 @@ public class QueryParamsBuilder {
     private Set<String> changedProperties = new HashSet<>();
     private SnapshotType snapshotType;
     private boolean loadCommitProps = true;
+    private Integer snapshotQueryLimit;
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -36,11 +37,21 @@ public class QueryParamsBuilder {
     };
 
     /**
-     * Initializes builder with a given limit - number of snapshots to be fetched from database.
+     *  Initializes builder with a given limit
+     *
+     *  @see QueryBuilder#limit(int)
      */
     public static QueryParamsBuilder withLimit(int limit) {
         checkLimit(limit);
         return new QueryParamsBuilder(limit);
+    }
+
+    /**
+     * @see QueryBuilder#snapshotQueryLimit(int)
+     */
+    public QueryParamsBuilder withSnapshotQueryLimit(int snapshotQueryLimit) {
+        this.snapshotQueryLimit = snapshotQueryLimit;
+        return this;
     }
 
     /**
@@ -178,6 +189,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps);
+        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
     }
 }

@@ -8,14 +8,15 @@ import java.time.Instant;
 import java.util.*;
 
 import org.javers.core.commit.CommitId;
+
 import java.time.LocalDateTime;
 
 /**
  * Container for additional query parameters
  * used for filtering Snapshots to be fetched from database.
  *
- * @see QueryParamsBuilder
  * @author michal wesolowski
+ * @see QueryParamsBuilder
  */
 public class QueryParams {
     private final int limit;
@@ -33,8 +34,10 @@ public class QueryParams {
     private final Set<String> changedProperties;
     private final SnapshotType snapshotType;
     private final boolean loadCommitProps;
+    private final Integer snapshotQueryLimit;
 
-    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps) {
+    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps, Integer snapshotQueryLimit) {
+        this.snapshotQueryLimit = snapshotQueryLimit;
         this.limit = limit;
         this.skip = skip;
         this.from = from;
@@ -55,13 +58,13 @@ public class QueryParams {
     public QueryParams changeAggregate(boolean newAggregate) {
         return new QueryParams(
                 limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties,
-                newAggregate, changedProperties, toCommitId, snapshotType, loadCommitProps);
+                newAggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
     }
 
     public QueryParams nextPage() {
         return new QueryParams(
-                limit, skip+limit, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties,
-                aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps);
+                limit, skip + limit, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties,
+                aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
     }
 
     /**
@@ -78,6 +81,14 @@ public class QueryParams {
         return skip;
     }
 
+    public boolean hasSnapshotQueryLimit() {
+        return snapshotQueryLimit != null;
+    }
+
+    public Optional<Integer> snapshotQueryLimit() {
+        return Optional.ofNullable(snapshotQueryLimit);
+    }
+
     /**
      * @see QueryBuilder#from(LocalDateTime)
      */
@@ -88,7 +99,9 @@ public class QueryParams {
     /**
      * @see QueryBuilder#fromInstant(Instant)
      */
-    public Optional<Instant> fromInstant() { return Optional.ofNullable(fromInstant); }
+    public Optional<Instant> fromInstant() {
+        return Optional.ofNullable(fromInstant);
+    }
 
     /**
      * @see QueryBuilder#to(LocalDateTime)
@@ -123,13 +136,13 @@ public class QueryParams {
      */
     public Map<String, String> commitProperties() {
         return commitProperties != null ?
-            commitProperties : Collections.emptyMap();
+                commitProperties : Collections.emptyMap();
     }
 
     /**
      * @see QueryBuilder#withChangedPropertyIn(String...)
      */
-    public Set<String> changedProperties(){
+    public Set<String> changedProperties() {
         return Collections.unmodifiableSet(changedProperties);
     }
 
@@ -180,6 +193,7 @@ public class QueryParams {
                 "author", author,
                 "snapshotType", snapshotType,
                 "limit", limit,
-                "skip", skip);
+                "skip", skip,
+                "snapshotQueryLimit", snapshotQueryLimit);
     }
 }

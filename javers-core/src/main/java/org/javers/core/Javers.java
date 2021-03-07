@@ -278,7 +278,7 @@ public interface Javers {
      * for paging.<br/>
      * But remember that to create one Shadow, Javers typically needs to load more than<br/>
      * one Snapshot. <br/>
-     * When the {@link QueryBuilder#snapshotLimit(int)} is hit, Javers repeats a given query <br/>
+     * When {@link QueryBuilder#snapshotQueryLimit(int)} is hit, Javers repeats a given query <br/>
      * to load next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
      * <br/>
      * Returned list of Shadow graphs is always complete (according to the selected {@link ShadowScope}) <br/>
@@ -445,7 +445,7 @@ public interface Javers {
      * <br/><br/>
      *
      * The returned stream is lazy loaded.<br/>
-     * When the {@link QueryBuilder#snapshotLimit(int)} is hit, Javers repeats a given query<br/>
+     * When {@link QueryBuilder#snapshotQueryLimit(int)} is hit, Javers repeats a given query<br/>
      * to load next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
      * <br/>
      * Returned list of Shadow graphs is always complete (according to the selected {@link ShadowScope}) <br/>

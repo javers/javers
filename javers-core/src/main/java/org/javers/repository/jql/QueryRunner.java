@@ -1,5 +1,7 @@
 package org.javers.repository.jql;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.shadow.Shadow;
@@ -40,11 +42,21 @@ public class QueryRunner {
         return snapshotQueryRunner.runQueryForLatestSnapshot(globalId);
     }
 
-    public List<CdoSnapshot> queryForSnapshots(JqlQuery query){
+    public List<CdoSnapshot> queryForSnapshots(JqlQuery query) {
+        validateSnapshotQueryLimit(query, "findSnapshots()");
         return snapshotQueryRunner.queryForSnapshots(query);
     }
 
     public List<Change> queryForChanges(JqlQuery query) {
+        validateSnapshotQueryLimit(query, "findChanges()");
         return changesQueryRunner.queryForChanges(query);
+    }
+
+    private void validateSnapshotQueryLimit(JqlQuery query, String method) {
+        if (query.getQueryParams().hasSnapshotQueryLimit()) {
+            throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
+                    "QueryBuilder.snapshotQueryLimit() can be used only in Shadow queries. " +
+                            "In Javers."+method+" use QueryBuilder.limit().");
+        }
     }
 }
