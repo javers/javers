@@ -5,11 +5,7 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
-
-import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.diff.changetype.PropertyChange;
-
-import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
@@ -78,8 +74,9 @@ import java.util.stream.Stream;
  *
  * - Minor bug fixed - https://github.com/javers/javers/issues/911
  *
- * - The {@link Javers#findShadows(JqlQuery)} method is <b>deprecated</b>
- *   in favour of {@link Javers#findShadowsAndStream(JqlQuery)}.
+ * - Fixed problem with limit() in {@link Javers#findShadows()}
+ *   and {@link Javers#findShadowsAndStream()}
+ *   - https://github.com/javers/javers/issues/822
  */
 
 /**
@@ -255,20 +252,6 @@ public interface Javers {
     Diff initial(Object newDomainObject);
 
     /**
-     * <b>Deprecated</b>, use {@link Javers#findShadowsAndStream(JqlQuery)}.
-     * <br/><br/>
-     *
-     * This method is <b>deprecated</b> because when {@link QueryBuilder#limit(int)} is hit
-     * &mdash; Javers might create incomplete object graphs or return a lower number
-     * of Shadows than expected.
-     * <br/><br/>
-     *
-     *See {@link QueryBuilder#limit(int)}
-     */
-    @Deprecated
-    <T> List<Shadow<T>> findShadows(JqlQuery query);
-
-    /**
      * Queries a JaversRepository for {@link Shadow}s. <br/>
      * Shadows are historical version of domain objects
      * which are restored from persisted snapshots.
@@ -278,8 +261,8 @@ public interface Javers {
      * <br/><br/>
      *
      * <pre>
-     * Stream<Shadow<Person>> shadows = javers.findShadowsAndStream(
-     *     QueryBuilder.byInstanceId("bob", Person.class).build()).limit(5);
+     * List&lt;Shadow&gt; shadows = javers.findShadows(
+     *       QueryBuilder.byInstanceId("bob", Person.class).limit(5).build() );
      * </pre>
      *
      * Since Shadows are instances of your domain classes, <br/>
@@ -291,17 +274,15 @@ public interface Javers {
      * </pre>
      *
      * <h2><b>Paging & limit</b></h2>
-     * Since <code>findShadowsAndStream()</code> returns a lazy loaded stream of Shadows,<br/>
-     * for paging and limit simply use {@link Stream#skip(long)} and {@link Stream#limit(long)}.
-     * <br/><br/>
-     *
-     * When the {@link QueryBuilder#limit(int)} is hit,
+     * Use {@link QueryBuilder#skip(int)} and {@link QueryBuilder#limit(int)}
+     * for paging.<br/>
+     * But remember that to create one Shadow, Javers typically needs to load more than<br/>
+     * one Snapshot. <br/>
+     * When the {@link QueryBuilder#snapshotLimit(int)} is hit, Javers repeats a given query <br/>
+     * to load next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
      * <br/>
-     * Javers repeats a given query to load a next bunch of Shadows.
-     * <br/>
-     * Shadow graphs loaded by findShadowsAndStream() are always complete
-     * <br/>
-     * (according to a selected {@link ShadowScope}) but can trigger a lot of DB queries.
+     * Returned list of Shadow graphs is always complete (according to the selected {@link ShadowScope}) <br/>
+     * but the whole operation can trigger a few DB queries.
      * <br/><br/>
      *
      * <h2><b>Query scopes</b></h2>
@@ -348,8 +329,9 @@ public interface Javers {
      *  javers.commit("author", e1) // commit 3.0 with snapshots of e1 and e2
      *
      *when: 'shallow scope query'
-     *  def shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity).build())
-     *  def shadowE1 = shadows.findFirst().get().get()
+     *  def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *                      .build())
+     *  def shadowE1 = shadows.get(0).get()
      *
      *then: 'only e1 is loaded'
      *  shadowE1 instanceof Entity
@@ -357,9 +339,9 @@ public interface Javers {
      *  shadowE1.ref == null
      *
      *when: 'commit-deep scope query'
-     *  shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity)
+     *  shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
      *                  .withScopeCommitDeep().build())
-     *  shadowE1 = shadows.findFirst().get().get()
+     *  shadowE1 = shadows.get(0).get()
      *
      *then: 'only e1 and e2 are loaded, both was committed in commit 3.0'
      *  shadowE1.id == 1
@@ -367,9 +349,9 @@ public interface Javers {
      *  shadowE1.ref.ref == null
      *
      *when: 'deep+1 scope query'
-     *  shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity)
+     *  shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
      *                  .withScopeDeepPlus(1).build())
-     *  shadowE1 = shadows.findFirst().get().get()
+     *  shadowE1 = shadows.get(0).get()
      *
      *then: 'only e1 + e2 are loaded'
      *  shadowE1.id == 1
@@ -377,9 +359,9 @@ public interface Javers {
      *  shadowE1.ref.ref == null
      *
      *when: 'deep+3 scope query'
-     *  shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity)
+     *  shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
      *                  .withScopeDeepPlus(3).build())
-     *  shadowE1 = shadows.findFirst().get().get()
+     *  shadowE1 = shadows.get(0).get()
      *
      *then: 'all object are loaded'
      *  shadowE1.id == 1
@@ -399,9 +381,9 @@ public interface Javers {
      *  javers.commit("author", e1) //commit 1.0 with snapshots of e1, e2, e3 and e4
      *
      *when: 'commit-deep scope query'
-     *  shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, Entity)
+     *  shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
      *                  .withScopeCommitDeep().build())
-     *  shadowE1 = shadows.findFirst().get().get()
+     *  shadowE1 = shadows.get(0).get()
      *
      *then: 'all object are loaded'
      *  shadowE1.id == 1
@@ -451,11 +433,29 @@ public interface Javers {
      *
      * Execution stats are also available in {@link JqlQuery#stats()}.
      *
-     * @return A lazy loaded stream of Shadows, ordered in reverse chronological order.
-     *         Terminated stream if nothing found.
+     * @return Returns a list of latest Shadows ordered in reverse chronological order
+     *         The size of the list is limited by {@link QueryBuilder#limit(int)}.
      * @param <T> type of a domain object
      * @see ShadowScope
-     * @since 3.10
+     */
+    <T> List<Shadow<T>> findShadows(JqlQuery query);
+
+    /**
+     * The streamed version of {@link #findShadows(JqlQuery)}.
+     * <br/><br/>
+     *
+     * The returned stream is lazy loaded.<br/>
+     * When the {@link QueryBuilder#snapshotLimit(int)} is hit, Javers repeats a given query<br/>
+     * to load next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
+     * <br/>
+     * Returned list of Shadow graphs is always complete (according to the selected {@link ShadowScope}) <br/>
+     * but the whole operation can trigger a few DB queries.
+     *
+     * @return A lazy loaded stream of latest Shadows ordered in reverse chronological order.
+     *         Terminated stream if nothing found. The size of the stream is limited by
+     *         {@link QueryBuilder#limit(int)}.
+     * @param <T> type of a domain object
+     * @see #findShadows(JqlQuery)
      */
     <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query);
 

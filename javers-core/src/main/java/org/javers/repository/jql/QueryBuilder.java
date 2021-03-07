@@ -354,13 +354,16 @@ public class QueryBuilder {
 
     /**
      * Sets the number of Snapshots to skip.<br/>
-     * Use skip() and snapshotLimit() for paging Snapshots and Changes.
+     * Use skip() and limit() for paging Snapshots, Changes.
      * <br/><br/>
      *
-     * For paging Shadows use {@link Javers#findShadowsAndStream(JqlQuery)}
-     * with {@link Stream#skip(long)} and {@link Stream#limit(long)}.
+     * {@link Javers#findShadowsAndStream(JqlQuery)}
      *
-     * @throws JaversException MALFORMED_JQL when used with {@link Javers#findShadowsAndStream(JqlQuery)}
+     * For paging Shadows you can also use
+     * {@link Stream#skip(long)} and {@link Stream#limit(long)}
+     * on the stream
+     *
+     * with
      */
     public QueryBuilder skip(int skip) {
         queryParamsBuilder.skip(skip);

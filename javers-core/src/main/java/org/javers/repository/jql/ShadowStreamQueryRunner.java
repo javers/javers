@@ -22,10 +22,6 @@ class ShadowStreamQueryRunner {
 
     Stream<Shadow> queryForShadowsStream(JqlQuery query) {
 
-        if (query.getQueryParams().skip() > 0) {
-            throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "QueryBuilder.skip() can't be used with findShadowsAndStream(). Use Stream.skip() on a resulting Stream.");
-        }
-
         int characteristics = IMMUTABLE | ORDERED;
         StreamQuery streamQuery = new StreamQuery(query);
         Spliterator<Shadow> spliterator = Spliterators
@@ -33,7 +29,11 @@ class ShadowStreamQueryRunner {
 
         Stream<Shadow> stream = StreamSupport.stream(spliterator, false);
 
-        return stream;
+        if (query.getQueryParams().skip() > 0) {
+            stream = stream.skip(query.getQueryParams().skip());
+        }
+
+        return stream.limit(query.getQueryParams().limit());
     }
 
     class StreamQuery {

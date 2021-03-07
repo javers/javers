@@ -34,7 +34,7 @@ class ShadowStreamLimitBug extends Specification {
         List<Shadow<Employee>> shadowsC = javers.findShadows(query)
 
         then:
-        shadows.count() == 11
+        shadows.count() == 2
         shadowsC.size() == 2
     }
 }
