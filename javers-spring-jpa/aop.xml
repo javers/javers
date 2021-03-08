@@ -1,0 +1,10 @@
+<!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
+<aspectj>
+    <weaver>
+        <include within="org.javers.spring.jpa.JaversEntityListener"/>
+    </weaver>
+
+    <aspects>
+        <aspect name="org.springframework.beans.factory.aspectj.AnnotationBeanConfigurerAspect"/>
+    </aspects>
+</aspectj>

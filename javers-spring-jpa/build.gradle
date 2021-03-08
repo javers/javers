@@ -1,3 +1,11 @@
+plugins {
+    id "io.freefair.aspectj.post-compile-weaving" version "5.3.0"
+}
+
+aspectj {
+    version = aspectjweaverVersion
+}
+
 javadoc {
     failOnError = false
 }
@@ -10,9 +18,19 @@ dependencies {
     implementation "org.springframework:spring-tx:$springVersion"
     implementation "org.springframework.data:spring-data-jpa:$springBootVersion"
 
+    aspect "org.springframework:spring-aspects:$springVersion"
+
     testCompile 'com.h2database:h2:1.4.184'
     testCompile "org.springframework:spring-orm:$springVersion"
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
     testCompile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+}
+
+compileJava {
+    ajc {
+        options {
+            compilerArgs = ["-xmlConfigured", "${projectDir.absolutePath}/aop.xml"]
+        }
+    }
 }
