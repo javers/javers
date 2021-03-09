@@ -1,6 +1,11 @@
 package org.javers.spring.sql
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonElement
+import com.google.gson.JsonSerializationContext
 import org.javers.core.Javers
+import org.javers.core.json.JsonTypeAdapter
 import org.javers.spring.boot.DummyEntity
 import org.javers.spring.boot.TestApplication
 import org.javers.spring.boot.sql.DummyEntityRepository
@@ -16,7 +21,7 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
 /**
  * @author pawelszymczyk
  */
-@SpringBootTest(classes = [TestApplication])
+@SpringBootTest(classes = [TestApplication, CustomJsonTypeAdapter])
 @ActiveProfiles("test")
 @Transactional
 class JaversSqlStarterIntegrationTest extends Specification {
@@ -53,5 +58,37 @@ class JaversSqlStarterIntegrationTest extends Specification {
       then:
       persisted.collect {p -> javers.getLatestSnapshot(p.id, DummyEntity)}
                .each {s -> assert s.isPresent() }
+    }
+
+    def "should register custom json type adapter from spring context"() {
+        expect:
+        javers.jsonConverter.toJson(new DummyCustomTypeEntity(BigDecimal.TEN)) == "[10]"
+    }
+
+    private static class DummyCustomTypeEntity {
+        BigDecimal value
+        DummyCustomTypeEntity(BigDecimal value) {
+            this.value = value
+        }
+    }
+
+    private static class CustomJsonTypeAdapter implements JsonTypeAdapter<DummyCustomTypeEntity> {
+
+        @Override
+        DummyCustomTypeEntity fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext) {
+            return new DummyCustomTypeEntity((json as JsonArray).get(0).asBigDecimal)
+        }
+
+        @Override
+        JsonElement toJson(DummyCustomTypeEntity sourceValue, JsonSerializationContext jsonSerializationContext) {
+            return new JsonArray().tap {
+                add(sourceValue.value)
+            }
+        }
+
+        @Override
+        List<Class> getValueTypes() {
+            return [DummyCustomTypeEntity]
+        }
     }
 }
