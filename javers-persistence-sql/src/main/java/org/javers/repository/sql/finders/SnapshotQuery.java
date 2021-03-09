@@ -183,7 +183,7 @@ class SnapshotQuery {
                     .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
                     .withCommitPk(resultSet.getLong(COMMIT_PK))
                     .withVersion(resultSet.getLong(SNAPSHOT_VERSION))
-                    .withSnapshotState(resultSet.getString(SNAPSHOT_STATE))
+                    .withSnapshotState(resultSet.getClob(SNAPSHOT_STATE))
                     .withChangedProperties(resultSet.getString(SNAPSHOT_CHANGED))
                     .withSnapshotType(resultSet.getString(SNAPSHOT_TYPE))
                     .withGlobalIdFragment(resultSet.getString(GLOBAL_ID_FRAGMENT))
