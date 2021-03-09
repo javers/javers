@@ -15,7 +15,7 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
     def "should use custom typeAdapter when converting to json"() {
         given:
         def jsonConverter= javersTestAssembly().jsonConverterBuilder
-                          .registerJsonTypeAdapter(new DummyPointJsonTypeAdapter()).build()
+                          .c(new DummyPointJsonTypeAdapter()).build()
 
         when:
         def json = jsonConverter.toJson( new DummyPoint(1,2))

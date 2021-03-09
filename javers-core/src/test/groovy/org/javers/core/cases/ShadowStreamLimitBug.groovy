@@ -18,7 +18,7 @@ import java.util.stream.Stream
 class ShadowStreamLimitBug extends Specification {
 
     @Unroll
-    def "should find shadows and stream with limit = #limit and snapshotQueryLimit = #snapshotQueryLimit" () {
+    def "should find shadows and stream when expectedSize = #expectedSize, limit = #limit, and snapshotQueryLimit = #snapshotQueryLimit" () {
         given:
         Javers javers = JaversBuilder.javers().build()
         Employee frodo = new Employee("Frodo")
@@ -34,15 +34,18 @@ class ShadowStreamLimitBug extends Specification {
         def query = QueryBuilder.byInstanceId("Frodo", Employee.class).limit(limit).snapshotQueryLimit(snapshotQueryLimit).build()
 
         Stream<Shadow<Employee>> shadowsStream = javers.findShadowsAndStream(query)
+        println "shadowsStream query " + query
+
         List<Shadow<Employee>> shadowsList = javers.findShadows(query)
+        println "shadowsList query " + query
 
         then:
         shadowsStream.count() == expectedSize
         shadowsList.size() == expectedSize
 
         where:
-        expectedSize <<       [ 11,  10,   11,   10]
-        limit <<              [100,  10,  100,   10]
-        snapshotQueryLimit << [  2,   2,  100, null]
+        expectedSize <<       [ 11,  11,   10, 10, 11, 11]
+        limit <<              [100, 100,   10, 10, 11, 11]
+        snapshotQueryLimit << [  2, 100, null,  2,  2, 11]
     }
 }

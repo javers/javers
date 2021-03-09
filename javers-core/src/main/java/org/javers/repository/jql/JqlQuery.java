@@ -2,24 +2,19 @@ package org.javers.repository.jql;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.CommitIdGenerator;
 import org.javers.core.Javers;
-import org.javers.core.commit.CommitId;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javers.repository.jql.ShadowStreamQueryRunner.ShadowStreamStats;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static org.javers.repository.jql.ShadowScope.DEEP_PLUS;
 
@@ -35,14 +30,12 @@ import static org.javers.repository.jql.ShadowScope.DEEP_PLUS;
  */
 public class JqlQuery {
     public static final String JQL_LOGGER_NAME = "org.javers.JQL";
-    private static final Logger logger = LoggerFactory.getLogger(JQL_LOGGER_NAME);
 
     private QueryParams queryParams;
     private final FilterDefinition filterDefinition;
     private final ShadowScopeDefinition shadowScopeDef;
     private Filter filter;
-    private Stats stats;
-    private List<Stats> streamStats = new ArrayList<>();
+    private ShadowStreamStats shadowStats;
 
     JqlQuery(FilterDefinition filter, QueryParams queryParams, ShadowScopeDefinition shadowScope) {
         Validate.argumentsAreNotNull(filter);
@@ -53,10 +46,6 @@ public class JqlQuery {
 
     JqlQuery nextQueryForStream() {
         return new JqlQuery(filterDefinition, queryParams.nextPage(), shadowScopeDef);
-    }
-
-    void appendNextStatsForStream(Stats nextStats) {
-        streamStats.add(nextStats);
     }
 
     void validate(CommitIdGenerator commitIdGenerator){
@@ -82,12 +71,16 @@ public class JqlQuery {
 
     @Override
     public String toString() {
-        return "\nJqlQuery {\n" +
-                "  "+filter + "\n"+
+        return "JqlQuery {\n" +
+                "  "+filterDefinition + "\n"+
                 "  "+queryParams + "\n" +
-                "  "+shadowScopeDef + "\n" +
-                "  "+stats+ "\n" +
+                "  shadowScope: "+shadowScopeDef.getScope() + "\n" +
+                shadowStats().map(it -> "  "+ it + "\n").orElse("") +
                 "}";
+    }
+
+    FilterDefinition getFilterDefinition() {
+        return filterDefinition;
     }
 
     QueryParams getQueryParams() {
@@ -118,21 +111,18 @@ public class JqlQuery {
         return Optional.empty();
     }
 
-    void changeLimit(int newLimit) {
-        queryParams = QueryParamsBuilder.copy(queryParams)
-                .limit(newLimit)
-                .snapshotQueryLimit(null)
-                .build();
+    JqlQuery changeLimit(int newLimit) {
+        return new JqlQuery(
+                filterDefinition,
+                QueryParamsBuilder.copy(queryParams).limit(newLimit).build(),
+                shadowScopeDef);
     }
 
-    void aggregateIfEntityQuery() {
-        if (isInstanceIdQuery() || isClassQuery()) {
-            queryParams = queryParams.changeAggregate(true);
-        }
+    void changeToAggregated() {
+        queryParams = queryParams.changeAggregate(true);
     }
 
     void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper, CommitIdGenerator commitIdGenerator) {
-        stats = new Stats();
         filter = filterDefinition.compile(globalIdFactory, typeMapper);
         validate(commitIdGenerator);
     }
@@ -178,215 +168,21 @@ public class JqlQuery {
      * Shadow query execution statistics.
      * <br/><br/>
      *
-     * Can be printed by:
-     * <pre>
-     * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
-     * </pre>
-     */
-    public Stats stats() {
-        return stats;
-    }
-
-    /**
-     * Stream queries execution statistics.<br/>
-     * Available only when using {@link Javers#findShadowsAndStream(JqlQuery)}
+     * Usage:<br/>
+     * <code>System.out.println(query))</code><br/>
+     * or<br/>
+     * <code>System.out.println(query.shadowStats().get())</code>
      * <br/><br/>
      *
-     * Can be printed by:
-     * <pre>
-     * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
+     * Detailed log from stream frames can printed by the org.javers.JQL logger:
+     * <pre>&lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
      * </pre>
      */
-    public StreamStats streamStats() {
-        return new StreamStats(streamStats);
+    public Optional<ShadowStreamStats> shadowStats() {
+        return Optional.ofNullable(shadowStats);
     }
 
-    public static class Stats {
-        private long startTimestamp = System.currentTimeMillis();
-        private long endTimestamp;
-        private int dbQueriesCount;
-        private int allSnapshotsCount;
-        private int shallowSnapshotsCount;
-        private int deepPlusSnapshotsCount;
-        private int commitDeepSnapshotsCount;
-        private int childVOSnapshotsCount;
-        private int deepPlusGapsFilled;
-        private int deepPlusGapsLeft;
-
-        void logQueryInChildValueObjectScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
-            validateChange();
-            logger.debug("CHILD_VALUE_OBJECT query for '{}' at timepointCommitId {}, {} snapshot(s) loaded",
-                    reference.toString(),
-                    context.value(),
-                    snapshotsLoaded);
-
-            dbQueriesCount++;
-            allSnapshotsCount += snapshotsLoaded;
-            childVOSnapshotsCount += snapshotsLoaded;
-        }
-
-        void logMaxGapsToFillExceededInfo(GlobalId reference) {
-            validateChange();
-            deepPlusGapsLeft++;
-            logger.debug("warning: object '" + reference.toString() +
-                         "' is outside of the DEEP_PLUS+{} scope" +
-                         ", references to this object will be nulled. " +
-                         "Increase maxGapsToFill and fill all gaps in your object graph.", deepPlusGapsFilled);
-        }
-
-        void logQueryInDeepPlusScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
-            validateChange();
-            dbQueriesCount++;
-            allSnapshotsCount += snapshotsLoaded;
-            deepPlusSnapshotsCount += snapshotsLoaded;
-            deepPlusGapsFilled++;
-
-            logger.debug("DEEP_PLUS query for '{}' at timepointCommitId {}, {} snapshot(s) loaded, gaps filled so far: {}",
-                    reference.toString(),
-                    context.value(),
-                    snapshotsLoaded,
-                    deepPlusGapsFilled);
-        }
-
-        void logShallowQuery(List<CdoSnapshot> snapshots) {
-            validateChange();
-            logger.debug("SHALLOW query: {} snapshots loaded (entities: {}, valueObjects: {})", snapshots.size(),
-                    snapshots.stream().filter(it -> it.getGlobalId() instanceof InstanceId).count(),
-                    snapshots.stream().filter(it -> it.getGlobalId() instanceof ValueObjectId).count());
-            dbQueriesCount++;
-            allSnapshotsCount += snapshots.size();
-            shallowSnapshotsCount += snapshots.size();
-        }
-
-        void logQueryInCommitDeepScope(List<CdoSnapshot> snapshots) {
-            validateChange();
-            logger.debug("COMMIT_DEEP query: {} snapshots loaded", snapshots.size());
-            dbQueriesCount++;
-            allSnapshotsCount += snapshots.size();
-            commitDeepSnapshotsCount+=snapshots.size();
-        }
-
-        void stop() {
-            validateChange();
-            endTimestamp = System.currentTimeMillis();
-        }
-
-        @Override
-        public String toString() {
-            if (endTimestamp == 0){
-                return ToStringBuilder.toString(this,
-                        "executed", "?");
-            }
-            return ToStringBuilder.toStringBlockStyle(this, "  ",
-                    "executed in millis", endTimestamp-startTimestamp,
-                    "DB queries", dbQueriesCount,
-                    "all snapshots", allSnapshotsCount,
-                    "SHALLOW snapshots", shallowSnapshotsCount,
-                    "COMMIT_DEEP snapshots", commitDeepSnapshotsCount,
-                    "CHILD_VALUE_OBJECT snapshots", childVOSnapshotsCount,
-                    "DEEP_PLUS snapshots", deepPlusSnapshotsCount,
-                    "gaps filled", deepPlusGapsFilled,
-                    "gaps left!", deepPlusGapsLeft
-            );
-        }
-
-        public long getStartTimestamp() {
-            return startTimestamp;
-        }
-
-        public long getEndTimestamp() {
-            return endTimestamp;
-        }
-
-        public int getDbQueriesCount() {
-            return dbQueriesCount;
-        }
-
-        public int getAllSnapshotsCount() {
-            return allSnapshotsCount;
-        }
-
-        public int getShallowSnapshotsCount() {
-            return shallowSnapshotsCount;
-        }
-
-        public int getDeepPlusSnapshotsCount() {
-            return deepPlusSnapshotsCount;
-        }
-
-        public int getCommitDeepSnapshotsCount() {
-            return commitDeepSnapshotsCount;
-        }
-
-        public int getChildVOSnapshotsCount() {
-            return childVOSnapshotsCount;
-        }
-
-        public int getDeepPlusGapsFilled() {
-            return deepPlusGapsFilled;
-        }
-
-        public int getDeepPlusGapsLeft() {
-            return deepPlusGapsLeft;
-        }
-
-        private void validateChange() {
-            if (endTimestamp > 0) {
-                throw new RuntimeException(new IllegalAccessException("executed query can't be changed"));
-            }
-        }
-    }
-
-    class StreamStats {
-        private final List<Stats> jqlQueriesStats;
-
-        StreamStats(List<Stats> jqlQueriesStats) {
-            Validate.argumentCheck(jqlQueriesStats.size() > 0, "empty jqlQueriesStats");
-            this.jqlQueriesStats = jqlQueriesStats;
-        }
-
-        public long getStartTimestamp() {
-            return jqlQueriesStats.get(0).startTimestamp;
-        }
-
-        public long getEndTimestamp() {
-            return jqlQueriesStats.get(jqlQueriesStats.size() - 1).endTimestamp;
-        }
-
-        public int getDbQueriesCount() {
-            return jqlQueriesStats.stream().mapToInt(it -> it.dbQueriesCount).sum();
-        }
-
-        public int getJqlQueriesCount() {
-            return jqlQueriesStats.size();
-        }
-
-        public int getAllSnapshotsCount() {
-            return jqlQueriesStats.stream().mapToInt(it -> it.allSnapshotsCount).sum();
-        }
-
-        public int getShallowSnapshotsCount() {
-            return jqlQueriesStats.stream().mapToInt(it -> it.shallowSnapshotsCount).sum();
-        }
-
-        public int getDeepPlusSnapshotsCount() {
-            return jqlQueriesStats.stream().mapToInt(it -> it.deepPlusSnapshotsCount).sum();
-        }
-
-        public int getCommitDeepSnapshotsCount() {
-            return jqlQueriesStats.stream().mapToInt(it -> it.commitDeepSnapshotsCount).sum();
-        }
-
-        public int getChildVOSnapshotsCount() {
-            return jqlQueriesStats.stream().mapToInt(it -> it.childVOSnapshotsCount).sum();
-        }
-
-        public int getDeepPlusGapsFilled() {
-            return jqlQueriesStats.stream().mapToInt(it -> it.deepPlusGapsFilled).sum();
-        }
-
-        public int getDeepPlusGapsLeft() {
-            return jqlQueriesStats.stream().mapToInt(it -> it.deepPlusGapsLeft).sum();
-        }
+    void setShadowQueryRunnerStats(ShadowStreamStats stats) {
+        this.shadowStats = stats;
     }
 }

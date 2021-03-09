@@ -278,7 +278,7 @@ public interface Javers {
      * for paging.<br/>
      * But remember that to create one Shadow, Javers typically needs to load more than<br/>
      * one Snapshot. <br/>
-     * When {@link QueryBuilder#snapshotQueryLimit(int)} is hit, Javers repeats a given query <br/>
+     * When {@link QueryBuilder#snapshotQueryLimit(Integer)} is hit, Javers repeats a given query <br/>
      * to load next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
      * <br/>
      * Returned list of Shadow graphs is always complete (according to the selected {@link ShadowScope}) <br/>
@@ -393,12 +393,45 @@ public interface Javers {
      *</pre>
      *
      * <h2><b>Performance & Profiling</b></h2>
+     *
      * Each Shadow query executes one or more DB queries (Snapshot queries).<br/>
      * The number of executed DB queries depends on: selected {@link ShadowScope}, <br/>
      * complexity of your object graphs, and obviously on {@link Stream#limit(long)}.
      * <br/><br/>
      *
-     * If you are having performance issues, set the
+     * If you are having performance issues, start from checking execution statistics of your query,
+     * available in {@link JqlQuery#shadowStats()}.
+     * Also, the stats are printed in {@link JqlQuery#toString()}, for example:
+     * <br/><br/>
+     *
+     * <pre>
+     * def query = QueryBuilder.byInstanceId(1, Entity).withScopeDeepPlus(1).build()
+     * def shadows = javers.findShadows(query)
+     * println 'executed query: ' + query
+     * </pre>
+     *
+     * Output:
+     * <pre>
+     * executed query: JqlQuery {
+     *   IdFilterDefinition{ globalId: 'org.javers.core.examples.JqlExample$Entity/1' }
+     *   QueryParams{ aggregate: 'true', limit: '100' }
+     *   shadowScope: DEEP_PLUS
+     *   ShadowStreamStats{
+     *     executed in millis: '7'
+     *     DB queries: '2'
+     *     snapshots loaded: '2'
+     *     SHALLOW snapshots: '1'
+     *     DEEP_PLUS snapshots: '1'
+     *     gaps filled: '1'
+     *     gaps left!: '1'
+     *     Shadow stream frame queries: '1'
+     *   }
+     * }
+     * </pre>
+     *
+     * TODO Shadow  execution stats are
+     *
+     * the
      * <code>org.javers.JQL</code> logger to <code>DEBUG</code> level <br/>
      * and check how your Shadow query is executed. <br/>
      * Then, try to reduce the scope.<br/><br/>
@@ -406,32 +439,6 @@ public interface Javers {
      *<pre>
      *&lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
      *</pre>
-     *
-     * <b<>Example debug log for a Shadow query execution:</b>
-     * <br/><br/>
-     *
-     *<pre>
-     *DEBUG org.javers.JQL - SHALLOW query: 1 snapshots loaded (entities: 1, valueObjects: 0)
-     *DEBUG org.javers.JQL - DEEP_PLUS query for '...SnapshotEntity/2' at commitId 3.0, 1 snapshot(s) loaded, gaps filled so far: 1
-     *DEBUG org.javers.JQL - warning: object '...SnapshotEntity/3' is outside of the DEEP_PLUS+1 scope, references to this object will be nulled. Increase maxGapsToFill and fill all gaps in your object graph.
-     *DEBUG org.javers.JQL - queryForShadows executed:
-     *JqlQuery {
-     *  IdFilter{ globalId: ...SnapshotEntity/1 }
-     *  QueryParams{ aggregate: true, limit: 100 }
-     *  ShadowScopeDefinition{ shadowScope: DEEP_PLUS, maxGapsToFill: 1 }
-     *  Stats{
-     *    executed in millis: 12
-     *    DB queries: 2
-     *    all snapshots: 2
-     *    SHALLOW snapshots: 1
-     *    DEEP_PLUS snapshots: 1
-     *    gaps filled: 1
-     *    gaps left!: 1
-     *  }
-     *}
-     *</pre>
-     *
-     * Execution stats are also available in {@link JqlQuery#stats()}.
      *
      * @return Returns a list of latest Shadows ordered in reverse chronological order
      *         The size of the list is limited by {@link QueryBuilder#limit(int)}.

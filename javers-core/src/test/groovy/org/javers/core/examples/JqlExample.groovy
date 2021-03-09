@@ -64,8 +64,9 @@ class JqlExample extends Specification {
         shadowE1.ref.ref == null
 
       when: 'deep+1 scope query'
-        shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-                        .withScopeDeepPlus(1).build())
+        def query = QueryBuilder.byInstanceId(1, Entity).withScopeDeepPlus(1).build()
+        shadows = javers.findShadows(query)
+        println 'deep+1 scope query: ' + query
         shadowE1 = shadows.get(0).get()
 
       then: 'only e1 and e2 are loaded'

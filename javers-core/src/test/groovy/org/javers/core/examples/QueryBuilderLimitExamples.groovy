@@ -4,12 +4,14 @@ import org.javers.core.JaversBuilder
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
 import org.javers.repository.jql.QueryBuilder
+import spock.lang.Ignore
 import spock.lang.Specification
 import java.time.ZonedDateTime
 import static org.javers.core.examples.model.Position.Specialist
 
 class QueryBuilderLimitExamples extends Specification {
 
+    @Ignore
     def "snapshot limit in findChanges and findShadows"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -60,6 +62,8 @@ class QueryBuilderLimitExamples extends Specification {
 
         then:
         shadows.size() == 2
+        println("query.shadowStats().get(): " + query.shadowStats().get())
+        println("query: " + query)
 
         when : "findShadowsAndStream()"
         shadows = javers.findShadowsAndStream(query).toArray()

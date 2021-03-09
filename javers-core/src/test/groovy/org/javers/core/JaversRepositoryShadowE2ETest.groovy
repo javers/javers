@@ -70,7 +70,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         query.stats().allSnapshotsCount == 5
         query.stats().shallowSnapshotsCount == 5
 
-        query.streamStats().jqlQueriesCount == 3
+        query.streamStats().shadowQueriesCount == 3
         query.streamStats().dbQueriesCount == 3
         query.streamStats().allSnapshotsCount == 15
         query.streamStats().shallowSnapshotsCount == 15
@@ -95,7 +95,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         query.stats().dbQueriesCount == 1
         query.stats().allSnapshotsCount == 5
 
-        query.streamStats().jqlQueriesCount == 5
+        query.streamStats().shadowQueriesCount == 5
         query.streamStats().dbQueriesCount == 5
         query.streamStats().allSnapshotsCount == 20
     }
@@ -135,7 +135,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
             assert it.entityRef.id == 2
         }
 
-        query.streamStats().jqlQueriesCount == 4
+        query.streamStats().shadowQueriesCount == 4
         query.streamStats().dbQueriesCount == 5
         query.streamStats().deepPlusGapsFilled == 1
     }
@@ -182,7 +182,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         //should reuse commit table in Stream queries
 
         query.stats().dbQueriesCount == 1
-        query.streamStats().jqlQueriesCount == 1
+        query.streamStats().shadowQueriesCount == 1
 
         where:
         queryType << ["InstanceId", "Class"]
