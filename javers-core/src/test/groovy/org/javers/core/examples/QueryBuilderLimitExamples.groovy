@@ -62,7 +62,7 @@ class QueryBuilderLimitExamples extends Specification {
 
         then:
         shadows.size() == 2
-        println("query.shadowStats().get(): " + query.shadowStats().get())
+        println("query.streamStats().get(): " + query.streamStats().get())
         println("query: " + query)
 
         when : "findShadowsAndStream()"

@@ -20,13 +20,11 @@ public class QueryRunner {
 
     private final ChangesQueryRunner changesQueryRunner;
     private final SnapshotQueryRunner snapshotQueryRunner;
-    private final ShadowQueryRunner shadowQueryRunner;
     private final ShadowStreamQueryRunner shadowStreamQueryRunner;
 
-    QueryRunner(ChangesQueryRunner changesQueryRunner, SnapshotQueryRunner snapshotQueryRunner, ShadowQueryRunner shadowQueryRunner, ShadowStreamQueryRunner shadowStreamQueryRunner) {
+    QueryRunner(ChangesQueryRunner changesQueryRunner, SnapshotQueryRunner snapshotQueryRunner, ShadowStreamQueryRunner shadowStreamQueryRunner) {
         this.changesQueryRunner = changesQueryRunner;
         this.snapshotQueryRunner = snapshotQueryRunner;
-        this.shadowQueryRunner = shadowQueryRunner;
         this.shadowStreamQueryRunner = shadowStreamQueryRunner;
     }
 
@@ -52,7 +50,8 @@ public class QueryRunner {
         if (query.getQueryParams().hasSnapshotQueryLimit()) {
             throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
                     "QueryBuilder.snapshotQueryLimit() can be used only in Shadow queries. " +
-                            "In Javers."+method+" use QueryBuilder.limit().");
+                    "You can't use it with "+method+
+                    ". Please do not confuse QueryBuilder.snapshotQueryLimit() with QueryBuilder.limit().");
         }
     }
 }

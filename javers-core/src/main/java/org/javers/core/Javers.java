@@ -61,7 +61,20 @@ import java.util.stream.Stream;
   * New or removed Entities always generate
   * {@link NewObject}/{@link ObjectRemoved} changes (it can't be disabled).
   *
-  * Detailed change log:
+  * - Behaviour of {@link Javers#findShadows()}
+  *   and {@link Javers#findShadowsAndStream()} is unified.
+  *   Now, findShadows() is only the facade for findShadowsAndStream():
+  *   
+  *   public <T> List<Shadow<T>> findShadows(JqlQuery query) {
+  *       return (List)findShadowsAndStream(query).collect(Collectors.toList());
+  *   }
+  *   
+  * - Fixed problem with limit() in {@link Javers#findShadows()}
+  *   and {@link Javers#findShadowsAndStream()}. Now, limit() works intuitively on both methods.
+  *   - https://github.com/javers/javers/issues/822
+  *
+  *
+  * Minor changes log:
   *
   * 0 The javers.terminalValueChanges flag is added (enabled by default).
   *
@@ -74,9 +87,6 @@ import java.util.stream.Stream;
  *
  * - Minor bug fixed - https://github.com/javers/javers/issues/911
  *
- * - Fixed problem with limit() in {@link Javers#findShadows()}
- *   and {@link Javers#findShadowsAndStream()}
- *   - https://github.com/javers/javers/issues/822
  */
 
 /**
@@ -279,7 +289,7 @@ public interface Javers {
      * But remember that to create one Shadow, Javers typically needs to load more than<br/>
      * one Snapshot. <br/>
      * When {@link QueryBuilder#snapshotQueryLimit(Integer)} is hit, Javers repeats a given query <br/>
-     * to load next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
+     * to load a next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
      * <br/>
      * Returned list of Shadow graphs is always complete (according to the selected {@link ShadowScope}) <br/>
      * but the whole operation can trigger a few DB queries.
@@ -400,7 +410,7 @@ public interface Javers {
      * <br/><br/>
      *
      * If you are having performance issues, start from checking execution statistics of your query,
-     * available in {@link JqlQuery#shadowStats()}.
+     * available in {@link JqlQuery#streamStats()}.
      * Also, the stats are printed in {@link JqlQuery#toString()}, for example:
      * <br/><br/>
      *
@@ -429,13 +439,12 @@ public interface Javers {
      * }
      * </pre>
      *
-     * TODO Shadow  execution stats are
+     * For quick win &mdash; try to reduce the {@link ShadowScope}.
+     * <br/><br/>
      *
-     * the
-     * <code>org.javers.JQL</code> logger to <code>DEBUG</code> level <br/>
-     * and check how your Shadow query is executed. <br/>
-     * Then, try to reduce the scope.<br/><br/>
-     *
+     * More detailed stats can be obtained by setting the
+     * <code>org.javers.JQL</code> logger to <code>DEBUG</code>:
+     * <br/><br/>
      *<pre>
      *&lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
      *</pre>
@@ -444,6 +453,7 @@ public interface Javers {
      *         The size of the list is limited by {@link QueryBuilder#limit(int)}.
      * @param <T> type of a domain object
      * @see ShadowScope
+     * @see JaversCore#findShadows(JqlQuery) 
      */
     <T> List<Shadow<T>> findShadows(JqlQuery query);
 
@@ -452,7 +462,7 @@ public interface Javers {
      * <br/><br/>
      *
      * The returned stream is lazy loaded.<br/>
-     * When {@link QueryBuilder#snapshotQueryLimit(int)} is hit, Javers repeats a given query<br/>
+     * When {@link QueryBuilder#snapshotQueryLimit(Integer)} is hit, Javers repeats a given query<br/>
      * to load next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
      * <br/>
      * Returned list of Shadow graphs is always complete (according to the selected {@link ShadowScope}) <br/>

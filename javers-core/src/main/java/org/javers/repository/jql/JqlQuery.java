@@ -11,6 +11,7 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
+import org.javers.repository.jql.ShadowQueryRunner.ShadowStats;
 import org.javers.repository.jql.ShadowStreamQueryRunner.ShadowStreamStats;
 
 import java.util.Optional;
@@ -59,7 +60,7 @@ public class JqlQuery {
         if (isAggregate()) {
             if (!(isClassQuery() || isInstanceIdQuery())) {
                 throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
-                        "aggregate filter can be enabled only for byClass and byInstanceId queries");
+                        "aggregate filter can be enabled only when querying for Entities, in byClass() and byInstanceId() queries");
             }
         }
 
@@ -75,7 +76,7 @@ public class JqlQuery {
                 "  "+filterDefinition + "\n"+
                 "  "+queryParams + "\n" +
                 "  shadowScope: "+shadowScopeDef.getScope() + "\n" +
-                shadowStats().map(it -> "  "+ it + "\n").orElse("") +
+                streamStats().map(it -> "  "+ it + "\n").orElse("") +
                 "}";
     }
 
@@ -111,15 +112,17 @@ public class JqlQuery {
         return Optional.empty();
     }
 
-    JqlQuery changeLimit(int newLimit) {
+    JqlQuery changeLimit(int newLimit, int newSkip) {
         return new JqlQuery(
                 filterDefinition,
-                QueryParamsBuilder.copy(queryParams).limit(newLimit).build(),
+                QueryParamsBuilder.copy(queryParams).limit(newLimit).skip(newSkip).build(),
                 shadowScopeDef);
     }
 
-    void changeToAggregated() {
-        queryParams = queryParams.changeAggregate(true);
+    void changeToAggregatedIfEntityQuery() {
+        if (isInstanceIdQuery() || isClassQuery()) {
+            queryParams = queryParams.changeAggregate(true);
+        }
     }
 
     void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper, CommitIdGenerator commitIdGenerator) {
@@ -165,21 +168,53 @@ public class JqlQuery {
     }
 
     /**
-     * Shadow query execution statistics.
+     * Full statistics from Shadow query execution.
+     * Contains joined stats from all frames.<br/>
+     * If only one frame was needed
+     * (if {@link QueryBuilder#snapshotQueryLimit(Integer)} wasn't hit)
+     * &mdash; it's equiv to {@link #firstFrameStats()}.
+     * <br/><br/>
+     *
+     * Available only for {@link Javers#findShadows(JqlQuery)} and {@link Javers#findShadowsAndStream(JqlQuery)}.
+     *
      * <br/><br/>
      *
      * Usage:<br/>
      * <code>System.out.println(query))</code><br/>
      * or<br/>
-     * <code>System.out.println(query.shadowStats().get())</code>
+     * <code>System.out.println(query.streamStats().get())</code>
      * <br/><br/>
      *
-     * Detailed log from stream frames can printed by the org.javers.JQL logger:
+     * Detailed log from can printed by the org.javers.JQL logger:
      * <pre>&lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
      * </pre>
+     * @see #firstFrameStats()
      */
-    public Optional<ShadowStreamStats> shadowStats() {
+    public Optional<ShadowStreamStats> streamStats() {
         return Optional.ofNullable(shadowStats);
+    }
+
+    /**
+     * Statistics from the first (frame) Shadow query
+     * executed
+     * by {@link Javers#findShadows(JqlQuery)} or {@link Javers#findShadowsAndStream(JqlQuery)}.
+     * <br/>
+     *
+     * If only one frame was needed
+     * (if {@link QueryBuilder#snapshotQueryLimit(Integer)} wasn't hit)
+     * &mdash; it's equiv to {@link #streamStats()}.
+     * <br/><br/>
+     *
+     * Available only for {@link Javers#findShadows(JqlQuery)} and {@link Javers#findShadowsAndStream(JqlQuery)}.
+     * <br/><br/>
+     *
+     * Usage:<br/>
+     * <code>System.out.println(query.firstFrameStats().get())</code>
+     *e
+     * @see #streamStats()
+     */
+    public Optional<ShadowStats> firstFrameStats() {
+        return streamStats().map(it -> it.getFirstFrameStats());
     }
 
     void setShadowQueryRunnerStats(ShadowStreamStats stats) {

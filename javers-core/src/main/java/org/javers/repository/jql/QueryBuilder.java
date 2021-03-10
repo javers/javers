@@ -297,15 +297,15 @@ public class QueryBuilder {
     }
 
     /**
+     * <b>Should be changed only to improve performance of Shadow queries.</b>
+     * Please do not confused it with {@link #limit(int)}.
+     * <br/><br/>
+     *
      * Works only with {@link Javers#findShadows(JqlQuery)} and {@link Javers#findShadowsAndStream(JqlQuery)}.
      * <br/>
      * Limits the number of Snapshots to be fetched from a JaversRepository in a single DB query
      * <br/>
      * &mdash; 100 by default.
-     * <br/><br/>
-     *
-     * In {@link Javers#findSnapshots(JqlQuery)} and {@link Javers#findChanges(JqlQuery)}
-     * simply use {@link #limit(int)}.
      *
      * @throws JaversException MALFORMED_JQL if used with {@link Javers#findSnapshots(JqlQuery)} or {@link Javers#findChanges(JqlQuery)}
      */
@@ -315,46 +315,38 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits the number of Snapshots to be fetched from JaversRepository in a single query.
+     * Limits the number of Snapshots or Shadows to be fetched from JaversRepository.
      * By default, the limit is set to 100.
      * <br/><br/>
      *
-     * TODO
-     *
      * There are four types of JQL query output: List of Changes,
-     * List of Snapshots, Stream of Shadows, and List of Shadows (deprecated).
+     * List of Snapshots, Stream of Shadows, and List of Shadows.
+     * The limit() filter affects all of them, but in a different way:
      * <br/><br/>
      *
-     * Since all of Javers queries rely on <b>Snapshots</b>
-     * in order to generate their output, the snapshotLimit() filter affects all of them,
-     * but in a different way:
-     *
      * <ul>
-     *   <li>{@link Javers#findSnapshots(JqlQuery)} &mdash; the snapshotLimit() works intuitively,
+     *   <li>{@link Javers#findSnapshots(JqlQuery)} &mdash; limit() works intuitively,
      *   it's the maximum size of a returned list.
      *   </li>
      *
      *   <li>{@link Javers#findChanges(JqlQuery)} &mdash;
-     *   the size of a returned list can be <b>greater</b> than the snapshotLimit(), because,
+     *   the size of a returned list can be <b>greater</b> than limit(), because,
      *   typically a difference between any two Snapshots consists of many atomic Changes.
      *   </li>
 
-     *   <li>{@link Javers#findShadowsAndStream(JqlQuery)} &mdash;
-     *   the resulting stream is <b>lazily loaded</b> and is limited only by
-     *   {@link Stream#limit(long)}.
-     *   The snapshotLimit() sets only the maximum size of a single query.
-     *   When it's hit, Javers repeats a given query to load a next bunch of Snapshots.
-     *   Shadow graphs loaded by findShadowsAndStream() are always complete,
-     *   but can trigger a lot of DB queries.
+     *   <li> {@link Javers#findShadowsAndStream(JqlQuery)} &mdash;
+     *   limit() is the maximum size of a returned stream which
+     *   is <b>lazily loaded</b>.
+     *   Typically, one Shadow is reconstructed from many Snapshots. When
+     *   {@link QueryBuilder#snapshotQueryLimit(Integer)} is hit, Javers repeats a given query<br/>
+     *   to load next bunch of Shadows until required limit() is reached.
      *   </li>
      *
      *   <li>{@link Javers#findShadows(JqlQuery)} &mdash;
-     *   the size of a returned list can be <b>less</b> than the snapshotLimit() and
-     *   Shadow graphs can be incomplete.
-     *   Typically, one Shadow is reconstructed from many Snapshots, so
-     *   hitting the snapshotLimit() in findShadows() is very likely and it's a bad thing.
-     *   <b>That's why {@link Javers#findShadows(JqlQuery)} is deprecated.</b>
-     *   </li>
+     *   limit() is the maximum count of a returned list.
+     *   The same as in {@link Javers#findShadowsAndStream(JqlQuery)},
+     *   when {@link QueryBuilder#snapshotQueryLimit(Integer)} is hit,
+     *   Javers repeats a given query until required limit() is reached.
      * </ul>
      *
      * See

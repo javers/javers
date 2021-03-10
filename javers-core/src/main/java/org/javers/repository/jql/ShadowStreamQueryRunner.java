@@ -19,14 +19,16 @@ class ShadowStreamQueryRunner {
     private static final Logger logger = LoggerFactory.getLogger(JqlQuery.JQL_LOGGER_NAME);
 
     private final ShadowQueryRunner shadowQueryRunner;
+    private final QueryCompiler queryCompiler;
 
-    ShadowStreamQueryRunner(ShadowQueryRunner shadowQueryRunner) {
+    public ShadowStreamQueryRunner(ShadowQueryRunner shadowQueryRunner, QueryCompiler queryCompiler) {
         this.shadowQueryRunner = shadowQueryRunner;
+        this.queryCompiler = queryCompiler;
     }
 
     Stream<Shadow> queryForShadowsStream(JqlQuery query) {
         int shadowsLimit = query.getQueryParams().limit();
-        query.changeToAggregated();
+        int shadowsSkip = query.getQueryParams().skip();
 
         int characteristics = IMMUTABLE | ORDERED;
         StreamQuery streamQuery = new StreamQuery(query, shadowsLimit);
@@ -35,8 +37,8 @@ class ShadowStreamQueryRunner {
 
         Stream<Shadow> stream = StreamSupport.stream(spliterator, false);
 
-        if (query.getQueryParams().skip() > 0) {
-            stream = stream.skip(query.getQueryParams().skip());
+        if (shadowsSkip > 0) {
+            stream = stream.skip(shadowsSkip);
         }
 
         query.setShadowQueryRunnerStats(streamQuery.streamStats);
@@ -52,11 +54,12 @@ class ShadowStreamQueryRunner {
 
         StreamQuery(JqlQuery initialQuery, int shadowsLimit) {
             Validate.argumentIsNotNull(initialQuery);
-            this.snapshotBatchSize = initialQuery.getQueryParams().hasSnapshotQueryLimit()
-                    ? initialQuery.getQueryParams().snapshotQueryLimit().get()
-                    : 100;
+            this.snapshotBatchSize = initialQuery.getQueryParams().snapshotQueryLimit().orElse(100);
 
-            this.awaitingQuery = initialQuery.changeLimit(this.snapshotBatchSize);
+            queryCompiler.compile(initialQuery); //not nice, but required by changeToAggregated
+            initialQuery.changeToAggregatedIfEntityQuery();
+
+            this.awaitingQuery = initialQuery.changeLimit(this.snapshotBatchSize, 0);
             this.shadowsLimit = shadowsLimit;
         }
 
@@ -146,6 +149,17 @@ class ShadowStreamQueryRunner {
 
         int size() {
             return frameQueriesStats.size();
+        }
+
+        ShadowStats getFirstFrameStats() {
+            if (frameQueriesStats.isEmpty()) {
+                return null;
+            }
+            return frameQueriesStats.get(0);
+        }
+
+        public List<ShadowStats> getFrameQueriesStats() {
+            return Collections.unmodifiableList(frameQueriesStats);
         }
 
         @Override
