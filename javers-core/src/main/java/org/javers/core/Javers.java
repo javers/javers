@@ -5,6 +5,7 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.InitialValueChange;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -27,7 +28,8 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 /**
- *  Changes in the diff algorithm.
+ *  Better diff thanks to the new Change types: initial and terminal ValueChanges. <br/>
+ *  More pretty and more meaningful prettyPrint()
  *
  *  In 6.0, both <code>Javers.compare()</code> and <code>Javers.findChanges()</code> methods
  *  use unified and consistent algorithm concerning
