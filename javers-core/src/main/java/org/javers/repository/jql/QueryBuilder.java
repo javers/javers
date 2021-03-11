@@ -315,7 +315,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits the number of Snapshots or Shadows to be fetched from JaversRepository.
+     * Limits the number of Snapshots or Shadows to be fetched from a JaversRepository.
      * By default, the limit is set to 100.
      * <br/><br/>
      *
@@ -325,28 +325,29 @@ public class QueryBuilder {
      * <br/><br/>
      *
      * <ul>
-     *   <li>{@link Javers#findSnapshots(JqlQuery)} &mdash; limit() works intuitively,
+     *   <li>{@link Javers#findSnapshots(JqlQuery)} &mdash; <code>limit()</code> works intuitively,
      *   it's the maximum size of a returned list.
      *   </li>
-     *
      *   <li>{@link Javers#findChanges(JqlQuery)} &mdash;
-     *   the size of a returned list can be <b>greater</b> than limit(), because,
-     *   typically a difference between any two Snapshots consists of many atomic Changes.
+     *   <code>limit()</code> is applied to
+     *   the Snapshots query, which underlies the Changes query.
+     *   The size of the returned list can be <b>greater</b> than <code>limit()</code>,
+     *   because, typically a difference between any two Snapshots consists of many atomic Changes.
      *   </li>
-
-     *   <li> {@link Javers#findShadowsAndStream(JqlQuery)} &mdash;
-     *   limit() is the maximum size of a returned stream which
-     *   is <b>lazily loaded</b>.
-     *   Typically, one Shadow is reconstructed from many Snapshots. When
-     *   {@link QueryBuilder#snapshotQueryLimit(Integer)} is hit, Javers repeats a given query<br/>
-     *   to load next bunch of Shadows until required limit() is reached.
-     *   </li>
-     *
      *   <li>{@link Javers#findShadows(JqlQuery)} &mdash;
-     *   limit() is the maximum count of a returned list.
-     *   The same as in {@link Javers#findShadowsAndStream(JqlQuery)},
-     *   when {@link QueryBuilder#snapshotQueryLimit(Integer)} is hit,
-     *   Javers repeats a given query until required limit() is reached.
+     *   <code>limit()</code> is applied to Shadows,
+     *   it limits the size of the returned list.
+     *   The underlying Snapshots query uses its own limit &mdash; {@link QueryBuilder#snapshotQueryLimit(Integer)}.
+     *   Since one Shadow might be reconstructed from many Snapshots,
+     *   when <code>snapshotQueryLimit()</code> is hit, Javers repeats a given Shadow query
+     *   to load a next <i>frame</i> of Shadows until required limit is reached.
+     *   </li>
+     *   <li> {@link Javers#findShadowsAndStream(JqlQuery)} &mdash;
+     *   <code>limit()</code> works like in <code>findShadows()</code>, it limits the size of the returned stream.
+     *   The main difference is that the stream is lazy loaded and subsequent
+     *   <i>frame</i> queries
+     *   are executed gradually, during the stream consumption.
+     *   </li>
      * </ul>
      *
      * See

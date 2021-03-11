@@ -286,13 +286,13 @@ public interface Javers {
      * </pre>
      *
      * <h2><b>Paging & limit</b></h2>
-     * Use {@link QueryBuilder#skip(int)} and {@link QueryBuilder#limit(int)}
-     * for paging.<br/>
-     * But remember that to create one Shadow, Javers typically needs to load more than<br/>
-     * one Snapshot. <br/>
-     * When {@link QueryBuilder#snapshotQueryLimit(Integer)} is hit, Javers repeats a given query <br/>
-     * to load a next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
+     * Use {@link QueryBuilder#skip(int)} and {@link QueryBuilder#limit(int)} for paging Shadows.
      * <br/>
+     * An underlying Snapshots query uses its own limit &mdash; {@link QueryBuilder#snapshotQueryLimit(Integer)}.<br/>
+     * Since one Shadow might be reconstructed from many Snapshots, when <code>snapshotQueryLimit()</code> is hit,<br/>
+     * Javers repeats a given Shadow query to load a next <i>frame</i> of Shadows until required limit is reached.
+     * <br/><br/>
+     *
      * Returned list of Shadow graphs is always complete (according to the selected {@link ShadowScope}) <br/>
      * but the whole operation can trigger a few DB queries.
      * <br/><br/>
@@ -463,12 +463,9 @@ public interface Javers {
      * The streamed version of {@link #findShadows(JqlQuery)}.
      * <br/><br/>
      *
-     * The returned stream is lazy loaded.<br/>
-     * When {@link QueryBuilder#snapshotQueryLimit(Integer)} is hit, Javers repeats a given query<br/>
-     * to load next bunch of Shadows until the limit set by {@link QueryBuilder#limit(int)} is reached.
-     * <br/>
-     * Returned list of Shadow graphs is always complete (according to the selected {@link ShadowScope}) <br/>
-     * but the whole operation can trigger a few DB queries.
+     * The main difference is that the returned stream is lazy loaded and subsequent frame queries
+     * are executed gradually, during the stream consumption.
+     *
      *
      * @return A lazy loaded stream of latest Shadows ordered in reverse chronological order.
      *         Terminated stream if nothing found. The size of the stream is limited by
