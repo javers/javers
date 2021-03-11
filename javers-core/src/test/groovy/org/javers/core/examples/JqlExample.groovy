@@ -10,10 +10,12 @@ import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
 import org.javers.core.examples.model.Person
 import org.javers.core.metamodel.annotation.Id
+import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
+import org.javers.shadow.Shadow
 import spock.lang.Specification
 
 import java.time.LocalDate
@@ -161,7 +163,8 @@ class JqlExample extends Specification {
           javers.commit("author", bob)       // second commit
 
       when:
-          def shadows = javers.findShadows(QueryBuilder.byInstance(bob).build())
+          List<Shadow<Employee>> shadows = javers.findShadows(
+                  QueryBuilder.byInstance(bob).build())
 
       then:
           assert shadows.size() == 2
@@ -438,23 +441,39 @@ class JqlExample extends Specification {
     }
 
     //TODO update docs prettyPrint
-    def "should query for changes (and snapshots) with skip filter"() {
+    def "Skip parameter in findChanges, findSnapshots, and findShadows"() {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit( "me", new Employee(name:"bob", age:29, salary: 900) )
-        javers.commit( "me", new Employee(name:"bob", age:30, salary: 1000) )
-        javers.commit( "me", new Employee(name:"bob", age:31, salary: 1100) )
-        javers.commit( "me", new Employee(name:"bob", age:32, salary: 1200) )
+        javers.commit( "me", new Employee(name:"bob", age:20, salary: 2000) )
+        javers.commit( "me", new Employee(name:"bob", age:30, salary: 3000) )
+        javers.commit( "me", new Employee(name:"bob", age:40, salary: 4000) )
+        javers.commit( "me", new Employee(name:"bob", age:50, salary: 5000) )
 
-        when:
-        def query = QueryBuilder.byInstanceId("bob", Employee.class).skip(1).build()
+        def query = QueryBuilder.byInstanceId("bob", Employee.class).skip(2).build()
+
+        when: "findChanges()"
         Changes changes = javers.findChanges( query )
 
         then:
         println changes.prettyPrint()
-        assert changes.size() == 8
-        assert javers.findSnapshots(query).size() == 3
+        assert changes.size() == 6
+
+        when: "findSnapshots()"
+        List<CdoSnapshot> snapshots = javers.findSnapshots( query )
+
+        then:
+        snapshots.each {println it}
+        assert snapshots.size() == 2
+        assert snapshots[0].getPropertyValue("salary") == 3000
+
+        when: "findShadows()"
+        List<Shadow<Employee>> shadows = javers.findShadows( query )
+
+        then:
+        shadows.each {println it}
+        assert shadows.size() == 2
+        assert shadows[0].get().salary == 3000
     }
 
     def "should query for changes (and snapshots) with author filter"() {
