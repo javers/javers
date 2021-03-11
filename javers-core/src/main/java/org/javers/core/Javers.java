@@ -72,7 +72,9 @@ import java.util.stream.Stream;
   *   }
   *   
   * - Fixed problem with limit() in {@link Javers#findShadows()}
-  *   and {@link Javers#findShadowsAndStream()}. Now, limit() works intuitively on both methods.
+  *   and {@link Javers#findShadowsAndStream()}.
+ *   Now, limit() works intuitively in both methods.
+ *   See {@link org.javers.repository.jql.QueryBuilder#limit(int)} javadoc.
   *   - https://github.com/javers/javers/issues/822
   *
   *

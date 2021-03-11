@@ -1,75 +1,80 @@
 package org.javers.core.examples
 
+import org.javers.core.Changes
 import org.javers.core.JaversBuilder
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
+import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.repository.jql.QueryBuilder
-import spock.lang.Ignore
+import org.javers.shadow.Shadow
 import spock.lang.Specification
-import java.time.ZonedDateTime
+
+import java.util.stream.Stream
+
 import static org.javers.core.examples.model.Position.Specialist
 
+//TODO prettyPrint update
 class QueryBuilderLimitExamples extends Specification {
 
-    @Ignore
-    def "snapshot limit in findChanges and findShadows"() {
+    def "Snapshot limit in findChanges and findShadows"() {
         given:
         def javers = JaversBuilder.javers().build()
 
         def bob = new Employee("Bob", 9_000, "ScrumMaster")
-        javers.commit("author", bob)
+        bob.age = 20
 
-        bob.salary += 1_000
-        bob.position = Specialist
-        bob.age = 21
-        bob.lastPromotionDate = ZonedDateTime.now()
-        javers.commit("author", bob)
+        10.times {
+            bob.salary += 1_000
+            bob.age += 1
+            javers.commit("author", bob)
+        }
 
         def query = QueryBuilder.byInstanceId("Bob", Employee).limit(2).build()
 
-        when: "findChanges"
-        def changes = javers.findChanges(query)
-        println changes.prettyPrint()
-
-        then:
-        changes.size() == 8
-
-        when: "findSnapshots"
-        def snapshots = javers.findSnapshots(query)
+        when: "findSnapshots - 2 latest snapshots are loaded and returned"
+        List<CdoSnapshot> snapshots = javers.findSnapshots(query)
         snapshots.each {println(it)}
 
         then:
         snapshots.size() == 2
+
+        when: "findChanges - two latest snapshots are loaded, 4 changes are returned"
+        Changes changes = javers.findChanges(query)
+        println changes.prettyPrint()
+
+        then:
+        changes.size() == 4
     }
 
-    def "shadows limit in findShadows and findShadowsAndStream"() {
+    def "Shadows limit in findShadows and findShadowsAndStream"() {
         given:
         def javers = JaversBuilder.javers().build()
 
         def bob = new Employee("Bob", 9_000, "ScrumMaster")
         bob.primaryAddress = new Address("London")
-        javers.commit("author", bob) // 2 snapshots are persisted
+        bob.postalAddress = new Address("Paris")
 
-        bob.salary += 1_000
-        bob.primaryAddress.city = "New York"
-        javers.commit("author", bob) // 3 snapshots are persisted
+        3.times {
+            bob.salary += 1_000
+            bob.primaryAddress.city = "London $it"
+            bob.postalAddress.city = "Paris $it"
+            javers.commit("author", bob)
+        }
 
         def query = QueryBuilder.byInstanceId("Bob", Employee).limit(2).build()
 
-        when : "findShadows()"
-        def shadows = javers.findShadows(query)
+        when : "findShadows() - 9 snapshots are loaded, 2 Shadows are returned"
+        List<Employee> shadows = javers.findShadows(query)
         shadows.each {println(it)}
 
         then:
         shadows.size() == 2
-        println("query.streamStats().get(): " + query.streamStats().get())
-        println("query: " + query)
+        println("query stats: " + query)
 
-        when : "findShadowsAndStream()"
-        shadows = javers.findShadowsAndStream(query).toArray()
-        shadows.each {println(it)}
+        when : "findShadowsAndStream() - 9 snapshots are loaded, 2 Shadows are returned"
+        Stream<Shadow<Employee>> shadowsStream = javers.findShadowsAndStream(query)
 
         then:
-        shadows.size() == 2
+        shadowsStream.count() == 2
     }
 }
