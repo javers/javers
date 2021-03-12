@@ -13,22 +13,32 @@ import java.util.List;
  * <a href="http://code.google.com/p/google-gson/">Gson</a> TypeAdapter.
  * <p/>
  *
- * Implement JsonTypeAdapter to add custom JSON serialization and deserialization behaviour,
+ * Implement a JsonTypeAdapter to add custom JSON serialization and deserialization behaviour,
  * depending on your domain model.
  * <p/>
  *
- * {@link ValueType} or {@link CustomType} eligible for deserialization
- * should have a no-argument constructor (public or private).
+ * Implementation shouldn't take care about nulls (nulls are handled by Gson engine).
+ * For a concrete adapter implementation example see {@link org.javers.java8support.LocalDateTimeTypeAdapter}.
  * <p/>
  *
- * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
+ * Convenient template classes are available, see {@link BasicStringTypeAdapter}
  * <p/>
  *
- * For implementation example see {@link org.javers.core.json.typeadapter.util.LocalDateTimeTypeAdapter}.
- * <p/>
+ * <b>Usage with Vanilla Javers</b>
+ *
+ * <pre>Javers javers = JaversBuilder.javers()
+ *                  .registerValueTypeAdapter(new MyTypeAdapter())
+ *                  .build();
+ * </pre>
+ *
+ * <b>Usage with Javers Spring Boot starters</b>
+ * <br/>
+ * Simply register your JSON type adapters as Spring beans.
+ * <br/>
  *
  * @param <T> user type, mapped to {@link ValueType} or {@link CustomType}
  * @see JsonConverter
+ * @see JsonAdvancedTypeAdapter
  * @author bartosz walacik
  */
 public interface JsonTypeAdapter<T> {
@@ -46,9 +56,13 @@ public interface JsonTypeAdapter<T> {
     JsonElement toJson(T sourceValue, JsonSerializationContext jsonSerializationContext);
 
     /**
-     * Target class.
-     * If adapter is designed to handle single class, return List with one element.
-     * If adapter is polymorfic, return list captaining all supported clazz
+     * Target class (or classes), typically {@link ValueType} or {@link CustomType}.
+     * <br/>
+     * Each target  class should have a no-argument constructor (public or private).
+     * <p/>
+     *
+     * If adapter is designed to handle single class, should return a List with one element &mdash; a supported class.<br/
+     * If adapter is polymorphic, should return all supported classes.
      */
     List<Class> getValueTypes();
 }

@@ -7,7 +7,11 @@ import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 
 /**
- * Advanced variant of {@link JsonTypeAdapter}
+ * Advanced variant of {@link JsonTypeAdapter}.<br/>
+ * Can be used to write polymorphic/generic type adapters.
+ * <br/><br/>
+ *
+ * Provides additional argument: <code>Type typeOfT</code>  &mdash; a runtime type of a serialized/deserialized object
  *
  * @author bartosz.walacik
  */

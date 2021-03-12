@@ -2,12 +2,14 @@ package org.javers.spring.boot.sql;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.internal.SessionImpl;
 import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.JaversBuilderPlugin;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
+import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
@@ -24,12 +26,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.*;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.List;
 
 /**
  * @author pawelszymczyk
@@ -38,6 +39,7 @@ import javax.persistence.EntityManagerFactory;
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties(value = {JaversSqlProperties.class, JpaProperties.class})
 @AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
+@Import({RegisterJsonTypeAdaptersPlugin.class})
 public class JaversSqlAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversSqlAutoConfiguration.class);
 
@@ -45,6 +47,9 @@ public class JaversSqlAutoConfiguration {
 
     @Autowired
     private JaversSqlProperties javersSqlProperties;
+
+    @Autowired
+    private RegisterJsonTypeAdaptersPlugin registerJsonTypeAdaptersPlugin;
 
     @Autowired
     private EntityManagerFactory entityManagerFactory;
@@ -79,14 +84,16 @@ public class JaversSqlAutoConfiguration {
 
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
-    public Javers javers(JaversSqlRepository sqlRepository, PlatformTransactionManager transactionManager) {
-        return TransactionalJaversBuilder
+    public Javers javers(JaversSqlRepository sqlRepository,
+                         PlatformTransactionManager transactionManager) {
+        JaversBuilder javersBuilder = TransactionalJaversBuilder
                 .javers()
                 .withTxManager(transactionManager)
                 .registerJaversRepository(sqlRepository)
                 .withObjectAccessHook(javersSqlProperties.createObjectAccessHookInstance())
-                .withProperties(javersSqlProperties)
-                .build();
+                .withProperties(javersSqlProperties);
+        registerJsonTypeAdaptersPlugin.beforeAssemble(javersBuilder);
+        return javersBuilder.build();
     }
 
     @Bean(name = "SpringSecurityAuthorProvider")
@@ -117,13 +124,19 @@ public class JaversSqlAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    public JaversAuditableAspect javersAuditableAspect(Javers javers,
+                                                       AuthorProvider authorProvider,
+                                                       CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
     }
 
     @Bean
     @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(
+            Javers javers,
+            AuthorProvider authorProvider,
+            CommitPropertiesProvider commitPropertiesProvider
+    ) {
         return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
     }
 }

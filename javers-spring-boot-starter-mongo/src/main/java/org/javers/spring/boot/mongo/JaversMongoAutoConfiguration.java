@@ -7,6 +7,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
+import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
@@ -25,6 +26,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
 
@@ -36,6 +38,7 @@ import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDoc
 @Configuration
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties({JaversMongoProperties.class})
+@Import({RegisterJsonTypeAdaptersPlugin.class})
 public class JaversMongoAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversMongoAutoConfiguration.class);
 
@@ -52,6 +55,9 @@ public class JaversMongoAutoConfiguration {
     @Qualifier("javersMongoClientSettings")
     private Optional<MongoClientSettings> mongoClientSettings;
 
+    @Autowired
+    private RegisterJsonTypeAdaptersPlugin registerJsonTypeAdaptersPlugin;
+
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
     public Javers javers() {
@@ -61,11 +67,12 @@ public class JaversMongoAutoConfiguration {
 
         MongoRepository javersRepository = createMongoRepository(mongoDatabase);
 
-        return JaversBuilder.javers()
+        JaversBuilder javersBuilder = JaversBuilder.javers()
                 .registerJaversRepository(javersRepository)
                 .withProperties(javersMongoProperties)
-                .withObjectAccessHook(javersMongoProperties.createObjectAccessHookInstance())
-                .build();
+                .withObjectAccessHook(javersMongoProperties.createObjectAccessHookInstance());
+        registerJsonTypeAdaptersPlugin.beforeAssemble(javersBuilder);
+        return javersBuilder.build();
     }
 
     private MongoDatabase initJaversMongoDatabase() {
