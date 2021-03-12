@@ -5,11 +5,11 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.JaversBuilderPlugin;
-import org.javers.core.RegisterTypeAdaptersPlugin;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
+import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
@@ -26,12 +26,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
@@ -43,7 +39,7 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties(value = {JaversSqlProperties.class, JpaProperties.class})
 @AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
-@Import({RegisterTypeAdaptersPlugin.class})
+@Import({RegisterJsonTypeAdaptersPlugin.class})
 public class JaversSqlAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversSqlAutoConfiguration.class);
 
@@ -51,6 +47,9 @@ public class JaversSqlAutoConfiguration {
 
     @Autowired
     private JaversSqlProperties javersSqlProperties;
+
+    @Autowired
+    private RegisterJsonTypeAdaptersPlugin registerJsonTypeAdaptersPlugin;
 
     @Autowired
     private EntityManagerFactory entityManagerFactory;
@@ -86,17 +85,14 @@ public class JaversSqlAutoConfiguration {
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
     public Javers javers(JaversSqlRepository sqlRepository,
-                         PlatformTransactionManager transactionManager,
-                         @Autowired(required = false) List<JaversBuilderPlugin> plugins) {
+                         PlatformTransactionManager transactionManager) {
         JaversBuilder javersBuilder = TransactionalJaversBuilder
                 .javers()
                 .withTxManager(transactionManager)
                 .registerJaversRepository(sqlRepository)
                 .withObjectAccessHook(javersSqlProperties.createObjectAccessHookInstance())
                 .withProperties(javersSqlProperties);
-        if (plugins != null) {
-            plugins.forEach(plugin -> plugin.beforeAssemble(javersBuilder));
-        }
+        registerJsonTypeAdaptersPlugin.beforeAssemble(javersBuilder);
         return javersBuilder.build();
     }
 

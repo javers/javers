@@ -1,7 +1,6 @@
 package org.javers.java8support;
 
 import org.javers.core.json.BasicStringTypeAdapter;
-import org.javers.core.json.JsonTypeAdapter;
 
 import java.time.ZoneOffset;
 

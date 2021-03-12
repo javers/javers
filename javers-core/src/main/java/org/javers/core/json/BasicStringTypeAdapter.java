@@ -8,14 +8,10 @@ import org.javers.core.metamodel.type.ValueType;
 
 /**
  * Convenient abstract implementation of {@link JsonTypeAdapter}.
- * Extend it if you need to represent your {@link ValueType} as single String and don't want to deal with Gson API.
- * <br><br>
+ * Extend it if you need to represent your {@link ValueType} as a single String.
+ * <p/>
  *
- * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
- * <br><br>
- *
- * For concrete class example see {@link org.javers.core.json.typeadapter.util.LocalDateTimeTypeAdapter}.
- * <br><br>
+ * For a concrete adapter implementation example see {@link org.javers.java8support.LocalDateTimeTypeAdapter}.
  *
  * @author bartosz walacik
  */
