@@ -2,8 +2,10 @@ package org.javers.spring.boot.sql;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.internal.SessionImpl;
 import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.JaversBuilderPlugin;
+import org.javers.core.RegisterTypeAdaptersPlugin;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
@@ -27,9 +29,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.List;
 
 /**
  * @author pawelszymczyk
@@ -38,6 +43,7 @@ import javax.persistence.EntityManagerFactory;
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties(value = {JaversSqlProperties.class, JpaProperties.class})
 @AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
+@Import({RegisterTypeAdaptersPlugin.class})
 public class JaversSqlAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversSqlAutoConfiguration.class);
 
@@ -79,14 +85,19 @@ public class JaversSqlAutoConfiguration {
 
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
-    public Javers javers(JaversSqlRepository sqlRepository, PlatformTransactionManager transactionManager) {
-        return TransactionalJaversBuilder
+    public Javers javers(JaversSqlRepository sqlRepository,
+                         PlatformTransactionManager transactionManager,
+                         @Autowired(required = false) List<JaversBuilderPlugin> plugins) {
+        JaversBuilder javersBuilder = TransactionalJaversBuilder
                 .javers()
                 .withTxManager(transactionManager)
                 .registerJaversRepository(sqlRepository)
                 .withObjectAccessHook(javersSqlProperties.createObjectAccessHookInstance())
-                .withProperties(javersSqlProperties)
-                .build();
+                .withProperties(javersSqlProperties);
+        if (plugins != null) {
+            plugins.forEach(plugin -> plugin.beforeAssemble(javersBuilder));
+        }
+        return javersBuilder.build();
     }
 
     @Bean(name = "SpringSecurityAuthorProvider")
@@ -117,13 +128,19 @@ public class JaversSqlAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    public JaversAuditableAspect javersAuditableAspect(Javers javers,
+                                                       AuthorProvider authorProvider,
+                                                       CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
     }
 
     @Bean
     @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(
+            Javers javers,
+            AuthorProvider authorProvider,
+            CommitPropertiesProvider commitPropertiesProvider
+    ) {
         return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
     }
 }

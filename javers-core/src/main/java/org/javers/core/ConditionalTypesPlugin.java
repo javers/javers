@@ -9,7 +9,7 @@ import java.util.Collections;
 /**
  * @author bartosz.walacik
  */
-public abstract class ConditionalTypesPlugin {
+public abstract class ConditionalTypesPlugin implements JaversBuilderPlugin {
 
     public Collection<Class<? extends PropertyChangeAppender<?>>> getPropertyChangeAppenders() {
         return Collections.emptyList();
@@ -18,6 +18,4 @@ public abstract class ConditionalTypesPlugin {
     public Collection<JaversType> getNewTypes() {
         return Collections.emptyList();
     }
-
-    public void beforeAssemble(JaversBuilder javersBuilder) {}
 }
