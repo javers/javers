@@ -524,10 +524,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Registers a {@link ValueType} and its custom JSON adapter.
-     * <br><br>
+     * Registers a {@link ValueType} and its custom JSON TypeAdapter.
+     * <p/>
      *
-     * Useful for not trivial ValueTypes when Gson's default representation isn't appropriate
+     * Useful for ValueTypes when Gson's default representation isn't good enough.
      *
      * @see <a href="http://javers.org/documentation/repository-configuration/#json-type-adapters">http://javers.org/documentation/repository-configuration/#json-type-adapters</a>
      * @see JsonTypeAdapter
@@ -542,10 +542,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * <font color='red'>INCUBATING</font><br/>
-     *
-     * For complex structures like Multimap
-     * @since 3.1
+     * Registers an advanced variant of custom JSON TypeAdapter.
+     * @see JsonAdvancedTypeAdapter
      */
     public JaversBuilder registerJsonAdvancedTypeAdapter(JsonAdvancedTypeAdapter adapter) {
         jsonConverterBuilder().registerJsonAdvancedTypeAdapter(adapter);

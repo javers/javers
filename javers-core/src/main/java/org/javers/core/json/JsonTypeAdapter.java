@@ -5,16 +5,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.ValueType;
+import org.javers.repository.api.JaversRepository;
 
 import java.util.List;
 
 /**
- * Javers abstraction over native
- * <a href="http://code.google.com/p/google-gson/">Gson</a> TypeAdapter.
- * <p/>
- *
- * Implement a JsonTypeAdapter to add custom JSON serialization and deserialization behaviour,
- * depending on your domain model.
+ * JsonTypeAdapter allows to customize JSON serialization
+ * of your {@link ValueType} or {@link CustomType} in a {@link JaversRepository}.
  * <p/>
  *
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine).
