@@ -1,4 +1,4 @@
-package org.javers.core.examples.adapter;
+package org.javers.core.examples;
 
 import org.bson.types.ObjectId;
 import org.javers.core.json.BasicStringTypeAdapter;

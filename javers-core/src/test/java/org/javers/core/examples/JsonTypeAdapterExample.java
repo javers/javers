@@ -6,7 +6,6 @@ import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.cases.MongoStoredEntity;
 import org.javers.core.diff.Diff;
-import org.javers.core.examples.adapter.ObjectIdTypeAdapter;
 import org.junit.Test;
 
 public class JsonTypeAdapterExample {
