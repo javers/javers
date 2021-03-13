@@ -9,7 +9,10 @@ import org.javers.repository.sql.session.ObjectMapper;
 import org.javers.repository.sql.session.Parameter;
 import org.javers.repository.sql.session.SelectBuilder;
 import org.javers.repository.sql.session.Session;
+import org.polyjdbc.core.dialect.Dialect;
+import org.polyjdbc.core.dialect.DialectRegistry;
 
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -17,16 +20,42 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
-import static org.javers.repository.sql.session.Parameter.*;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_AUTHOR;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_DATE;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_DATE_INSTANT;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_ID;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_PK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_PROPERTY_COMMIT_FK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_PROPERTY_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_PROPERTY_VALUE;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_FRAGMENT;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_LOCAL_ID;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_OWNER_ID_FK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_PK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_TYPE_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_CHANGED;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_COMMIT_FK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBAL_ID_FK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_MANAGED_TYPE;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_PK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_STATE;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_TYPE;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_VERSION;
+import static org.javers.repository.sql.session.Parameter.bigDecimalParam;
+import static org.javers.repository.sql.session.Parameter.instantParam;
+import static org.javers.repository.sql.session.Parameter.localDateTimeParam;
+import static org.javers.repository.sql.session.Parameter.longParam;
+import static org.javers.repository.sql.session.Parameter.stringParam;
 
 class SnapshotQuery {
     private final QueryParams queryParams;
     private final SelectBuilder selectBuilder;
     private final TableNameProvider tableNameProvider;
     private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
+    private final Dialect dialect;
 
-    public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
+    public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session, Dialect dialect) {
+        this.dialect = dialect;
         this.selectBuilder = session
             .select(
                 SNAPSHOT_STATE + ", " +
@@ -161,6 +190,7 @@ class SnapshotQuery {
     List<CdoSnapshotSerialized> run() {
         selectBuilder.orderByDesc(SNAPSHOT_PK);
         selectBuilder.limit(queryParams.limit(), queryParams.skip());
+        cdoSnapshotMapper.setDialect(this.dialect);
         return selectBuilder.executeQuery(cdoSnapshotMapper);
     }
 
@@ -174,6 +204,13 @@ class SnapshotQuery {
     }
 
     private static class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
+
+        private Dialect dialect;
+
+        public void setDialect (Dialect dialect) {
+            this.dialect = dialect;
+        }
+
         @Override
         public CdoSnapshotSerialized get(ResultSet resultSet) throws SQLException {
             return new CdoSnapshotSerialized()
@@ -183,7 +220,7 @@ class SnapshotQuery {
                     .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
                     .withCommitPk(resultSet.getLong(COMMIT_PK))
                     .withVersion(resultSet.getLong(SNAPSHOT_VERSION))
-                    .withSnapshotState(resultSet.getClob(SNAPSHOT_STATE))
+                    .withSnapshotState(fetchSnapshotState(resultSet))
                     .withChangedProperties(resultSet.getString(SNAPSHOT_CHANGED))
                     .withSnapshotType(resultSet.getString(SNAPSHOT_TYPE))
                     .withGlobalIdFragment(resultSet.getString(GLOBAL_ID_FRAGMENT))
@@ -192,6 +229,13 @@ class SnapshotQuery {
                     .withOwnerGlobalIdFragment(resultSet.getString("owner_" + GLOBAL_ID_FRAGMENT))
                     .withOwnerGlobalIdLocalId(resultSet.getString("owner_" + GLOBAL_ID_LOCAL_ID))
                     .withOwnerGlobalIdTypeName(resultSet.getString("owner_" + GLOBAL_ID_TYPE_NAME));
+        }
+        private String fetchSnapshotState(ResultSet resultSet)  throws SQLException {
+            if(dialect.getCode().equals(DialectRegistry.ORACLE.name()) ) {
+                Clob snapshotState = resultSet.getClob(SNAPSHOT_STATE);
+                return snapshotState.getSubString(1, (int)snapshotState.length());
+            }
+            return resultSet.getString(SNAPSHOT_STATE);
         }
     }
 
@@ -207,7 +251,7 @@ class SnapshotQuery {
         return tableNameProvider.getCommitPropertyTableNameWithSchema();
     }
 
-    static class SnapshotDbIdentifier {
+     static class SnapshotDbIdentifier {
         private final long version;
         private final long globalIdPk;
 

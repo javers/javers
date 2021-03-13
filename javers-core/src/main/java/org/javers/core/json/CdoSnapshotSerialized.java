@@ -3,8 +3,6 @@ package org.javers.core.json;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 
 import java.math.BigDecimal;
-import java.sql.Clob;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -74,8 +72,8 @@ public class CdoSnapshotSerialized {
         return this;
     }
 
-    public CdoSnapshotSerialized withSnapshotState(Clob snapshotState) throws SQLException {
-        this.snapshotState = snapshotState.getSubString(1, (int)snapshotState.length());
+    public CdoSnapshotSerialized withSnapshotState(String snapshotState) {
+        this.snapshotState = snapshotState;
         return this;
     }
 

@@ -15,6 +15,7 @@ import org.javers.repository.sql.finders.SnapshotQuery.SnapshotDbIdentifier;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.session.Session;
+import org.polyjdbc.core.dialect.Dialect;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -30,11 +31,13 @@ public class CdoSnapshotFinder {
     private final CdoSnapshotsEnricher cdoSnapshotsEnricher = new CdoSnapshotsEnricher();
     private JsonConverter jsonConverter;
     private final TableNameProvider tableNameProvider;
+    private final Dialect dialect;
 
-    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameProvider tableNameProvider) {
+    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameProvider tableNameProvider, Dialect dialect) {
         this.globalIdRepository = globalIdRepository;
         this.commitPropertyFinder = commitPropertyFinder;
         this.tableNameProvider = tableNameProvider;
+        this.dialect = dialect;
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId, Session session, boolean loadCommitProps) {
@@ -87,7 +90,7 @@ public class CdoSnapshotFinder {
 
     private List<CdoSnapshot> fetchCdoSnapshots(Consumer<SnapshotQuery> additionalFilter,
                                                 QueryParams queryParams, Session session) {
-        SnapshotQuery query = new SnapshotQuery(tableNameProvider, queryParams, session);
+        SnapshotQuery query = new SnapshotQuery(tableNameProvider, queryParams, session, dialect);
         additionalFilter.accept(query);
         List<CdoSnapshotSerialized> serializedSnapshots = query.run();
 
