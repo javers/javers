@@ -25,7 +25,10 @@ class JsonConverterDateTimeTest extends Specification {
     long time = 1443807427050
 
     @Shared
-    int zoneOffset = Instant.ofEpochMilli(time).atZone(ZoneId.systemDefault()).getOffset().getTotalSeconds()/3600
+    int zoneOffsetHours = Instant.ofEpochMilli(time).atZone(ZoneId.systemDefault()).getOffset().getTotalSeconds()/3600
+
+    @Shared
+    long zoneOffsetMinutes = (Instant.ofEpochMilli(time).atZone(ZoneId.systemDefault()).getOffset().getTotalSeconds() % 3600) / 60;
 
     @Unroll
     def "should convert java8.LocalDateTime from json #fromJson to json #expectedJson"(){
@@ -80,7 +83,7 @@ class JsonConverterDateTimeTest extends Specification {
         given:
         println "ZonedDateTime.now:   " + ZonedDateTime.now()
         println "time:                " + Instant.ofEpochMilli(time)
-        println "zone offset:         " + zoneOffset + "H"
+        println "zone offset:         " + zoneOffsetHours + "H " + zoneOffsetMinutes + "M"
         println "givenValue:          " + givenValue.toString() + " " + givenValue.getClass()
         println "expectedJson:        " + expectedJson
         println "converted to JSON:   " + jsonConverter.toJson(givenValue)
@@ -98,18 +101,18 @@ class JsonConverterDateTimeTest extends Specification {
                          org.joda.time.LocalDateTime,
                          org.joda.time.LocalDate
         ]
-        givenValue <<   [new java.util.Date(time),
-                         new java.sql.Timestamp(time),
-                         new java.sql.Date(time),
-                         new java.sql.Time(time),
+        givenValue <<   [new java.util.Date(time - zoneOffsetMinutes * 60 * 1000),
+                         new java.sql.Timestamp(time - zoneOffsetMinutes * 60 * 1000),
+                         new java.sql.Date(time - zoneOffsetMinutes * 60 * 1000),
+                         new java.sql.Time(time - zoneOffsetMinutes * 60 * 1000),
                          new org.joda.time.LocalDateTime(time, DateTimeZone.UTC),
                          new org.joda.time.LocalDate(2015,10,02)
         ]
         expectedJson << [
-                        '"2015-10-02T'+(17+zoneOffset)+':37:07.05"',
-                        '"2015-10-02T'+(17+zoneOffset)+':37:07.05"',
-                        '"2015-10-02T'+(17+zoneOffset)+':37:07.05"',
-                        '"2015-10-02T'+(17+zoneOffset)+':37:07.05"',
+                        '"2015-10-02T'+(17+zoneOffsetHours)+':37:07.05"',
+                        '"2015-10-02T'+(17+zoneOffsetHours)+':37:07.05"',
+                        '"2015-10-02T'+(17+zoneOffsetHours)+':37:07.05"',
+                        '"2015-10-02T'+(17+zoneOffsetHours)+':37:07.05"',
                         '"2015-10-02T17:37:07.050"',
                         '"2015-10-02"'
                         ]

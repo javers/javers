@@ -1,5 +1,6 @@
 package org.javers.spring.sql
 
+
 import org.javers.core.Javers
 import org.javers.spring.boot.DummyEntity
 import org.javers.spring.boot.TestApplication
@@ -53,5 +54,10 @@ class JaversSqlStarterIntegrationTest extends Specification {
       then:
       persisted.collect {p -> javers.getLatestSnapshot(p.id, DummyEntity)}
                .each {s -> assert s.isPresent() }
+    }
+
+    def "should register custom JSON type adapter from spring context"() {
+        expect:
+        javers.jsonConverter.toJson(new TestApplication.DummyBigDecimalEntity(BigDecimal.TEN)) == '"10"'
     }
 }

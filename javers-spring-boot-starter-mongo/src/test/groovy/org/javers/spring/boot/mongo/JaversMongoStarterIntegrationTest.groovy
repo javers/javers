@@ -1,5 +1,6 @@
 package org.javers.spring.boot.mongo
 
+
 import org.javers.core.Javers
 import org.javers.core.metamodel.type.EntityType
 import org.javers.repository.jql.QueryBuilder
@@ -33,5 +34,10 @@ class JaversMongoStarterIntegrationTest extends Specification{
     def "should scan given packages for classes with @TypeName"() {
         expect:
         javers.getTypeMapping("AnotherEntity") instanceof EntityType
+    }
+
+    def "should register custom JSON type adapter from spring context"() {
+        expect:
+        javers.jsonConverter.toJson(new TestApplication.DummyBigDecimalEntity(BigDecimal.TEN)) == '"10"'
     }
 }
