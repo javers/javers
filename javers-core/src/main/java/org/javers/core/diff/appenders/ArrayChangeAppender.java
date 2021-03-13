@@ -6,10 +6,6 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.ArrayChange;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.map.EntryChange;
-import org.javers.core.diff.changetype.map.MapChange;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
 
 import java.util.List;

@@ -104,7 +104,6 @@ public class Changes extends AbstractList<Change> implements Serializable {
      *
      * See example in {@link #groupByCommit()}
      *
-     *
      * @since 3.9
      */
     public List<ChangesByObject> groupByObject() {

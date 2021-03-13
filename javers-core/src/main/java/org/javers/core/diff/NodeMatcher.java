@@ -21,7 +21,7 @@ class NodeMatcher {
         for (ObjectNode left : graphPair.getLeftNodeSet()) {
             GlobalId key = left.getGlobalId();
             if (rightMap.containsKey(key)) {
-                pairs.add(new RealNodePair(left, rightMap.get(key), graphPair.getCommitMetadata()));
+                pairs.add(new NodePair(left, rightMap.get(key), graphPair.getCommitMetadata()));
             }
         }
 

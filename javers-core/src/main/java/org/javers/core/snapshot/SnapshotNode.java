@@ -48,4 +48,9 @@ class SnapshotNode extends ObjectNode<CdoSnapshot> {
             return Collections.emptyList();
         }
     }
+
+    @Override
+    public boolean isEdge() {
+        return getCdo().isTerminal();
+    }
 }

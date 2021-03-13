@@ -1,9 +1,10 @@
 package org.javers.core
 
+import org.javers.core.diff.changetype.InitialValueChange
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
-import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.TerminalValueChange
 import org.javers.core.metamodel.annotation.Id
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
@@ -37,12 +38,12 @@ class NewObjectChangesE2ETest extends Specification {
         then:
         changes.size() == 3
         changes.getChangesByType(NewObject).size() == 1
-        changes.getChangesByType(ValueChange).size() == 2
-        with(changes.getChangesByType(ValueChange).find { it.propertyName == "id" }) {
+        changes.getChangesByType(InitialValueChange).size() == 2
+        with(changes.getChangesByType(InitialValueChange).find { it.propertyName == "id" }) {
             assert it.left == null
             assert it.right == "1"
         }
-        with(changes.getChangesByType(ValueChange).find { it.propertyName == "name" }) {
+        with(changes.getChangesByType(InitialValueChange).find { it.propertyName == "name" }) {
             assert it.left == null
             assert it.right == "mine"
         }
@@ -83,7 +84,7 @@ class NewObjectChangesE2ETest extends Specification {
 
         println changes.prettyPrint()
         def lastCommitChanges = changes.findAll{it.commitMetadata.get().id.majorId==2}
-        def lastCommitValueChanges = lastCommitChanges.findAll{it instanceof ValueChange}
+        def lastCommitValueChanges = lastCommitChanges.findAll{it instanceof TerminalValueChange}
 
         then:
         lastCommitChanges.size() == 3
@@ -142,17 +143,17 @@ class NewObjectChangesE2ETest extends Specification {
             assert it.right.value() == 'org.javers.core.NewObjectChangesE2ETest$Employee/2'
         }
 
-        diff.getChangesByType(ValueChange).forEach {
+        diff.getChangesByType(InitialValueChange).forEach {
             assert it.left == null
             assert it.right != null
         }
 
-        with(diff.getChangesByType(ValueChange).find {it.propertyName == "id"}) {
+        with(diff.getChangesByType(InitialValueChange).find {it.propertyName == "id"}) {
             assert it.left == null
             assert it.right == "2"
         }
 
-        with(diff.getChangesByType(ValueChange).find {it.propertyName == "name"}) {
+        with(diff.getChangesByType(InitialValueChange).find {it.propertyName == "name"}) {
             assert it.left == null
             assert it.right == "mine"
         }
@@ -196,17 +197,17 @@ class NewObjectChangesE2ETest extends Specification {
             assert it.right == null
         }
 
-        diff.getChangesByType(ValueChange).forEach {
+        diff.getChangesByType(TerminalValueChange).forEach {
             assert it.left != null
             assert it.right == null
         }
 
-        with(diff.getChangesByType(ValueChange).find {it.propertyName == "id"}) {
+        with(diff.getChangesByType(TerminalValueChange).find {it.propertyName == "id"}) {
             assert it.left == "2"
             assert it.right == null
         }
 
-        with(diff.getChangesByType(ValueChange).find {it.propertyName == "name"}) {
+        with(diff.getChangesByType(TerminalValueChange).find {it.propertyName == "name"}) {
             assert it.left == "mine"
             assert it.right == null
         }
@@ -227,7 +228,7 @@ class NewObjectChangesE2ETest extends Specification {
         diff.changes.getChangesByType(ObjectRemoved).size() == 1
     }
 
-    def "should generate ValueChanges in compare() when null is changed to ValueObject"() {
+    def "should generate initial ValueChanges in compare() when null is changed to ValueObject"() {
         given:
         def javers = JaversBuilder
                 .javers()
@@ -241,7 +242,7 @@ class NewObjectChangesE2ETest extends Specification {
 
         then:
         diff.changes.size() == 2
-        diff.getChangesByType(ValueChange).size() == 2
+        diff.getChangesByType(InitialValueChange).size() == 2
 
         with(diff.changes.find {it.propertyName == "street"}) {
             assert it.left == null
@@ -253,7 +254,7 @@ class NewObjectChangesE2ETest extends Specification {
         }
     }
 
-    def "should generate ValueChanges in compare() when ValueObject is changed to null"() {
+    def "should generate terminal ValueChanges in compare() when ValueObject is changed to null"() {
         given:
         def javers = JaversBuilder
                 .javers()
@@ -270,7 +271,7 @@ class NewObjectChangesE2ETest extends Specification {
         diff.changes.size() == 1
 
         with(diff.changes[0]) {
-            assert it instanceof ValueChange
+            assert it instanceof TerminalValueChange
             assert it.propertyName == "city"
             assert it.left == "Berlin"
             assert it.right == null

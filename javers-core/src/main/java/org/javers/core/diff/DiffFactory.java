@@ -116,14 +116,14 @@ public class DiffFactory {
         //calculate snapshot of NewObjects and RemovedObjects
         if (javersCoreConfiguration.isNewObjectChanges()) {
             for (ObjectNode node : graphPair.getOnlyOnRight()) {
-                NodePair pair = new RealNodePair(new FakeNode(node.getCdo()), node, graphPair.getCommitMetadata());
+                NodePair pair = new NodePair(new FakeNode(node.getCdo()), node, graphPair.getCommitMetadata());
                 appendPropertyChanges(diff, pair);
             }
         }
 
         if (javersCoreConfiguration.isRemovedObjectChanges()) {
             for (ObjectNode node : graphPair.getOnlyOnLeft()) {
-                NodePair pair = new RealNodePair(node, new FakeNode(node.getCdo()), graphPair.getCommitMetadata());
+                NodePair pair = new NodePair(node, new FakeNode(node.getCdo()), graphPair.getCommitMetadata());
                 appendPropertyChanges(diff, pair);
             }
         }

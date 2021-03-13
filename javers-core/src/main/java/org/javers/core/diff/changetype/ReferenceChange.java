@@ -78,9 +78,17 @@ public class ReferenceChange extends PropertyChange {
             return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
                     " property with reference " + valuePrinter.formatWithQuotes(getLeft()) +" removed";
         } else {
-            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-                    " reference changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
-                    valuePrinter.formatWithQuotes(getRight());
+            if (left == null) {
+                return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                        " = " + valuePrinter.formatWithQuotes(getRight());
+            }else if (right == null) {
+                return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                        " reference " + valuePrinter.formatWithQuotes(getLeft()) + " unset";
+            } else {
+                return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                        " reference changed: " + valuePrinter.formatWithQuotes(getLeft()) + " -> " +
+                        valuePrinter.formatWithQuotes(getRight());
+            }
         }
     }
 

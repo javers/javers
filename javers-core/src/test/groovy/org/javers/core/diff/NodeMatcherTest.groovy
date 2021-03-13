@@ -18,7 +18,7 @@ class NodeMatcherTest extends AbstractDiffTest{
 
         then:
         pairs.size() == 1
-        RealNodePair pair = pairs[0]
+        NodePair pair = pairs[0]
         pair.left.globalId.cdoId == 2
         pair.right.globalId.cdoId == 2
     }

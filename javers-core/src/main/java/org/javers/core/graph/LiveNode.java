@@ -27,6 +27,11 @@ public class LiveNode extends ObjectNode<LiveCdo>{
     }
 
     @Override
+    public boolean isEdge() {
+        return false;
+    }
+
+    @Override
     public GlobalId getReference(Property property){
         Edge edge = getEdge(property);
 

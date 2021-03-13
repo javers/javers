@@ -17,6 +17,11 @@ public class FakeNode extends ObjectNode<Cdo>{
     }
 
     @Override
+    public boolean isEdge() {
+        return true;
+    }
+
+    @Override
     public GlobalId getReference(Property property) {
         return null;
     }

@@ -79,4 +79,6 @@ public abstract class ObjectNode<T extends Cdo> {
     public int cdoHashCode() {
         return cdo.hashCode();
     }
+
+    public abstract boolean isEdge();
 }

@@ -31,7 +31,7 @@ public class ValueAdded extends ValueAddOrRemove {
 
     @Override
     protected String prettyPrint(PrettyValuePrinter valuePrinter) {
-        return (getIndex() == null ? "" : getIndex()) + ". " +
+        return (getIndex() == null ? "· " : getIndex()+ ". ")  +
                 valuePrinter.formatWithQuotes(getAddedValue()) + " added";
     }
 }

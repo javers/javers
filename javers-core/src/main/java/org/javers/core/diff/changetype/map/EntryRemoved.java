@@ -22,7 +22,7 @@ public class EntryRemoved extends EntryAddOrRemove {
 
     @Override
     protected String prettyPrint(PrettyValuePrinter valuePrinter) {
-        return valuePrinter.formatWithQuotes(getKey()) + " -> " +
-                valuePrinter.formatWithQuotes(getValue()) + " removed";
+        return "· entry ["+ valuePrinter.formatWithQuotes(getKey()) + " : " +
+               valuePrinter.formatWithQuotes(getValue()) + "] removed";
     }
 }

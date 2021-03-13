@@ -4,7 +4,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.ValueChangeFactory;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.*;
 
@@ -49,7 +49,7 @@ public class OptionalChangeAppender implements PropertyChangeAppender<PropertyCh
                     flat(pair.getRightPropertyValue(property)));
         }
         if (contentType instanceof PrimitiveOrValueType) {
-            return new ValueChange(pair.createPropertyChangeMetadata(property), leftOptional, rightOptional);
+            ValueChangeFactory.create(pair, property, leftOptional, rightOptional);
         }
 
         throw new JaversException(UNSUPPORTED_OPTIONAL_CONTENT_TYPE, contentType);

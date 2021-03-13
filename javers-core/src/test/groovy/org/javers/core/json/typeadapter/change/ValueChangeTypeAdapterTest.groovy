@@ -18,6 +18,7 @@ import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 
 /**
+ * //TODO
  * @author bartosz walacik
  */
 class ValueChangeTypeAdapterTest extends Specification {

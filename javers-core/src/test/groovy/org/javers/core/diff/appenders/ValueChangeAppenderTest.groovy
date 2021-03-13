@@ -1,7 +1,7 @@
 package org.javers.core.diff.appenders
 
 import org.javers.core.diff.ChangeAssert
-import org.javers.core.diff.RealNodePair
+import org.javers.core.diff.NodePair
 import org.javers.core.graph.ObjectNode
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyAddress
@@ -10,7 +10,6 @@ import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.DummyUserWithValues
 import java.time.LocalDateTime
 
-import static DummyUserWithValues.dummyUserWithDate
 import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
 import static org.javers.core.model.DummyUser.Sex.FEMALE
@@ -31,7 +30,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def alwaysEquals = getManagedProperty(ValuesHolder, 'alwaysEquals')
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), alwaysEquals)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right), alwaysEquals)
 
         then:
         !change
@@ -44,7 +43,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def neverEquals = getManagedProperty(ValuesHolder, 'neverEquals')
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), neverEquals)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right), neverEquals)
 
         then:
         change.propertyName == 'neverEquals'
@@ -57,7 +56,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def sex = getManagedProperty(DummyUser,"sex")
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex)
 
         then:
         ChangeAssert.assertThat(change)
@@ -72,7 +71,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def sex = getManagedProperty(DummyUser,"sex")
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex)
 
         then:
         assertThat(change)
@@ -88,7 +87,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def age = getManagedProperty(DummyUser,"age")
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),age)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right),age)
 
         then:
         assertThat(change)
@@ -104,7 +103,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def largeInt = getManagedProperty(DummyUser,"largeInt")
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),largeInt)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right),largeInt)
 
         then:
         assertThat(change)
@@ -120,7 +119,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def flag = getManagedProperty(DummyUser,"flag")
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right),flag)
 
         then:
         assertThat(change)
@@ -136,7 +135,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def flag = getManagedProperty(DummyUser,"bigFlag")
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right),flag)
 
         then:
         assertThat(change)
@@ -155,7 +154,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def dobProperty = getManagedProperty(DummyUserWithValues,"dob")
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), dobProperty)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right), dobProperty)
 
         then:
         assertThat(change)
@@ -175,7 +174,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), salaryProperty)
+        def change = new ValueChangeAppender().calculateChanges(new NodePair(left,right), salaryProperty)
 
         then:
         assertThat(change)
@@ -196,7 +195,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
         when:
         def change = new ValueChangeAppender().calculateChanges(
-                      new RealNodePair(followEdge(left,address), followEdge(right,address)),street)
+                      new NodePair(followEdge(left,address), followEdge(right,address)),street)
 
         then:
         assertThat(change)

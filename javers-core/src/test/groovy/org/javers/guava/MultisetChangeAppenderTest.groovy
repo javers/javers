@@ -2,8 +2,7 @@ package org.javers.guava
 
 import com.google.common.collect.HashMultiset
 import com.google.common.collect.TreeMultiset
-import org.javers.core.JaversTestBuilder
-import org.javers.core.diff.RealNodePair
+import org.javers.core.diff.NodePair
 import org.javers.core.diff.appenders.AbstractDiffAppendersTest
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
@@ -28,7 +27,7 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightNode = buildGraph(new SnapshotEntity(multiSetOfPrimitives: TreeMultiset.create(rightList)))
 
         def change = multisetChangeAppender().calculateChanges(
-                new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetOfPrimitives"))
+                new NodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetOfPrimitives"))
 
         then:
         new ArrayList(change.addedValues).sort() == added.sort()
@@ -55,7 +54,7 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightNode = buildGraph(new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(rightList)))
 
         def change = multisetChangeAppender().calculateChanges(
-                new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetOfPrimitives"))
+                new NodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetOfPrimitives"))
 
         then:
         change == null
@@ -74,7 +73,7 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
 
         when:
         def change = multisetChangeAppender()
-                .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetValueObject"))
+                .calculateChanges(new NodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetValueObject"))
 
         then:
         change.valueAddedChanges.size() == 1
@@ -95,7 +94,7 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
 
         when:
         def change = multisetChangeAppender()
-                .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetValueObject"))
+                .calculateChanges(new NodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetValueObject"))
 
         then:
         change.valueRemovedChanges.size() == 1
