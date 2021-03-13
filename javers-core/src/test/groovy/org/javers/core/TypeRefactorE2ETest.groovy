@@ -1,6 +1,8 @@
 package org.javers.core
 
+import org.javers.core.diff.changetype.InitialValueChange
 import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.TerminalValueChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.annotation.Id
@@ -55,20 +57,24 @@ class TypeRefactorE2ETest extends Specification {
         changes[0].left == 10
         changes[0].right == 15
 
+        changes[1] instanceof ValueChange
         changes[1].propertyName == "oldField"
         changes[1].left == 5  //removed properties are treated as nulls
         changes[1].right == 0
 
+        changes[2] instanceof ValueChange
         changes[2].propertyName == "newField"
         changes[2].left == 0
         changes[2].right == 10
 
+        changes[3] instanceof InitialValueChange
         changes[3].propertyName == "oldField"
-        changes[3].left == 0
+        changes[3].left == null
         changes[3].right == 5
 
+        changes[4] instanceof InitialValueChange
         changes[4].propertyName == "someValue"
-        changes[4].left == 0
+        changes[4].left == null
         changes[4].right == 5
     }
 
