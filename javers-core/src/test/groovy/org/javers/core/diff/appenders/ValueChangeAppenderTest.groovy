@@ -16,6 +16,7 @@ import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserDetails.dummyUserDetails
+import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithSalary
 
 /**

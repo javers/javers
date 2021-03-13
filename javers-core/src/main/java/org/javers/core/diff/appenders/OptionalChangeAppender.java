@@ -49,7 +49,7 @@ public class OptionalChangeAppender implements PropertyChangeAppender<PropertyCh
                     flat(pair.getRightPropertyValue(property)));
         }
         if (contentType instanceof PrimitiveOrValueType) {
-            ValueChangeFactory.create(pair, property, leftOptional, rightOptional);
+            return ValueChangeFactory.create(pair, property, leftOptional, rightOptional);
         }
 
         throw new JaversException(UNSUPPORTED_OPTIONAL_CONTENT_TYPE, contentType);
