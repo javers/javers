@@ -5,12 +5,12 @@ import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.session.Dialect;
+import org.javers.repository.sql.session.Dialects;
 import org.javers.repository.sql.session.ObjectMapper;
 import org.javers.repository.sql.session.Parameter;
 import org.javers.repository.sql.session.SelectBuilder;
 import org.javers.repository.sql.session.Session;
-import org.polyjdbc.core.dialect.Dialect;
-import org.polyjdbc.core.dialect.DialectRegistry;
 
 import java.sql.Clob;
 import java.sql.ResultSet;
@@ -20,32 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_AUTHOR;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_DATE;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_DATE_INSTANT;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_ID;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_PK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_PROPERTY_COMMIT_FK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_PROPERTY_NAME;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_PROPERTY_VALUE;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_FRAGMENT;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_LOCAL_ID;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_OWNER_ID_FK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_PK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_TYPE_NAME;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_CHANGED;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_COMMIT_FK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBAL_ID_FK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_MANAGED_TYPE;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_PK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_STATE;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_TYPE;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_VERSION;
-import static org.javers.repository.sql.session.Parameter.bigDecimalParam;
-import static org.javers.repository.sql.session.Parameter.instantParam;
-import static org.javers.repository.sql.session.Parameter.localDateTimeParam;
-import static org.javers.repository.sql.session.Parameter.longParam;
-import static org.javers.repository.sql.session.Parameter.stringParam;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import static org.javers.repository.sql.session.Parameter.*;
 
 class SnapshotQuery {
     private final QueryParams queryParams;
@@ -54,8 +30,7 @@ class SnapshotQuery {
     private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
     private final Dialect dialect;
 
-    public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session, Dialect dialect) {
-        this.dialect = dialect;
+    public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
         this.selectBuilder = session
             .select(
                 SNAPSHOT_STATE + ", " +
@@ -84,6 +59,7 @@ class SnapshotQuery {
 
         this.queryParams = queryParams;
         this.tableNameProvider = tableNames;
+        this.dialect = session.getDialect();
         applyQueryParams();
     }
 
@@ -231,7 +207,7 @@ class SnapshotQuery {
                     .withOwnerGlobalIdTypeName(resultSet.getString("owner_" + GLOBAL_ID_TYPE_NAME));
         }
         private String fetchSnapshotState(ResultSet resultSet)  throws SQLException {
-            if(dialect.getCode().equals(DialectRegistry.ORACLE.name()) ) {
+            if(dialect instanceof Dialects.OracleDialect)  {
                 Clob snapshotState = resultSet.getClob(SNAPSHOT_STATE);
                 return snapshotState.getSubString(1, (int)snapshotState.length());
             }

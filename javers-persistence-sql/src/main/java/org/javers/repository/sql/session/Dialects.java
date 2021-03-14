@@ -7,7 +7,7 @@ import org.javers.repository.sql.session.KeyGeneratorDefinition.SequenceDefiniti
 
 import static org.javers.repository.sql.session.Parameter.longParam;
 
-class Dialects {
+public class Dialects {
 
     static Dialect fromName(DialectName dialectName) {
         if (DialectName.H2 == dialectName) {
@@ -28,7 +28,7 @@ class Dialects {
         throw new JaversException(JaversExceptionCode.UNSUPPORTED_SQL_DIALECT, dialectName);
     }
 
-    static class H2 extends Dialect {
+    public static class H2 extends Dialect {
         H2(DialectName dialectName) {
             super(dialectName);
         }
@@ -39,7 +39,7 @@ class Dialects {
         }
     }
 
-    static class MysqlDialect extends Dialect {
+    public static class MysqlDialect extends Dialect {
         MysqlDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -50,7 +50,7 @@ class Dialects {
         }
     }
 
-    static class MsSqlDialect extends Dialect {
+    public static class MsSqlDialect extends Dialect {
         MsSqlDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -73,7 +73,7 @@ class Dialects {
         }
     }
 
-    static class PostgresDialect extends Dialect {
+    public static class PostgresDialect extends Dialect {
         PostgresDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -84,7 +84,7 @@ class Dialects {
         }
     }
 
-    static class OracleDialect extends Dialect {
+    public static class OracleDialect extends Dialect {
         OracleDialect(DialectName dialectName) {
             super(dialectName);
         }
