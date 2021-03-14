@@ -14,6 +14,7 @@ public class DummyEntity {
         this.id = id;
     }
 
+    @Id
     public int getId() {
         return id;
     }

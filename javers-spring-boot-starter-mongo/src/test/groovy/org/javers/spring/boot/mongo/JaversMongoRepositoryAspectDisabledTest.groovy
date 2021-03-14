@@ -13,7 +13,7 @@ import spock.lang.Specification
 /**
  * @author mwesolowski
  */
-@SpringBootTest(classes = [TestApplication], properties = ["javers.springDataAuditableRepositoryAspectEnabled=false"])
+@SpringBootTest(classes = [TestApplication])
 @ActiveProfiles("test")
 class JaversMongoRepositoryAspectDisabledTest extends Specification{
 
@@ -23,7 +23,10 @@ class JaversMongoRepositoryAspectDisabledTest extends Specification{
     @Autowired
     DummyEntityRepository dummyEntityRepository
 
-    def "should build javers instance without auto-audit aspect"() {
+    @Autowired
+    JaversMongoProperties javersProperties
+
+    def "should build javers instance without auto-audit aspect when disabled"() {
         when:
         def dummyEntity = dummyEntityRepository.save(new DummyEntity(UUID.randomUUID().hashCode()))
 
