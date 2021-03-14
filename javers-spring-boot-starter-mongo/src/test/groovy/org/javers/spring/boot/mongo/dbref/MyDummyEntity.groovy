@@ -4,13 +4,15 @@ import org.javers.core.metamodel.annotation.Id
 import org.springframework.data.mongodb.core.mapping.DBRef
 
 class MyDummyEntity {
+
+    @Id
     private String id
+
     private String name
 
     @DBRef(lazy = true)
     private MyDummyRefEntity refEntity
 
-    @Id
     String getId() {
         return id
     }

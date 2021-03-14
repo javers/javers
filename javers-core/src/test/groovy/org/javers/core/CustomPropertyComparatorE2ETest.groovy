@@ -61,7 +61,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
         def javers = JaversBuilder.javers()
         registerComparator(javers)
         javers.withListCompareAlgorithm(listCompareAlgorithm)
-        javers = javers.withNewObjectChanges(false).build()
+        javers = javers.withInitialValueChanges(false).build()
 
         when:
         def diff = javers.compare(left, right)
@@ -104,7 +104,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
 
         def javers = JaversBuilder.javers()
         registerComparator(javers)
-        javers = javers.withNewObjectChanges(false).build()
+        javers = javers.withInitialValueChanges(false).build()
 
         when:
         def diff = javers.compare(left, right)

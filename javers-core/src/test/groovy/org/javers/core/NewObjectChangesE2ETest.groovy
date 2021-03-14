@@ -53,7 +53,7 @@ class NewObjectChangesE2ETest extends Specification {
 
         given:
         def javers = JaversBuilder.javers()
-                .withNewObjectChanges(false)
+                .withInitialValueChanges(false)
                 .build()
 
         when:
@@ -102,7 +102,7 @@ class NewObjectChangesE2ETest extends Specification {
     def "should not generate terminal ValueChanges in findChanges() when disabled"() {
         given:
         def javers = JaversBuilder
-                .javers().withRemovedObjectChanges(false)
+                .javers().withTerminalValueChanges(false)
                 .build()
 
         when:
@@ -161,7 +161,7 @@ class NewObjectChangesE2ETest extends Specification {
 
     def "should not generate initial ValueChanges in compare() when disabled" () {
         given:
-        def javers = JaversBuilder.javers().withNewObjectChanges(false).build()
+        def javers = JaversBuilder.javers().withInitialValueChanges(false).build()
 
         when:
         def diff = javers.compare(
@@ -215,7 +215,7 @@ class NewObjectChangesE2ETest extends Specification {
 
     def "should not generate terminal ValueChanges in compare() when disabled" () {
         given:
-        def javers = JaversBuilder.javers().withRemovedObjectChanges(false).build()
+        def javers = JaversBuilder.javers().withTerminalValueChanges(false).build()
 
         when:
         def diff = javers.compare(

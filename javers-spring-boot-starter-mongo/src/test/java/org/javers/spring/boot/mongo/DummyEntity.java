@@ -7,13 +7,13 @@ import org.javers.core.metamodel.annotation.Id;
  */
 public class DummyEntity {
 
+    @Id
     private final int id;
 
     public DummyEntity(int id) {
         this.id = id;
     }
 
-    @Id
     public int getId() {
         return id;
     }

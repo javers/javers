@@ -41,15 +41,18 @@ class JaversSqlAutoConfigurationTest extends Specification {
        !javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
 
-        javersProperties.isTypeSafeValues()
-        dialectName == DialectName.H2
-        javersProperties.sqlSchema == "test"
-        javersProperties.sqlSchemaManagementEnabled
+        javersProperties.typeSafeValues
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"
+       !javersProperties.auditableAspectEnabled
+       !javersProperties.springDataAuditableRepositoryAspectEnabled
         javersProperties.prettyPrintDateFormats.localDateTime == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd-mm-yyyy HH mm ss Z"
         javersProperties.prettyPrintDateFormats.localDate == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.localTime == "HH mm ss"
+
+        dialectName == DialectName.H2
+        javersProperties.sqlSchema == "test"
+        javersProperties.sqlSchemaManagementEnabled
         javersProperties.sqlGlobalIdCacheDisabled
         javersProperties.objectAccessHook == "org.javers.spring.boot.DummySqlObjectAccessHook"
         javersProperties.sqlGlobalIdTableName == "cust_jv_global_id"

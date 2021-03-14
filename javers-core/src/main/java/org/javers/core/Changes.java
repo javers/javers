@@ -68,8 +68,7 @@ public class Changes extends AbstractList<Change> implements Serializable {
      *
      * is printed by this code:
      * <pre>
-     * Changes changes = javers.findChanges(QueryBuilder.byClass(Employee.class)
-     *                         .withNewObjectChanges().build());
+     * Changes changes = javers.findChanges(QueryBuilder.byClass(Employee.class).build());
      *
      * changes.groupByCommit().forEach(byCommit -> {
      *   System.out.println("commit " + byCommit.getCommit().getId());
@@ -84,6 +83,7 @@ public class Changes extends AbstractList<Change> implements Serializable {
      *
      * @see <a href="https://javers.org/documentation/repository-examples/#change-log">http://javers.org/documentation/repository-examples/#change-log</a>
      * @since 3.9
+     * TODO javadoc
      */
     public List<ChangesByCommit> groupByCommit() {
         Map<CommitMetadata, List<Change>> changesByCommit = changes.stream().collect(

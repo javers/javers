@@ -32,7 +32,7 @@ class CaseWithChangedPropertyType extends Specification {
 
     def "should allow for property type change, from LocalDateTime to Instant"() {
         given:
-        def javers = JaversBuilder.javers().withNewObjectChanges(false).build()
+        def javers = JaversBuilder.javers().withInitialValueChanges(false).build()
 
         def localDateNow = LocalDateTime.now()
         def instantNow = Instant.now()

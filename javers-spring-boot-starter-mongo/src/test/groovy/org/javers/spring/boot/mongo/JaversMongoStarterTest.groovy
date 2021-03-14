@@ -42,21 +42,23 @@ class JaversMongoStarterTest extends Specification{
        !javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
 
-        javersProperties.algorithm == "levenshtein_distance"
-        javersProperties.packagesToScan == "org.javers.spring.boot"
-        javersProperties.mappingStyle == "bean"
-       !javersProperties.newObjectChanges
-       !javersProperties.removedObjectChanges
-        javersProperties.commitIdGenerator=="random"
         javersProperties.typeSafeValues
+        javersProperties.packagesToScan == "org.javers.spring.boot"
         javersProperties.documentDbCompatibilityEnabled == true
+       !javersProperties.auditableAspectEnabled
+       !javersProperties.springDataAuditableRepositoryAspectEnabled
+        javersProperties.prettyPrintDateFormats.localDateTime == "dd-mm-yyyy"
+        javersProperties.prettyPrintDateFormats.zonedDateTime == "dd-mm-yyyy HH mm ss Z"
+        javersProperties.prettyPrintDateFormats.localDate == "dd-mm-yyyy"
+        javersProperties.prettyPrintDateFormats.localTime == "HH mm ss"
+
         javersProperties.objectAccessHook == "org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook"
         javersProperties.snapshotsCacheSize == 100
     }
 
-    def "shouldReadBeanMappingStyleFromYml"() {
+    def "should scan given packages for classes with @TypeName"() {
         expect:
-        javers.getTypeMapping(DummyEntity) instanceof EntityType
+        javers.getTypeMapping("AnotherEntity") instanceof EntityType
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath"() {

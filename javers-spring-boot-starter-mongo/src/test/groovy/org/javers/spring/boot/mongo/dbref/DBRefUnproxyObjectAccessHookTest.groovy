@@ -11,7 +11,6 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 @SpringBootTest(classes = [TestApplication])
-@ActiveProfiles("test")
 class DBRefUnproxyObjectAccessHookTest extends Specification {
 
     @Autowired

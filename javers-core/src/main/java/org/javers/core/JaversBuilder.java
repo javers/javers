@@ -678,9 +678,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * javers:
      *   initialValueChanges: false
      * </pre>
+     * TODO javadoc
      */
-    public JaversBuilder withNewObjectChanges(boolean newObjectsChanges){
-        configurationBuilder().withInitialValueChanges(newObjectsChanges);
+    public JaversBuilder withInitialValueChanges(boolean initialValueChanges){
+        configurationBuilder().withInitialValueChanges(initialValueChanges);
         return this;
     }
 
@@ -689,19 +690,19 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     @Deprecated
     public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
-        return this.withNewObjectChanges(newObjectsSnapshot);
+        return this.withInitialValueChanges(newObjectsSnapshot);
     }
 
     /**
+     * Enabled by default since Javers 6.0.
+     * <br/><br/>
+     *
      * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
      * generates additional set of terminal Value Changes for each Removed Object to capture their state.
      * <br/><br/>
      *
      * Terminal {@link ValueChange} is a change with a property value on left and null on right
      * and is generated for each property of {@link ObjectRemoved}.
-     * <br/><br/>
-     *
-     * Enabled by default.
      * <br/><br/>
      *
      * In Javers Spring Boot starter you can disabled terminal Value Changes in `application.yml`:
@@ -713,8 +714,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * @since 6.0
      */
-    public JaversBuilder withRemovedObjectChanges(boolean removedObjectsChanges){
-        configurationBuilder().withTerminalValueChanges(removedObjectsChanges);
+    public JaversBuilder withTerminalValueChanges(boolean terminalValueChanges){
+        configurationBuilder().withTerminalValueChanges(terminalValueChanges);
         return this;
     }
 
@@ -812,10 +813,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
             withPrettyPrint(javersProperties.isPrettyPrint());
         }
         if (javersProperties.isInitialValueChanges() != null) {
-            withNewObjectChanges(javersProperties.isInitialValueChanges());
+            withInitialValueChanges(javersProperties.isInitialValueChanges());
         }
         if (javersProperties.isTerminalValueChanges() != null) {
-            withRemovedObjectChanges(javersProperties.isTerminalValueChanges());
+            withTerminalValueChanges(javersProperties.isTerminalValueChanges());
         }
 
         withPrettyPrintDateFormats(javersProperties.getPrettyPrintDateFormats());

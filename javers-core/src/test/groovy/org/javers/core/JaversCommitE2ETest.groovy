@@ -175,7 +175,7 @@ class JaversCommitE2ETest extends Specification {
     def "should detect changes on referenced node even if root is new"() {
         given:
         def oldRef = new SnapshotEntity(id: 2, intProperty:2)
-        def javers = javers().withNewObjectChanges(false).build()
+        def javers = javers().withInitialValueChanges(false).build()
         javers.commit("user",oldRef)
 
         def cdo = new SnapshotEntity(id: 1, entityRef: oldRef)

@@ -13,13 +13,10 @@ import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
-import org.javers.core.metamodel.annotation.ValueObject
 import org.javers.core.metamodel.property.Property
-import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.IgnoredType
 import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.*
-import spock.lang.Shared
 import spock.lang.Unroll
 
 import javax.persistence.EmbeddedId
@@ -186,7 +183,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
     def "should not create properties snapshot of NewObject when disabled"() {
         given:
-        def javers = JaversBuilder.javers().withNewObjectChanges(false).build()
+        def javers = JaversBuilder.javers().withInitialValueChanges(false).build()
         def left =  new DummyUser(name: "kazik")
         def right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
 

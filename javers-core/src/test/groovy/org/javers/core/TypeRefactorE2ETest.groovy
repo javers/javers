@@ -2,7 +2,6 @@ package org.javers.core
 
 import org.javers.core.diff.changetype.InitialValueChange
 import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.TerminalValueChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.annotation.Id
@@ -19,7 +18,7 @@ class TypeRefactorE2ETest extends Specification {
 
     def "should manage Entity class name refactor when old and new class uses @TypeName"() {
         given:
-        def javers = JaversBuilder.javers().withNewObjectChanges(false).build()
+        def javers = JaversBuilder.javers().withInitialValueChanges(false).build()
 
         when:
         javers.commit("author", new OldEntityWithTypeAlias(id: 1, val: 5))
@@ -80,7 +79,7 @@ class TypeRefactorE2ETest extends Specification {
 
     def "should manage ValueObject class name refactor when querying using new class with @TypeName retrofitted to old class name"() {
         given:
-        def javers = JaversBuilder.javers().withNewObjectChanges(false).build()
+        def javers = JaversBuilder.javers().withInitialValueChanges(false).build()
 
         when:
         javers.commit("author", new EntityWithRefactoredValueObject(id: 1, value: new OldValueObject(5, 10)))
@@ -117,7 +116,7 @@ class TypeRefactorE2ETest extends Specification {
     @Unroll
     def "should manage Entity class name refactor when querying using new class with @TypeName retrofitted to old class name"() {
         given:
-        def javers = JaversBuilder.javers().withNewObjectChanges(false).build()
+        def javers = JaversBuilder.javers().withInitialValueChanges(false).build()
 
         when:
         javers.commit("author", new OldEntity(id: 1, value: 5))

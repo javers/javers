@@ -1,8 +1,8 @@
 javers:
   algorithm: levenshtein_distance
   mappingStyle: bean
-  newObjectChanges: false
-  removedObjectChanges: false
+  initialValueChanges: false
+  terminalValueChanges: false
   prettyPrint: false
   typeSafeValues: true
   dialect: H2
@@ -11,6 +11,8 @@ javers:
   commitIdGenerator: random
   packagesToScan: my.company.domain.person, my.company.domain.finance
   sqlGlobalIdCacheDisabled: true
+  auditableAspectEnabled: false
+  springDataAuditableRepositoryAspectEnabled: false
   prettyPrintDateFormats:
     localDateTime: "dd-mm-yyyy"
     zonedDateTime: "dd-mm-yyyy HH mm ss Z"

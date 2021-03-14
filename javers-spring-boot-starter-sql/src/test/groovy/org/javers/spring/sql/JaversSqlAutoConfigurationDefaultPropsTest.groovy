@@ -39,6 +39,8 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.SYNCHRONIZED_SEQUENCE
 
+        javersProperties.auditableAspectEnabled
+        javersProperties.springDataAuditableRepositoryAspectEnabled
         !javersProperties.isTypeSafeValues()
         javersProperties.packagesToScan == ""
         dialectName == DialectName.H2
