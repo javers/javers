@@ -114,6 +114,15 @@ public class Changes extends AbstractList<Change> implements Serializable {
     }
 
     /**
+     * Delegates to {@link #devPrint()}.<br/>
+     * See {@link #prettyPrint()}
+     */
+    @Override
+    public String toString() {
+        return devPrint();
+    }
+
+    /**
      * Prints the nicely formatted list of Changes. <br/>
      * Can be used on GUI to show Changes to your users.
      * <br/><br/>
@@ -199,25 +208,18 @@ public class Changes extends AbstractList<Change> implements Serializable {
      * <pre>
      */
     public String devPrint() {
+        StringBuilder b = new StringBuilder();
+        b.append("Changes ("+size()+"):\n");
 
         groupByCommit().forEach(byCommit -> {
-          System.out.println("commit " + byCommit.getCommit().getId());
-          byCommit.groupByObject().forEach(byObject -> {
-            System.out.println("  changes on " + byObject.getGlobalId().value() + ":");
-            byObject.get().forEach(change -> System.out.println("  - " + change));
-          });
+            b.append("commit " + byCommit.getCommit().getId() + "\n");
+            byCommit.groupByObject().forEach(byObject -> {
+                b.append("  changes on " + byObject.getGlobalId().value() + " :\n");
+                byObject.get().forEach(change -> b.append("  - " + change + " \n"));
+            });
         });
 
-        return "";
-    }
-
-    /**
-     * Delegates to {@link #devPrint()}.<br/>
-     * See {@link #prettyPrint()}
-     */
-    @Override
-    public String toString() {
-        return devPrint();
+        return b.toString();
     }
 
 }
