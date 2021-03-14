@@ -30,8 +30,8 @@ class JaversMongoStarterDefaultsTest extends Specification{
         expect:
         javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.SIMPLE
         javers.coreConfiguration.mappingStyle == MappingStyle.FIELD
-        javers.coreConfiguration.newObjectChanges
-        javers.coreConfiguration.removedObjectChanges
+        javers.coreConfiguration.initialValueChanges
+        javers.coreConfiguration.terminalValueChanges
         javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.SYNCHRONIZED_SEQUENCE
 

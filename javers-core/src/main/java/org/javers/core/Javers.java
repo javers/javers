@@ -85,9 +85,9 @@ import java.util.stream.Stream;
   * 0 In <code>Javers.findChanges()</code>, a NewObject change is always generated for each initial Snapshot
  *   (it can't be disabled by the javers.initialValueChanges flag).
  *
- * 0 QueryBuilder.withNewObjectChanges() method is now deprecated and has no effect.
+ * 0 {@link org.javers.repository.jql.QueryBuilder#withNewObjectChanges()} method is deprecated and has no effect.
  *
- * 0 The javers.newObjectSnapshot flag is renamed to javers.initialValueChanges (enabled by default)
+ * 0 The javers.newObjectSnapshot flag is renamed to javers.initialValueChanges and is enabled by default
  *
  * - Minor bug fixed - https://github.com/javers/javers/issues/911
  *

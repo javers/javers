@@ -37,8 +37,8 @@ class JaversMongoStarterTest extends Specification{
         expect:
         javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.LEVENSHTEIN_DISTANCE
         javers.coreConfiguration.mappingStyle == MappingStyle.BEAN
-       !javers.coreConfiguration.newObjectChanges
-       !javers.coreConfiguration.removedObjectChanges
+       !javers.coreConfiguration.initialValueChanges
+       !javers.coreConfiguration.terminalValueChanges
        !javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
 

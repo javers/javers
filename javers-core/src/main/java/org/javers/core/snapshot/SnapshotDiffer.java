@@ -7,7 +7,6 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
-import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.SnapshotIdentifier;
@@ -59,7 +58,7 @@ public class SnapshotDiffer {
 
     private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot, CdoSnapshot previousSnapshot) {
         changes.add(new ObjectRemoved(terminalSnapshot.getGlobalId(), empty(), of(terminalSnapshot.getCommitMetadata())));
-        if (previousSnapshot != null && javersCoreConfiguration.isRemovedObjectChanges()) {
+        if (previousSnapshot != null && javersCoreConfiguration.isTerminalValueChanges()) {
             Diff terminalDiff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(terminalSnapshot), commitMetadata(terminalSnapshot));
             changes.addAll(terminalDiff.getChanges());
         }

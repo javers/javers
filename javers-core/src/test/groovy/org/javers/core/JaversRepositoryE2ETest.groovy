@@ -288,7 +288,7 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots.size() == 1
         snapshots[0].globalId.typeName == DummyAddress.name
 
-        when: "withNewObjectChanges"
+        when:
         snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
                 .withChangedProperty("city").build())
 
@@ -374,7 +374,7 @@ class JaversRepositoryE2ETest extends Specification {
         commitSeq(snapshots[0].commitMetadata) == 3
         snapshots[0].globalId.value() ==  SnapshotEntity.name+"/1"
 
-        when: "withNewObjectChanges"
+        when:
         snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity)
                 .withChangedProperty("intProperty").build())
 

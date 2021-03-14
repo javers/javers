@@ -13,8 +13,8 @@ public abstract class JaversCoreProperties {
     private String algorithm;
     private String commitIdGenerator;
     private String mappingStyle;
-    private Boolean newObjectChanges;
-    private Boolean removedObjectChanges;
+    private Boolean initialValueChanges;
+    private Boolean terminalValueChanges;
     private Boolean prettyPrint;
     private Boolean typeSafeValues;
     private String packagesToScan = "";
@@ -33,15 +33,27 @@ public abstract class JaversCoreProperties {
     }
 
     /**
-     * Use {@link #isNewObjectChanges()}
+     * Use {@link #isInitialValueChanges()}
      */
     @Deprecated
     public Boolean isNewObjectSnapshot() {
-        return isNewObjectChanges();
+        return isInitialValueChanges();
     }
 
-    public Boolean isNewObjectChanges() {
-        return newObjectChanges;
+    /**
+     * Use {@link #setInitialValueChanges(Boolean)}
+     */
+    @Deprecated
+    public void setNewObjectSnapshot(Boolean newObjectSnapshot) {
+        setInitialValueChanges(newObjectSnapshot);
+    }
+
+    public Boolean isInitialValueChanges() {
+        return initialValueChanges;
+    }
+
+    public Boolean isTerminalValueChanges() {
+        return terminalValueChanges;
     }
 
     public Boolean isPrettyPrint() {
@@ -68,16 +80,8 @@ public abstract class JaversCoreProperties {
         this.mappingStyle = mappingStyle;
     }
 
-    public void setNewObjectChanges(Boolean newObjectChanges) {
-        this.newObjectChanges = newObjectChanges;
-    }
-
-    /**
-     * Use {@link #setNewObjectChanges(Boolean)}
-     */
-    @Deprecated
-    public void setNewObjectSnapshot(Boolean newObjectSnapshot) {
-        setNewObjectChanges(newObjectSnapshot);
+    public void setInitialValueChanges(Boolean initialValueChanges) {
+        this.initialValueChanges = initialValueChanges;
     }
 
     public void setPrettyPrint(Boolean prettyPrint) {
@@ -96,12 +100,8 @@ public abstract class JaversCoreProperties {
         return prettyPrintDateFormats;
     }
 
-    public Boolean isRemovedObjectChanges() {
-        return removedObjectChanges;
-    }
-
-    public void setRemovedObjectChanges(Boolean removedObjectChanges) {
-        this.removedObjectChanges = removedObjectChanges;
+    public void setTerminalValueChanges(Boolean terminalValueChanges) {
+        this.terminalValueChanges = terminalValueChanges;
     }
 
     public static class PrettyPrintDateFormats {

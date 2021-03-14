@@ -1,8 +1,6 @@
 package org.javers.core;
 
 import org.javers.common.string.PrettyValuePrinter;
-import org.javers.common.validation.Validate;
-import org.javers.core.JaversCoreProperties.PrettyPrintDateFormats;
 import org.javers.core.commit.CommitId;
 import org.javers.core.diff.ListCompareAlgorithm;
 
@@ -21,22 +19,22 @@ public class CoreConfiguration {
 
     private boolean prettyPrint;
 
-    private final boolean newObjectChanges;
+    private final boolean initialValueChanges;
 
-    private final boolean removedObjectChanges;
+    private final boolean terminalValueChanges;
 
     private final CommitIdGenerator commitIdGenerator;
 
     private final Supplier<CommitId> customCommitIdGenerator;
 
-    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean newObjectChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean removedObjectChanges, boolean prettyPrint) {
+    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean initialValueChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean terminalValueChanges, boolean prettyPrint) {
         this.prettyValuePrinter = prettyValuePrinter;
         this.mappingStyle = mappingStyle;
         this.listCompareAlgorithm = listCompareAlgorithm;
-        this.newObjectChanges = newObjectChanges;
+        this.initialValueChanges = initialValueChanges;
         this.commitIdGenerator = commitIdGenerator;
         this.customCommitIdGenerator = customCommitIdGenerator;
-        this.removedObjectChanges = removedObjectChanges;
+        this.terminalValueChanges = terminalValueChanges;
         this.prettyPrint = prettyPrint;
     }
 
@@ -52,12 +50,12 @@ public class CoreConfiguration {
         return listCompareAlgorithm;
     }
 
-    public boolean isNewObjectChanges() {
-        return newObjectChanges;
+    public boolean isInitialValueChanges() {
+        return initialValueChanges;
     }
 
-    public boolean isRemovedObjectChanges() {
-        return removedObjectChanges;
+    public boolean isTerminalValueChanges() {
+        return terminalValueChanges;
     }
 
     public CommitIdGenerator getCommitIdGenerator() {

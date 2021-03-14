@@ -679,14 +679,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *   initialValueChanges: false
      * </pre>
      */
-    //TODO rename withInitialValueChanges
     public JaversBuilder withNewObjectChanges(boolean newObjectsChanges){
-        configurationBuilder().withNewObjectChanges(newObjectsChanges);
+        configurationBuilder().withInitialValueChanges(newObjectsChanges);
         return this;
     }
 
     /**
-     * Use {@link #withNewObjectChanges(boolean)}
+     * Use {@link #withInitialValueChanges(boolean)}
      */
     @Deprecated
     public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
@@ -714,9 +713,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * @since 6.0
      */
-    //TODO rename to withTerminalValueChanges
     public JaversBuilder withRemovedObjectChanges(boolean removedObjectsChanges){
-        configurationBuilder().withRemovedObjectChanges(removedObjectsChanges);
+        configurationBuilder().withTerminalValueChanges(removedObjectsChanges);
         return this;
     }
 
@@ -813,11 +811,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
         if (javersProperties.isPrettyPrint() != null) {
             withPrettyPrint(javersProperties.isPrettyPrint());
         }
-        if (javersProperties.isNewObjectChanges() != null) {
-            withNewObjectChanges(javersProperties.isNewObjectChanges());
+        if (javersProperties.isInitialValueChanges() != null) {
+            withNewObjectChanges(javersProperties.isInitialValueChanges());
         }
-        if (javersProperties.isRemovedObjectChanges() != null) {
-            withRemovedObjectChanges(javersProperties.isRemovedObjectChanges());
+        if (javersProperties.isTerminalValueChanges() != null) {
+            withRemovedObjectChanges(javersProperties.isTerminalValueChanges());
         }
 
         withPrettyPrintDateFormats(javersProperties.getPrettyPrintDateFormats());
