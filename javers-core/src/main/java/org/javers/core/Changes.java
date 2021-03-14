@@ -47,22 +47,17 @@ public class Changes extends AbstractList<Change> implements Serializable {
      * usually you need to group changes by commits and then by objects.
      * <br/><br/>
      *
-     * A simple changelog (like {@link #devPrint()}) can be printed by this code:
+     * A simple changelog, like {@link #devPrint()}, can be printed by this code:
      *<br/><br/>
      *
      * <pre>
-     * StringBuilder b = new StringBuilder();
-     * b.append("Changes ("+size()+"):\n");
-     *
-     * groupByCommit().forEach(byCommit -> {
-     *   b.append("commit " + byCommit.getCommit().getId() + "\n");
+     * changes.groupByCommit().forEach(byCommit -> {
+     *   System.out.println("commit " + byCommit.getCommit().getId());
      *   byCommit.groupByObject().forEach(byObject -> {
-     *     b.append("  changes on " + byObject.getGlobalId().value() + " :\n");
-     *     byObject.get().forEach(change -> b.append("  - " + change + " \n"));
+     *     System.out.println("  changes on " + byObject.getGlobalId().value() + ":");
+     *     byObject.get().forEach(change -> System.out.println("  - " + change));
      *   });
      * });
-     *
-     * return b.toString();
      * </pre>
      *
      * @see <a href="https://javers.org/documentation/repository-examples/#change-log">http://javers.org/documentation/repository-examples/#change-log</a>
@@ -204,18 +199,16 @@ public class Changes extends AbstractList<Change> implements Serializable {
      * <pre>
      */
     public String devPrint() {
-        StringBuilder b = new StringBuilder();
-        b.append("Changes ("+size()+"):\n");
 
         groupByCommit().forEach(byCommit -> {
-          b.append("commit " + byCommit.getCommit().getId() + "\n");
+          System.out.println("commit " + byCommit.getCommit().getId());
           byCommit.groupByObject().forEach(byObject -> {
-            b.append("  changes on " + byObject.getGlobalId().value() + " :\n");
-            byObject.get().forEach(change -> b.append("  - " + change + " \n"));
+            System.out.println("  changes on " + byObject.getGlobalId().value() + ":");
+            byObject.get().forEach(change -> System.out.println("  - " + change));
           });
         });
 
-        return b.toString();
+        return "";
     }
 
     /**
