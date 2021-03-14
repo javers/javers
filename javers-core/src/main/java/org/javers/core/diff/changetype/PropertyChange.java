@@ -1,5 +1,6 @@
 package org.javers.core.diff.changetype;
 
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.ValueObjectId;
 
@@ -85,5 +86,10 @@ public abstract class PropertyChange extends Change {
      */
     public boolean isPropertyValueChanged() {
         return changeType == PropertyChangeType.PROPERTY_VALUE_CHANGED;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{ property: '"+propertyName +"' }";
     }
 }

@@ -77,4 +77,10 @@ public abstract class ContainerChange extends PropertyChange {
     public int hashCode() {
         return Objects.hash(super.hashCode(), changes);
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
+                " elementChanges:"+changes.size()+" }";
+    }
 }

@@ -110,4 +110,11 @@ public class ReferenceChange extends PropertyChange {
     public int hashCode() {
         return Objects.hash(super.hashCode(), getLeft(), getRight());
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
+                " left:'"+getLeft().value()+"', " +
+                " right:'"+getRight().value()+"' }";
+    }
 }

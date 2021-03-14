@@ -76,4 +76,10 @@ public class MapChange extends PropertyChange {
     public int hashCode() {
         return Objects.hash(super.hashCode(), this.changes);
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
+                " entryChanges:"+changes.size()+" }";
+    }
 }

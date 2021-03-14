@@ -58,7 +58,8 @@ class PrettyPrintingExample extends Specification {
       def changeLog = javers.processChangeList(changes, new SimpleTextChangeLog());
       println("SimpleTextChangeLog : " + changeLog )
 
-      println("javers.findChanges() : " + changes.toString() )
+      println("changes.prettyPrint() : " + changes.prettyPrint() )
+      println("changes.devPrint() : " + changes.devPrint() )
 
       then:
       true

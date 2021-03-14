@@ -72,4 +72,12 @@ public class ValueChange extends PropertyChange {
     public int hashCode() {
         return Objects.hash(super.hashCode(), getLeft(), getRight());
     }
+
+    @Override
+    public String toString() {
+        PrettyValuePrinter printer = PrettyValuePrinter.getDefault();
+        return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
+                " left:"+printer.formatWithQuotes(getLeft())+", " +
+                " right:"+printer.formatWithQuotes(getRight())+" }";
+    }
 }
