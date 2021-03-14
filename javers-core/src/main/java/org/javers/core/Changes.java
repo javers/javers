@@ -19,14 +19,22 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 /**
  * Convenient wrapper for the list of Changes returned by {@link Javers#findChanges(JqlQuery)}.
  * <br/><br/>
- *
- * Allows traversing over the list of Changes grouped by commits
- * and grouped by entities, see: <br/>
- * {@link #groupByCommit()}, {@link #groupByObject()}.
+ * Can be used as <code>List&lt;Change&gt;</code>,
+ * but also provides additional methods:
  * <br/><br/>
  *
- * {@link #prettyPrint()} prints Changes to the the nicely formatted String.
+ * <ul>
+ *     <li>{@link #groupByCommit()}, {@link #groupByObject()} &mdash;
+ *     allow traversing over the list of Changes grouped by commits
+ *     and grouped by objects</li>
+ *     <li>{@link #getChangesByType(Class)}  &mdash; a subset of Changes with a given type
+ *     <li>{@link #prettyPrint()}  &mdash; prints Changes to a String, nicely formatted, user-readable style
+ *     <li>{@link #devPrint()}  &mdash; prints Changes to a String, simple and technical style
+ * </ul>
  *
+ * //TODO
+ *
+ * @see <a href="https://javers.org/documentation/repository-examples/#change-log">http://javers.org/documentation/repository-examples/#change-log</a>
  * @since 3.9
  */
 public class Changes extends AbstractList<Change> implements Serializable {
@@ -60,9 +68,7 @@ public class Changes extends AbstractList<Change> implements Serializable {
      * });
      * </pre>
      *
-     * @see <a href="https://javers.org/documentation/repository-examples/#change-log">http://javers.org/documentation/repository-examples/#change-log</a>
      * @since 3.9
-     * TODO javadoc
      */
     public List<ChangesByCommit> groupByCommit() {
         Map<CommitMetadata, List<Change>> changesByCommit = changes.stream().collect(
@@ -107,6 +113,9 @@ public class Changes extends AbstractList<Change> implements Serializable {
         return changes.size();
     }
 
+    /**
+     * Returns a subset of Changes with a given type
+     */
     public <C extends Change> List<C> getChangesByType(final Class<C> type) {
         argumentIsNotNull(type);
         return (List) unmodifiableList(
@@ -123,7 +132,7 @@ public class Changes extends AbstractList<Change> implements Serializable {
     }
 
     /**
-     * Prints the nicely formatted list of Changes. <br/>
+     * Prints the list of Changes to a nicely formatted String.<br/>
      * Can be used on GUI to show Changes to your users.
      * <br/><br/>
      * Example:
@@ -175,7 +184,9 @@ public class Changes extends AbstractList<Change> implements Serializable {
     /**
      * Prints the Changes in a technical style. <br/>
      * Useful for development and debugging. <br/>
-     * You can use the implementation of this method as the template to write your own pretty print.
+     *  <br/>
+     * You can use the implementation of this method as a template to create your own changelog<br/>
+     * (if {@link #prettyPrint()} is not ok for you).
      * <br/><br/>
      *
      * Example:
