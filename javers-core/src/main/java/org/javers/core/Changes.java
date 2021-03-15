@@ -223,9 +223,9 @@ public class Changes extends AbstractList<Change> implements Serializable {
         b.append("Changes ("+size()+"):\n");
 
         groupByCommit().forEach(byCommit -> {
-            b.append("commit " + byCommit.getCommit().getId() + "\n");
+            b.append("commit " + byCommit.getCommit().getId() + " \n");
             byCommit.groupByObject().forEach(byObject -> {
-                b.append("  changes on " + byObject.getGlobalId().value() + " :\n");
+                b.append("* changes on " + byObject.getGlobalId().value() + " :\n");
                 byObject.get().forEach(change -> b.append("  - " + change + " \n"));
             });
         });

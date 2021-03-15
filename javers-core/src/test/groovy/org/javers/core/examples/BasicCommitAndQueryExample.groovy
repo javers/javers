@@ -55,7 +55,6 @@ class BasicCommitAndQueryExample extends Specification {
         // or the old approach:
         // List<Change> changes = javers.findChanges(query)
 
-        //TODO update prettyPrint in docs
         println changes.prettyPrint()
 
         then: "there should be five Changes on Bob"

@@ -31,7 +31,7 @@ public class ReferenceChange extends PropertyChange {
     }
 
     /**
-     * GlobalId of left (or previous) domain object reference
+     * GlobalId of left (or previous) domain object reference.
      */
     public GlobalId getLeft() {
         return left;
@@ -113,8 +113,9 @@ public class ReferenceChange extends PropertyChange {
 
     @Override
     public String toString() {
+        PrettyValuePrinter valuePrinter = PrettyValuePrinter.getDefault();
         return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
-                " left:'"+getLeft().value()+"', " +
-                " right:'"+getRight().value()+"' }";
+                " left:"+valuePrinter.formatWithQuotes(getLeft())+", " +
+                " right:"+valuePrinter.formatWithQuotes(getRight())+" }";
     }
 }
