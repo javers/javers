@@ -121,7 +121,6 @@ class JqlExample extends Specification {
         shadowE1.ref.ref.ref.id == 4
     }
 
-    //TODO update prettyPrint in docs
     def "should query for Changes made on any object"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -262,8 +261,6 @@ class JqlExample extends Specification {
         assert snapshots[1].getPropertyValue("boss").value() == "Employee/john"
     }
 
-
-    //TODO update prettyPrint in docs
     def "should query for Entity changes by instance Id"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -281,7 +278,6 @@ class JqlExample extends Specification {
         assert changes.size() == 6
     }
 
-    //TODO update prettyPrint in docs
     def "should query for ValueObject changes by owning Entity instance and class"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -345,7 +341,6 @@ class JqlExample extends Specification {
         assert changes.size() == 2
     }
 
-    //TODO update docs
     def "should query for Object changes by its class"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -364,7 +359,6 @@ class JqlExample extends Specification {
         assert changes.size() == 4
     }
 
-    //TODO update docs prettyPrint
     def "should query for any domain object changes"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -382,7 +376,6 @@ class JqlExample extends Specification {
         assert changes.size() == 8
     }
 
-    //TODO update docs prettyPrint
     def "should query for changes (and snapshots) with property filter"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -440,7 +433,6 @@ class JqlExample extends Specification {
         assert javers.findSnapshots(query).size() == 2
     }
 
-    //TODO update docs prettyPrint
     def "Skip parameter in findChanges, findSnapshots, and findShadows"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -591,27 +583,37 @@ class JqlExample extends Specification {
         assert javers.findSnapshots(query).size() == 1
     }
 
-    //TODO serious update
-    //@Deprecated
-    def "should query for changes with NewObject filter"() {
-        given:
+    def "should query for changes with/without InitialValueChanges"() {
+        when:
         def javers = JaversBuilder.javers().build()
 
         javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
         javers.commit( "author", new Employee(name:"bob", age:30, salary: 1200) )
 
-        when:
         Changes changes = javers
-            .findChanges( QueryBuilder.byInstanceId("bob", Employee.class)
-            .build() )
+                .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).build() )
 
         then:
+        println "with InitialValueChanges:"
         println changes.prettyPrint()
         assert changes.size() == 5
-        assert changes.getChangesByType(NewObject).size() == 1
+
+        when:
+        javers = JaversBuilder.javers()
+                .withInitialValueChanges(false).build() // !
+
+        javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
+        javers.commit( "author", new Employee(name:"bob", age:30, salary: 1200) )
+
+        changes = javers
+                .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).build() )
+
+        then:
+        println "without InitialValueChanges:"
+        println changes.prettyPrint()
+        assert changes.size() == 2
     }
 
-    //TODO update docs prettyPrint
     def "should query for changes made on Entity and its ValueObjects by InstanceId and Class"(){
       given:
       def javers = JaversBuilder.javers().build()

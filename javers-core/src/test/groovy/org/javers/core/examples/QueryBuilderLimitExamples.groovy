@@ -13,10 +13,9 @@ import java.util.stream.Stream
 
 import static org.javers.core.examples.model.Position.Specialist
 
-//TODO prettyPrint update
 class QueryBuilderLimitExamples extends Specification {
 
-    def "Snapshot limit in findChanges and findShadows"() {
+    def "Snapshots limit in findChanges and findShadows"() {
         given:
         def javers = JaversBuilder.javers().build()
 

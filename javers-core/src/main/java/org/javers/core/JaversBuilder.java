@@ -14,9 +14,9 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
-import org.javers.core.diff.changetype.NewObject;
-import org.javers.core.diff.changetype.ObjectRemoved;
-import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.*;
+import org.javers.core.diff.changetype.container.ListChange;
+import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.custom.*;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.graph.ObjectAccessHook;
@@ -71,7 +71,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * Javers javers = JaversBuilder.javers().build();
  * </pre>
  *
- * To build a JaVers instance with Entity type registered:
+ * To build a JaVers instance with an Entity type:
  * <pre>
  * Javers javers = JaversBuilder.javers()
  *                              .registerEntity(MyEntity.class)
@@ -665,12 +665,21 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
      * and {@link Javers#findChanges(JqlQuery)}
-     * generate additional set of initial Value Changes for each New Object to capture their state.
-     * <br/><br/>
+     * generate additional set of Initial Changes for each
+     * property of a NewObject to capture its state.
+     * <br/>
+     * Internally, Javers generates Initial Changes by comparing a virtual, totally empty object
+     * with a real NewObject.
      *
-     * Initial {@link ValueChange} is a change with null on left and a property value on right
-     * and is generated for each property of {@link NewObject}.
-     * <br
+     * <br/><br/>
+     * For Primitives and Values
+     * an Initial Change is modeled as {@link InitialValueChange} (subtype of {@link ValueChange})
+     * with null on left, and a property value on right.
+     * <br/>
+     * For Collections, there are no specific subtypes to mark Initial Changes.
+     * So, for example, an Initial Change for a List is a regular {@link ListChange}
+     * with all elements from this list reflected as {@link ValueAdded}.
+     * <br/><br/>
      *
      * In Javers Spring Boot starter you can disabled initial Value Changes in `application.yml`:
      *
@@ -678,8 +687,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * javers:
      *   initialValueChanges: false
      * </pre>
-     * TODO javadoc
+     * @see NewObject
      */
+    //TODO rename
     public JaversBuilder withInitialValueChanges(boolean initialValueChanges){
         configurationBuilder().withInitialValueChanges(initialValueChanges);
         return this;
@@ -698,11 +708,12 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * <br/><br/>
      *
      * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
-     * generates additional set of terminal Value Changes for each Removed Object to capture their state.
+     * and {@link Javers#findChanges(JqlQuery)}
+     * generate additional set of terminal Value Changes for each Removed Object to capture its state.
      * <br/><br/>
      *
-     * Terminal {@link ValueChange} is a change with a property value on left and null on right
-     * and is generated for each property of {@link ObjectRemoved}.
+     * {@link TerminalValueChange} is a ValueChange with a property value on left, and null on right
+     * and is generated for each Primitive or Value property of a Removed Object.
      * <br/><br/>
      *
      * In Javers Spring Boot starter you can disabled terminal Value Changes in `application.yml`:
@@ -713,7 +724,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * </pre>
      *
      * @since 6.0
+     * @see ObjectRemoved
      */
+    //TODO
     public JaversBuilder withTerminalValueChanges(boolean terminalValueChanges){
         configurationBuilder().withTerminalValueChanges(terminalValueChanges);
         return this;

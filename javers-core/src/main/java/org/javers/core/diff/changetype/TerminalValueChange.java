@@ -1,7 +1,15 @@
 package org.javers.core.diff.changetype;
 
+import org.javers.core.JaversBuilder;
+import org.javers.core.metamodel.type.PrimitiveOrValueType;
+
 /**
- * TODO desc and print
+ * TerminalValueChange is a subtype of ValueChange with a property value on left and null on right.
+ * It is generated for each Primitive or Value property of a Removed Object to capture its state.
+ *
+ * @see ObjectRemoved
+ * @see PrimitiveOrValueType
+ * @see JaversBuilder#withTerminalValueChanges(boolean)
  */
 public class TerminalValueChange extends ValueChange {
 

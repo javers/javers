@@ -32,8 +32,6 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *     <li>{@link #devPrint()}  &mdash; prints Changes to a String, simple and technical style
  * </ul>
  *
- * //TODO
- *
  * @see <a href="https://javers.org/documentation/repository-examples/#change-log">http://javers.org/documentation/repository-examples/#change-log</a>
  * @since 3.9
  */
