@@ -660,10 +660,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Enabled by default since Javers 6.0.
+     * The Initial Changes switch, enabled by default since Javers 6.0.
      * <br/><br/>
      *
-     * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
+     * When the switch is enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
      * and {@link Javers#findChanges(JqlQuery)}
      * generate additional set of Initial Changes for each
      * property of a NewObject to capture its state.
