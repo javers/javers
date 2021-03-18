@@ -2,7 +2,10 @@ package org.javers.core.examples
 
 import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.Id
+import org.javers.core.metamodel.object.InstanceId
 import spock.lang.Specification
+
+import javax.persistence.IdClass
 
 class CompositeIdExample extends Specification {
 
@@ -81,6 +84,60 @@ class CompositeIdExample extends Specification {
         snapshot.getPropertyValue('name').name == 'Elizabeth'
         snapshot.getPropertyValue('name').surname == 'Batory'
         snapshot.getPropertyValue('data') == 'more data'
+
+        println snapshot
+    }
+
+    class Person {
+        @Id String email;
+        String name;
+    }
+
+    class Order {
+        @Id String itemId;
+        String description;
+    }
+
+    @IdClass(ShipmentWithCompositeId.ShipmentIdClass.class)
+    class ShipmentWithCompositeId {
+        @Id Person person;
+        @Id Order order;
+        String address;
+
+        class ShipmentIdClass {
+            String person;
+            String order;
+        }
+    }
+
+    def "should support Entity with Composite-Id and IdClass"(){
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        def first = new ShipmentWithCompositeId(
+                person: new Person(email: "someone@localhost", name: "Some One"),
+                order: new Order(itemId: "id-123134", description: "Awesome Item"),
+                address: "Home"
+        )
+        javers.commit('author', first)
+
+        when:
+        Map localId = [
+                person: new Person(email: "someone@localhost"),
+                order:  new Order(itemId: "id-123134")
+        ]
+
+        def snapshot = javers.getLatestSnapshot(localId, ShipmentWithCompositeId).get()
+
+        then:
+        snapshot.globalId.value().endsWith('ShipmentWithCompositeId/id-123134,someone@localhost')
+        snapshot.globalId.cdoId instanceof String
+        snapshot.globalId.cdoId == 'id-123134,someone@localhost'
+        snapshot.getPropertyValue('person') instanceof InstanceId
+        snapshot.getPropertyValue('person').cdoId == 'someone@localhost'
+        snapshot.getPropertyValue('order') instanceof InstanceId
+        snapshot.getPropertyValue('order').cdoId == 'id-123134'
+        snapshot.getPropertyValue('address') == 'Home'
 
         println snapshot
     }
