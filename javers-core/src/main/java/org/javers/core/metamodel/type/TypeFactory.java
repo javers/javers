@@ -96,8 +96,9 @@ class TypeFactory {
 
         if (prototype.isPresent()) {
             JaversType jType = spawnFromPrototype(javaRichType, prototype.get());
-            logger.debug("javersType of '{}' spawned as {} from prototype {}",
-                    javaRichType.getSimpleName(), jType.getClass().getSimpleName(), prototype.get());
+            logger.debug("javersType for '{}' spawned as {} from prototype {}",
+                    javaRichType.getTypeName(),
+                    jType.getClass().getSimpleName(), prototype.get());
             return jType;
         }
 
@@ -105,8 +106,8 @@ class TypeFactory {
 
         return dynamicType
                 .orElseGet(() -> inferFromAnnotations(javaRichType).map(jType -> {
-                        logger.debug("javersType of '{}' inferred from annotations as {}",
-                        javaRichType.getSimpleName(), jType.getClass().getSimpleName());
+                        logger.debug("javersType for '{}' inferred from annotations as {}",
+                        javaRichType.getTypeName(), jType.getClass().getSimpleName());
                         return jType;
                 })
                 .orElseGet(() -> inferFromHints(javaRichType)
@@ -115,7 +116,7 @@ class TypeFactory {
 
     private Optional<JaversType> resolveIfTokenType(Type javaType) {
         if (javaType instanceof TypeVariable) {
-            logger.debug("javersType of '{}' inferred as TokenType", javaType);
+            logger.debug("javersType for '{}' inferred as TokenType", javaType);
             return Optional.of(new TokenType((TypeVariable) javaType));
         }
         return Optional.empty();
@@ -126,7 +127,7 @@ class TypeFactory {
 
         if (vote != null) {
             JaversType jType = vote.vote(richType);
-            logger.debug("javersType of '{}' inferred as {}, based on {} ", richType.getSimpleName(), jType.getClass().getSimpleName(), vote.getClass().getSimpleName());
+            logger.debug("javersType for '{}' inferred as {}, based on {} ", richType.getTypeName(), jType.getClass().getSimpleName(), vote.getClass().getSimpleName());
             return Optional.of(jType);
         }
 
@@ -151,7 +152,7 @@ class TypeFactory {
     }
 
     private JaversType createDefaultType(JavaRichType t) {
-        logger.debug("javersType of '{}' defaulted to ValueObjectType", t.getSimpleName());
+        logger.debug("javersType for '{}' defaulted to ValueObjectType", t.getTypeName());
         return create(valueObjectDefinition(t.javaClass)
                 .withTypeName(t.getScan().typeName())
                 .defaultType()
@@ -192,6 +193,10 @@ class TypeFactory {
             this.javaType = javaType;
             this.javaClass = extractClass(javaType);
             this.classScan = () -> classScanner.scan(javaClass);
+        }
+
+        String getTypeName() {
+            return javaType.toString();
         }
 
         Object getSimpleName() {

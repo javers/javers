@@ -1329,10 +1329,16 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should allow concurrent javers commits"() {
         given:
+        def threads = 10
         def uuids = (1..10).collect { UUID.randomUUID().hashCode() }
 
         when:
-        uuids.parallelStream().forEach(sId -> javers.commit("author", new SnapshotEntity(id: sId)))
+        withPool(threads) {
+            (1..threads).collectParallel {
+               javers.commit("author", new SnapshotEntity(id: uuids[it-1]))
+               databaseCommit()
+            }
+        }
 
         then:
         uuids.forEach {
