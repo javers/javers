@@ -34,8 +34,8 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         expect:
         javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.SIMPLE
         javers.coreConfiguration.mappingStyle == MappingStyle.FIELD
-        javers.coreConfiguration.initialValueChanges
-        javers.coreConfiguration.terminalValueChanges
+        javers.coreConfiguration.initialChanges
+        javers.coreConfiguration.terminalChanges
         javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.SYNCHRONIZED_SEQUENCE
 

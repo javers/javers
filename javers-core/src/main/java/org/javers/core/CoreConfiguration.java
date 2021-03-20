@@ -19,22 +19,22 @@ public class CoreConfiguration {
 
     private boolean prettyPrint;
 
-    private final boolean initialValueChanges;
+    private final boolean initialChanges;
 
-    private final boolean terminalValueChanges;
+    private final boolean terminalChanges;
 
     private final CommitIdGenerator commitIdGenerator;
 
     private final Supplier<CommitId> customCommitIdGenerator;
 
-    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean initialValueChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean terminalValueChanges, boolean prettyPrint) {
+    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean initialChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean terminalChanges, boolean prettyPrint) {
         this.prettyValuePrinter = prettyValuePrinter;
         this.mappingStyle = mappingStyle;
         this.listCompareAlgorithm = listCompareAlgorithm;
-        this.initialValueChanges = initialValueChanges;
+        this.initialChanges = initialChanges;
         this.commitIdGenerator = commitIdGenerator;
         this.customCommitIdGenerator = customCommitIdGenerator;
-        this.terminalValueChanges = terminalValueChanges;
+        this.terminalChanges = terminalChanges;
         this.prettyPrint = prettyPrint;
     }
 
@@ -50,12 +50,12 @@ public class CoreConfiguration {
         return listCompareAlgorithm;
     }
 
-    public boolean isInitialValueChanges() {
-        return initialValueChanges;
+    public boolean isInitialChanges() {
+        return initialChanges;
     }
 
-    public boolean isTerminalValueChanges() {
-        return terminalValueChanges;
+    public boolean isTerminalChanges() {
+        return terminalChanges;
     }
 
     public CommitIdGenerator getCommitIdGenerator() {

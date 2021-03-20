@@ -45,13 +45,13 @@ import java.util.stream.Stream;
  *  and is generated for each property of {@link ObjectRemoved}.
  *
  *  Generating of initial and terminal ValueChanges is enabled by default.
- *  You can disable it using JaversBuilder.withTerminalValueChanges() and JaversBuilder.withInitialValueChanges().
+ *  You can disable it using JaversBuilder.withTerminalChanges() and JaversBuilder.withInitialChanges().
  *  Or in `application.yml`, if you are using Javers Spring Boot:
  *
   * <pre>
   * javers:
-  *   initialValueChanges: false
-  *   terminalValueChanges: false
+  *   initialChanges: false
+  *   terminalChanges: false
   * </pre>
   *
   * New or removed ValueObjects no longer generate
@@ -80,14 +80,14 @@ import java.util.stream.Stream;
   *
   * Minor changes log:
   *
-  * 0 The javers.terminalValueChanges flag is added (enabled by default).
+  * 0 The javers.terminalChanges flag is added (enabled by default).
   *
   * 0 In <code>Javers.findChanges()</code>, a NewObject change is always generated for each initial Snapshot
- *   (it can't be disabled by the javers.initialValueChanges flag).
+ *   (it can't be disabled by the javers.initialChanges flag).
  *
  * 0 {@link org.javers.repository.jql.QueryBuilder#withNewObjectChanges()} method is deprecated and has no effect.
  *
- * 0 The javers.newObjectSnapshot flag is renamed to javers.initialValueChanges and is enabled by default
+ * 0 The javers.newObjectSnapshot flag is renamed to javers.initialChanges and is enabled by default
  *
  * - Minor bug fixed - https://github.com/javers/javers/issues/911
  *

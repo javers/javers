@@ -77,7 +77,7 @@ class CaseWithAbstractValueObjectPath extends Specification {
 
       // new javers instance - fresh TypeMapper state
       javers = JaversBuilder.javers()
-              .withInitialValueChanges(false)
+              .withInitialChanges(false)
               .registerJaversRepository(repo)
               .build()
 

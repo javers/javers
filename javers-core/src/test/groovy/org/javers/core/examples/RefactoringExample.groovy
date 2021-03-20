@@ -6,9 +6,6 @@ import org.javers.core.metamodel.annotation.TypeName
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
-/**
- * //TODO update prettyPrint in docs
- */
 class RefactoringExample extends Specification {
 
     @TypeName("Person")

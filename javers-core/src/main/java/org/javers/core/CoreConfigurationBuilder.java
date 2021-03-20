@@ -16,9 +16,9 @@ class CoreConfigurationBuilder {
 
     private boolean prettyPrint = true;
 
-    private boolean initialValueChanges = true;
+    private boolean initialChanges = true;
 
-    private boolean terminalValueChanges = true;
+    private boolean terminalChanges = true;
 
     private CommitIdGenerator commitIdGenerator = CommitIdGenerator.SYNCHRONIZED_SEQUENCE;
 
@@ -36,10 +36,10 @@ class CoreConfigurationBuilder {
                 prettyValuePrinter,
                 mappingStyle,
                 listCompareAlgorithm,
-                initialValueChanges,
+                initialChanges,
                 commitIdGenerator,
                 customCommitIdGenerator,
-                terminalValueChanges,
+                terminalChanges,
                 prettyPrint
                 );
     }
@@ -70,13 +70,13 @@ class CoreConfigurationBuilder {
         return this;
     }
 
-    CoreConfigurationBuilder withInitialValueChanges(boolean initialValueChanges) {
-        this.initialValueChanges = initialValueChanges;
+    CoreConfigurationBuilder withInitialChanges(boolean initialChanges) {
+        this.initialChanges = initialChanges;
         return this;
     }
 
-    CoreConfigurationBuilder withTerminalValueChanges(boolean terminalValueChanges) {
-        this.terminalValueChanges = terminalValueChanges;
+    CoreConfigurationBuilder withTerminalChanges(boolean terminalChanges) {
+        this.terminalChanges = terminalChanges;
         return this;
     }
 

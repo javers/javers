@@ -1,13 +1,11 @@
 package org.javers.spring.boot.mongo
 
 import com.mongodb.client.MongoClient
-import com.mongodb.client.MongoDatabase
 import org.javers.core.CommitIdGenerator
 import org.javers.core.Javers
 import org.javers.core.MappingStyle
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.repository.jql.QueryBuilder
-import org.javers.repository.mongo.MongoRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
@@ -35,8 +33,8 @@ class JaversMongoStarterDefaultsTest extends Specification{
         expect:
         javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.SIMPLE
         javers.coreConfiguration.mappingStyle == MappingStyle.FIELD
-        javers.coreConfiguration.initialValueChanges
-        javers.coreConfiguration.terminalValueChanges
+        javers.coreConfiguration.initialChanges
+        javers.coreConfiguration.terminalChanges
         javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.SYNCHRONIZED_SEQUENCE
 

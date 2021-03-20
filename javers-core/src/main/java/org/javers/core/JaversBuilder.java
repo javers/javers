@@ -685,50 +685,48 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * <pre>
      * javers:
-     *   initialValueChanges: false
+     *   initialChanges: false
      * </pre>
      * @see NewObject
      */
-    //TODO rename
-    public JaversBuilder withInitialValueChanges(boolean initialValueChanges){
-        configurationBuilder().withInitialValueChanges(initialValueChanges);
+    public JaversBuilder withInitialChanges(boolean initialChanges){
+        configurationBuilder().withInitialChanges(initialChanges);
         return this;
     }
 
     /**
-     * Use {@link #withInitialValueChanges(boolean)}
+     * Use {@link #withInitialChanges(boolean)}
      */
     @Deprecated
     public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
-        return this.withInitialValueChanges(newObjectsSnapshot);
+        return this.withInitialChanges(newObjectsSnapshot);
     }
 
     /**
      * Enabled by default since Javers 6.0.
      * <br/><br/>
      *
-     * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
+     * When the switch is enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
      * and {@link Javers#findChanges(JqlQuery)}
-     * generate additional set of terminal Value Changes for each Removed Object to capture its state.
-     * <br/><br/>
-     *
-     * {@link TerminalValueChange} is a ValueChange with a property value on left, and null on right
-     * and is generated for each Primitive or Value property of a Removed Object.
+     * generate additional set of Terminal Changes for each
+     * property of a Removed Object to capture its state.
+     * <br/>
+     * Internally, Javers generates Terminal Changes by comparing
+     * a real Removed Object with a virtual, totally empty object.
      * <br/><br/>
      *
      * In Javers Spring Boot starter you can disabled terminal Value Changes in `application.yml`:
      *
      * <pre>
      * javers:
-     *   terminalValueChanges: false
+     *   terminalChanges: false
      * </pre>
      *
      * @since 6.0
      * @see ObjectRemoved
      */
-    //TODO
-    public JaversBuilder withTerminalValueChanges(boolean terminalValueChanges){
-        configurationBuilder().withTerminalValueChanges(terminalValueChanges);
+    public JaversBuilder withTerminalChanges(boolean terminalChanges){
+        configurationBuilder().withTerminalChanges(terminalChanges);
         return this;
     }
 
@@ -825,11 +823,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
         if (javersProperties.isPrettyPrint() != null) {
             withPrettyPrint(javersProperties.isPrettyPrint());
         }
-        if (javersProperties.isInitialValueChanges() != null) {
-            withInitialValueChanges(javersProperties.isInitialValueChanges());
+        if (javersProperties.isInitialChanges() != null) {
+            withInitialChanges(javersProperties.isInitialChanges());
         }
-        if (javersProperties.isTerminalValueChanges() != null) {
-            withTerminalValueChanges(javersProperties.isTerminalValueChanges());
+        if (javersProperties.isTerminalChanges() != null) {
+            withTerminalChanges(javersProperties.isTerminalChanges());
         }
 
         withPrettyPrintDateFormats(javersProperties.getPrettyPrintDateFormats());

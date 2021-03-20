@@ -6,13 +6,10 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.jql.FilterDefinition.*;
-import org.javers.shadow.Shadow;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,7 +18,6 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.javers.common.collections.Lists.asList;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
@@ -223,9 +219,9 @@ public class QueryBuilder {
      * Since Javers 6.0 this method is <b>deprecated</b> and has no effect.
      * <br/><br/>
      *
-     * Since Javers 6.0, the <code>newObjectChanges</code> flag is renamed to <code>initialValueChanges</code>
+     * Since Javers 6.0, the <code>newObjectChanges</code> flag is renamed to <code>initialChanges</code>
      * and can be set only on a Javers instance level,
-     * see {@link org.javers.core.JaversBuilder#withInitialValueChanges(boolean)}.
+     * see {@link org.javers.core.JaversBuilder#withInitialChanges(boolean)}.
      */
     @Deprecated
     public QueryBuilder withNewObjectChanges(boolean newObjectChanges) {
@@ -236,9 +232,9 @@ public class QueryBuilder {
      * Since Javers 6.0 this method is <b>deprecated</b> and has no effect.
      * <br/><br/>
      *
-     * Since Javers 6.0, the <code>newObjectChanges</code> flag is renamed to <code>initialValueChanges</code>
+     * Since Javers 6.0, the <code>newObjectChanges</code> flag is renamed to <code>initialChanges</code>
      * and can be set only on a Javers instance level,
-     * see {@link org.javers.core.JaversBuilder#withInitialValueChanges(boolean)}.
+     * see {@link org.javers.core.JaversBuilder#withInitialChanges(boolean)}.
      */
     @Deprecated
     public QueryBuilder withNewObjectChanges() {

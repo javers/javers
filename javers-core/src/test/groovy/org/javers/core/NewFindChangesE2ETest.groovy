@@ -10,7 +10,7 @@ import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
 class NewFindChangesE2ETest extends Specification {
-    def javers = JaversBuilder.javers().withInitialValueChanges(false).build()
+    def javers = JaversBuilder.javers().withInitialChanges(false).build()
 
     def "should return changes as flat List"(){
       given:

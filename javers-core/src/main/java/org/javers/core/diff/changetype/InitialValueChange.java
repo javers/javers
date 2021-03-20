@@ -9,7 +9,7 @@ import org.javers.core.metamodel.type.PrimitiveOrValueType;
  *
  * @see NewObject
  * @see PrimitiveOrValueType
- * @see JaversBuilder#withInitialValueChanges(boolean)
+ * @see JaversBuilder#withInitialChanges(boolean)
  */
 public class InitialValueChange extends ValueChange {
     public InitialValueChange(PropertyChangeMetadata metadata, Object rightValue) {

@@ -9,7 +9,7 @@ import org.javers.core.metamodel.type.PrimitiveOrValueType;
  *
  * @see ObjectRemoved
  * @see PrimitiveOrValueType
- * @see JaversBuilder#withTerminalValueChanges(boolean)
+ * @see JaversBuilder#withTerminalChanges(boolean)
  */
 public class TerminalValueChange extends ValueChange {
 

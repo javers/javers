@@ -4,7 +4,6 @@ import org.javers.core.FakeDateProvider
 import org.javers.core.Changes
 import org.javers.core.JaversBuilder
 import org.javers.core.commit.CommitId
-import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
@@ -583,7 +582,7 @@ class JqlExample extends Specification {
         assert javers.findSnapshots(query).size() == 1
     }
 
-    def "should query for changes with/without InitialValueChanges"() {
+    def "should query for changes with/without initialChanges"() {
         when:
         def javers = JaversBuilder.javers().build()
 
@@ -594,13 +593,13 @@ class JqlExample extends Specification {
                 .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).build() )
 
         then:
-        println "with InitialValueChanges:"
+        println "with initialChanges:"
         println changes.prettyPrint()
         assert changes.size() == 5
 
         when:
         javers = JaversBuilder.javers()
-                .withInitialValueChanges(false).build() // !
+                .withInitialChanges(false).build() // !
 
         javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
         javers.commit( "author", new Employee(name:"bob", age:30, salary: 1200) )
@@ -609,7 +608,7 @@ class JqlExample extends Specification {
                 .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).build() )
 
         then:
-        println "without InitialValueChanges:"
+        println "without initialChanges:"
         println changes.prettyPrint()
         assert changes.size() == 2
     }

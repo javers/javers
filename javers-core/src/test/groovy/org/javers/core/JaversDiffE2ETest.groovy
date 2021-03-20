@@ -183,7 +183,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
     def "should not create properties snapshot of NewObject when disabled"() {
         given:
-        def javers = JaversBuilder.javers().withInitialValueChanges(false).build()
+        def javers = JaversBuilder.javers().withInitialChanges(false).build()
         def left =  new DummyUser(name: "kazik")
         def right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
 

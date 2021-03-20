@@ -13,8 +13,8 @@ public abstract class JaversCoreProperties {
     private String algorithm;
     private String commitIdGenerator;
     private String mappingStyle;
-    private Boolean initialValueChanges;
-    private Boolean terminalValueChanges;
+    private Boolean initialChanges;
+    private Boolean terminalChanges;
     private Boolean prettyPrint;
     private Boolean typeSafeValues;
     private String packagesToScan = "";
@@ -33,27 +33,27 @@ public abstract class JaversCoreProperties {
     }
 
     /**
-     * Use {@link #isInitialValueChanges()}
+     * Use {@link #isInitialChanges()}
      */
     @Deprecated
     public Boolean isNewObjectSnapshot() {
-        return isInitialValueChanges();
+        return isInitialChanges();
     }
 
     /**
-     * Use {@link #setInitialValueChanges(Boolean)}
+     * Use {@link #setInitialChanges(Boolean)}
      */
     @Deprecated
     public void setNewObjectSnapshot(Boolean newObjectSnapshot) {
-        setInitialValueChanges(newObjectSnapshot);
+        setInitialChanges(newObjectSnapshot);
     }
 
-    public Boolean isInitialValueChanges() {
-        return initialValueChanges;
+    public Boolean isInitialChanges() {
+        return initialChanges;
     }
 
-    public Boolean isTerminalValueChanges() {
-        return terminalValueChanges;
+    public Boolean isTerminalChanges() {
+        return terminalChanges;
     }
 
     public Boolean isPrettyPrint() {
@@ -80,8 +80,8 @@ public abstract class JaversCoreProperties {
         this.mappingStyle = mappingStyle;
     }
 
-    public void setInitialValueChanges(Boolean initialValueChanges) {
-        this.initialValueChanges = initialValueChanges;
+    public void setInitialChanges(Boolean initialChanges) {
+        this.initialChanges = initialChanges;
     }
 
     public void setPrettyPrint(Boolean prettyPrint) {
@@ -100,8 +100,8 @@ public abstract class JaversCoreProperties {
         return prettyPrintDateFormats;
     }
 
-    public void setTerminalValueChanges(Boolean terminalValueChanges) {
-        this.terminalValueChanges = terminalValueChanges;
+    public void setTerminalChanges(Boolean terminalChanges) {
+        this.terminalChanges = terminalChanges;
     }
 
     public static class PrettyPrintDateFormats {

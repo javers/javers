@@ -27,7 +27,7 @@ class JaversGroovyObjectTest extends Specification {
     def "should support GroovyObjects in #mappingStyle mappingStyle"(){
         given:
         def javers = JaversBuilder.javers()
-                .withInitialValueChanges(false)
+                .withInitialChanges(false)
                 .withMappingStyle(mappingStyle).build()
 
         when:
