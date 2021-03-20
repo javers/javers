@@ -1326,4 +1326,17 @@ class JaversRepositoryE2ETest extends Specification {
       changes.size() == 6
       changes[0] instanceof ValueChange
     }
+
+    def "should allow concurrent javers commits"() {
+        given:
+        def uuids = (1..10).collect { UUID.randomUUID().hashCode() }
+
+        when:
+        uuids.parallelStream().forEach(sId -> javers.commit("author", new SnapshotEntity(id: sId)))
+
+        then:
+        uuids.forEach {
+            assert javers.findSnapshots(QueryBuilder.byInstanceId(it, SnapshotEntity).build()).size() == 1
+        }
+    }
 }
