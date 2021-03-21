@@ -5,7 +5,6 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.InitialValueChange;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -28,78 +27,12 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 /**
- *  Better diff thanks to the new Change types: initial and terminal ValueChanges. <br/>
- *  More pretty and more meaningful prettyPrint()
- *
- *  In 6.0, both <code>Javers.compare()</code> and <code>Javers.findChanges()</code> methods
- *  use unified and consistent algorithm concerning
- *  NewObject, ObjectRemoved, initial and terminal ValueChanges.
- *
- *  Initial and terminal ValueChanges are additional sets
- *  of changes generated for each new object and removed object to capture their state.
- *
- *  Initial {@link ValueChange} is a change with null on left and a property value on right
- *  and is generated for each property of {@link NewObject}.
- *
- *  Terminal {@link ValueChange} is a change with a property value on left and null on right
- *  and is generated for each property of {@link ObjectRemoved}.
- *
- *  Generating of initial and terminal ValueChanges is enabled by default.
- *  You can disable it using JaversBuilder.withTerminalChanges() and JaversBuilder.withInitialChanges().
- *  Or in `application.yml`, if you are using Javers Spring Boot:
- *
-  * <pre>
-  * javers:
-  *   initialChanges: false
-  *   terminalChanges: false
-  * </pre>
-  *
-  * New or removed ValueObjects no longer generate
-  * {@link NewObject}, {@link ObjectRemoved} nor {@link ReferenceChange}.
-  * These changes were considered rather useless.
-  * Instead, a state of new or removed ValueObjects
-  *  is captured by initial and terminal ValueChanges.
-  *
-  * New or removed Entities always generate
-  * {@link NewObject}/{@link ObjectRemoved} changes (it can't be disabled).
-  *
-  * - Behaviour of {@link Javers#findShadows()}
-  *   and {@link Javers#findShadowsAndStream()} is unified.
-  *   Now, findShadows() is only the facade for findShadowsAndStream():
-  *   
-  *   public <T> List<Shadow<T>> findShadows(JqlQuery query) {
-  *       return (List)findShadowsAndStream(query).collect(Collectors.toList());
-  *   }
-  *   
-  * - Fixed problem with limit() in {@link Javers#findShadows()}
-  *   and {@link Javers#findShadowsAndStream()}.
- *   Now, limit() works intuitively in both methods.
- *   See {@link org.javers.repository.jql.QueryBuilder#limit(int)} javadoc.
-  *   - https://github.com/javers/javers/issues/822
-  *
-  *
-  * Minor changes log:
-  *
-  * 0 The javers.terminalChanges flag is added (enabled by default).
-  *
-  * 0 In <code>Javers.findChanges()</code>, a NewObject change is always generated for each initial Snapshot
- *   (it can't be disabled by the javers.initialChanges flag).
- *
- * 0 {@link org.javers.repository.jql.QueryBuilder#withNewObjectChanges()} method is deprecated and has no effect.
- *
- * 0 The javers.newObjectSnapshot flag is renamed to javers.initialChanges and is enabled by default
- *
- * - Minor bug fixed - https://github.com/javers/javers/issues/911
- *
- */
-
-/**
  * A JaVers instance.<br>
  * Should be constructed by {@link JaversBuilder} provided with your domain model configuration.
  * <br/><br/>
  *
  * For example, to deeply compare two objects
- * or two arbitrary complex graphs of objects, call:
+ * or two arbitrary complex object graphs, call:
  * <pre>
  * Javers javers = JaversBuilder.javers().build();
  * Diff diff = javers.compare(oldVersion, currentVersion);
