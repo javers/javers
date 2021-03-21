@@ -14,7 +14,6 @@ import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
 @SpringBootTest(classes = [TestApplication])
-@ActiveProfiles("test")
 class HibernateSmartUnproxyTest extends Specification {
     @Autowired
     Javers javers

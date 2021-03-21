@@ -5,6 +5,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.PropertyChangeType
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.InitialValueChange
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
 import org.javers.core.model.DummyUser
@@ -18,6 +19,7 @@ import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 
 /**
+ * //TODO support for {@link InitialValueChange}
  * @author bartosz walacik
  */
 class ValueChangeTypeAdapterTest extends Specification {

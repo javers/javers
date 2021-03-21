@@ -10,7 +10,6 @@ import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
 @SpringBootTest(classes = [TestApplication])
-@ActiveProfiles("test")
 class SnapshotStateViolationCase extends Specification {
 
 	@Autowired Javers javers

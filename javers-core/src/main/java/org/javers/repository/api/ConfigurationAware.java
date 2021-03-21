@@ -1,8 +1,8 @@
 package org.javers.repository.api;
 
-import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.CoreConfiguration;
 
 public interface ConfigurationAware {
 
-    void setConfiguration(JaversCoreConfiguration coreConfiguration);
+    void setConfiguration(CoreConfiguration coreConfiguration);
 }

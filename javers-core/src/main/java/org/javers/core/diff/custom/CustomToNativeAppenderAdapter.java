@@ -6,8 +6,6 @@ import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 
-import java.util.Optional;
-
 /**
  * @author bartosz walacik
  */

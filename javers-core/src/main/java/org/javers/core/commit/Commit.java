@@ -16,11 +16,11 @@ import java.util.Map;
 import java.util.TimeZone;
 
 /**
- * JaVers commit is similar notion to GIT <i>commit</i> or SVN <i>revision</i>.
- * It records <b>change</b> done by user on application data.
+ * JaVers commit is a similar concept to GIT commit.
+ * It records snapshots of <b>changed</b> domain objects.
  * <br><br>
  *
- * Commit can affect one or more domain objects (aka {@link Cdo}).
+ * One commit can affect one or more domain objects.
  * <br><br>
  *
  * Commit holds following data:

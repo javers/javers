@@ -53,7 +53,7 @@ public class MapChange extends PropertyChange {
 
         builder.append(valuePrinter.formatWithQuotes(getPropertyNameWithPath()) + " map changes :\n");
 
-        changes.forEach(cc -> builder.append("  " + cc.prettyPrint(valuePrinter)+"\n"));
+        changes.forEach(cc -> builder.append("   " + cc.prettyPrint(valuePrinter)+"\n"));
 
         String result = builder.toString();
         return result.substring(0, result.length() - 1);
@@ -75,5 +75,11 @@ public class MapChange extends PropertyChange {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), this.changes);
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
+                " entryChanges:"+changes.size()+" }";
     }
 }

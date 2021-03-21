@@ -4,11 +4,11 @@ import org.javers.core.metamodel.annotation.Id
 
 class MyDummyRefEntity {
 
+    @Id
     private  String id
-
     private String name
 
-    @Id
+
     String getId() {
         return id
     }

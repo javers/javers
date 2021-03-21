@@ -45,7 +45,8 @@ class CaseWithAbstractValueObjectPath extends Specification {
     def "should manage query for Value Object by concrete path"(){
       given:
       def repo = new InMemoryRepository()
-      def javers = JaversBuilder.javers().registerJaversRepository(repo) .build()
+      def javers = JaversBuilder.javers().registerJaversRepository(repo).build()
+
       def staticInputFormGroup =
               new StaticInputFormGroup(id: "100", inputControl: new InputControl("static Input"))
 
@@ -75,7 +76,10 @@ class CaseWithAbstractValueObjectPath extends Specification {
       println "query path: " + path
 
       // new javers instance - fresh TypeMapper state
-      javers = JaversBuilder.javers().registerJaversRepository(repo) .build()
+      javers = JaversBuilder.javers()
+              .withInitialChanges(false)
+              .registerJaversRepository(repo)
+              .build()
 
       then:
       // This has thrown

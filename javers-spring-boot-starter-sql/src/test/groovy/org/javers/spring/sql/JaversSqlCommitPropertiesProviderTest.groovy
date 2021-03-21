@@ -18,7 +18,6 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
  * @author Oai Ha
  */
 @SpringBootTest(classes = [TestApplicationWithComplexPropertiesProvider])
-@ActiveProfiles("test")
 @Transactional
 class JaversSqlCommitPropertiesProviderTest extends Specification {
 

@@ -40,9 +40,17 @@ public class ValueChange extends PropertyChange {
             return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
                     " property with value " + valuePrinter.formatWithQuotes(left.unwrap()) +" removed";
         } else {
-            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-                " value changed from " + valuePrinter.formatWithQuotes(left.unwrap()) + " to " +
-                                   valuePrinter.formatWithQuotes(right.unwrap());
+            if (left.isNull()) {
+                return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                        " = " + valuePrinter.formatWithQuotes(getRight());
+            }else if (right.isNull()) {
+                return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                        " value " + valuePrinter.formatWithQuotes(getLeft() )+ " unset";
+            } else {
+                return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                        " changed: " + valuePrinter.formatWithQuotes(getLeft()) + " -> " +
+                        valuePrinter.formatWithQuotes(getRight());
+            }
         }
     }
 
@@ -63,5 +71,13 @@ public class ValueChange extends PropertyChange {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getLeft(), getRight());
+    }
+
+    @Override
+    public String toString() {
+        PrettyValuePrinter printer = PrettyValuePrinter.getDefault();
+        return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
+                " left:"+printer.formatWithQuotes(getLeft())+", " +
+                " right:"+printer.formatWithQuotes(getRight())+" }";
     }
 }

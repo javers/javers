@@ -27,8 +27,7 @@ public class ChangeLogExample {
         javers.commit("author", frodo);
 
         // when
-        Changes changes = javers.findChanges(QueryBuilder.byClass(Employee.class)
-                .withNewObjectChanges().build());
+        Changes changes = javers.findChanges(QueryBuilder.byClass(Employee.class).build());
 
         //then
         System.out.println("Printing the flat list of Changes :");
@@ -38,14 +37,13 @@ public class ChangeLogExample {
         System.out.println("Changes prettyPrint :");
         System.out.println(changes.prettyPrint());
 
-        System.out.println("Printing Changes with grouping by commits and by objects :");
+        //then
+        System.out.println("Printing Changes grouped by commits and by objects :");
         changes.groupByCommit().forEach(byCommit -> {
             System.out.println("commit " + byCommit.getCommit().getId());
             byCommit.groupByObject().forEach(byObject -> {
-                System.out.println("  changes on " + byObject.getGlobalId().value() + " : ");
-                byObject.get().forEach(change -> {
-                    System.out.println("  - " + change);
-                });
+                System.out.println("* changes on " + byObject.getGlobalId().value() + " : ");
+                byObject.get().forEach(change -> System.out.println("  - " + change));
             });
         });
     }

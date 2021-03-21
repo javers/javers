@@ -57,8 +57,8 @@ class BasicCommitAndQueryExample extends Specification {
 
         println changes.prettyPrint()
 
-        then: "there should be two Changes on Bob"
-        assert changes.size() == 2
+        then: "there should be five Changes on Bob"
+        assert changes.size() == 5
     }
 }
 

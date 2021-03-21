@@ -12,7 +12,7 @@ class Case820NPEinLevenshteinDistance extends Specification {
 
     def "should not fail when comparing list to null or empty list"(){
         given:
-        Javers javers = JaversBuilder.javers().withNewObjectsSnapshot(true)
+        Javers javers = JaversBuilder.javers()
                 .withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE).build()
 
 

@@ -31,7 +31,7 @@ public class ReferenceChange extends PropertyChange {
     }
 
     /**
-     * GlobalId of left (or previous) domain object reference
+     * GlobalId of left (or previous) domain object reference.
      */
     public GlobalId getLeft() {
         return left;
@@ -78,9 +78,17 @@ public class ReferenceChange extends PropertyChange {
             return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
                     " property with reference " + valuePrinter.formatWithQuotes(getLeft()) +" removed";
         } else {
-            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-                    " reference changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
-                    valuePrinter.formatWithQuotes(getRight());
+            if (left == null) {
+                return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                        " = " + valuePrinter.formatWithQuotes(getRight());
+            }else if (right == null) {
+                return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                        " reference " + valuePrinter.formatWithQuotes(getLeft()) + " unset";
+            } else {
+                return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                        " reference changed: " + valuePrinter.formatWithQuotes(getLeft()) + " -> " +
+                        valuePrinter.formatWithQuotes(getRight());
+            }
         }
     }
 
@@ -101,5 +109,13 @@ public class ReferenceChange extends PropertyChange {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getLeft(), getRight());
+    }
+
+    @Override
+    public String toString() {
+        PrettyValuePrinter valuePrinter = PrettyValuePrinter.getDefault();
+        return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
+                " left:"+valuePrinter.formatWithQuotes(getLeft())+", " +
+                " right:"+valuePrinter.formatWithQuotes(getRight())+" }";
     }
 }

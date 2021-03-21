@@ -19,7 +19,7 @@ class TopLevelContainerTest extends Specification {
     @Unroll
     def "should compare top-level #containerType"() {
         given:
-        def javers = JaversBuilder.javers().build();
+        def javers = JaversBuilder.javers().build()
 
         when:
         def diff = javers.compare(container1, container2)

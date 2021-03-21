@@ -25,11 +25,33 @@ public class QueryParamsBuilder {
     private Long version;
     private String author;
     private boolean aggregate;
-    private boolean newObjectChanges;
     private Map<String, String> commitProperties = new HashMap<>();
     private Set<String> changedProperties = new HashSet<>();
     private SnapshotType snapshotType;
     private boolean loadCommitProps = true;
+    private Integer snapshotQueryLimit;
+
+    public static QueryParamsBuilder copy(QueryParams that) {
+        QueryParamsBuilder copy =  new QueryParamsBuilder(that.limit())
+                .skip(that.skip());
+
+        that.from().ifPresent(it -> copy.from(it));
+        that.to().ifPresent(it -> copy.to(it));
+        that.fromInstant().ifPresent(it -> copy.fromInstant(it));
+        that.toInstant().ifPresent(it -> copy.toInstant(it));
+        that.toCommitId().ifPresent((it -> copy.toCommitId(it)));
+        copy.commitIds = that.commitIds();
+        that.version().ifPresent((it -> copy.version(it)));
+        that.author().ifPresent((it -> copy.author(it)));
+        copy.withChildValueObjects(that.isAggregate());
+        copy.commitProperties = that.commitProperties();
+        copy.changedProperties = that.changedProperties();
+        that.snapshotType().ifPresent((it -> copy.withSnapshotType(it)));
+        copy.loadCommitProps = that.isLoadCommitProps();
+        that.snapshotQueryLimit().ifPresent((it -> copy.snapshotQueryLimit(it)));
+
+        return copy;
+    }
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -37,11 +59,23 @@ public class QueryParamsBuilder {
     };
 
     /**
-     * Initializes builder with a given limit - number of snapshots to be fetched from database.
+     *  Initializes builder with a given limit
+     *
+     *  @see QueryBuilder#limit(int)
      */
     public static QueryParamsBuilder withLimit(int limit) {
         checkLimit(limit);
         return new QueryParamsBuilder(limit);
+    }
+
+
+
+    /**
+     * @see QueryBuilder#snapshotQueryLimit(int)
+     */
+    public QueryParamsBuilder snapshotQueryLimit(Integer snapshotQueryLimit) {
+        this.snapshotQueryLimit = snapshotQueryLimit;
+        return this;
     }
 
     /**
@@ -130,7 +164,9 @@ public class QueryParamsBuilder {
      * @see QueryBuilder#withCommitIds(Collection)
      */
     public QueryParamsBuilder commitIds(Collection<CommitId> commitIds) {
-        this.commitIds.addAll(commitIds);
+        if (commitIds != null) {
+            this.commitIds.addAll(commitIds);
+        }
         return this;
     }
 
@@ -147,14 +183,6 @@ public class QueryParamsBuilder {
      */
     public QueryParamsBuilder version(Long version) {
         this.version = version;
-        return this;
-    }
-
-    /**
-     * @see QueryBuilder#withNewObjectChanges(boolean)
-     */
-    public QueryParamsBuilder newObjectChanges(boolean newObjectChanges) {
-        this.newObjectChanges = newObjectChanges;
         return this;
     }
 
@@ -187,6 +215,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperties, toCommitId, snapshotType, loadCommitProps);
+        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
     }
 }

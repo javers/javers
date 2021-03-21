@@ -37,7 +37,7 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(globalId, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(globalId, queryParams);
-        List<Change> changes = getChangesIntroducedBySnapshots(snapshots, queryParams.newObjectChanges());
+        List<Change> changes = getChangesIntroducedBySnapshots(snapshots);
 
         return filterChangesByPropertyNames(changes, queryParams);
     }
@@ -46,7 +46,7 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(givenClasses, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClasses, queryParams);
-        List<Change> changes = getChangesIntroducedBySnapshots(snapshots, queryParams.newObjectChanges());
+        List<Change> changes = getChangesIntroducedBySnapshots(snapshots);
         return filterChangesByPropertyNames(changes, queryParams);
     }
 
@@ -54,14 +54,14 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(ownerEntity, path, queryParams);
 
         List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntity, path, queryParams);
-        return getChangesIntroducedBySnapshots(snapshots, queryParams.newObjectChanges());
+        return getChangesIntroducedBySnapshots(snapshots);
     }
 
-    public List<Change> getChanges(boolean newObjects, QueryParams queryParams) {
+    public List<Change> getChanges(QueryParams queryParams) {
         argumentsAreNotNull(queryParams);
 
         List<CdoSnapshot> snapshots = getSnapshots(queryParams);
-        return getChangesIntroducedBySnapshots(snapshots, queryParams.newObjectChanges());
+        return getChangesIntroducedBySnapshots(snapshots);
     }
 
     @Override
@@ -177,12 +177,8 @@ public class JaversExtendedRepository implements JaversRepository {
                 queryParams.changedProperties().contains(((PropertyChange) input).getPropertyName()));
     }
 
-    private List<CdoSnapshot> skipInitial(List<CdoSnapshot> snapshots) {
-        return Lists.negativeFilter(snapshots, snapshot -> snapshot.isInitial());
-    }
-
-    private List<Change> getChangesIntroducedBySnapshots(List<CdoSnapshot> snapshots, boolean newObjectChanges) {
-        return snapshotDiffer.calculateDiffs(newObjectChanges ? snapshots : skipInitial(snapshots), previousSnapshotsCalculator.calculate(snapshots));
+    private List<Change> getChangesIntroducedBySnapshots(List<CdoSnapshot> snapshots) {
+        return snapshotDiffer.calculateDiffs(snapshots, previousSnapshotsCalculator.calculate(snapshots));
     }
 
     //required for the corner case, when valueObject snapshots consume all the limit

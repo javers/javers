@@ -1,6 +1,7 @@
 package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
+import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
@@ -31,7 +32,7 @@ class CaseWithChangedPropertyType extends Specification {
 
     def "should allow for property type change, from LocalDateTime to Instant"() {
         given:
-        def javers = JaversBuilder.javers().build()
+        def javers = JaversBuilder.javers().withInitialChanges(false).build()
 
         def localDateNow = LocalDateTime.now()
         def instantNow = Instant.now()
@@ -53,9 +54,9 @@ class CaseWithChangedPropertyType extends Specification {
         def changes = javers.findChanges(byInstanceId(1, "ModelWithDateTime").build())
 
         then:
-        println changes.prettyPrint()
-        changes.size() == 1
-        changes[0] instanceof ValueChange
+        changes.size() == 2
+        changes.getChangesByType(ValueChange).size() == 1
+        changes.getChangesByType(NewObject).size() == 1
 
         when:
         def shadows = javers.findShadows(byInstanceId(1, "ModelWithDateTime").build())

@@ -1,6 +1,9 @@
 package org.javers.spring.sql
 
-
+import org.javers.core.CommitIdGenerator
+import org.javers.core.Javers
+import org.javers.core.MappingStyle
+import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.repository.sql.DialectName
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -18,6 +21,8 @@ import spock.lang.Specification
 @ActiveProfiles("test")
 class JaversSqlAutoConfigurationTest extends Specification {
 
+    @Autowired Javers javers
+
     @Autowired
     DialectName dialectName
 
@@ -29,20 +34,25 @@ class JaversSqlAutoConfigurationTest extends Specification {
 
     def "should read configuration from yml" () {
         expect:
-        javersProperties.getAlgorithm() == "levenshtein_distance"
-        javersProperties.getMappingStyle() == "bean"
-        !javersProperties.isNewObjectSnapshot()
-        !javersProperties.isPrettyPrint()
-        javersProperties.isTypeSafeValues()
-        dialectName == DialectName.H2
-        javersProperties.sqlSchema == "test"
-        javersProperties.sqlSchemaManagementEnabled
-        javersProperties.getCommitIdGenerator() == "random"
+        javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.LEVENSHTEIN_DISTANCE
+        javers.coreConfiguration.mappingStyle == MappingStyle.BEAN
+       !javers.coreConfiguration.initialChanges
+       !javers.coreConfiguration.terminalChanges
+       !javers.coreConfiguration.prettyPrint
+        javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
+
+        javersProperties.typeSafeValues
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"
+       !javersProperties.auditableAspectEnabled
+       !javersProperties.springDataAuditableRepositoryAspectEnabled
         javersProperties.prettyPrintDateFormats.localDateTime == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd-mm-yyyy HH mm ss Z"
         javersProperties.prettyPrintDateFormats.localDate == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.localTime == "HH mm ss"
+
+        dialectName == DialectName.H2
+        javersProperties.sqlSchema == "test"
+        javersProperties.sqlSchemaManagementEnabled
         javersProperties.sqlGlobalIdCacheDisabled
         javersProperties.objectAccessHook == "org.javers.spring.boot.DummySqlObjectAccessHook"
         javersProperties.sqlGlobalIdTableName == "cust_jv_global_id"

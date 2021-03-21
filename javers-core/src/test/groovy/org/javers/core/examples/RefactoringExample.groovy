@@ -6,9 +6,6 @@ import org.javers.core.metamodel.annotation.TypeName
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
-/**
- * @author bartosz.walacik
- */
 class RefactoringExample extends Specification {
 
     @TypeName("Person")
@@ -44,23 +41,12 @@ class RefactoringExample extends Specification {
 
         def changes =
             javers.findChanges( QueryBuilder.byInstanceId(1, PersonRefactored.class).build() )
+        println changes.prettyPrint()
 
-        then: 'two ValueChanges are expected'
-        assert changes.size() == 2
-
-        with(changes.find{it.propertyName == "name"}){
-            assert left == 'Bob'
-            assert right == 'Uncle Bob'
-        }
-
-        with(changes.find{it.propertyName == "city"}){
-            assert left == null
-            assert right == 'London'
-        }
+        then: 'three ValueChanges and one NewObject change is expected'
+        assert changes.size() == 4
 
         changes.each { assert it.affectedGlobalId.value() == 'Person/1' }
-
-        println changes.prettyPrint()
     }
 
     @TypeName("org.javers.core.examples.PersonSimple")
@@ -83,15 +69,15 @@ class RefactoringExample extends Specification {
 
       def changes =
           javers.findChanges( QueryBuilder.byInstanceId(1,PersonRetrofitted.class).build() )
+      println changes.prettyPrint()
 
-      then: 'one ValueChange is expected'
-      assert changes.size() == 1
+      then: 'two ValueChange and one NewObject change is expected'
+      assert changes.size() == 3
       with(changes[0]){
           assert left == 'Bob'
           assert right == 'Uncle Bob'
           assert affectedGlobalId.value() == 'org.javers.core.examples.PersonSimple/1'
       }
-      println changes[0]
     }
 
     abstract class Address {
@@ -132,11 +118,11 @@ class RefactoringExample extends Specification {
       when:
       def changes =
           javers.findChanges( QueryBuilder.byValueObjectId(1, Person.class, 'address').build() )
+      println changes.prettyPrint()
 
-      changes.each { println it }
-
-      then: 'four ValueChanges are expected'
-      assert changes.size() == 5
-      assert changes.collect{ it.propertyName } as Set == ['street','verified','city', 'email'] as Set
+      then: 'six ValueChanges are expected'
+      assert changes.size() == 6
+      assert changes.collect{ it.propertyName } as Set ==
+              ['street','verified','city','email'] as Set
     }
 }

@@ -13,13 +13,10 @@ import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
-import org.javers.core.metamodel.annotation.ValueObject
 import org.javers.core.metamodel.property.Property
-import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.IgnoredType
 import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.*
-import spock.lang.Shared
 import spock.lang.Unroll
 
 import javax.persistence.EmbeddedId
@@ -167,7 +164,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         DiffAssert.assertThat(diff).has(2, NewObject)
     }
 
-    def "should not create properties snapshot of NewObject by default"() {
+    def "should create properties snapshot of NewObject by default"() {
         given:
         def javers = JaversBuilder.javers().build()
         def left =  new DummyUser(name: "kazik")
@@ -177,14 +174,16 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def diff = javers.compare(left, right)
 
         then:
-        DiffAssert.assertThat(diff).hasChanges(2)
+        DiffAssert.assertThat(diff).hasChanges(4)
                   .hasNewObject(instanceId(1,DummyUserDetails))
+                  .hasValueChangeAt("id", null, 1)
+                  .hasValueChangeAt("someValue", null, "some")
                   .hasReferenceChangeAt("dummyUserDetails",null,instanceId(1,DummyUserDetails))
     }
 
-    def "should create properties snapshot of NewObject only when configured"() {
+    def "should not create properties snapshot of NewObject when disabled"() {
         given:
-        def javers = JaversBuilder.javers().withNewObjectsSnapshot(true).build()
+        def javers = JaversBuilder.javers().withInitialChanges(false).build()
         def left =  new DummyUser(name: "kazik")
         def right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
 
@@ -192,10 +191,9 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def diff = javers.compare(left, right)
 
         then:
-        DiffAssert.assertThat(diff)
+        DiffAssert.assertThat(diff).hasChanges(2)
                 .hasNewObject(instanceId(1,DummyUserDetails))
-                .hasValueChangeAt("id",null,1)
-                .hasValueChangeAt("someValue",null,"some")
+                .hasReferenceChangeAt("dummyUserDetails",null,instanceId(1,DummyUserDetails))
     }
 
     def "should create valueChange with Enum" () {
@@ -226,10 +224,8 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.changes.size() == 3
+        json.changes.size() == 4
         json.changes[0].changeType == "NewObject"
-        json.changes[1].changeType == "ValueChange"
-        json.changes[2].changeType == "ReferenceChange"
     }
 
     def "should support custom JsonTypeAdapter for ValueChange"() {
@@ -276,7 +272,9 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def diff = javers.initial(new PrimitiveEntity())
 
         then:
-        DiffAssert.assertThat(diff).hasOnly(1, NewObject)
+        DiffAssert.assertThat(diff)
+                .hasNewObject(instanceId("a",PrimitiveEntity))
+                .hasValueChangeAt("id", null, "a")
     }
 
     def "should understand primitive default values when creating ValueChange"() {
@@ -492,12 +490,11 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
        when:
        def diff = javers.compare(s1, s2)
-       println diff
+       println diff.prettyPrint()
 
        then:
-       diff.changes.size() == 2
+       diff.changes.size() == 3
 
-       diff.getChangesByType(NewObject).size() == 1
        diff.getChangesByType(ListChange).size() == 1
 
        def lChange = diff.getChangesByType(ListChange)[0]
@@ -584,7 +581,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def diff = javers.compare(object1, object2)
 
         then:
-        println diff.prettyPrint()
         diff.changes.size() == 3
 
         def vChange = diff.changes.find{it.propertyValueChanged}
@@ -625,7 +621,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
         when:
         def diff = javers.compare(object1, object2)
-        println diff.prettyPrint()
         def changes = diff.getChangesByType(PropertyChange)
 
         then:
@@ -668,7 +663,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
       when:
       def diff = javers.compare(object1, object2)
-      println diff.prettyPrint()
       def changes = diff.getChangesByType(PropertyChange)
 
       then:
@@ -679,7 +673,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
       when:
       diff = javers.compare(object2, object1)
-      println diff.prettyPrint()
       changes = diff.getChangesByType(PropertyChange)
 
       then:

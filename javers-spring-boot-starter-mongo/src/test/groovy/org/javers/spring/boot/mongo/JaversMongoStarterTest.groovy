@@ -1,6 +1,9 @@
 package org.javers.spring.boot.mongo
 
+import org.javers.core.CommitIdGenerator
 import org.javers.core.Javers
+import org.javers.core.MappingStyle
+import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.metamodel.type.EntityType
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -32,20 +35,30 @@ class JaversMongoStarterTest extends Specification{
 
     def "shouldReadConfigurationFromYml"() {
         expect:
-        javersProperties.algorithm == "levenshtein_distance"
-        javersProperties.mappingStyle == "bean"
-        !javersProperties.newObjectSnapshot
-        !javersProperties.prettyPrint
+        javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.LEVENSHTEIN_DISTANCE
+        javers.coreConfiguration.mappingStyle == MappingStyle.BEAN
+       !javers.coreConfiguration.initialChanges
+       !javers.coreConfiguration.terminalChanges
+       !javers.coreConfiguration.prettyPrint
+        javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
+
         javersProperties.typeSafeValues
-        javersProperties.commitIdGenerator == "random"
+        javersProperties.packagesToScan == "org.javers.spring.boot"
         javersProperties.documentDbCompatibilityEnabled == true
+       !javersProperties.auditableAspectEnabled
+       !javersProperties.springDataAuditableRepositoryAspectEnabled
+        javersProperties.prettyPrintDateFormats.localDateTime == "dd-mm-yyyy"
+        javersProperties.prettyPrintDateFormats.zonedDateTime == "dd-mm-yyyy HH mm ss Z"
+        javersProperties.prettyPrintDateFormats.localDate == "dd-mm-yyyy"
+        javersProperties.prettyPrintDateFormats.localTime == "HH mm ss"
+
         javersProperties.objectAccessHook == "org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook"
         javersProperties.snapshotsCacheSize == 100
     }
 
-    def "shouldReadBeanMappingStyleFromYml"() {
+    def "should scan given packages for classes with @TypeName"() {
         expect:
-        javers.getTypeMapping(DummyEntity) instanceof EntityType
+        javers.getTypeMapping("AnotherEntity") instanceof EntityType
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath"() {

@@ -48,7 +48,9 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
         given:
         def cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
         def cat2 = CategoryTestBuilder.category(-1).deepWithChildNumber(5,5).build()
-        Javers javers = javers().build()
+        Javers javers = javers().withInitialChanges(false)
+                                .withTerminalChanges(false)
+                                .build()
 
         when:
         Diff diff = javers.compare(cat1, cat2)

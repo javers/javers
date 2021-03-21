@@ -18,7 +18,6 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
  * @author pawelszymczyk
  */
 @SpringBootTest(classes = [TestApplication])
-@ActiveProfiles("test")
 @Transactional
 class JaversSqlStarterIntegrationTest extends Specification {
 

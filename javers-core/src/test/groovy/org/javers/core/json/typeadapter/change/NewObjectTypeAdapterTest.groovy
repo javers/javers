@@ -60,9 +60,10 @@ class NewObjectTypeAdapterTest extends Specification {
         def dummyUser = new DummyUser(name: "bob")
         javers.commit("author", dummyUser)
         def changes = javers
-                .findChanges(QueryBuilder.byInstanceId("bob", DummyUser.class)
-                .withNewObjectChanges(true).build())
-        def change = changes[1]
+                .findChanges(QueryBuilder.byInstanceId("bob", DummyUser)
+                .build())
+        def change = changes.getChangesByType(NewObject)[0]
+
         when:
         def jsonText = javers.jsonConverter.toJson(change)
 

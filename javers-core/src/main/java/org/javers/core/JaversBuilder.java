@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
@@ -13,6 +14,9 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
+import org.javers.core.diff.changetype.*;
+import org.javers.core.diff.changetype.container.ListChange;
+import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.custom.*;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.graph.ObjectAccessHook;
@@ -40,6 +44,7 @@ import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.inmemory.InMemoryRepository;
 import org.javers.repository.jql.JqlModule;
+import org.javers.repository.jql.JqlQuery;
 import org.javers.shadow.ShadowModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +71,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * Javers javers = JaversBuilder.javers().build();
  * </pre>
  *
- * To build a JaVers instance with Entity type registered:
+ * To build a JaVers instance with an Entity type:
  * <pre>
  * Javers javers = JaversBuilder.javers()
  *                              .registerEntity(MyEntity.class)
@@ -87,6 +92,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private final Set<ConditionalTypesPlugin> conditionalTypesPlugins;
 
+    private CoreConfigurationBuilder coreConfigurationBuilder = CoreConfigurationBuilder.coreConfiguration();
     private JaversRepository repository;
     private DateProvider dateProvider;
     private long bootStart = System.currentTimeMillis();
@@ -132,14 +138,17 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     protected Javers assembleJaversInstance(){
+        CoreConfiguration coreConfiguration = configurationBuilder().build();
+        addComponent(coreConfiguration);
+
         // boot main modules
         addModule(new DiffFactoryModule());
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new SnapshotModule(getContainer()));
         addModule(new GraphFactoryModule(getContainer()));
-        addModule(new DiffAppendersModule(coreConfiguration(), getContainer()));
-        addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
-        addModule(new ScannerModule(coreConfiguration(), getContainer()));
+        addModule(new DiffAppendersModule(coreConfiguration, getContainer()));
+        addModule(new TailoredJaversMemberFactoryModule(coreConfiguration, getContainer()));
+        addModule(new ScannerModule(coreConfiguration, getContainer()));
         addModule(new ShadowModule(getContainer()));
         addModule(new JqlModule(getContainer()));
 
@@ -324,7 +333,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 			scanTypeName(c);
 		}
 		long delta = System.currentTimeMillis() - start;
-        logger.info("  found {} ManagedClasse(s) with @TypeName in {} ms", scan.size(), delta);
+        logger.info("  found {} ManagedClass(es) with @TypeName in {} ms", scan.size(), delta);
 
 		return this;
     }
@@ -600,10 +609,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * </pre>
      * </li></ul>
      *
+     * @see GsonBuilder#setPrettyPrinting()
      * @param prettyPrint default true
      */
     public JaversBuilder withPrettyPrint(boolean prettyPrint) {
-        jsonConverterBuilder().prettyPrint(prettyPrint);
+        this.coreConfigurationBuilder.withPrettyPrint(prettyPrint);
         return this;
     }
 
@@ -628,7 +638,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
         argumentIsNotNull(mappingStyle);
-        coreConfiguration().withMappingStyle(mappingStyle);
+        configurationBuilder().withMappingStyle(mappingStyle);
         return this;
     }
 
@@ -640,27 +650,83 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * SYNCHRONIZED_SEQUENCE is used by default.
      */
     public JaversBuilder withCommitIdGenerator(CommitIdGenerator commitIdGenerator) {
-        coreConfiguration().withCommitIdGenerator(commitIdGenerator);
+        configurationBuilder().withCommitIdGenerator(commitIdGenerator);
         return this;
     }
 
     JaversBuilder withCustomCommitIdGenerator(Supplier<CommitId> commitIdGenerator) {
-        coreConfiguration().withCustomCommitIdGenerator(commitIdGenerator);
+        configurationBuilder().withCustomCommitIdGenerator(commitIdGenerator);
         return this;
     }
 
     /**
-     * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
-     * generates additional 'Snapshots' of new objects (objects added in currentVersion graph).
-     * <br/>
-     * For each new object, state of its properties is captured and returned as a Set of PropertyChanges.
-     * These Changes have null at the left side and a current property value at the right side.
+     * The Initial Changes switch, enabled by default since Javers 6.0.
      * <br/><br/>
      *
-     * Disabled by default.
+     * When the switch is enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
+     * and {@link Javers#findChanges(JqlQuery)}
+     * generate additional set of Initial Changes for each
+     * property of a NewObject to capture its state.
+     * <br/>
+     * Internally, Javers generates Initial Changes by comparing a virtual, totally empty object
+     * with a real NewObject.
+     *
+     * <br/><br/>
+     * For Primitives and Values
+     * an Initial Change is modeled as {@link InitialValueChange} (subtype of {@link ValueChange})
+     * with null on left, and a property value on right.
+     * <br/>
+     * For Collections, there are no specific subtypes to mark Initial Changes.
+     * So, for example, an Initial Change for a List is a regular {@link ListChange}
+     * with all elements from this list reflected as {@link ValueAdded}.
+     * <br/><br/>
+     *
+     * In Javers Spring Boot starter you can disabled initial Value Changes in `application.yml`:
+     *
+     * <pre>
+     * javers:
+     *   initialChanges: false
+     * </pre>
+     * @see NewObject
      */
+    public JaversBuilder withInitialChanges(boolean initialChanges){
+        configurationBuilder().withInitialChanges(initialChanges);
+        return this;
+    }
+
+    /**
+     * Use {@link #withInitialChanges(boolean)}
+     */
+    @Deprecated
     public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
-        coreConfiguration().withNewObjectsSnapshot(newObjectsSnapshot);
+        return this.withInitialChanges(newObjectsSnapshot);
+    }
+
+    /**
+     * Enabled by default since Javers 6.0.
+     * <br/><br/>
+     *
+     * When the switch is enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
+     * and {@link Javers#findChanges(JqlQuery)}
+     * generate additional set of Terminal Changes for each
+     * property of a Removed Object to capture its state.
+     * <br/>
+     * Internally, Javers generates Terminal Changes by comparing
+     * a real Removed Object with a virtual, totally empty object.
+     * <br/><br/>
+     *
+     * In Javers Spring Boot starter you can disabled terminal Value Changes in `application.yml`:
+     *
+     * <pre>
+     * javers:
+     *   terminalChanges: false
+     * </pre>
+     *
+     * @since 6.0
+     * @see ObjectRemoved
+     */
+    public JaversBuilder withTerminalChanges(boolean terminalChanges){
+        configurationBuilder().withTerminalChanges(terminalChanges);
         return this;
     }
 
@@ -716,7 +782,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder withListCompareAlgorithm(ListCompareAlgorithm algorithm) {
         argumentIsNotNull(algorithm);
-        coreConfiguration().withListCompareAlgorithm(algorithm);
+        configurationBuilder().withListCompareAlgorithm(algorithm);
         return this;
     }
 
@@ -734,19 +800,37 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     public JaversBuilder withPrettyPrintDateFormats(PrettyPrintDateFormats prettyPrintDateFormats) {
-        coreConfiguration().withPrettyPrintDateFormats(prettyPrintDateFormats);
+        configurationBuilder().withPrettyPrintDateFormats(prettyPrintDateFormats);
         return this;
     }
 
     public JaversBuilder withProperties(JaversCoreProperties javersProperties) {
-        this.withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
-            .withCommitIdGenerator(CommitIdGenerator.valueOf(javersProperties.getCommitIdGenerator().toUpperCase()))
-            .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
-            .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
-            .withPrettyPrint(javersProperties.isPrettyPrint())
-            .withTypeSafeValues(javersProperties.isTypeSafeValues())
-            .withPackagesToScan(javersProperties.getPackagesToScan())
-            .withPrettyPrintDateFormats(javersProperties.getPrettyPrintDateFormats());
+        if (javersProperties.getMappingStyle() != null) {
+            withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()));
+        }
+        if (javersProperties.getCommitIdGenerator() != null) {
+            withCommitIdGenerator(CommitIdGenerator.valueOf(javersProperties.getCommitIdGenerator().toUpperCase()));
+        }
+        if (javersProperties.getPackagesToScan() != null) {
+            withPackagesToScan(javersProperties.getPackagesToScan());
+        }
+        if (javersProperties.isTypeSafeValues() != null) {
+            withTypeSafeValues(javersProperties.isTypeSafeValues());
+        }
+        if (javersProperties.getAlgorithm() != null) {
+            withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()));
+        }
+        if (javersProperties.isPrettyPrint() != null) {
+            withPrettyPrint(javersProperties.isPrettyPrint());
+        }
+        if (javersProperties.isInitialChanges() != null) {
+            withInitialChanges(javersProperties.isInitialChanges());
+        }
+        if (javersProperties.isTerminalChanges() != null) {
+            withTerminalChanges(javersProperties.isTerminalChanges());
+        }
+
+        withPrettyPrintDateFormats(javersProperties.getPrettyPrintDateFormats());
         return this;
     }
 
@@ -761,8 +845,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return getContainerComponent(TypeMapper.class);
     }
 
-    private JaversCoreConfiguration coreConfiguration() {
-        return getContainerComponent(JaversCoreConfiguration.class);
+    private CoreConfigurationBuilder configurationBuilder() {
+        return this.coreConfigurationBuilder;
     }
 
     private JsonConverterBuilder jsonConverterBuilder(){
@@ -791,6 +875,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     private Collection<JaversType> bootJsonConverter() {
         JsonConverterBuilder jsonConverterBuilder = jsonConverterBuilder();
+        jsonConverterBuilder.prettyPrint(coreConfiguration().isPrettyPrint());
 
         addModule(new ChangeTypeAdaptersModule(getContainer()));
         addModule(new CommitTypeAdaptersModule(getContainer()));
@@ -815,6 +900,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     private void bootRepository(){
+        CoreConfiguration coreConfiguration = coreConfiguration();
         if (repository == null){
             logger.info("using fake InMemoryRepository, register actual Repository implementation via JaversBuilder.registerJaversRepository()");
             repository = new InMemoryRepository();
@@ -823,7 +909,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         repository.setJsonConverter( getContainerComponent(JsonConverter.class));
 
         if (repository instanceof ConfigurationAware){
-            ((ConfigurationAware) repository).setConfiguration(coreConfiguration());
+            ((ConfigurationAware) repository).setConfiguration(coreConfiguration);
         }
 
         bindComponent(JaversRepository.class, repository);
@@ -834,5 +920,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private <T extends ClientsClassDefinition> T getClassDefinition(Class<?> baseJavaClass) {
         return (T)clientsClassDefinitions.get(baseJavaClass);
+    }
+
+    private CoreConfiguration coreConfiguration() {
+        return getContainerComponent(CoreConfiguration.class);
     }
 }

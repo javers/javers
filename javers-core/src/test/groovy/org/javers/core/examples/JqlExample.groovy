@@ -4,16 +4,17 @@ import org.javers.core.FakeDateProvider
 import org.javers.core.Changes
 import org.javers.core.JaversBuilder
 import org.javers.core.commit.CommitId
-import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
 import org.javers.core.examples.model.Person
 import org.javers.core.metamodel.annotation.Id
+import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
+import org.javers.shadow.Shadow
 import spock.lang.Specification
 
 import java.time.LocalDate
@@ -31,7 +32,7 @@ class JqlExample extends Specification {
     }
 
     def "should query for Shadows with different scopes, lightweight example, multiple commits"(){
-      given: 'In this scenario, our 4 entities are committed in 3 commits'
+      given: 'In the first scenario, our 4 entities are committed in 3 commits'
         def javers = JaversBuilder.javers().build()
 
         // E1 -> E2 -> E3 -> E4
@@ -64,8 +65,9 @@ class JqlExample extends Specification {
         shadowE1.ref.ref == null
 
       when: 'deep+1 scope query'
-        shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-                        .withScopeDeepPlus(1).build())
+        def query = QueryBuilder.byInstanceId(1, Entity).withScopeDeepPlus(1).build()
+        shadows = javers.findShadows(query)
+        println 'deep+1 scope query: ' + query
         shadowE1 = shadows.get(0).get()
 
       then: 'only e1 and e2 are loaded'
@@ -86,7 +88,7 @@ class JqlExample extends Specification {
     }
 
     def "should query for Shadows with different scopes, lightweight example, single commit"(){
-        given: 'In this scenario, all entities are committed in the first commit'
+        given: 'In the second scenario, our four entities are committed in the single commit'
         def javers = JaversBuilder.javers().build()
 
         // E1 -> E2 -> E3 -> E4
@@ -98,8 +100,7 @@ class JqlExample extends Specification {
         javers.commit("author", e1) // commit 1.0 with snapshots of e1, e2, e3 and e4
 
         when: 'shallow scope query'
-        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-                .build())
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity).build())
         def shadowE1 = shadows.get(0).get()
 
         then: 'only e1 is loaded'
@@ -109,7 +110,7 @@ class JqlExample extends Specification {
 
         when: 'commit-deep scope query'
         shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-                .withScopeCommitDeep().build())
+                        .withScopeCommitDeep().build())
         shadowE1 = shadows.get(0).get()
 
         then: 'all object are loaded'
@@ -129,21 +130,22 @@ class JqlExample extends Specification {
 
         bob.salary = 1200                  // changes
         bob.primaryAddress.city = "Paris"  //
+
         javers.commit("author", bob)       // second commit
 
         when:
         Changes changes = javers.findChanges( QueryBuilder.anyDomainObject().build() )
+        println changes.prettyPrint()
 
         then:
-        assert changes.size() == 2
-        ValueChange salaryChange = changes.find{it.propertyName == "salary"}
-        ValueChange cityChange = changes.find{it.propertyName == "city"}
+        def lastCommitChanges = changes.groupByCommit()[0].changes
+        assert lastCommitChanges.size() == 2
+        ValueChange salaryChange = lastCommitChanges.find{it.propertyName == "salary"}
+        ValueChange cityChange = lastCommitChanges.find{it.propertyName == "city"}
         assert salaryChange.left ==  1000
         assert salaryChange.right == 1200
         assert cityChange.left ==  "London"
         assert cityChange.right == "Paris"
-
-        println changes.prettyPrint()
     }
 
     def "should query for Shadows of an object"() {
@@ -159,7 +161,8 @@ class JqlExample extends Specification {
           javers.commit("author", bob)       // second commit
 
       when:
-          def shadows = javers.findShadows(QueryBuilder.byInstance(bob).build())
+          List<Shadow<Employee>> shadows = javers.findShadows(
+                  QueryBuilder.byInstance(bob).build())
 
       then:
           assert shadows.size() == 2
@@ -257,7 +260,6 @@ class JqlExample extends Specification {
         assert snapshots[1].getPropertyValue("boss").value() == "Employee/john"
     }
 
-
     def "should query for Entity changes by instance Id"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -267,11 +269,12 @@ class JqlExample extends Specification {
         javers.commit("author", new Employee(name:"john",age:25) )
 
         when:
-        Changes changes = javers.findChanges( QueryBuilder.byInstanceId("bob", Employee.class).build() )
+        Changes changes = javers.
+                findChanges( QueryBuilder.byInstanceId("bob", Employee.class).build() )
+        println changes.prettyPrint()
 
         then:
-        println changes.prettyPrint()
-        assert changes.size() == 2
+        assert changes.size() == 6
     }
 
     def "should query for ValueObject changes by owning Entity instance and class"() {
@@ -288,19 +291,19 @@ class JqlExample extends Specification {
         println "query for ValueObject changes by owning Entity instance Id"
         Changes changes = javers
             .findChanges( QueryBuilder.byValueObjectId("bob",Employee.class,"primaryAddress").build())
+        println changes.prettyPrint()
 
         then:
-        println changes.prettyPrint()
-        assert changes.size() == 1
+        assert changes.size() == 2
 
         when:
         println "query for ValueObject changes by owning Entity class"
         changes = javers
             .findChanges( QueryBuilder.byValueObject(Employee.class,"primaryAddress").build())
+        println changes.prettyPrint()
 
         then:
-        println changes.prettyPrint()
-        assert changes.size() == 2
+        assert changes.size() == 4
     }
 
     def "should query for ValueObject changes when stored in a List"() {
@@ -318,7 +321,7 @@ class JqlExample extends Specification {
 
         then:
         println changes.prettyPrint()
-        assert changes.size() == 1
+        assert changes.size() == 2
     }
 
     def "should query for ValueObject changes when stored as Map values"() {
@@ -334,7 +337,7 @@ class JqlExample extends Specification {
 
         then:
         println changes.prettyPrint()
-        assert changes.size() == 1
+        assert changes.size() == 2
     }
 
     def "should query for Object changes by its class"() {
@@ -352,7 +355,7 @@ class JqlExample extends Specification {
 
         then:
         println changes.prettyPrint()
-        assert changes.size() == 2
+        assert changes.size() == 4
     }
 
     def "should query for any domain object changes"() {
@@ -369,7 +372,7 @@ class JqlExample extends Specification {
 
         then:
         println changes.prettyPrint()
-        assert changes.size() == 2
+        assert changes.size() == 8
     }
 
     def "should query for changes (and snapshots) with property filter"() {
@@ -387,7 +390,7 @@ class JqlExample extends Specification {
 
         then:
         println changes.prettyPrint()
-        assert changes.size() == 2
+        assert changes.size() == 3
         assert javers.findSnapshots(query).size() == 3
     }
 
@@ -406,7 +409,7 @@ class JqlExample extends Specification {
 
         then:
         println changes.prettyPrint()
-        assert changes.size() == 3
+        assert changes.size() == 5
         assert javers.findSnapshots(query).size() == 3
     }
 
@@ -429,23 +432,39 @@ class JqlExample extends Specification {
         assert javers.findSnapshots(query).size() == 2
     }
 
-    def "should query for changes (and snapshots) with skip filter"() {
+    def "Skip parameter in findChanges, findSnapshots, and findShadows"() {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit( "me", new Employee(name:"bob", age:29, salary: 900) )
-        javers.commit( "me", new Employee(name:"bob", age:30, salary: 1000) )
-        javers.commit( "me", new Employee(name:"bob", age:31, salary: 1100) )
-        javers.commit( "me", new Employee(name:"bob", age:32, salary: 1200) )
+        javers.commit( "me", new Employee(name:"bob", age:20, salary: 2000) )
+        javers.commit( "me", new Employee(name:"bob", age:30, salary: 3000) )
+        javers.commit( "me", new Employee(name:"bob", age:40, salary: 4000) )
+        javers.commit( "me", new Employee(name:"bob", age:50, salary: 5000) )
 
-        when:
-        def query = QueryBuilder.byInstanceId("bob", Employee.class).skip(1).build()
+        def query = QueryBuilder.byInstanceId("bob", Employee.class).skip(2).build()
+
+        when: "findChanges()"
         Changes changes = javers.findChanges( query )
 
         then:
         println changes.prettyPrint()
-        assert changes.size() == 4
-        assert javers.findSnapshots(query).size() == 3
+        assert changes.size() == 6
+
+        when: "findSnapshots()"
+        List<CdoSnapshot> snapshots = javers.findSnapshots( query )
+
+        then:
+        snapshots.each {println it}
+        assert snapshots.size() == 2
+        assert snapshots[0].getPropertyValue("salary") == 3000
+
+        when: "findShadows()"
+        List<Shadow<Employee>> shadows = javers.findShadows( query )
+
+        then:
+        shadows.each {println it}
+        assert shadows.size() == 2
+        assert shadows[0].get().salary == 3000
     }
 
     def "should query for changes (and snapshots) with author filter"() {
@@ -563,22 +582,35 @@ class JqlExample extends Specification {
         assert javers.findSnapshots(query).size() == 1
     }
 
-    def "should query for changes with NewObject filter"() {
-        given:
+    def "should query for changes with/without initialChanges"() {
+        when:
         def javers = JaversBuilder.javers().build()
 
         javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
         javers.commit( "author", new Employee(name:"bob", age:30, salary: 1200) )
 
-        when:
         Changes changes = javers
-            .findChanges( QueryBuilder.byInstanceId("bob", Employee.class)
-            .withNewObjectChanges(true).build() )
+                .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).build() )
 
         then:
+        println "with initialChanges:"
         println changes.prettyPrint()
         assert changes.size() == 5
-        assert changes[4] instanceof NewObject
+
+        when:
+        javers = JaversBuilder.javers()
+                .withInitialChanges(false).build() // !
+
+        javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
+        javers.commit( "author", new Employee(name:"bob", age:30, salary: 1200) )
+
+        changes = javers
+                .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).build() )
+
+        then:
+        println "without initialChanges:"
+        println changes.prettyPrint()
+        assert changes.size() == 2
     }
 
     def "should query for changes made on Entity and its ValueObjects by InstanceId and Class"(){
@@ -600,13 +632,13 @@ class JqlExample extends Specification {
 
       then:
       println changes.prettyPrint()
-      assert changes.size() == 2
+      assert changes.size() == 8
 
       when: "query by Entity class"
       query = QueryBuilder.byClass(Employee.class).withChildValueObjects().build()
       changes = javers.findChanges( query )
 
       then:
-      assert changes.size() == 2
+      assert changes.size() == 8
     }
 }

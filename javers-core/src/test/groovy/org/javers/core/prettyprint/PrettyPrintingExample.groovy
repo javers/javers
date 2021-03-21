@@ -1,5 +1,6 @@
 package org.javers.core.prettyprint
 
+import org.javers.core.Changes
 import org.javers.core.JaversBuilder
 import org.javers.core.JaversCoreProperties
 import org.javers.core.changelog.SimpleTextChangeLog
@@ -44,16 +45,21 @@ class PrettyPrintingExample extends Specification {
 
       when:
       def diff = javers.compare(oldFrodo, newFrodo)
-      println( diff )
+      println("javers.compare() : " + diff )
 
+      then:
+      true
+
+      when:
       println "-- SimpleTextChangeLog print --"
 
-      def changes = javers.findChanges(QueryBuilder.byInstance(newFrodo)
-              .withChildValueObjects()
-              .withNewObjectChanges().build())
-      println "SimpleTextChangeLog"
+      Changes changes = javers.findChanges(QueryBuilder.byClass(Employee)
+              .withChildValueObjects().build())
       def changeLog = javers.processChangeList(changes, new SimpleTextChangeLog());
-      println( changeLog )
+      println("SimpleTextChangeLog : " + changeLog )
+
+      println("changes.prettyPrint() : " + changes.prettyPrint() )
+      println("changes.devPrint() : " + changes.devPrint() )
 
       then:
       true

@@ -5,7 +5,6 @@ import org.javers.core.diff.EqualsFunction;
 import java.util.List;
 
 
-//TODO: We have a heavy use of list.get, which relies on both lists being quickly randomly accessible, like an ArrayList. Is that assumption ok?
 class Backtrack {
 
     private final static int PENALTY = 1;

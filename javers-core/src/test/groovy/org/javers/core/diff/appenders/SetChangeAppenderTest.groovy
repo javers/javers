@@ -1,6 +1,6 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.RealNodePair
+import org.javers.core.diff.NodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Shared
@@ -38,7 +38,7 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightNode = buildGraph(new DummyUser(name: 'name', "$commonFieldName": rightField))
 
         def change = setChangeAppender.calculateChanges(
-                new RealNodePair(leftNode, rightNode), getProperty(DummyUser, commonFieldName))
+                new NodePair(leftNode, rightNode), getProperty(DummyUser, commonFieldName))
 
         then:
         change.changes.size() == changesCount
@@ -65,7 +65,7 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightNode = buildGraph(new DummyUser(name: 'name', "$commonFieldName": rightField))
 
         def change = setChangeAppender.calculateChanges(
-                new RealNodePair(leftNode, rightNode), getProperty(DummyUser, commonFieldName))
+                new NodePair(leftNode, rightNode), getProperty(DummyUser, commonFieldName))
 
         then:
         change == null

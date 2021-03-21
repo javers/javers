@@ -15,8 +15,7 @@ import java.util.function.BiFunction;
 import static java.util.Collections.unmodifiableList;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
-import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
-import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
+import static org.javers.core.metamodel.object.SnapshotType.*;
 
 /**
  * Historical state of a domain object captured as the property->value Map.
@@ -139,6 +138,10 @@ public final class CdoSnapshot extends Cdo {
 
     public boolean isTerminal() {
         return type == TERMINAL;
+    }
+
+    public boolean isUpdate() {
+        return type == UPDATE;
     }
 
     public SnapshotType getType() {

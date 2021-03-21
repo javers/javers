@@ -21,7 +21,6 @@ public class CoreJaversModule extends InstantiatingModule {
         return Lists.<Class>asList(
                 JaversCore.class,
                 JsonConverterBuilder.class,
-                JaversCoreConfiguration.class,
                 GlobalIdFactory.class
         );
     }

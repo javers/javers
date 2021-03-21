@@ -1,17 +1,15 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Sets;
+import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.jql.FilterDefinition.*;
-import org.javers.shadow.Shadow;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,7 +18,6 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.javers.common.collections.Lists.asList;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
@@ -219,24 +216,28 @@ public class QueryBuilder {
     }
 
     /**
-     * See javadoc in {@link #withNewObjectChanges()}
+     * Since Javers 6.0 this method is <b>deprecated</b> and has no effect.
+     * <br/><br/>
+     *
+     * Since Javers 6.0, the <code>newObjectChanges</code> flag is renamed to <code>initialChanges</code>
+     * and can be set only on a Javers instance level,
+     * see {@link org.javers.core.JaversBuilder#withInitialChanges(boolean)}.
      */
+    @Deprecated
     public QueryBuilder withNewObjectChanges(boolean newObjectChanges) {
-        queryParamsBuilder.newObjectChanges(newObjectChanges);
         return this;
     }
 
     /**
-     * Affects changes query only.
-     * When switched on, additional changes are generated for the initial snapshot
-     * (the first commit of a given object). Off by default.
-     * <br/>
-     * It means one NewObject change for each initial snapshot
-     * and the full set of initial PropertyChanges with null on the left side
-     * and initial property value on the right.
+     * Since Javers 6.0 this method is <b>deprecated</b> and has no effect.
+     * <br/><br/>
+     *
+     * Since Javers 6.0, the <code>newObjectChanges</code> flag is renamed to <code>initialChanges</code>
+     * and can be set only on a Javers instance level,
+     * see {@link org.javers.core.JaversBuilder#withInitialChanges(boolean)}.
      */
+    @Deprecated
     public QueryBuilder withNewObjectChanges() {
-        queryParamsBuilder.newObjectChanges(true);
         return this;
     }
 
@@ -293,53 +294,63 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits the number of Snapshots to be fetched from JaversRepository in a single query.
-     * By default, the limit is set to 100, which works well with small data structures.
+     * <b>Should be changed only to improve performance of Shadow queries.</b>
+     * Please do not confused it with {@link #limit(int)}.
      * <br/><br/>
      *
-     * There are four types of query output: List of Changes,
-     * List of Snapshots, List of Shadows, and Stream of Shadows.
+     * Works only with {@link Javers#findShadows(JqlQuery)} and {@link Javers#findShadowsAndStream(JqlQuery)}.
+     * <br/>
+     * Limits the number of Snapshots to be fetched from a JaversRepository in a single DB query
+     * <br/>
+     * &mdash; 100 by default.
      *
-     * Since all of Javers queries rely on <b>Snapshots</b>
-     * in order to generate their output, the limit filter affects all of them,
-     * but in a different way:
+     * @throws JaversException MALFORMED_JQL if used with {@link Javers#findSnapshots(JqlQuery)} or {@link Javers#findChanges(JqlQuery)}
+     */
+    public QueryBuilder snapshotQueryLimit(Integer snapshotQueryLimit) {
+        queryParamsBuilder.snapshotQueryLimit(snapshotQueryLimit);
+        return this;
+    }
+
+    /**
+     * Limits the number of Snapshots or Shadows to be fetched from a JaversRepository.
+     * By default, the limit is set to 100.
+     * <br/><br/>
+     *
+     * There are four types of JQL query output: List of Changes,
+     * List of Snapshots, Stream of Shadows, and List of Shadows.
+     * The limit() filter affects all of them, but in a different way:
+     * <br/><br/>
      *
      * <ul>
-     *   <li>{@link Javers#findSnapshots(JqlQuery)} &mdash; the limit works intuitively,
+     *   <li>{@link Javers#findSnapshots(JqlQuery)} &mdash; <code>limit()</code> works intuitively,
      *   it's the maximum size of a returned list.
      *   </li>
      *   <li>{@link Javers#findChanges(JqlQuery)} &mdash;
-     *   the size of a returned list can be <b>greater</b> than the limit, because,
-     *   typically a difference between any two Snapshots consists of many atomic Changes.
+     *   <code>limit()</code> is applied to
+     *   the Snapshots query, which underlies the Changes query.
+     *   The size of the returned list can be <b>greater</b> than <code>limit()</code>,
+     *   because, typically a difference between any two Snapshots consists of many atomic Changes.
      *   </li>
      *   <li>{@link Javers#findShadows(JqlQuery)} &mdash;
-     *   the size of a returned list can be <b>less</b> than the limit and
-     *   Shadow graphs can be incomplete,
-     *   because, typically, one Shadow is reconstructed from many Snapshots.
-     *   Hitting the limit in findShadows() is very likely and it's a bad thing.
+     *   <code>limit()</code> is applied to Shadows,
+     *   it limits the size of the returned list.
+     *   The underlying Snapshots query uses its own limit &mdash; {@link QueryBuilder#snapshotQueryLimit(Integer)}.
+     *   Since one Shadow might be reconstructed from many Snapshots,
+     *   when <code>snapshotQueryLimit()</code> is hit, Javers repeats a given Shadow query
+     *   to load a next <i>frame</i> of Shadows until required limit is reached.
      *   </li>
-     *   <li>{@link Javers#findShadowsAndStream(JqlQuery)} &mdash;
-     *   the resulting stream is <b>lazily loaded</b> and it's limited only by
-     *   the size of your JaversRepository and your heap.
-     *   When the limit is hit, Javers repeats a given query to load a next bunch of Snapshots.
-     *   Shadow graphs loaded by findShadowsAndStream() are always complete,
-     *   but can trigger a lot of queries.
+     *   <li> {@link Javers#findShadowsAndStream(JqlQuery)} &mdash;
+     *   <code>limit()</code> works like in <code>findShadows()</code>, it limits the size of the returned stream.
+     *   The main difference is that the stream is lazy loaded and subsequent
+     *   <i>frame</i> queries
+     *   are executed gradually, during the stream consumption.
      *   </li>
      * </ul>
-     *
-     * <b>We recommend</b> {@link Javers#findShadowsAndStream(JqlQuery)}
-     * as a primary method of loading Shadows.
-     * <br/><br/>
      *
      * See
      * <a href="https://github.com/javers/javers/blob/master/javers-core/src/test/groovy/org/javers/core/examples/QueryBuilderLimitExamples.groovy">
      * QueryBuilderLimitExamples.groovy
      * </a>.
-     *
-     * @see Change
-     * @see CdoSnapshot
-     * @see Shadow
-     * @see JaversRepository
      */
     public QueryBuilder limit(int limit) {
         queryParamsBuilder.limit(limit);
@@ -347,13 +358,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Sets the number of Snapshots to skip.
-     * Use skip() and limit() for paging Snapshots and Changes.
+     * Sets the number of Snapshots or Shadows to skip.<br/>
+     * Use skip() and limit() for paging.
      * <br/><br/>
      *
-     * For paging Shadows use {@link Javers#findShadowsAndStream(JqlQuery)}
-     * with {@link Stream#skip(long)} and {@link Stream#limit(long)}.
-     *  <br/><br/>
+     * See {@link #limit(int)}
      */
     public QueryBuilder skip(int skip) {
         queryParamsBuilder.skip(skip);

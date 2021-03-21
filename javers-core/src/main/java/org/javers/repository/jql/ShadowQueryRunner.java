@@ -1,13 +1,17 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Consumer;
-import org.javers.common.collections.Pair;
+import org.javers.common.collections.Lists;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.CommitIdGenerator;
-import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
@@ -22,38 +26,36 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.javers.repository.jql.JqlQuery.JQL_LOGGER_NAME;
 
 /**
  * @author bartosz.walacik
  */
 class ShadowQueryRunner {
-    private static final Logger logger = LoggerFactory.getLogger(JqlQuery.JQL_LOGGER_NAME);
+    private static final Logger logger = LoggerFactory.getLogger(JQL_LOGGER_NAME);
 
-    private final QueryCompiler queryCompiler;
     private final SnapshotQueryRunner snapshotQueryRunner;
     private final JaversExtendedRepository repository;
     private final ShadowFactory shadowFactory;
-    private final JaversCoreConfiguration javersCoreConfiguration;
+    private final CoreConfiguration javersCoreConfiguration;
 
-    ShadowQueryRunner(QueryCompiler queryCompiler, SnapshotQueryRunner snapshotQueryRunner, JaversExtendedRepository repository, ShadowFactory shadowFactory, JaversCoreConfiguration javersCoreConfiguration) {
-        this.queryCompiler = queryCompiler;
+    ShadowQueryRunner(SnapshotQueryRunner snapshotQueryRunner, JaversExtendedRepository repository, ShadowFactory shadowFactory, CoreConfiguration javersCoreConfiguration) {
         this.snapshotQueryRunner = snapshotQueryRunner;
         this.repository = repository;
         this.shadowFactory = shadowFactory;
         this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
-    List<Shadow> queryForShadows(JqlQuery query) {
-        return queryForShadows(query, Collections.emptyList()).left();
-    }
+    ShadowQueryResult queryForShadows(JqlQuery query, List<CdoSnapshot> gapsFilledInPreviousQuery) {
+        ShadowStats queryStats = new ShadowStats();
 
-    Pair<List<Shadow>, List<CdoSnapshot>> queryForShadows(JqlQuery query, List<CdoSnapshot> gapsFilledInPreviousQuery) {
-        List<CdoSnapshot> coreSnapshots = queryForCoreSnapshots(query);
+        List<CdoSnapshot> coreSnapshots = queryForCoreSnapshots(query, queryStats);
 
         CommitTable commitTable = new CommitTable(
                 coreSnapshots,
                 query.getMaxGapsToFill(),
-                query);
+                query,
+                queryStats);
 
         commitTable.appendSnapshots(gapsFilledInPreviousQuery);
 
@@ -65,18 +67,14 @@ class ShadowQueryRunner {
                 .map(r -> shadowFactory.createShadow(r.root, r.context, (cm, targetId) -> commitTable.referenceResolver(cm, targetId)))
                 .collect(toList());
 
-        query.stats().stop();
-
-        logger.debug("queryForShadows executed: {}", query);
-        return new Pair(shadows, commitTable.getFilledGapsSnapshots());
+        queryStats.stop();
+        ShadowQueryResult result = new ShadowQueryResult(shadows, commitTable.getFilledGapsSnapshots(), queryStats);
+        return result;
     }
 
-    private List<CdoSnapshot> queryForCoreSnapshots(JqlQuery query) {
-        queryCompiler.compile(query);
-        query.aggregateIfEntityQuery();
-
+    private List<CdoSnapshot> queryForCoreSnapshots(JqlQuery query, ShadowStats queryStats) {
         List<CdoSnapshot> snapshots = snapshotQueryRunner.queryForSnapshots(query);
-        query.stats().logShallowQuery(snapshots);
+        queryStats.logShallowQuery(snapshots);
 
         return snapshots;
     }
@@ -102,12 +100,14 @@ class ShadowQueryRunner {
         private final JqlQuery query;
         private int filledGapsCount;
         private final List<CdoSnapshot> filledGapsSnapshots = new ArrayList<>();
+        private final ShadowStats queryStats;
 
-        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill, JqlQuery query) {
+        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill, JqlQuery query, ShadowStats queryStats) {
             this.maxGapsToFill = maxGapsToFill;
             this.query = query;
             this.commitsMap = new TreeMap<>(javersCoreConfiguration.getCommitIdGenerator().getComparator());
             appendSnapshots(coreSnapshots);
+            this.queryStats = queryStats;
         }
 
         List<ShadowRoot> rootsForQuery(JqlQuery query) {
@@ -132,7 +132,7 @@ class ShadowQueryRunner {
                     .commitIds(commitsMap.keySet().stream().map(it -> it.getId()).collect(toSet()))
                     .build();
             List<CdoSnapshot> fullCommitsSnapshots = repository.getSnapshots(params);
-            query.stats().logQueryInCommitDeepScope(fullCommitsSnapshots);
+            queryStats.logQueryInCommitDeepScope(fullCommitsSnapshots);
 
             appendSnapshots(fullCommitsSnapshots);
         }
@@ -151,7 +151,7 @@ class ShadowQueryRunner {
 
             latest = findLatestToInCommitTable(reference);
             if (latest == null){
-                query.stats().logMaxGapsToFillExceededInfo(targetId);
+                queryStats.logMaxGapsToFillExceededInfo(targetId);
             }
             return latest;
         }
@@ -188,11 +188,11 @@ class ShadowQueryRunner {
             List<CdoSnapshot> historicals;
             if (isInChildValueObjectScope(snapshotReference)) {
                 historicals = getHistoricals(snapshotReference.targetId(), snapshotReference, false, limit);
-                query.stats().logQueryInChildValueObjectScope(snapshotReference.targetId(), snapshotReference.timepointCommitId(), historicals.size());
+                queryStats.logQueryInChildValueObjectScope(snapshotReference.targetId(), snapshotReference.timepointCommitId(), historicals.size());
             }
             else {
                 historicals = getHistoricals(snapshotReference.targetId(), snapshotReference, query.isAggregate(), limit);
-                query.stats().logQueryInDeepPlusScope(snapshotReference.targetId(), snapshotReference.timepointCommitId(), historicals.size());
+                queryStats.logQueryInDeepPlusScope(snapshotReference.targetId(), snapshotReference.timepointCommitId(), historicals.size());
             }
 
             filledGapsCount++;
@@ -331,4 +331,170 @@ class ShadowQueryRunner {
         }
     }
 
+    static class ShadowQueryResult {
+        private final List<Shadow> shadows;
+        private final List<CdoSnapshot> filledGapsSnapshots;
+        private final ShadowStats queryStats;
+
+        ShadowQueryResult(List<Shadow> shadows, List<CdoSnapshot> filledGapsSnapshots, ShadowStats queryStats) {
+            this.shadows = shadows;
+            this.filledGapsSnapshots = filledGapsSnapshots;
+            this.queryStats = queryStats;
+        }
+
+        List<Shadow> getShadows() {
+            return shadows;
+        }
+
+        List<CdoSnapshot> getFilledGapsSnapshots() {
+            return filledGapsSnapshots;
+        }
+
+        ShadowStats getQueryStats() {
+            return queryStats;
+        }
+    }
+
+    static class ShadowStats {
+        private long startTimestamp = System.currentTimeMillis();
+        private long endTimestamp;
+        private int dbQueriesCount;
+        private int allSnapshotsCount;
+        private int shallowSnapshotsCount;
+        private int deepPlusSnapshotsCount;
+        private int commitDeepSnapshotsCount;
+        private int childVOSnapshotsCount;
+        private int deepPlusGapsFilled;
+        private int deepPlusGapsLeft;
+
+        void logQueryInChildValueObjectScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
+            validateChange();
+            logger.debug("CHILD_VALUE_OBJECT query for '{}' at timepointCommitId {}, {} snapshot(s) loaded",
+                    reference.toString(),
+                    context.value(),
+                    snapshotsLoaded);
+
+            dbQueriesCount++;
+            allSnapshotsCount += snapshotsLoaded;
+            childVOSnapshotsCount += snapshotsLoaded;
+        }
+
+        void logMaxGapsToFillExceededInfo(GlobalId reference) {
+            validateChange();
+            deepPlusGapsLeft++;
+            logger.debug("warning: object '" + reference.toString() +
+                    "' is outside of the DEEP_PLUS+{} scope" +
+                    ", references to this object will be nulled. " +
+                    "Increase maxGapsToFill and fill all gaps in your object graph.", deepPlusGapsFilled);
+        }
+
+        void logQueryInDeepPlusScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
+            validateChange();
+            dbQueriesCount++;
+            allSnapshotsCount += snapshotsLoaded;
+            deepPlusSnapshotsCount += snapshotsLoaded;
+            deepPlusGapsFilled++;
+
+            logger.debug("DEEP_PLUS query for '{}' at timepointCommitId {}, {} snapshot(s) loaded, gaps filled so far: {}",
+                    reference.toString(),
+                    context.value(),
+                    snapshotsLoaded,
+                    deepPlusGapsFilled);
+        }
+
+        void logShallowQuery(List<CdoSnapshot> snapshots) {
+            validateChange();
+            logger.debug("SHALLOW query (core snapshots): {} snapshots loaded (entities: {}, valueObjects: {})", snapshots.size(),
+                    snapshots.stream().filter(it -> it.getGlobalId() instanceof InstanceId).count(),
+                    snapshots.stream().filter(it -> it.getGlobalId() instanceof ValueObjectId).count());
+            dbQueriesCount++;
+            allSnapshotsCount += snapshots.size();
+            shallowSnapshotsCount += snapshots.size();
+        }
+
+        void logQueryInCommitDeepScope(List<CdoSnapshot> snapshots) {
+            validateChange();
+            logger.debug("COMMIT_DEEP query: {} snapshots loaded", snapshots.size());
+            dbQueriesCount++;
+            allSnapshotsCount += snapshots.size();
+            commitDeepSnapshotsCount+=snapshots.size();
+        }
+
+        void stop() {
+            validateChange();
+            endTimestamp = System.currentTimeMillis();
+        }
+
+        @Override
+        public String toString() {
+            if (getEndTimestamp() == 0){
+                return ToStringBuilder.toString(this,
+                        "still running", "?");
+            }
+            return ToStringBuilder.toStringBlockStyle(this, "  ", toStringProps().toArray());
+        }
+
+        List<Object> toStringProps() {
+            return Lists.asList(
+                    "executed in millis", getEndTimestamp()-getStartTimestamp(),
+                    "DB queries", getDbQueriesCount(),
+                    "snapshots loaded", getAllSnapshotsCount(),
+                    "SHALLOW snapshots", getShallowSnapshotsCount(),
+                    "COMMIT_DEEP snapshots", getCommitDeepSnapshotsCount(),
+                    "CHILD_VALUE_OBJECT snapshots", getChildVOSnapshotsCount(),
+                    "DEEP_PLUS snapshots", getDeepPlusSnapshotsCount(),
+                    "gaps filled", getDeepPlusGapsFilled(),
+                    "gaps left!", getDeepPlusGapsLeft()
+            );
+        }
+
+        public int getDbQueriesCount() {
+            return dbQueriesCount;
+        }
+
+        /**
+         * number of all snapshots loaded from a JaversRepository
+         */
+        public int getAllSnapshotsCount() {
+            return allSnapshotsCount;
+        }
+
+        public long getStartTimestamp() {
+            return startTimestamp;
+        }
+
+        public long getEndTimestamp() {
+            return endTimestamp;
+        }
+
+        public int getShallowSnapshotsCount() {
+            return shallowSnapshotsCount;
+        }
+
+        public int getDeepPlusSnapshotsCount() {
+            return deepPlusSnapshotsCount;
+        }
+
+        public int getCommitDeepSnapshotsCount() {
+            return commitDeepSnapshotsCount;
+        }
+
+        public int getChildVOSnapshotsCount() {
+            return childVOSnapshotsCount;
+        }
+
+        public int getDeepPlusGapsFilled() {
+            return deepPlusGapsFilled;
+        }
+
+        public int getDeepPlusGapsLeft() {
+            return deepPlusGapsLeft;
+        }
+
+        private void validateChange() {
+            if (endTimestamp > 0) {
+                throw new RuntimeException(new IllegalAccessException("executed query can't be changed"));
+            }
+        }
+    }
 }

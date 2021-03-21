@@ -37,8 +37,8 @@ abstract class AbstractDiffTest extends Specification {
         getEntity(forClass).getProperty(propName)
     }
 
-    RealNodePair realNodePair(def leftCdo, def rightCdo){
-        new RealNodePair(buildGraph(leftCdo), buildGraph(rightCdo))
+    NodePair realNodePair(def leftCdo, def rightCdo){
+        new NodePair(buildGraph(leftCdo), buildGraph(rightCdo))
     }
 
     JaversType getJaversType(def javaType){

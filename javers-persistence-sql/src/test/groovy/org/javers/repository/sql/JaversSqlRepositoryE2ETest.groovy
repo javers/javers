@@ -244,7 +244,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
         javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).limit(1000).build()).size() == threads * 4
     }
 
-    def "should allow concurrent updates of the same Object"(){
+    def "should allow concurrent updates of the same Object on SQL"(){
         given:
         def cnt = new AtomicInteger()
         def sId = 222

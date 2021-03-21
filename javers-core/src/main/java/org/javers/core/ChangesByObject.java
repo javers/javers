@@ -73,9 +73,12 @@ public final class ChangesByObject {
                 b.append("* " + c.prettyPrint(valuePrinter) + "\n")
         );
 
-        if (!getPropertyChanges().isEmpty()) {
+        if (!getPropertyChanges().isEmpty() &&
+                getNewObjects().size() == 0 &&
+                getObjectsRemoved().size() == 0) {
             b.append("* changes on " + globalId.value() + " :\n");
         }
+
         getPropertyChanges().forEach(c ->
                 b.append("  - " + c.prettyPrint(valuePrinter).replace("\n", "\n  ") + "\n")
         );

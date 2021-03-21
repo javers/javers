@@ -10,12 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class JaversCoreProperties {
-    private String algorithm = "simple";
-    private String commitIdGenerator = "synchronized_sequence";
-    private String mappingStyle = "field";
-    private boolean newObjectSnapshot = false;
-    private boolean prettyPrint = true;
-    private boolean typeSafeValues = false;
+    private String algorithm;
+    private String commitIdGenerator;
+    private String mappingStyle;
+    private Boolean initialChanges;
+    private Boolean terminalChanges;
+    private Boolean prettyPrint;
+    private Boolean typeSafeValues;
     private String packagesToScan = "";
     private PrettyPrintDateFormats prettyPrintDateFormats = new PrettyPrintDateFormats();
 
@@ -31,15 +32,35 @@ public abstract class JaversCoreProperties {
         return mappingStyle;
     }
 
-    public boolean isNewObjectSnapshot() {
-        return newObjectSnapshot;
+    /**
+     * Use {@link #isInitialChanges()}
+     */
+    @Deprecated
+    public Boolean isNewObjectSnapshot() {
+        return isInitialChanges();
     }
 
-    public boolean isPrettyPrint() {
+    /**
+     * Use {@link #setInitialChanges(Boolean)}
+     */
+    @Deprecated
+    public void setNewObjectSnapshot(Boolean newObjectSnapshot) {
+        setInitialChanges(newObjectSnapshot);
+    }
+
+    public Boolean isInitialChanges() {
+        return initialChanges;
+    }
+
+    public Boolean isTerminalChanges() {
+        return terminalChanges;
+    }
+
+    public Boolean isPrettyPrint() {
         return prettyPrint;
     }
 
-    public boolean isTypeSafeValues() {
+    public Boolean isTypeSafeValues() {
         return typeSafeValues;
     }
 
@@ -59,15 +80,15 @@ public abstract class JaversCoreProperties {
         this.mappingStyle = mappingStyle;
     }
 
-    public void setNewObjectSnapshot(boolean newObjectSnapshot) {
-        this.newObjectSnapshot = newObjectSnapshot;
+    public void setInitialChanges(Boolean initialChanges) {
+        this.initialChanges = initialChanges;
     }
 
-    public void setPrettyPrint(boolean prettyPrint) {
+    public void setPrettyPrint(Boolean prettyPrint) {
         this.prettyPrint = prettyPrint;
     }
 
-    public void setTypeSafeValues(boolean typeSafeValues) {
+    public void setTypeSafeValues(Boolean typeSafeValues) {
         this.typeSafeValues = typeSafeValues;
     }
 
@@ -77,6 +98,10 @@ public abstract class JaversCoreProperties {
 
     public PrettyPrintDateFormats getPrettyPrintDateFormats() {
         return prettyPrintDateFormats;
+    }
+
+    public void setTerminalChanges(Boolean terminalChanges) {
+        this.terminalChanges = terminalChanges;
     }
 
     public static class PrettyPrintDateFormats {

@@ -4,7 +4,6 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
-import org.javers.core.JaversBuilderPlugin;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;

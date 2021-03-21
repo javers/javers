@@ -53,10 +53,10 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         }
 
         when:
-        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).limit(5).build()
-        def shadows = javers.findShadowsAndStream(query)
-                .limit(12)
-                .collect(Collectors.toList())
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .snapshotQueryLimit(5)
+                .limit(12).build()
+        def shadows = javers.findShadowsAndStream(query).collect(Collectors.toList())
 
         then:
         shadows.size() == 12
@@ -66,14 +66,14 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
             assert shadows[it].get().intProperty == 19-it
         }
 
-        query.stats().dbQueriesCount == 1
-        query.stats().allSnapshotsCount == 5
-        query.stats().shallowSnapshotsCount == 5
+        query.firstFrameStats().get().dbQueriesCount == 1
+        query.firstFrameStats().get().allSnapshotsCount == 5
+        query.firstFrameStats().get().shallowSnapshotsCount == 5
 
-        query.streamStats().jqlQueriesCount == 3
-        query.streamStats().dbQueriesCount == 3
-        query.streamStats().allSnapshotsCount == 15
-        query.streamStats().shallowSnapshotsCount == 15
+        query.streamStats().get().shadowQueriesCount == 3
+        query.streamStats().get().dbQueriesCount == 3
+        query.streamStats().get().allSnapshotsCount == 15
+        query.streamStats().get().shallowSnapshotsCount == 15
     }
 
     def "should terminate Stream when there is no more Shadows"(){
@@ -85,28 +85,42 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         }
 
         when:
-        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).limit(5).build()
-        def shadows = javers.findShadowsAndStream(query)
-                .collect(Collectors.toList())
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).snapshotQueryLimit(5).build()
+        def shadows = javers.findShadowsAndStream(query).collect(Collectors.toList())
 
         then:
         shadows.size() == 20
 
-        query.stats().dbQueriesCount == 1
-        query.stats().allSnapshotsCount == 5
+        query.firstFrameStats().get().dbQueriesCount == 1
+        query.firstFrameStats().get().allSnapshotsCount == 5
 
-        query.streamStats().jqlQueriesCount == 5
-        query.streamStats().dbQueriesCount == 5
-        query.streamStats().allSnapshotsCount == 20
+        query.streamStats().get().shadowQueriesCount == 5
+        query.streamStats().get().dbQueriesCount == 5
+        query.streamStats().get().allSnapshotsCount == 20
     }
 
-    def "should not allow for setting skip in Stream query"(){
-      when:
-      javers.findShadowsAndStream(byInstanceId(1, SnapshotEntity).skip(5).build())
+    def "should allow for setting skip in Stream and Shadows query"() {
+        given:
+        def entity = new SnapshotEntity(id: 1, intProperty: 0)
+        20.times {
+            entity.intProperty = it
+            javers.commit("a", entity)
+        }
 
-      then:
-      JaversException e = thrown()
-      e.code == JaversExceptionCode.MALFORMED_JQL
+        when:
+        def results = javers.findShadows(byInstanceId(1, SnapshotEntity).skip(5).build())
+
+        then:
+        results.size() == 15
+        results[0].get().intProperty == 14
+
+        when:
+        results = javers.findShadowsAndStream(byInstanceId(1, SnapshotEntity).skip(5).build())
+                .collect(Collectors.toList())
+
+        then:
+        results.size() == 15
+        results[0].get().intProperty == 14
     }
 
     def "should reuse references loaded in previous Stream queries"() {
@@ -121,7 +135,10 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         }
 
         when:
-        def query = byInstanceId(1, SnapshotEntity).limit(5).withScopeDeepPlus(1).build()
+        def query = byInstanceId(1, SnapshotEntity)
+                .snapshotQueryLimit(5)
+                .withScopeDeepPlus(1)
+                .build()
         def shadows = javers.findShadowsAndStream(query)
                 .collect(Collectors.toList())
                 .collect{it.get()}
@@ -135,9 +152,9 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
             assert it.entityRef.id == 2
         }
 
-        query.streamStats().jqlQueriesCount == 4
-        query.streamStats().dbQueriesCount == 5
-        query.streamStats().deepPlusGapsFilled == 1
+        query.streamStats().get().shadowQueriesCount == 4
+        query.streamStats().get().dbQueriesCount == 5
+        query.streamStats().get().deepPlusGapsFilled == 1
     }
 
     @Unroll
@@ -181,8 +198,8 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
         //should reuse commit table in Stream queries
 
-        query.stats().dbQueriesCount == 1
-        query.streamStats().jqlQueriesCount == 1
+        query.firstFrameStats().get().dbQueriesCount == 1
+        query.streamStats().get().shadowQueriesCount == 1
 
         where:
         queryType << ["InstanceId", "Class"]
@@ -433,7 +450,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[4].valueObjectRef.city == "London"
         !shadows[4].valueObjectRef.networkAddress
 
-        query.stats().dbQueriesCount == 1
+        query.firstFrameStats().get().dbQueriesCount == 1
     }
 
     def "should query for Shadows with property filter using implicit CHILD_VALUE_OBJECT scope"() {
@@ -486,8 +503,8 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
       shadows.size() == 1
       shadows[0].entityRef.valueObjectRef.city == "London"
 
-      query.stats().dbQueriesCount == 2
-      query.stats().allSnapshotsCount == 3
+      query.firstFrameStats().get().dbQueriesCount == 2
+      query.firstFrameStats().get().allSnapshotsCount == 3
     }
 
     def "should prefetch refs in DEEP_PLUS scope"(){
@@ -508,9 +525,9 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         def shadows = javers.findShadows(query).collect{it.get()}
 
         then:
-        query.stats().dbQueriesCount == 2
-        query.stats().allSnapshotsCount == 8
-        query.stats().deepPlusSnapshotsCount == 4
+        query.firstFrameStats().get().dbQueriesCount == 2
+        query.firstFrameStats().get().allSnapshotsCount == 8
+        query.firstFrameStats().get().deepPlusSnapshotsCount == 4
 
         shadows[0].intProperty == 3
         shadows[0].entityRef.intProperty == 3
@@ -574,7 +591,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[0].listOfEntities.size() == 1
     }
 
-    def "should load master snapshot even if child snapshots 'consumed' the snapshot limit"(){
+    def "should load master Entity snapshot even if child snapshots 'consumed' the whole snapshot limit"(){
         given:
         def a = new DummyAddress(city: "a")
         def e = new SnapshotEntity(id: 1, valueObjectRef:a)
@@ -598,11 +615,13 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         snapshots.size() == 51
         snapshots.find {it -> it.globalId.typeName.endsWith('SnapshotEntity') && it.globalId.cdoId == 1}
 
-        shadows.size() == 51
+        shadows.size() == 50
         shadows.each {
             it instanceof SnapshotEntity
             it.valueObjectRef instanceof DummyAddress
         }
+        shadows.first().valueObjectRef.city == "49"
+        shadows.last().valueObjectRef.city == "0"
     }
 
     def "should load a thin Shadow when a property has @ShallowReference"(){

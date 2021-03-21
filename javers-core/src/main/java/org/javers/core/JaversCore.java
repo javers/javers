@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -52,9 +53,9 @@ class JaversCore implements Javers {
     private final JaversExtendedRepository repository;
     private final QueryRunner queryRunner;
     private final GlobalIdFactory globalIdFactory;
-    private final JaversCoreConfiguration configuration;
+    private final CoreConfiguration configuration;
 
-    JaversCore(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, QueryRunner queryRunner, GlobalIdFactory globalIdFactory, JaversCoreConfiguration javersCoreConfiguration) {
+    JaversCore(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, QueryRunner queryRunner, GlobalIdFactory globalIdFactory, CoreConfiguration javersCoreConfiguration) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
@@ -184,7 +185,7 @@ class JaversCore implements Javers {
     @Override
     public <T> List<Shadow<T>> findShadows(JqlQuery query) {
         Validate.argumentIsNotNull(query);
-        return (List)queryRunner.queryForShadows(query);
+        return (List)findShadowsAndStream(query).collect(Collectors.toList());
     }
 
     @Override
@@ -252,6 +253,11 @@ class JaversCore implements Javers {
     public Property getProperty(PropertyChange propertyChange) {
         ManagedType managedType = typeMapper.getJaversManagedType(propertyChange.getAffectedGlobalId());
         return managedType.getProperty(propertyChange.getPropertyName());
+    }
+
+    @Override
+    public CoreConfiguration getCoreConfiguration() {
+        return configuration;
     }
 
     private static class CommitWithTimestamp {

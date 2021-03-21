@@ -7,6 +7,9 @@ import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.List;
 
+import static java.util.Spliterator.IMMUTABLE;
+import static java.util.Spliterator.ORDERED;
+
 class ChangesQueryRunner {
     private final QueryCompiler queryCompiler;
     private final JaversExtendedRepository repository;
@@ -20,7 +23,7 @@ class ChangesQueryRunner {
         queryCompiler.compile(query);
 
         if (query.isAnyDomainObjectQuery()) {
-            return repository.getChanges(query.isNewObjectChanges(), query.getQueryParams());
+            return repository.getChanges(query.getQueryParams());
         }
 
         if (query.isIdQuery()){

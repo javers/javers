@@ -2,15 +2,13 @@ package org.javers.core.snapshot;
 
 import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
-import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
-import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 
 import java.util.*;
@@ -21,9 +19,11 @@ import static java.util.Optional.of;
 public class SnapshotDiffer {
 
     private final DiffFactory diffFactory;
+    private final CoreConfiguration javersCoreConfiguration;
 
-    public SnapshotDiffer(DiffFactory diffFactory) {
+    public SnapshotDiffer(DiffFactory diffFactory, CoreConfiguration javersCoreConfiguration) {
         this.diffFactory = diffFactory;
+        this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
     /**
@@ -37,10 +37,13 @@ public class SnapshotDiffer {
         List<Change> changes = new ArrayList<>();
         for (CdoSnapshot snapshot : snapshots) {
             if (snapshot.isInitial()) {
-                addInitialChanges(changes, snapshot);
-            } else if (snapshot.isTerminal()) {
-                addTerminalChanges(changes, snapshot);
-            } else {
+                changes.addAll(addInitialChanges(snapshot));
+            }
+            if (snapshot.isTerminal()) {
+                CdoSnapshot previousSnapshot = previousSnapshots.get(SnapshotIdentifier.from(snapshot).previous());
+                addTerminalChanges(changes, snapshot, previousSnapshot);
+            }
+            if (snapshot.isUpdate()) {
                 CdoSnapshot previousSnapshot = previousSnapshots.get(SnapshotIdentifier.from(snapshot).previous());
                 addChanges(changes, previousSnapshot, snapshot);
             }
@@ -48,28 +51,30 @@ public class SnapshotDiffer {
         return changes;
     }
 
-    private void addInitialChanges(List<Change> changes, CdoSnapshot initialSnapshot) {
-        CdoSnapshot emptySnapshot = CdoSnapshotBuilder.emptyCopyOf(initialSnapshot).build();
-        Diff diff = diffFactory.create(snapshotGraph(emptySnapshot), snapshotGraph(initialSnapshot),
-            commitMetadata(initialSnapshot));
-        NewObject newObjectChange =
-            new NewObject(initialSnapshot.getGlobalId(), empty(), of(initialSnapshot.getCommitMetadata()));
-        changes.addAll(diff.getChanges());
-        changes.add(newObjectChange);
+    private List<Change> addInitialChanges(CdoSnapshot initialSnapshot) {
+        Diff initialDiff = diffFactory.create(emptySnapshotGraph(), snapshotGraph(initialSnapshot), commitMetadata(initialSnapshot));
+        return initialDiff.getChanges();
     }
 
-    private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot) {
+    private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot, CdoSnapshot previousSnapshot) {
         changes.add(new ObjectRemoved(terminalSnapshot.getGlobalId(), empty(), of(terminalSnapshot.getCommitMetadata())));
+        if (previousSnapshot != null && javersCoreConfiguration.isTerminalChanges()) {
+            Diff terminalDiff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(terminalSnapshot), commitMetadata(terminalSnapshot));
+            changes.addAll(terminalDiff.getChanges());
+        }
     }
 
     private void addChanges(List<Change> changes, CdoSnapshot previousSnapshot, CdoSnapshot currentSnapshot) {
-        Diff diff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(currentSnapshot),
-            commitMetadata(currentSnapshot));
+        Diff diff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(currentSnapshot), commitMetadata(currentSnapshot));
         changes.addAll(diff.getChanges());
     }
 
     private SnapshotGraph snapshotGraph(CdoSnapshot snapshot) {
         return new SnapshotGraph(Sets.asSet(new SnapshotNode(snapshot)));
+    }
+
+    private SnapshotGraph emptySnapshotGraph() {
+        return new SnapshotGraph(Collections.emptySet());
     }
 
     private Optional<CommitMetadata> commitMetadata(CdoSnapshot snapshot) {

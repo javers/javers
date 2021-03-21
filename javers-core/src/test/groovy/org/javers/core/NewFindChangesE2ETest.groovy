@@ -1,13 +1,16 @@
 package org.javers.core
 
 import org.javers.core.diff.Change
+import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.PropertyChange
+import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
 class NewFindChangesE2ETest extends Specification {
-    def javers = JaversBuilder.javers().build()
+    def javers = JaversBuilder.javers().withInitialChanges(false).build()
 
     def "should return changes as flat List"(){
       given:
@@ -16,11 +19,10 @@ class NewFindChangesE2ETest extends Specification {
       when:
       List<Change> changes = javers.findChanges(QueryBuilder.byClass(Employee).build())
 
-      println "changes: "
-      changes.each{ println it }
+      println (changes.prettyPrint())
 
       then:
-      changes.size() == 8
+      changes.getChangesByType(PropertyChange).size() == 8
     }
 
     def "should return changes grouped by commit"(){
@@ -35,7 +37,7 @@ class NewFindChangesE2ETest extends Specification {
         List<ChangesByCommit> changesByCommit = changes.groupByCommit()
 
         then:
-        changesByCommit.size() == 3
+        changesByCommit.size() == 4
 
         changesByCommit[0].commit.id.majorId == 4
         changesByCommit[0].get().size() == 4
@@ -45,6 +47,9 @@ class NewFindChangesE2ETest extends Specification {
 
         changesByCommit[2].commit.id.majorId == 2
         changesByCommit[2].get().size() == 4
+
+        changesByCommit[3].commit.id.majorId == 1
+        changesByCommit[3].get().size() == 2
     }
 
     def "should return changes grouped by commit and by entity object"(){
@@ -61,7 +66,7 @@ class NewFindChangesE2ETest extends Specification {
         List<ChangesByObject> changesByObject = changesByCommit[0].groupByObject()
 
         then:
-        changesByCommit.size() == 3
+        changesByCommit.size() == 4
 
         changesByObject.size() == 1
         changesByObject[0].get().size() == 4
@@ -82,6 +87,15 @@ class NewFindChangesE2ETest extends Specification {
         changesByObject.size() == 2
         changesByObject[0].get().size() == 2
         changesByObject[1].get().size() == 2
+        changesByObject.each{it instanceof ValueChange }
+        changesByObject.collect{it.globalId.value()} as Set == ['Employee/kaz','Employee/stef'] as Set
+
+        when:
+        changesByObject = changesByCommit[3].groupByObject()
+
+        then:
+        changesByObject.size() == 2
+        changesByObject.each{it instanceof NewObject }
         changesByObject.collect{it.globalId.value()} as Set == ['Employee/kaz','Employee/stef'] as Set
     }
 

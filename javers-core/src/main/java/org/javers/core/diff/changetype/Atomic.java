@@ -11,7 +11,6 @@ import java.util.Objects;
  * Immutable wrapper for client's Primitives, Values and Id's
  * <br><br>
  *
- * TODO refine dehydrate approach
  * Value needs to be dehydrated before persisting. Dehydration is simply serialization to JSON.
  *
  * @author bartosz walacik

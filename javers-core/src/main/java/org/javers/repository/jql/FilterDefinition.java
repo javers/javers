@@ -23,8 +23,17 @@ abstract class FilterDefinition {
             this.globalIdDTO = globalIdDTO;
         }
 
+        boolean isInstanceIdFilter() {
+            return globalIdDTO instanceof InstanceIdDTO;
+        }
+
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
             return new IdFilter(globalIdFactory.createFromDto(globalIdDTO));
+        }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.toString(this, "globalId", globalIdDTO.value());
         }
     }
 
@@ -41,6 +50,11 @@ abstract class FilterDefinition {
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
             return new IdFilter(globalIdFactory.createInstanceId(localId, typeName));
         }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.toString(this, "typeName", typeName, "localId", localId);
+        }
     }
 
     static class ClassFilterDefinition extends FilterDefinition {
@@ -53,6 +67,11 @@ abstract class FilterDefinition {
         @Override
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
             return new ClassFilter(Sets.transform(requiredClasses, javaClass -> typeMapper.getJaversManagedType(javaClass)));
+        }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.toString(this, "requiredClasses", requiredClasses);
         }
     }
 
@@ -76,6 +95,11 @@ abstract class FilterDefinition {
                 }
             }
         }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.toString(this, "instance", instance);
+        }
     }
 
     static class VoOwnerFilterDefinition extends FilterDefinition {
@@ -98,12 +122,23 @@ abstract class FilterDefinition {
 
             return new VoOwnerFilter((EntityType)mType, path);
         }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.toString(this, "ownerEntityClass", ownerEntityClass.getName(),
+                                                  "path", path);
+        }
     }
 
     static class AnyDomainObjectFilterDefinition extends FilterDefinition {
         @Override
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
             return new AnyDomainObjectFilter();
+        }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.toString(this);
         }
     }
 }
