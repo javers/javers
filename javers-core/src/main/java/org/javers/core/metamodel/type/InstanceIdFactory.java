@@ -51,7 +51,12 @@ class InstanceIdFactory {
                     .entrySet()
                     .stream()
                     .sorted(Map.Entry.comparingByKey())
-                    .map(e -> localIdAsString(entityType.getProperty(e.getKey()), e.getValue()))
+                    .map(e -> {
+                        JaversProperty idProperty = entityType.getProperty(e.getKey());
+                        Object dehydratedAtomicLocalId = dehydratedLocalId(idProperty, e.getValue());
+
+                        return localIdAsString(idProperty, dehydratedAtomicLocalId);
+                    })
                     .collect(Collectors.toList()));
         }
 
