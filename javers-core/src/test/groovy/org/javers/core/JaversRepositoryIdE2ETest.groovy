@@ -45,13 +45,13 @@ class JaversRepositoryIdE2ETest extends Specification {
         javers.getLatestSnapshot(longId, CategoryC).get().globalId.cdoId == longId
     }
 
-    class EntityWithVOId {
+    static class EntityWithVOId {
         @Id ValueObjectAsId id
         int value
     }
 
     @ValueObject
-    class ValueObjectAsId {
+    static class ValueObjectAsId {
         int id
         int value
     }

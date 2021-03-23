@@ -73,8 +73,8 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
 
     private InstanceId deserializeInstanceId(JsonElement cdoIdElement, EntityType entity, JsonDeserializationContext context) {
         try {
-            Object localId = context.deserialize(cdoIdElement, entity.getLocalIdDehydratedType());
-            return entity.createIdFromDehydratedLocalId(localId);
+            Object localId = context.deserialize(cdoIdElement, entity.getLocalIdDehydratedJsonType());
+            return entity.createIdFromDehydratedJsonLocalId(localId);
         } catch (JsonSyntaxException e) {
             //legacy format support
             Object localId = context.deserialize(cdoIdElement, entity.getIdProperty().getGenericType());

@@ -1,4 +1,4 @@
-package org.javers.core.metamodel.type
+package org.javers.core.metamodel.object
 
 import groovy.transform.MapConstructor
 import org.javers.core.metamodel.annotation.Id
