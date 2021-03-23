@@ -30,17 +30,30 @@ class InstanceIdFactory {
     InstanceId createFromDehydratedJsonLocalId(Object dehydratedLocalId) {
         Validate.argumentsAreNotNull(entityType, dehydratedLocalId);
 
-        String localIdAsString = localIdAsString(dehydratedLocalId);
+        String localIdAsString = localIdAsStringFromJson(dehydratedLocalId);
 
         return new InstanceId(entityType.getName(), dehydratedLocalId, localIdAsString);
     }
 
-    String localIdAsString(Object dehydratedLocalId) {
-        if (dehydratedLocalId instanceof String) {
-            return (String) dehydratedLocalId;
+    private String localIdAsStringFromJson(Object dehydratedJsonLocalId) {
+        if (dehydratedJsonLocalId instanceof String) {
+            return (String) dehydratedJsonLocalId;
         }
 
-        return localIdAsString(entityType.getIdProperty(), dehydratedLocalId);
+        JaversProperty idProperty = entityType.getIdProperty();
+        if (idProperty.isEntityType()) {
+            EntityType idPropertyType = idProperty.getType();
+            return idPropertyType.getInstanceIdFactory().localIdAsStringFromJson(dehydratedJsonLocalId);
+        }
+        if (idProperty.isValueObjectType()) {
+            return dehydratedJsonLocalId.toString();
+         }
+        if (idProperty.isPrimitiveOrValueType()) {
+            PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
+            return primitiveOrValueType.valueToString(dehydratedJsonLocalId);
+        }
+
+        throw idTypeNotSupported();
     }
 
     private DehydratedLocalId dehydratedLocalId(Object localId) {
@@ -52,31 +65,11 @@ class InstanceIdFactory {
                     .entrySet()
                     .stream()
                     .sorted(Map.Entry.comparingByKey())
-                    .map(e -> {
-                        JaversProperty idProperty = entityType.getProperty(e.getKey());
-                        Object localIdElement = e.getValue();
-                        return dehydratedLocalId(idProperty, localIdElement);
-                    })
+                    .map(e -> dehydratedLocalId(entityType.getProperty(e.getKey()), e.getValue()))
                     .collect(Collectors.toList()));
         }
 
         return dehydratedLocalId(entityType.getIdProperty(), localId);
-    }
-
-    String localIdAsString(JaversProperty idProperty, Object dehydratedAtomicLocalId) {
-        if (idProperty.isEntityType()) {
-            EntityType idPropertyType = idProperty.getType();
-            return idPropertyType.getInstanceIdFactory().localIdAsString(dehydratedAtomicLocalId);
-        }
-        //if (idProperty.isValueObjectType()) {
-        //    return dehydratedAtomicLocalId.toString();
-       // }
-        if (idProperty.isPrimitiveOrValueType()) {
-            PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
-            return primitiveOrValueType.valueToString(dehydratedAtomicLocalId);
-        }
-
-        throw idTypeNotSupported();
     }
 
     private JaversException idTypeNotSupported() {
@@ -164,8 +157,7 @@ class InstanceIdFactory {
 
         @Override
         public String toLocalIdString() {
-            return String.join(",",
-                    dehydratedLocalIds.stream().map(it -> it.toLocalIdString()).collect(Collectors.toList()));
+            return String.join(",", dehydratedLocalIds.stream().map(it -> it.toLocalIdString()).collect(Collectors.toList()));
         }
     }
 }

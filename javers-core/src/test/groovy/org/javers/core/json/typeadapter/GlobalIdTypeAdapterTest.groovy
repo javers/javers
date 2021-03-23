@@ -6,13 +6,16 @@ import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.ValueObject
 import org.javers.core.metamodel.clazz.JaversEntity
+import org.javers.core.metamodel.object.FirstNameId
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.LastNameId
+import org.javers.core.metamodel.object.PersonCompositeEntityId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.metamodel.type.PersonComposite
-import org.javers.core.metamodel.type.PersonId
-import org.javers.core.metamodel.type.PersonSimpleEntityId
+import org.javers.core.metamodel.object.PersonComposite
+import org.javers.core.metamodel.object.PersonId
+import org.javers.core.metamodel.object.PersonSimpleEntityId
 import org.javers.core.model.*
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -164,6 +167,24 @@ class GlobalIdTypeAdapterTest extends Specification {
         json.entity == PersonSimpleEntityId.name
     }
 
+    def "should serialize InstanceId with Composite EntityId using joined, delegated cdoId"(){
+        given:
+        def javers = javersTestAssembly()
+        def id = javers.instanceId(new PersonCompositeEntityId(
+                firstNameId: new FirstNameId(name: "mad", id:10),
+                lastNameId: new LastNameId(name: "kaz", id:11),
+                data: 1)
+        )
+
+        when:
+        def jsonText = javers.jsonConverter.toJson(id)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.cdoId == "10,11"
+        json.entity == PersonCompositeEntityId.name
+    }
+
     @Unroll
     def "should serialize InstanceId with #what name"() {
         given:
@@ -238,7 +259,7 @@ class GlobalIdTypeAdapterTest extends Specification {
         given:
         def json =
         '''
-        { "entity": "org.javers.core.metamodel.type.PersonComposite",
+        { "entity": "org.javers.core.metamodel.object.PersonComposite",
           "cdoId": "2019,1,1,mad,kaz"
         }
         '''
@@ -258,7 +279,7 @@ class GlobalIdTypeAdapterTest extends Specification {
         given:
         def json =
         '''
-        { "entity": "org.javers.core.metamodel.type.PersonSimpleEntityId",
+        { "entity": "org.javers.core.metamodel.object.PersonSimpleEntityId",
           "cdoId": 10
         }
         '''
@@ -272,6 +293,26 @@ class GlobalIdTypeAdapterTest extends Specification {
         id.typeName == PersonSimpleEntityId.name
         id.value() == PersonSimpleEntityId.name + "/10"
         id.cdoId == 10
+    }
+
+    def "should deserialize InstanceId with Composite EntityId using joined, delegated cdoId"(){
+        given:
+        def json =
+                '''
+        { "entity": "org.javers.core.metamodel.object.PersonCompositeEntityId",
+          "cdoId": "10,11"
+        }
+        '''
+        def javers = javersTestAssembly()
+
+        when:
+        def id = javers.jsonConverter.fromJson(json, GlobalId)
+
+        then:
+        id instanceof InstanceId
+        id.typeName == PersonCompositeEntityId.name
+        id.value() == PersonCompositeEntityId.name + "/10,11"
+        id.cdoId == "10,11"
     }
 
     def "should deserialize InstanceId with @TypeName when EntityType is mapped"(){

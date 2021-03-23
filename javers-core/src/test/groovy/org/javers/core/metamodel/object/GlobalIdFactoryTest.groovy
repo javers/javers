@@ -1,9 +1,6 @@
 package org.javers.core.metamodel.object
 
 
-import org.javers.core.metamodel.type.PersonComposite
-import org.javers.core.metamodel.type.PersonSimpleEntityId
-import org.javers.core.metamodel.type.PersonId
 import org.javers.core.model.*
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
@@ -59,6 +56,22 @@ class GlobalIdFactoryTest extends Specification {
         instanceId.typeName == PersonSimpleEntityId.name
         instanceId.cdoId == 10
         instanceId.value() == PersonSimpleEntityId.name + "/10"
+    }
+
+    def "should create proper InstanceId for Composite EntityId case with joined, delegated cdoId"(){
+        given:
+        def person = new PersonCompositeEntityId(
+                firstNameId: new FirstNameId(name: "mad", id:10),
+                lastNameId: new LastNameId(name: "kaz", id:11),
+                data: 1)
+
+        when:
+        def instanceId = globalIdFactory.createId(person)
+
+        then:
+        instanceId.typeName == PersonCompositeEntityId.name
+        instanceId.cdoId == "10,11"
+        instanceId.value() == PersonCompositeEntityId.name + "/10,11"
     }
 
     @Unroll

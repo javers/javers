@@ -4,6 +4,7 @@ package org.javers.core.metamodel.type
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.metamodel.clazz.EntityDefinition
+import org.javers.core.metamodel.object.PersonComposite
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyUser
