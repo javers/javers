@@ -41,4 +41,8 @@ public class InstanceId extends GlobalId {
     public String toString() {
         return getTypeNameShort()+"/"+cdoIdAsString;
     }
+
+    public String getCdoIdAsString() {
+        return cdoIdAsString;
+    }
 }

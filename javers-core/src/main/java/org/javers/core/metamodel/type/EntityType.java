@@ -127,8 +127,8 @@ public class EntityType extends ManagedType {
         return instanceIdFactory.create(localId);
     }
 
-    public InstanceId createIdFromDehydratedLocalId(Object dehydratedLocalId) {
-        return instanceIdFactory.createFromDehydratedLocalId(dehydratedLocalId);
+    public InstanceId createIdFromDehydratedJsonLocalId(Object dehydratedLocalId) {
+        return instanceIdFactory.createFromDehydratedJsonLocalId(dehydratedLocalId);
     }
 
     InstanceIdFactory getInstanceIdFactory() {
@@ -161,7 +161,7 @@ public class EntityType extends ManagedType {
         return super.prettyPrintBuilder().addField("idProperties", getIdPropertyNames());
     }
 
-    public Type getLocalIdDehydratedType() {
-        return instanceIdFactory.getLocalIdDehydratedType();
+    public Type getLocalIdDehydratedJsonType() {
+        return instanceIdFactory.getLocalIdDehydratedJsonType();
     }
 }

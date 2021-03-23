@@ -100,13 +100,13 @@ class CompositeIdExample extends Specification {
 
     @IdClass(ShipmentWithCompositeId.ShipmentIdClass.class)
     class ShipmentWithCompositeId {
-        @Id Person person;
-        @Id Order order;
-        String address;
+        @Id Person person
+        @Id Order order
+        String address
 
         class ShipmentIdClass {
-            String person;
-            String order;
+            String person
+            String order
         }
     }
 

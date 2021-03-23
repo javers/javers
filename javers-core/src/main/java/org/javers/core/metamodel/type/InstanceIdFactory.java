@@ -6,6 +6,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.InstanceId;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -19,14 +20,14 @@ class InstanceIdFactory {
     InstanceId create(Object localId) {
         Validate.argumentsAreNotNull(entityType, localId);
 
-        Object dehydratedLocalId = dehydratedLocalId(entityType, localId);
+        DehydratedLocalId dehydratedLocalId = dehydratedLocalId(localId);
 
-        String localIdAsString = localIdAsString(dehydratedLocalId);
-
-        return new InstanceId(entityType.getName(), dehydratedLocalId, localIdAsString);
+        return new InstanceId(entityType.getName(),
+                dehydratedLocalId.getId(),
+                dehydratedLocalId.toLocalIdString());
     }
 
-    InstanceId createFromDehydratedLocalId(Object dehydratedLocalId) {
+    InstanceId createFromDehydratedJsonLocalId(Object dehydratedLocalId) {
         Validate.argumentsAreNotNull(entityType, dehydratedLocalId);
 
         String localIdAsString = localIdAsString(dehydratedLocalId);
@@ -42,20 +43,19 @@ class InstanceIdFactory {
         return localIdAsString(entityType.getIdProperty(), dehydratedLocalId);
     }
 
-    private Object dehydratedLocalId(EntityType entityType, Object localId) {
+    private DehydratedLocalId dehydratedLocalId(Object localId) {
 
         if (entityType.hasCompositeId()) {
             Map<String,?> compositeLocalId = (Map)localId;
 
-            return String.join(",", compositeLocalId
+            return new CompositeDehydratedLocalId( compositeLocalId
                     .entrySet()
                     .stream()
                     .sorted(Map.Entry.comparingByKey())
                     .map(e -> {
                         JaversProperty idProperty = entityType.getProperty(e.getKey());
-                        Object dehydratedAtomicLocalId = dehydratedLocalId(idProperty, e.getValue());
-
-                        return localIdAsString(idProperty, dehydratedAtomicLocalId);
+                        Object localIdElement = e.getValue();
+                        return dehydratedLocalId(idProperty, localIdElement);
                     })
                     .collect(Collectors.toList()));
         }
@@ -68,9 +68,9 @@ class InstanceIdFactory {
             EntityType idPropertyType = idProperty.getType();
             return idPropertyType.getInstanceIdFactory().localIdAsString(dehydratedAtomicLocalId);
         }
-        if (idProperty.isValueObjectType()) {
-            return dehydratedAtomicLocalId.toString();
-        }
+        //if (idProperty.isValueObjectType()) {
+        //    return dehydratedAtomicLocalId.toString();
+       // }
         if (idProperty.isPrimitiveOrValueType()) {
             PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
             return primitiveOrValueType.valueToString(dehydratedAtomicLocalId);
@@ -86,7 +86,7 @@ class InstanceIdFactory {
                 entityType.getBaseJavaClass().getName());
     }
 
-    Type getLocalIdDehydratedType() {
+    Type getLocalIdDehydratedJsonType() {
         if (entityType.hasCompositeId()) {
             return String.class;
         }
@@ -95,7 +95,7 @@ class InstanceIdFactory {
 
         if (idProperty.isEntityType()) {
             EntityType idPropertyType = idProperty.getType();
-            return idPropertyType.getLocalIdDehydratedType();
+            return idPropertyType.getLocalIdDehydratedJsonType();
         }
         if (idProperty.isValueObjectType()) {
             return String.class;
@@ -108,19 +108,64 @@ class InstanceIdFactory {
     }
 
 
-    private Object dehydratedLocalId(JaversProperty idProperty, Object localId) {
+    private DehydratedLocalId dehydratedLocalId(JaversProperty idProperty, Object localId) {
         if (idProperty.isEntityType()) {
             EntityType idPropertyType = idProperty.getType();
-            return idPropertyType.getIdOf(localId);
+            return idPropertyType.getInstanceIdFactory().dehydratedLocalId(idPropertyType.getIdOf(localId));
         }
         if (idProperty.isValueObjectType()) {
             ValueObjectType valueObjectType = idProperty.getType();
-            return valueObjectType.smartToString(localId);
+            return new SimpleDehydratedLocalId(localId, valueObjectType.smartToString(localId));
         }
         if (idProperty.isPrimitiveOrValueType()) {
-            return localId;
+            PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
+            return new SimpleDehydratedLocalId(localId, primitiveOrValueType.valueToString(localId));
         }
 
         throw idTypeNotSupported();
+    }
+
+    private interface DehydratedLocalId {
+        String toLocalIdString();
+        Object getId();
+    }
+
+    private static class SimpleDehydratedLocalId implements DehydratedLocalId {
+        final Object localId;
+        final String localIdAsString;
+
+        SimpleDehydratedLocalId(Object localId, String localIdAsString) {
+            this.localId = localId;
+            this.localIdAsString = localIdAsString;
+        }
+
+        @Override
+        public String toLocalIdString() {
+            return localIdAsString;
+        }
+
+        @Override
+        public Object getId() {
+            return localId;
+        }
+    }
+
+    private static class CompositeDehydratedLocalId implements DehydratedLocalId {
+        final List<DehydratedLocalId> dehydratedLocalIds;
+
+        CompositeDehydratedLocalId(List<DehydratedLocalId> dehydratedLocalIds) {
+            this.dehydratedLocalIds = dehydratedLocalIds;
+        }
+
+        @Override
+        public Object getId() {
+            return toLocalIdString();
+        }
+
+        @Override
+        public String toLocalIdString() {
+            return String.join(",",
+                    dehydratedLocalIds.stream().map(it -> it.toLocalIdString()).collect(Collectors.toList()));
+        }
     }
 }

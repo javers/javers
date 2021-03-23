@@ -43,21 +43,19 @@ public class BasicEntityDiffExample {
     Diff diff = javers.compare(frodoOld, frodoNew);
 
     //then
-    assertThat(diff.getChanges()).hasSize(9);
+    assertThat(diff.getChanges()).hasSize(14);
 
-    // diff pretty print
-    System.out.println(diff);
+    System.out.println("diff pretty print:");
+    System.out.println(diff.prettyPrint());
 
-    //iterating over changes grouped by objects
-    System.out.println("");
+    System.out.println("iterating over changes:");
+    diff.getChanges().forEach(change -> System.out.println("- " + change));
+
+    System.out.println("iterating over changes grouped by objects");
     diff.groupByObject().forEach(byObject -> {
       System.out.println("* changes on " +byObject.getGlobalId().value() + " : ");
       byObject.get().forEach(change -> System.out.println("  - " + change));
     });
-
-    //iterating over changes
-    System.out.println("");
-    diff.getChanges().forEach(change -> System.out.println("- " + change));
 
     // diff as JSON
     System.out.println("");
