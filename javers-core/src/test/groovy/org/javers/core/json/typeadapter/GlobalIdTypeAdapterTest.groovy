@@ -78,27 +78,6 @@ class GlobalIdTypeAdapterTest extends Specification {
         int value
     }
 
-    def "should deserialize InstanceId with ValueObject Id -- legacy format"(){
-        given:
-        def instanceIdLegacyJson = '''
-            {
-              "entity": "org.javers.core.json.typeadapter.GlobalIdTypeAdapterTest$EntityWithVOId",
-              "cdoId": {
-                "id": 1,
-                "value": 5
-              }
-            }
-            '''
-
-        when:
-        InstanceId instanceId = javersTestAssembly().jsonConverter.fromJson(instanceIdLegacyJson, InstanceId)
-
-        then:
-        println instanceId.value()
-        instanceId.value().endsWith("EntityWithVOId/1,5")
-    }
-
-
     @Unroll
     def "should deserialize InstanceId with #type cdoId"() {
         when:
@@ -133,6 +112,20 @@ class GlobalIdTypeAdapterTest extends Specification {
         json.cdoId.x == 2
         json.cdoId.y == 3
         json.entity == DummyEntityWithEmbeddedId.name
+    }
+
+    def "should serialize InstanceId with ValueObject Id using json fields"(){
+        given:
+        def javers = javersTestAssembly()
+        def id = javers.instanceId(new EntityWithVOId(id: new ValueObjectAsId(id: 1, value:5), value:5))
+
+        when:
+        def jsonText = javers.jsonConverter.toJson(id)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.cdoId == "1,5"
+        json.entity == EntityWithVOId.name
     }
 
     def "should serialize InstanceId with CompositeId using localIdAsString"(){
@@ -231,7 +224,7 @@ class GlobalIdTypeAdapterTest extends Specification {
         idHolder.id == javers.unboundedValueObjectId(DummyAddress)
     }
 
-    def "should deserialize InstanceId with @EmbeddedId to original Type"(){
+    def "should deserialize InstanceId with @EmbeddedId to original cdoId Type"(){
         given:
         def json =
         '''
@@ -253,6 +246,47 @@ class GlobalIdTypeAdapterTest extends Specification {
         id.cdoId instanceof DummyPoint
         id.cdoId.x == 2
         id.cdoId.y == 3
+    }
+
+    def "should deserialize InstanceId with ValueObject Id to original cdoId Type - legacy format"(){
+        given:
+        def instanceIdLegacyJson = '''
+            {
+              "entity": "org.javers.core.json.typeadapter.GlobalIdTypeAdapterTest$EntityWithVOId",
+              "cdoId": {
+                "id": 1,
+                "value": 5
+              }
+            }
+            '''
+
+        when:
+        InstanceId instanceId = javersTestAssembly().jsonConverter.fromJson(instanceIdLegacyJson, InstanceId)
+
+        then:
+        println instanceId.value()
+        instanceId.typeName == EntityWithVOId.name
+        instanceId.cdoId == "1,5"
+        instanceId.value().endsWith("EntityWithVOId/1,5")
+    }
+
+    def "should deserialize InstanceId with ValueObject Id using localIdAsString"(){
+        given:
+        def instanceIdLegacyJson = '''
+            {
+              "entity": "org.javers.core.json.typeadapter.GlobalIdTypeAdapterTest$EntityWithVOId",
+              "cdoId": "1,5"
+            }
+            '''
+
+        when:
+        InstanceId instanceId = javersTestAssembly().jsonConverter.fromJson(instanceIdLegacyJson, InstanceId)
+
+        then:
+        println instanceId.value()
+        instanceId.typeName == EntityWithVOId.name
+        instanceId.cdoId == "1,5"
+        instanceId.value().endsWith("EntityWithVOId/1,5")
     }
 
     def "should deserialize InstanceId with CompositeId using localIdAsString"(){

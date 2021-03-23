@@ -46,7 +46,8 @@ class InstanceIdFactory {
             return idPropertyType.getInstanceIdFactory().localIdAsStringFromJson(dehydratedJsonLocalId);
         }
         if (idProperty.isValueObjectType()) {
-            return dehydratedJsonLocalId.toString();
+            ValueObjectType valueObjectType = idProperty.getType();
+            return valueObjectType.smartToString(dehydratedJsonLocalId);
          }
         if (idProperty.isPrimitiveOrValueType()) {
             PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
@@ -55,6 +56,25 @@ class InstanceIdFactory {
 
         throw idTypeNotSupported();
     }
+
+    private DehydratedLocalId dehydratedLocalId(JaversProperty idProperty, Object localId) {
+        if (idProperty.isEntityType()) {
+            EntityType idPropertyType = idProperty.getType();
+            return idPropertyType.getInstanceIdFactory().dehydratedLocalId(idPropertyType.getIdOf(localId));
+        }
+        if (idProperty.isValueObjectType()) {
+            ValueObjectType valueObjectType = idProperty.getType();
+            String localIdAsString = valueObjectType.smartToString(localId);
+            return new SimpleDehydratedLocalId(localIdAsString, valueObjectType.smartToString(localId));
+        }
+        if (idProperty.isPrimitiveOrValueType()) {
+            PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
+            return new SimpleDehydratedLocalId(localId, primitiveOrValueType.valueToString(localId));
+        }
+
+        throw idTypeNotSupported();
+    }
+
 
     private DehydratedLocalId dehydratedLocalId(Object localId) {
 
@@ -95,24 +115,6 @@ class InstanceIdFactory {
         }
         if (idProperty.isPrimitiveOrValueType()) {
             return idProperty.getGenericType();
-        }
-
-        throw idTypeNotSupported();
-    }
-
-
-    private DehydratedLocalId dehydratedLocalId(JaversProperty idProperty, Object localId) {
-        if (idProperty.isEntityType()) {
-            EntityType idPropertyType = idProperty.getType();
-            return idPropertyType.getInstanceIdFactory().dehydratedLocalId(idPropertyType.getIdOf(localId));
-        }
-        if (idProperty.isValueObjectType()) {
-            ValueObjectType valueObjectType = idProperty.getType();
-            return new SimpleDehydratedLocalId(localId, valueObjectType.smartToString(localId));
-        }
-        if (idProperty.isPrimitiveOrValueType()) {
-            PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
-            return new SimpleDehydratedLocalId(localId, primitiveOrValueType.valueToString(localId));
         }
 
         throw idTypeNotSupported();

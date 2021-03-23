@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.object
 
-
+import org.javers.core.JaversRepositoryIdE2ETest
+import org.javers.core.json.typeadapter.GlobalIdTypeAdapterTest
 import org.javers.core.model.*
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
@@ -9,6 +10,7 @@ import spock.lang.Unroll
 
 import java.time.LocalDate
 
+import static org.javers.core.JaversRepositoryIdE2ETest.*
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
@@ -24,12 +26,26 @@ class GlobalIdFactoryTest extends Specification {
         def instanceId = globalIdFactory.createId(
                 new DummyEntityWithEmbeddedId(point: new DummyPoint(1,3)))
 
+
         then:
         instanceId.typeName == DummyEntityWithEmbeddedId.name
         instanceId.cdoId instanceof DummyPoint
         instanceId.cdoId.x == 1
         instanceId.cdoId.y == 3
         instanceId.value() == DummyEntityWithEmbeddedId.name + "/1,3"
+    }
+
+    def "should build instanceId using reflectiveToString() for ValueObject as Id "() {
+        when:
+        def instanceId = globalIdFactory.createId(
+                new EntityWithVOId(id: new ValueObjectAsId(id: 1, value:5), value:5)
+        )
+
+
+        then:
+        instanceId.typeName == EntityWithVOId.name
+        instanceId.cdoId == "1,5"
+        instanceId.value() == EntityWithVOId.name + "/1,5"
     }
 
     def "should create proper InstanceId for Instance with Composite Id"(){
