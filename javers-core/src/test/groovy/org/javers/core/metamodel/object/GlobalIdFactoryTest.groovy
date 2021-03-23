@@ -1,10 +1,14 @@
 package org.javers.core.metamodel.object
 
+
+import org.javers.core.metamodel.type.PersonComposite
 import org.javers.core.model.*
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.time.LocalDate
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
@@ -16,17 +20,32 @@ class GlobalIdFactoryTest extends Specification {
     @Shared
     GlobalIdFactory globalIdFactory = javersTestAssembly().globalIdFactory
 
-    def "should build value() from typeName and reflectiveToString() for Embedded Id "() {
+    def "should build instanceId using reflectiveToString() for Embedded Id "() {
         when:
         def instanceId = globalIdFactory.createId(
                 new DummyEntityWithEmbeddedId(point: new DummyPoint(1,3)))
 
         then:
-        instanceId.typeName == DummyEntityWithEmbeddedId.class.name
+        instanceId.typeName == DummyEntityWithEmbeddedId.name
+        instanceId.cdoId instanceof DummyPoint
         instanceId.cdoId.x == 1
         instanceId.cdoId.y == 3
-        instanceId.value() == instanceId.typeName+"/1,3"
+        instanceId.value() == DummyEntityWithEmbeddedId.name + "/1,3"
     }
+
+    def "should create proper InstanceId for Instance with Composite Id"(){
+        given:
+        def person = new PersonComposite(name: "mad", surname: "kaz", dob: LocalDate.of(2019,01,01), data: 1)
+
+        when:
+        def instanceId = globalIdFactory.createId(person)
+
+        then:
+        instanceId.typeName == PersonComposite.name
+        instanceId.cdoId == "2019,1,1,mad,kaz"
+        instanceId.value() == PersonComposite.name + "/2019,1,1,mad,kaz"
+    }
+
     @Unroll
     def "should infer valueObjectType from path when path is #pathType"(){
       when:
