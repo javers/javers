@@ -11,6 +11,8 @@ import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.metamodel.type.PersonComposite
+import org.javers.core.metamodel.type.PersonId
+import org.javers.core.metamodel.type.PersonSimpleEntityId
 import org.javers.core.model.*
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -146,6 +148,22 @@ class GlobalIdTypeAdapterTest extends Specification {
         json.entity == PersonComposite.name
     }
 
+    def "should serialize InstanceId with simple EntityId using delegated cdoId"(){
+        given:
+        def javers = javersTestAssembly()
+        def id = javers.instanceId(
+            new PersonSimpleEntityId(personId: new PersonId(name: "mad", id: 10), data: 1)
+        )
+
+        when:
+        def jsonText = javers.jsonConverter.toJson(id)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.cdoId == 10
+        json.entity == PersonSimpleEntityId.name
+    }
+
     @Unroll
     def "should serialize InstanceId with #what name"() {
         given:
@@ -234,6 +252,26 @@ class GlobalIdTypeAdapterTest extends Specification {
         id.typeName == PersonComposite.name
         id.value() == PersonComposite.name + "/2019,1,1,mad,kaz"
         id.cdoId == "2019,1,1,mad,kaz"
+    }
+
+    def "should deserialize InstanceId with simple EntityId using delegated cdoId"() {
+        given:
+        def json =
+        '''
+        { "entity": "org.javers.core.metamodel.type.PersonSimpleEntityId",
+          "cdoId": 10
+        }
+        '''
+        def javers = javersTestAssembly()
+
+        when:
+        def id = javers.jsonConverter.fromJson(json, GlobalId)
+
+        then:
+        id instanceof InstanceId
+        id.typeName == PersonSimpleEntityId.name
+        id.value() == PersonSimpleEntityId.name + "/10"
+        id.cdoId == 10
     }
 
     def "should deserialize InstanceId with @TypeName when EntityType is mapped"(){
