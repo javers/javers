@@ -124,10 +124,10 @@ class InstanceIdFactory {
     }
 
     private static class SimpleDehydratedLocalId implements DehydratedLocalId {
-        final Object localId;
-        final String localIdAsString;
+        private final Object localId;
+        private final String localIdAsString;
 
-        SimpleDehydratedLocalId(Object localId, String localIdAsString) {
+        private SimpleDehydratedLocalId(Object localId, String localIdAsString) {
             this.localId = localId;
             this.localIdAsString = localIdAsString;
         }
@@ -144,9 +144,9 @@ class InstanceIdFactory {
     }
 
     private static class CompositeDehydratedLocalId implements DehydratedLocalId {
-        final List<DehydratedLocalId> dehydratedLocalIds;
+        private final List<DehydratedLocalId> dehydratedLocalIds;
 
-        CompositeDehydratedLocalId(List<DehydratedLocalId> dehydratedLocalIds) {
+        private CompositeDehydratedLocalId(List<DehydratedLocalId> dehydratedLocalIds) {
             this.dehydratedLocalIds = dehydratedLocalIds;
         }
 
