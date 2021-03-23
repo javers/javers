@@ -51,4 +51,9 @@ public class JaversAuditableAspect {
     public void commitDeleteAdvice(JoinPoint pjp) {
         javersCommitAdvice.commitDeleteMethodArguments(pjp);
     }
+
+    @AfterReturning(value = "@annotation(org.javers.spring.annotation.JaversAuditableConditionalDelete)", returning = "entities")
+    public void commitConditionalDeleteAdvice(JoinPoint pjp, Object entities) {
+        javersCommitAdvice.commitDeleteMethodResult(pjp, entities);
+    }
 }

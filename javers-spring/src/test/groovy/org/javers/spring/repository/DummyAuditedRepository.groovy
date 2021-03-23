@@ -1,6 +1,7 @@
 package org.javers.spring.repository
 
 import org.javers.spring.annotation.JaversAuditable
+import org.javers.spring.annotation.JaversAuditableConditionalDelete
 import org.javers.spring.annotation.JaversAuditableDelete
 import org.javers.spring.model.DummyObject
 import org.springframework.stereotype.Repository
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 class DummyAuditedRepository {
+
+    List<DummyObject> deleteByNameResult = []
 
     @JaversAuditable
     void save(DummyObject obj){
@@ -62,6 +65,16 @@ class DummyAuditedRepository {
     @JaversAuditableDelete
     void deleteAll(Iterable<DummyObject> objetcs) {
         //... omitted
+    }
+
+    @JaversAuditableConditionalDelete
+    List<DummyObject> deleteByName(String name) {
+        return deleteByNameResult
+    }
+
+    @JaversAuditableConditionalDelete
+    Long deleteByNameWrongReturnType(String name) {
+        return 1
     }
 
 }
