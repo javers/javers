@@ -10,9 +10,12 @@ import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
+import org.javers.core.metamodel.type.PersonComposite
 import org.javers.core.model.*
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.time.LocalDate
 
 import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
@@ -112,7 +115,7 @@ class GlobalIdTypeAdapterTest extends Specification {
         ]
     }
 
-    def "should serialize Instance @EmbeddedId using json fields"(){
+    def "should serialize InstanceId with @EmbeddedId using json fields"(){
         given:
         def javers = javersTestAssembly()
         def id = javers.instanceId(new DummyPoint(2,3),DummyEntityWithEmbeddedId)
@@ -124,6 +127,23 @@ class GlobalIdTypeAdapterTest extends Specification {
         def json = new JsonSlurper().parseText(jsonText)
         json.cdoId.x == 2
         json.cdoId.y == 3
+        json.entity == DummyEntityWithEmbeddedId.name
+    }
+
+    def "should serialize InstanceId with CompositeId using localIdAsString"(){
+        given:
+        def javers = javersTestAssembly()
+        def id = javers.instanceId(
+                new PersonComposite(name: "mad", surname: "kaz", dob: LocalDate.of(2019,01,01), data: 1)
+        )
+
+        when:
+        def jsonText = javers.jsonConverter.toJson(id)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.cdoId == "2019,1,1,mad,kaz"
+        json.entity == PersonComposite.name
     }
 
     @Unroll
@@ -189,9 +209,31 @@ class GlobalIdTypeAdapterTest extends Specification {
 
         then:
         id instanceof InstanceId
+        id.typeName == DummyEntityWithEmbeddedId.name
+        id.value() == DummyEntityWithEmbeddedId.name + "/2,3"
         id.cdoId instanceof DummyPoint
         id.cdoId.x == 2
         id.cdoId.y == 3
+    }
+
+    def "should deserialize InstanceId with CompositeId using localIdAsString"(){
+        given:
+        def json =
+        '''
+        { "entity": "org.javers.core.metamodel.type.PersonComposite",
+          "cdoId": "2019,1,1,mad,kaz"
+        }
+        '''
+        def javers = javersTestAssembly()
+
+        when:
+        def id = javers.jsonConverter.fromJson(json, GlobalId)
+
+        then:
+        id instanceof InstanceId
+        id.typeName == PersonComposite.name
+        id.value() == PersonComposite.name + "/2019,1,1,mad,kaz"
+        id.cdoId == "2019,1,1,mad,kaz"
     }
 
     def "should deserialize InstanceId with @TypeName when EntityType is mapped"(){
