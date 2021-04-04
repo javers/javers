@@ -524,7 +524,7 @@ class JqlExample extends Specification {
           fakeDateProvider.set( now )
           def bob = new Employee(name:"bob", age:20+i)
           javers.commit("author", bob)
-          println "comitting bob on $now"
+          println "committing bob on $now"
       }
 
       when:

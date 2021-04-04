@@ -27,31 +27,31 @@ class InstanceIdFactory {
                 dehydratedLocalId.toLocalIdString());
     }
 
-    InstanceId createFromDehydratedJsonLocalId(Object dehydratedLocalId) {
-        Validate.argumentsAreNotNull(entityType, dehydratedLocalId);
+    InstanceId createFromDeserializedJsonLocalId(Object deserializedLocalId) {
+        Validate.argumentsAreNotNull(entityType, deserializedLocalId);
 
-        String localIdAsString = localIdAsStringFromJson(dehydratedLocalId);
+        String localIdAsString = localIdAsStringFromJson(deserializedLocalId);
 
-        return new InstanceId(entityType.getName(), dehydratedLocalId, localIdAsString);
+        return new InstanceId(entityType.getName(), deserializedLocalId, localIdAsString);
     }
 
-    private String localIdAsStringFromJson(Object dehydratedJsonLocalId) {
-        if (dehydratedJsonLocalId instanceof String) {
-            return (String) dehydratedJsonLocalId;
+    private String localIdAsStringFromJson(Object deserializedJsonLocalId) {
+        if (deserializedJsonLocalId instanceof String) {
+            return (String) deserializedJsonLocalId;
         }
 
         JaversProperty idProperty = entityType.getIdProperty();
         if (idProperty.isEntityType()) {
             EntityType idPropertyType = idProperty.getType();
-            return idPropertyType.getInstanceIdFactory().localIdAsStringFromJson(dehydratedJsonLocalId);
+            return idPropertyType.getInstanceIdFactory().localIdAsStringFromJson(deserializedJsonLocalId);
         }
         if (idProperty.isValueObjectType()) {
             ValueObjectType valueObjectType = idProperty.getType();
-            return valueObjectType.smartToString(dehydratedJsonLocalId);
+            return valueObjectType.smartToString(deserializedJsonLocalId);
          }
         if (idProperty.isPrimitiveOrValueType()) {
             PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
-            return primitiveOrValueType.valueToString(dehydratedJsonLocalId);
+            return primitiveOrValueType.valueToString(deserializedJsonLocalId);
         }
 
         throw idTypeNotSupported();

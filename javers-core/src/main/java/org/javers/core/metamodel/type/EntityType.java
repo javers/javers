@@ -127,8 +127,8 @@ public class EntityType extends ManagedType {
         return instanceIdFactory.create(localId);
     }
 
-    public InstanceId createIdFromDehydratedJsonLocalId(Object dehydratedLocalId) {
-        return instanceIdFactory.createFromDehydratedJsonLocalId(dehydratedLocalId);
+    public InstanceId createIdFromDeserializedJsonLocalId(Object localId) {
+        return instanceIdFactory.createFromDeserializedJsonLocalId(localId);
     }
 
     InstanceIdFactory getInstanceIdFactory() {

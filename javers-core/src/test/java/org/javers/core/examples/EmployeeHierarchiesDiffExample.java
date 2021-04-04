@@ -10,18 +10,16 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EmployeeHierarchiesDiffExample {
 
-  /** {@link NewObject} example */
+  /** NewObject example */
   @Test
   public void shouldDetectHired() {
     //given
     Javers javers = JaversBuilder.javers().build();
 
-    Employee oldBoss = new Employee("Big Boss")
-        .addSubordinates(
+    Employee oldBoss = new Employee("Big Boss").addSubordinates(
             new Employee("Great Developer"));
 
-    Employee newBoss = new Employee("Big Boss")
-        .addSubordinates(
+    Employee newBoss = new Employee("Big Boss").addSubordinates(
             new Employee("Great Developer"),
             new Employee("Hired One"),
             new Employee("Hired Second"));
@@ -38,26 +36,24 @@ public class EmployeeHierarchiesDiffExample {
     System.out.println(diff);
   }
 
-  /** {@link ObjectRemoved} example */
+  /** ObjectRemoved example */
   @Test
   public void shouldDetectFired() {
     //given
     Javers javers = JaversBuilder.javers().build();
 
-    Employee oldBoss = new Employee("Big Boss")
-            .addSubordinates(
-                    new Employee("Great Developer"),
-                    new Employee("Team Lead").addSubordinates(
-                            new Employee("Another Dev"),
-                            new Employee("To Be Fired")
-                    ));
+    Employee oldBoss = new Employee("Big Boss").addSubordinates(
+        new Employee("Great Developer"),
+        new Employee("Team Lead").addSubordinates(
+                new Employee("Another Dev"),
+                new Employee("To Be Fired")
+        ));
 
-    Employee newBoss = new Employee("Big Boss")
-            .addSubordinates(
-                    new Employee("Great Developer"),
-                    new Employee("Team Lead").addSubordinates(
-                            new Employee("Another Dev")
-                    ));
+    Employee newBoss = new Employee("Big Boss").addSubordinates(
+        new Employee("Great Developer"),
+        new Employee("Team Lead").addSubordinates(
+                new Employee("Another Dev")
+        ));
 
     //when
     Diff diff = javers.compare(oldBoss, newBoss);
@@ -68,21 +64,19 @@ public class EmployeeHierarchiesDiffExample {
     System.out.println(diff);
   }
 
-  /** {@link ValueChange} example */
+  /** ValueChange example */
   @Test
   public void shouldDetectSalaryChange(){
     //given
     Javers javers = JaversBuilder.javers().build();
 
-    Employee oldBoss = new Employee("Big Boss")
-            .addSubordinates(
-                    new Employee("Noisy Manager"),
-                    new Employee("Great Developer", 10000));
+    Employee oldBoss = new Employee("Big Boss").addSubordinates(
+        new Employee("Noisy Manager"),
+        new Employee("Great Developer", 10000));
 
-    Employee newBoss = new Employee("Big Boss")
-            .addSubordinates(
-                    new Employee("Noisy Manager"),
-                    new Employee("Great Developer", 20000));
+    Employee newBoss = new Employee("Big Boss").addSubordinates(
+        new Employee("Noisy Manager"),
+        new Employee("Great Developer", 20000));
 
     //when
     Diff diff = javers.compare(oldBoss, newBoss);
@@ -98,23 +92,21 @@ public class EmployeeHierarchiesDiffExample {
     System.out.println(diff);
   }
 
-  /** {@link ReferenceChange} example */
+  /** ReferenceChange example */
   @Test
   public void shouldDetectBossChange() {
     //given
     Javers javers = JaversBuilder.javers().build();
 
-    Employee oldBoss = new Employee("Big Boss")
-        .addSubordinates(
-             new Employee("Manager One")
-                 .addSubordinate(new Employee("Great Developer")),
-             new Employee("Manager Second"));
+    Employee oldBoss = new Employee("Big Boss").addSubordinates(
+        new Employee("Manager One")
+           .addSubordinate(new Employee("Great Developer")),
+        new Employee("Manager Second"));
 
-    Employee newBoss = new Employee("Big Boss")
-        .addSubordinates(
-             new Employee("Manager One"),
-             new Employee("Manager Second")
-                 .addSubordinate(new Employee("Great Developer")));
+    Employee newBoss = new Employee("Big Boss").addSubordinates(
+        new Employee("Manager One"),
+        new Employee("Manager Second")
+           .addSubordinate(new Employee("Great Developer")));
 
     //when
     Diff diff = javers.compare(oldBoss, newBoss);
