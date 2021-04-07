@@ -787,7 +787,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
   /**
-   * DateProvider providers current util for {@link Commit#getCommitDate()}.
+   * DateProvider providers current timestamp for {@link Commit#getCommitDate()}.
    * <br/>
    * By default, now() is used.
    * <br/>

@@ -48,6 +48,12 @@ subprojects {
         mavenCentral()
     }
 
+    java {
+        registerFeature('spring') {
+            usingSourceSet(sourceSets.main)
+        }
+    }
+
     dependencies {
         testImplementation "org.spockframework:spock-core:$spockVersion"
         testImplementation "org.codehaus.groovy:groovy-all:$groovyVersion"
@@ -142,6 +148,7 @@ subprojects {
             }
         }
     }
+
     signing {
         sign publishing.publications
     }
