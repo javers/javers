@@ -7,8 +7,8 @@ dependencies {
     api project(':javers-persistence-sql')
 
     implementation "org.hibernate:hibernate-core:$hibernateVersion"
-    implementation "org.springframework:spring-tx:$springVersion"
-    implementation "org.springframework.data:spring-data-jpa:$springBootVersion"
+    springImplementation "org.springframework:spring-tx:$springVersion"
+    springImplementation "org.springframework.data:spring-data-jpa:$springBootVersion"
 
     testCompile 'com.h2database:h2:1.4.184'
     testCompile "org.springframework:spring-orm:$springVersion"
