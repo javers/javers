@@ -137,7 +137,7 @@ public class Session implements AutoCloseable {
         }
     }
 
-    public Dialect getDialect() {
+    Dialect getDialect() {
         return dialect;
     }
 

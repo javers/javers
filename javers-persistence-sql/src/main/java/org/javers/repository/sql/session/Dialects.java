@@ -28,7 +28,7 @@ class Dialects {
         throw new JaversException(JaversExceptionCode.UNSUPPORTED_SQL_DIALECT, dialectName);
     }
 
-    public static class H2 extends Dialect {
+    static class H2 extends Dialect {
         H2(DialectName dialectName) {
             super(dialectName);
         }
@@ -39,7 +39,7 @@ class Dialects {
         }
     }
 
-    public static class MysqlDialect extends Dialect {
+    static class MysqlDialect extends Dialect {
         MysqlDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -50,7 +50,7 @@ class Dialects {
         }
     }
 
-    public static class MsSqlDialect extends Dialect {
+    static class MsSqlDialect extends Dialect {
         MsSqlDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -73,7 +73,7 @@ class Dialects {
         }
     }
 
-    public static class PostgresDialect extends Dialect {
+    static class PostgresDialect extends Dialect {
         PostgresDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -84,7 +84,7 @@ class Dialects {
         }
     }
 
-    public static class OracleDialect extends Dialect {
+    static class OracleDialect extends Dialect {
         OracleDialect(DialectName dialectName) {
             super(dialectName);
         }
