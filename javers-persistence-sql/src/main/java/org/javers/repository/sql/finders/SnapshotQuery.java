@@ -27,10 +27,9 @@ class SnapshotQuery {
     private final QueryParams queryParams;
     private final SelectBuilder selectBuilder;
     private final TableNameProvider tableNameProvider;
-    private final CdoSnapshotMapper cdoSnapshotMapper;
+    private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
 
     public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
-        this.cdoSnapshotMapper = new CdoSnapshotMapper(session.getDialect());
         this.selectBuilder = session
             .select(
                 SNAPSHOT_STATE + ", " +
@@ -177,12 +176,11 @@ class SnapshotQuery {
                 stringParam(propertyName), stringParam(propertyValue));
     }
 
-    private static class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
-        private final Dialect dialect;
+    private Dialect getDialect() {
+        return selectBuilder.getDialect();
+    }
 
-        public CdoSnapshotMapper(Dialect dialect) {
-            this.dialect = dialect;
-        }
+    private class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
 
         @Override
         public CdoSnapshotSerialized get(ResultSet resultSet) throws SQLException {
@@ -204,7 +202,7 @@ class SnapshotQuery {
                     .withOwnerGlobalIdTypeName(resultSet.getString("owner_" + GLOBAL_ID_TYPE_NAME));
         }
         private String fetchSnapshotState(ResultSet resultSet)  throws SQLException {
-            if (dialect instanceof Dialects.OracleDialect)  {
+            if (getDialect() instanceof Dialects.OracleDialect)  {
                 Clob snapshotState = resultSet.getClob(SNAPSHOT_STATE);
                 return snapshotState.getSubString(1, (int)snapshotState.length());
             }
