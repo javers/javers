@@ -15,7 +15,7 @@ class OracleDockerIntegrationTest extends JaversSqlRepositoryE2ETest {
 
     //docker image built by https://github.com/wnameless/docker-oracle-xe-11g.git
     @Shared
-    public OracleContainer oracle = new OracleContainer(DockerImageName.parse("wnameless/oracle-xe-11g"))
+    public OracleContainer oracle = new OracleContainer(DockerImageName.parse("wnameless/oracle-xe-11g-r2"))
 
     Connection createConnection() {
        String url = oracle.getJdbcUrl()
