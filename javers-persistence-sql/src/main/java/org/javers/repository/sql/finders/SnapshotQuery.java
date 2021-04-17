@@ -27,10 +27,10 @@ class SnapshotQuery {
     private final QueryParams queryParams;
     private final SelectBuilder selectBuilder;
     private final TableNameProvider tableNameProvider;
-    private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
-    private final Dialect dialect;
+    private final CdoSnapshotMapper cdoSnapshotMapper;
 
     public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
+        this.cdoSnapshotMapper = new CdoSnapshotMapper(session.getDialect());
         this.selectBuilder = session
             .select(
                 SNAPSHOT_STATE + ", " +
@@ -59,7 +59,6 @@ class SnapshotQuery {
 
         this.queryParams = queryParams;
         this.tableNameProvider = tableNames;
-        this.dialect = session.getDialect();
         applyQueryParams();
     }
 
@@ -166,7 +165,6 @@ class SnapshotQuery {
     List<CdoSnapshotSerialized> run() {
         selectBuilder.orderByDesc(SNAPSHOT_PK);
         selectBuilder.limit(queryParams.limit(), queryParams.skip());
-        cdoSnapshotMapper.setDialect(this.dialect);
         return selectBuilder.executeQuery(cdoSnapshotMapper);
     }
 
@@ -180,10 +178,9 @@ class SnapshotQuery {
     }
 
     private static class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
+        private final Dialect dialect;
 
-        private Dialect dialect;
-
-        public void setDialect (Dialect dialect) {
+        public CdoSnapshotMapper(Dialect dialect) {
             this.dialect = dialect;
         }
 
@@ -207,7 +204,7 @@ class SnapshotQuery {
                     .withOwnerGlobalIdTypeName(resultSet.getString("owner_" + GLOBAL_ID_TYPE_NAME));
         }
         private String fetchSnapshotState(ResultSet resultSet)  throws SQLException {
-            if(dialect instanceof Dialects.OracleDialect)  {
+            if (dialect instanceof Dialects.OracleDialect)  {
                 Clob snapshotState = resultSet.getClob(SNAPSHOT_STATE);
                 return snapshotState.getSubString(1, (int)snapshotState.length());
             }
