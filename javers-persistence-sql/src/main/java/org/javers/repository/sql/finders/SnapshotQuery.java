@@ -5,11 +5,14 @@ import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.session.Dialect;
+import org.javers.repository.sql.session.Dialects;
 import org.javers.repository.sql.session.ObjectMapper;
 import org.javers.repository.sql.session.Parameter;
 import org.javers.repository.sql.session.SelectBuilder;
 import org.javers.repository.sql.session.Session;
 
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -25,6 +28,7 @@ class SnapshotQuery {
     private final SelectBuilder selectBuilder;
     private final TableNameProvider tableNameProvider;
     private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
+    private final Dialect dialect;
 
     public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
         this.selectBuilder = session
@@ -55,6 +59,7 @@ class SnapshotQuery {
 
         this.queryParams = queryParams;
         this.tableNameProvider = tableNames;
+        this.dialect = session.getDialect();
         applyQueryParams();
     }
 
@@ -161,6 +166,7 @@ class SnapshotQuery {
     List<CdoSnapshotSerialized> run() {
         selectBuilder.orderByDesc(SNAPSHOT_PK);
         selectBuilder.limit(queryParams.limit(), queryParams.skip());
+        cdoSnapshotMapper.setDialect(this.dialect);
         return selectBuilder.executeQuery(cdoSnapshotMapper);
     }
 
@@ -174,6 +180,13 @@ class SnapshotQuery {
     }
 
     private static class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
+
+        private Dialect dialect;
+
+        public void setDialect (Dialect dialect) {
+            this.dialect = dialect;
+        }
+
         @Override
         public CdoSnapshotSerialized get(ResultSet resultSet) throws SQLException {
             return new CdoSnapshotSerialized()
@@ -183,7 +196,7 @@ class SnapshotQuery {
                     .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
                     .withCommitPk(resultSet.getLong(COMMIT_PK))
                     .withVersion(resultSet.getLong(SNAPSHOT_VERSION))
-                    .withSnapshotState(resultSet.getString(SNAPSHOT_STATE))
+                    .withSnapshotState(fetchSnapshotState(resultSet))
                     .withChangedProperties(resultSet.getString(SNAPSHOT_CHANGED))
                     .withSnapshotType(resultSet.getString(SNAPSHOT_TYPE))
                     .withGlobalIdFragment(resultSet.getString(GLOBAL_ID_FRAGMENT))
@@ -192,6 +205,13 @@ class SnapshotQuery {
                     .withOwnerGlobalIdFragment(resultSet.getString("owner_" + GLOBAL_ID_FRAGMENT))
                     .withOwnerGlobalIdLocalId(resultSet.getString("owner_" + GLOBAL_ID_LOCAL_ID))
                     .withOwnerGlobalIdTypeName(resultSet.getString("owner_" + GLOBAL_ID_TYPE_NAME));
+        }
+        private String fetchSnapshotState(ResultSet resultSet)  throws SQLException {
+            if(dialect instanceof Dialects.OracleDialect)  {
+                Clob snapshotState = resultSet.getClob(SNAPSHOT_STATE);
+                return snapshotState.getSubString(1, (int)snapshotState.length());
+            }
+            return resultSet.getString(SNAPSHOT_STATE);
         }
     }
 
@@ -207,7 +227,7 @@ class SnapshotQuery {
         return tableNameProvider.getCommitPropertyTableNameWithSchema();
     }
 
-    static class SnapshotDbIdentifier {
+     static class SnapshotDbIdentifier {
         private final long version;
         private final long globalIdPk;
 
