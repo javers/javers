@@ -7,7 +7,7 @@ import org.javers.repository.sql.session.KeyGeneratorDefinition.SequenceDefiniti
 
 import static org.javers.repository.sql.session.Parameter.longParam;
 
-public class Dialects {
+class Dialects {
 
     static Dialect fromName(DialectName dialectName) {
         if (DialectName.H2 == dialectName) {

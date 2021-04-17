@@ -4,9 +4,8 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.SnapshotIdentifier;
+import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.schema.TableNameProvider;
-import org.javers.repository.sql.session.Dialect;
-import org.javers.repository.sql.session.Dialects;
 import org.javers.repository.sql.session.ObjectMapper;
 import org.javers.repository.sql.session.Parameter;
 import org.javers.repository.sql.session.SelectBuilder;
@@ -28,8 +27,11 @@ class SnapshotQuery {
     private final SelectBuilder selectBuilder;
     private final TableNameProvider tableNameProvider;
     private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
+    private final DialectName dialectName;
 
     public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
+        this.dialectName = session.getDialectName();
+
         this.selectBuilder = session
             .select(
                 SNAPSHOT_STATE + ", " +
@@ -176,10 +178,6 @@ class SnapshotQuery {
                 stringParam(propertyName), stringParam(propertyValue));
     }
 
-    private Dialect getDialect() {
-        return selectBuilder.getDialect();
-    }
-
     private class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
 
         @Override
@@ -202,7 +200,7 @@ class SnapshotQuery {
                     .withOwnerGlobalIdTypeName(resultSet.getString("owner_" + GLOBAL_ID_TYPE_NAME));
         }
         private String fetchSnapshotState(ResultSet resultSet)  throws SQLException {
-            if (getDialect() instanceof Dialects.OracleDialect)  {
+            if (dialectName == DialectName.ORACLE)  {
                 Clob snapshotState = resultSet.getClob(SNAPSHOT_STATE);
                 return snapshotState.getSubString(1, (int)snapshotState.length());
             }

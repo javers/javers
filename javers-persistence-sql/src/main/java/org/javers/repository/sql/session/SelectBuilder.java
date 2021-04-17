@@ -98,8 +98,4 @@ public class SelectBuilder extends QueryBuilder<SelectBuilder> {
     public <T> List<T> executeQuery(ObjectMapper<T> objectMapper) {
         return session.executeQuery(build(), objectMapper);
     }
-
-    public Dialect getDialect() {
-        return session.getDialect();
-    }
 }

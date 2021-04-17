@@ -5,7 +5,7 @@ import org.javers.repository.sql.DialectName;
 
 import static org.javers.repository.sql.session.Parameter.longParam;
 
-public abstract class Dialect {
+abstract class Dialect {
     private final DialectName dialectName;
 
     Dialect(DialectName dialectName) {

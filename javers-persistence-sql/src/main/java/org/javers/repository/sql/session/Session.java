@@ -3,6 +3,7 @@ package org.javers.repository.sql.session;
 import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.ConnectionProvider;
+import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.session.KeyGenerator.SequenceAllocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,4 +141,7 @@ public class Session implements AutoCloseable {
         return dialect;
     }
 
+    public DialectName getDialectName() {
+        return dialect.getName();
+    }
 }
