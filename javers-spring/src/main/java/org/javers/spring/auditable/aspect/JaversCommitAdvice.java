@@ -66,6 +66,18 @@ public class JaversCommitAdvice {
         }
     }
 
+    void commitDeleteMethodResult(JoinPoint jp, Object entities) {
+        for (Object arg : AspectUtil.collectReturnedObjects(entities)) {
+            JaversType javersType = javers.getTypeMapping(arg.getClass());
+            if (javersType instanceof ManagedType) {
+                commitShallowDelete(arg);
+            } else {
+                Method method = ((MethodSignature) jp.getSignature()).getMethod();
+                throw new JaversException(JaversExceptionCode.WRONG_USAGE_OF_JAVERS_AUDITABLE_CONDITIONAL_DELETE, method);
+            }
+        }
+    }
+
     private Class<?> getDomainTypeToDelete(JoinPoint jp, Object id) {
         Method method = ((MethodSignature) jp.getSignature()).getMethod();
         JaversAuditableDelete javersAuditableDelete = method.getAnnotation(JaversAuditableDelete.class);
