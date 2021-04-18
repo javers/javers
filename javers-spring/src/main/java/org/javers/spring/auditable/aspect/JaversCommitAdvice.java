@@ -73,7 +73,7 @@ public class JaversCommitAdvice {
                 commitShallowDelete(arg);
             } else {
                 Method method = ((MethodSignature) jp.getSignature()).getMethod();
-                throw new JaversException(JaversExceptionCode.WRONG_USAGE_OF_JAVERS_AUDITABLE_CONDITIONAL_DELETE, arg, method);
+                throw new JaversException(JaversExceptionCode.WRONG_USAGE_OF_JAVERS_AUDITABLE_CONDITIONAL_DELETE, method);
             }
         }
     }

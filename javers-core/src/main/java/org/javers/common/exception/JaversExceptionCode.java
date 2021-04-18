@@ -12,9 +12,9 @@ public enum JaversExceptionCode {
             "If your intention is to delete by Id, provide the Entity class parameter."),
 
     WRONG_USAGE_OF_JAVERS_AUDITABLE_CONDITIONAL_DELETE("" +
-            "The returned item '%s' from the method '%s' annotated with @JaversAuditableConditionalDelete " +
-            "is not an Entity. " +
-            "If your intention is to delete by condition, use return value as an Entity collection."),
+            "The return type of the method '%s'\n" +
+            "annotated with @JaversAuditableConditionalDelete is not an Entity nor a collection of Entities.\n" +
+            "If your intention is to execute shallow delete by condition, the method should return an Entity or a collection of Entities."),
 
     MALFORMED_JAVERS_MONGODB_PROPERTIES("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
 

@@ -73,8 +73,17 @@ class DummyAuditedRepository {
     }
 
     @JaversAuditableConditionalDelete
+    DummyObject deleteOneByName(String name) {
+        return deleteByNameResult[0]
+    }
+
+    @JaversAuditableConditionalDelete
     Long deleteByNameWrongReturnType(String name) {
         return 1
     }
 
+    @JaversAuditableConditionalDelete
+    DummyObject deleteByNameReturnNull(String name) {
+        return null
+    }
 }

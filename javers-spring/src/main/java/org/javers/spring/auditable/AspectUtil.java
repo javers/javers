@@ -5,6 +5,7 @@ import org.javers.common.collections.Lists;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,6 +28,9 @@ public class AspectUtil {
     public static Iterable<Object> collectReturnedObjects(Object returnedObject){
         if (returnedObject instanceof Iterable) {
             return (Iterable)returnedObject;
+        }
+        if (returnedObject == null) {
+            return Collections.emptyList();
         }
         return Lists.immutableListOf(returnedObject);
     }

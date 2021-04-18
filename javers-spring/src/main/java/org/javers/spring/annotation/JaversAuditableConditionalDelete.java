@@ -9,20 +9,33 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Enables auto-audit when put on a conditional deleting method (typically on a Repository method)
+ * Enables auto-audit when put on a conditionally deleting method (typically on a Repository method).
  * <br/><br/>
  *
- * Triggers {@link Javers#commitShallowDelete} for each returned entity.
+ * The annotated method should return a deleted Entity or a collection of deleted Entities.
+ * <br/><br/>
+ *
+ * Triggers {@link Javers#commitShallowDelete(String, Object)} on each returned Entity.
  * <br/><br/>
  *
  * Usage:
  *
  * <pre>
- *    {@literal @}JaversAuditableDelete
- *     List<DummyEntity> deleteByName(String name) {
+ *    {@literal @}JaversAuditableConditionalDelete
+ *     List&lt;DummyEntity&gt; deleteByName(String name) {
  *         ...
  *     }
  * </pre>
+ *
+ * or
+ *
+ * <pre>
+ *    {@literal @}JaversAuditableConditionalDelete
+ *     DummyEntity deleteById(String id) {
+ *         ...
+ *     }
+ * </pre>
+ *
  * @see JaversAuditableAspect
  */
 @Retention(RetentionPolicy.RUNTIME)

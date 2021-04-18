@@ -19,6 +19,23 @@ class JaversAuditableConditionalDeleteAspectIntegrationTest extends Specificatio
     @Autowired
     DummyAuditedRepository repository
 
+    def "should commit returned entity when method is annotated with @JaversAuditableConditionalDelete"() {
+        given:
+        def o = new DummyObject()
+
+        when:
+        repository.save(o)
+        repository.deleteByNameResult = [o]
+        repository.deleteOneByName("dummy")
+
+        then:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
+
+        snapshots.size() == 2
+        snapshots[0].terminal
+        snapshots[1].initial
+    }
+
     def "should commit returned entities when method is annotated with @JaversAuditableConditionalDelete"() {
         given:
         def o1 = new DummyObject()
@@ -57,5 +74,17 @@ class JaversAuditableConditionalDeleteAspectIntegrationTest extends Specificatio
         JaversException e = thrown()
         println e
         e.code == JaversExceptionCode.WRONG_USAGE_OF_JAVERS_AUDITABLE_CONDITIONAL_DELETE
+    }
+
+    def "should not delete when null is returned" () {
+        given:
+        def o = new DummyObject()
+
+        when:
+        repository.save(o)
+        repository.deleteByNameReturnNull(o.id)
+
+        then:
+        javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build()).size() == 1
     }
 }
