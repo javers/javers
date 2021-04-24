@@ -2,7 +2,6 @@ package org.javers.spring.annotation;
 
 import org.javers.core.Javers;
 import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
