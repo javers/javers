@@ -21,19 +21,19 @@ import java.lang.annotation.Target;
  * Usage:
  *
  * <pre>
- *    {@literal @}JaversAuditableConditionalDelete
- *     List&lt;DummyEntity&gt; deleteByName(String name) {
- *         ...
- *     }
+ * {@literal @}JaversAuditableConditionalDelete
+ *  List&lt;DummyEntity&gt; deleteByName(String name) {
+ *     ...
+ *  }
  * </pre>
  *
- * or
+ * or <br/><br/>
  *
  * <pre>
- *    {@literal @}JaversAuditableConditionalDelete
- *     DummyEntity deleteById(String id) {
- *         ...
- *     }
+ *{@literal @}JaversAuditableConditionalDelete
+ * DummyEntity deleteById(String id) {
+ *    ...
+ * }
  * </pre>
  *
  * @see JaversAuditableAspect
