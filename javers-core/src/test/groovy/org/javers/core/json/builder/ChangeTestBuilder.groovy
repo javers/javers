@@ -1,11 +1,13 @@
 package org.javers.core.json.builder
 
 import org.javers.core.JaversTestBuilder
+import org.javers.core.diff.changetype.InitialValueChange
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.PropertyChangeMetadata
 import org.javers.core.diff.changetype.PropertyChangeType
 import org.javers.core.diff.changetype.ReferenceChange
+import org.javers.core.diff.changetype.TerminalValueChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.map.EntryChange
@@ -40,6 +42,14 @@ class ChangeTestBuilder {
 
     static ValueChange valueChange(Object cdo, String propertyName, oldVal=null, newVal=null) {
         new ValueChange(createMetadata(cdo, propertyName), oldVal, newVal)
+    }
+
+    static InitialValueChange initialValueChange(Object cdo, String propertyName, newVal=null) {
+        new InitialValueChange(createMetadata(cdo, propertyName), newVal)
+    }
+
+    static TerminalValueChange terminalValueChange(Object cdo, String propertyName, oldVal=null) {
+        new TerminalValueChange(createMetadata(cdo, propertyName), oldVal)
     }
 
     static ReferenceChange referenceChanged(Object cdo, String propertyName, Object oldRef , Object newRef) {

@@ -13,6 +13,7 @@ import org.javers.core.diff.changetype.container.ArrayChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.map.MapChange;
+import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.JaversProperty;
@@ -20,6 +21,7 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,6 +40,8 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
         this.changeTypeMap = new HashMap<>();
         this.typeMapper = typeMapper;
         initEntry(ValueChange.class);
+        initEntry(InitialValueChange.class);
+        initEntry(TerminalValueChange.class);
         initEntry(ReferenceChange.class);
         initEntry(NewObject.class);
         initEntry(ObjectRemoved.class);
@@ -61,10 +65,7 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
 
     @Override
     public T fromJson(JsonElement json, JsonDeserializationContext context) {
-        JsonObject jsonObject = (JsonObject) json;
-        String changeTypeField = jsonObject.get(CHANGE_TYPE_FIELD).getAsString();
-        Class<? extends Change> changeType = decode(changeTypeField);
-
+        Class<? extends Change> changeType = decodeChangeType((JsonObject) json);
         return context.deserialize(json, changeType);
     }
 
@@ -113,18 +114,19 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
         return Change.class;
     }
 
-    private void initEntry(Class<? extends Change> valueChangeClass) {
-        changeTypeMap.put(encode(valueChangeClass), valueChangeClass);
+    private void initEntry(Class<? extends Change> changeClass) {
+        changeTypeMap.put(encode(changeClass), changeClass);
     }
 
     private String encode(Class<? extends Change> valueChangeClass) {
         return valueChangeClass.getSimpleName();
     }
 
-    private Class<? extends Change> decode(String changeType){
-        if (!changeTypeMap.containsKey(changeType)) {
-            throw new JaversException(JaversExceptionCode.MALFORMED_CHANGE_TYPE_FIELD, changeType);
+    Class<? extends Change> decodeChangeType(JsonObject jsonObject){
+        String changeTypeField = jsonObject.get(CHANGE_TYPE_FIELD).getAsString();
+        if (!changeTypeMap.containsKey(changeTypeField)) {
+            throw new JaversException(JaversExceptionCode.MALFORMED_CHANGE_TYPE_FIELD, changeTypeField);
         }
-        return changeTypeMap.get(changeType);
+        return changeTypeMap.get(changeTypeField);
     }
 }

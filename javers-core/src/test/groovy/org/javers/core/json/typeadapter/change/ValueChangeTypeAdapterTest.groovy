@@ -9,17 +9,20 @@ import org.javers.core.diff.changetype.InitialValueChange
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
 import org.javers.core.model.DummyUser
+import spock.lang.Unroll
+
 import java.time.LocalDate
 import java.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.json.builder.ChangeTestBuilder.initialValueChange
+import static org.javers.core.json.builder.ChangeTestBuilder.terminalValueChange
 import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
 import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 
 /**
- * //TODO support for {@link InitialValueChange}
  * @author bartosz walacik
  */
 class ValueChangeTypeAdapterTest extends Specification {
@@ -40,6 +43,40 @@ class ValueChangeTypeAdapterTest extends Specification {
         json.left == true
         json.right == false
         json.propertyChangeType == 'PROPERTY_VALUE_CHANGED'
+    }
+
+    @Unroll
+    def "should serialize and deserialize #changeType" () {
+        given:
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
+
+        when:
+        def jsonText = jsonConverter.toJson(change)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.property == "flag"
+        json.changeType == changeType
+        json.globalId
+        json.left == change.left
+        json.right == change.right
+        json.propertyChangeType == 'PROPERTY_VALUE_CHANGED'
+
+        when:
+        ValueChange deserializedChange  = jsonConverter.fromJson(json.toString(),Change)
+
+        then:
+        deserializedChange.class.simpleName == changeType
+        deserializedChange.affectedGlobalId == change.affectedGlobalId
+        deserializedChange.left == change.left
+        deserializedChange.right == change.right
+        deserializedChange.propertyName == change.propertyName
+        deserializedChange.changeType == change.changeType
+
+        where:
+        changeType << ['InitialValueChange', 'TerminalValueChange']
+        change << [initialValueChange(new DummyUser(name:"kaz"),"flag",true),
+                   terminalValueChange(new DummyUser(name:"kaz"),"flag",true)]
     }
 
     def "should deserialize ValueChange"() {
