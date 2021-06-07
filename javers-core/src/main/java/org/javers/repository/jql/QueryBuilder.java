@@ -483,6 +483,19 @@ public class QueryBuilder {
     }
 
     /**
+     * Only snapshots with a given commit property partially containing a String value.
+     <br/><br/>
+     *
+     * If this method is called multiple times,
+     * <b>all</b> given properties must match with persisted commit properties.
+     */
+    public QueryBuilder withCommitPropertyLike(String name, String value){
+        Validate.argumentsAreNotNull(name, value);
+        queryParamsBuilder.commitPropertyLike(name, value);
+        return this;
+    }
+
+    /**
      * Only snapshots with a given version.
      */
     public QueryBuilder withVersion(long version) {

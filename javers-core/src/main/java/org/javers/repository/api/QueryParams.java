@@ -30,13 +30,14 @@ public class QueryParams {
     private final Long version;
     private final String author;
     private final Map<String, String> commitProperties;
+    private final Map<String, String> commitPropertiesLike;
     private final boolean aggregate;
     private final Set<String> changedProperties;
     private final SnapshotType snapshotType;
     private final boolean loadCommitProps;
     private final Integer snapshotQueryLimit;
 
-    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps, Integer snapshotQueryLimit) {
+    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, Map<String,String> commitPropertiesLike, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps, Integer snapshotQueryLimit) {
         this.snapshotQueryLimit = snapshotQueryLimit;
         this.limit = limit;
         this.skip = skip;
@@ -50,7 +51,7 @@ public class QueryParams {
         this.commitProperties = Collections.unmodifiableMap(commitProperties);
         this.aggregate = aggregate;
         this.changedProperties = Collections.unmodifiableSet(changedProperties);
-
+        this.commitPropertiesLike = Collections.unmodifiableMap(commitPropertiesLike);
         this.toCommitId = toCommitId;
         this.snapshotType = snapshotType;
         this.loadCommitProps = loadCommitProps;
@@ -136,6 +137,14 @@ public class QueryParams {
     public Map<String, String> commitProperties() {
         return commitProperties != null ?
                 commitProperties : Collections.emptyMap();
+    }
+
+    /**
+     * @see QueryBuilder#withCommitPropertyLike/(String, String)
+     */
+    public Map<String, String> commitPropertiesLike() {
+        return commitPropertiesLike != null ?
+            commitPropertiesLike : Collections.emptyMap();
     }
 
     /**
