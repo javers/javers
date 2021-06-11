@@ -13,8 +13,6 @@ import org.slf4j.Logger;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.stream.Collectors;
-
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -153,6 +151,10 @@ public class ReflectionUtil {
 
     private static boolean isPrivate(Member member){
         return Modifier.isPrivate(member.getModifiers());
+    }
+
+    static boolean isNotStatic(Member member) {
+        return !Modifier.isStatic(member.getModifiers());
     }
 
     private static boolean isProtected(Member member){
