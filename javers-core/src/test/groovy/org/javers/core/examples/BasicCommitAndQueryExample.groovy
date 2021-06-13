@@ -36,7 +36,7 @@ class BasicCommitAndQueryExample extends Specification {
         shadows.forEach { println it.get() }
 
         then: "there should be two Bob's Shadows"
-        assert shadows.size == 2
+        assert shadows.size() == 2
 
         when:
         println "Snapshots query:"
@@ -46,7 +46,7 @@ class BasicCommitAndQueryExample extends Specification {
         snapshots.forEach { println it }
 
         then: "there should be two Bob's Shadows"
-        assert snapshots.size == 2
+        assert snapshots.size() == 2
 
         when:
         println "Changes query:"

@@ -18,7 +18,7 @@ class AtomicTypeAdapterTest extends Specification {
         def jsonConverter = javersTestAssemblyTypeSafe().jsonConverter
 
         when:
-        def jsonText = jsonConverter.toJson(new Atomic(new LocalDate(2000, 1, 1)))
+        def jsonText = jsonConverter.toJson(new Atomic(LocalDate.of(2000, 1, 1)))
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -31,7 +31,7 @@ class AtomicTypeAdapterTest extends Specification {
         def jsonConverter = javersTestAssembly().jsonConverter
 
         when:
-        def jsonText = jsonConverter.toJson(new Atomic(new LocalDate(2000, 1, 1)))
+        def jsonText = jsonConverter.toJson(new Atomic(LocalDate.of(2000, 1, 1)))
 
         then:
         jsonText == '"2000-01-01"'

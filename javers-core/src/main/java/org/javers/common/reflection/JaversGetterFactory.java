@@ -1,5 +1,6 @@
 package org.javers.common.reflection;
 
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 import java.lang.reflect.Modifier;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import static org.javers.common.reflection.ReflectionUtil.isNotStatic;
 
 /**
  * @author bartosz walacik
@@ -81,10 +84,6 @@ class JaversGetterFactory {
 
     private static boolean returnsSomething(Method rawMethod) {
         return rawMethod.getGenericReturnType() != void.class;
-    }
-
-    private static boolean isNotStatic(Method rawMethod) {
-        return !Modifier.isStatic(rawMethod.getModifiers());
     }
 
     private static boolean isNotNative(Method rawMethod) {

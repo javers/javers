@@ -5,6 +5,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.javers.common.reflection.ReflectionUtil.isNotStatic;
+
 /**
  * @author bartosz walacik
  */
@@ -25,7 +27,9 @@ class JaversFieldFactory {
             context.addTypeSubstitutions(clazz);
 
             for (Field f : clazz.getDeclaredFields()){
-                fields.add(createJField(f,context));
+                if (isNotStatic(f)) {
+                    fields.add(createJField(f, context));
+                }
             }
 
             clazz = clazz.getSuperclass();

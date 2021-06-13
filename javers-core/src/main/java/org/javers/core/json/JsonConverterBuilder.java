@@ -5,11 +5,10 @@ import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.java8support.Java8TypeAdapters;
+import org.javers.java8support.OptionalTypeAdapter;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -22,13 +21,13 @@ public class JsonConverterBuilder {
     private boolean typeSafeValues = false;
     private boolean prettyPrint;
     private final GsonBuilder gsonBuilder;
-    private final List<Class> builtInValueTypes = new ArrayList<>();
 
     public JsonConverterBuilder() {
         this.gsonBuilder = new GsonBuilder();
         this.gsonBuilder.setExclusionStrategies(new SkipFieldExclusionStrategy());
         registerBuiltInAdapters(Java8TypeAdapters.adapters());
-        registerBuiltInAdapters(UtilTypeCoreAdapters.adapters());
+        registerBuiltInAdapters((List)UtilTypeCoreAdapters.adapters());
+        registerJsonAdvancedTypeAdapter(new OptionalTypeAdapter());
     }
 
     /**
@@ -143,10 +142,6 @@ public class JsonConverterBuilder {
         return this;
     }
 
-    public List<Class> getBuiltInValueTypes() {
-        return Collections.unmodifiableList(builtInValueTypes);
-    }
-
     public JsonConverter build() {
         registerBuiltInAdapter(new AtomicTypeAdapter(typeSafeValues));
 
@@ -175,10 +170,7 @@ public class JsonConverterBuilder {
     }
 
     private void registerBuiltInAdapter(final JsonTypeAdapter adapter) {
-        adapter.getValueTypes().forEach( c -> {
-            builtInValueTypes.add((Class) c);
-            registerJsonTypeAdapterForType((Class) c, adapter);
-        });
+        adapter.getValueTypes().forEach( c -> registerJsonTypeAdapterForType((Class) c, adapter));
     }
 
     private static class SkipFieldExclusionStrategy implements ExclusionStrategy {

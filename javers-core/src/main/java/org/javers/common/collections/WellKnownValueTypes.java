@@ -26,18 +26,18 @@ public class WellKnownValueTypes {
             Number.class
     );
 
-    public static List<Class<?>> getValueTypes() {
+    public static List<Class<?>> getOldGoodValueTypes() {
         return java.util.Collections.unmodifiableList(VALUE_TYPES);
     }
 
-    public static boolean isValueType(Object object) {
+    public static boolean isOldGoodValueType(Object object) {
         if (object == null) {
             return false;
         }
-        return  isValueType(object.getClass());
+        return  isOldGoodValueType(object.getClass());
     }
 
-    private static boolean isValueType(Class clazz) {
+    private static boolean isOldGoodValueType(Class clazz) {
         return ReflectionUtil.isAssignableFromAny(clazz, VALUE_TYPES);
     }
 }

@@ -141,7 +141,7 @@ class ValueChangeTypeAdapterTest extends Specification {
 
         then:
         change.left == null
-        change.right == new LocalDate(2001,1,1)
+        change.right == LocalDate.of(2001,1,1)
     }
 
 

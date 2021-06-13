@@ -15,6 +15,12 @@ public class ValueDefinition extends ClientsClassDefinition {
         super(clazz);
     }
 
+    public ValueDefinition(Class<?> clazz, CustomValueComparator customValueComparator) {
+        super(clazz);
+        this.customValueComparator = customValueComparator;
+    }
+
+    @Deprecated
     public void setCustomValueComparator(CustomValueComparator customValueComparator) {
         this.customValueComparator = customValueComparator;
     }

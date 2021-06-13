@@ -128,15 +128,15 @@ class SnapshotDifferIntegrationTest extends Specification {
         propertyType <<  ["Primitive", "Value", "Entity"]
         propertyName <<  ["listOfIntegers",  "listOfDates",  "listOfEntities"]
         oldCdo       <<  [new SnapshotEntity(listOfIntegers:      [1, 2]),
-                          new SnapshotEntity(listOfDates:         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
+                          new SnapshotEntity(listOfDates:         [LocalDate.of(2000, 1, 1), LocalDate.of(2002, 1, 1)]),
                           new SnapshotEntity(listOfEntities:      [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
                          ]
         newCdo       <<  [new SnapshotEntity(listOfIntegers:      [5, 2]),
-                          new SnapshotEntity(listOfDates:         [new LocalDate(2002, 2, 2), new LocalDate(2002, 1, 1)]),
+                          new SnapshotEntity(listOfDates:         [LocalDate.of(2002, 2, 2), LocalDate.of(2002, 1, 1)]),
                           new SnapshotEntity(listOfEntities:      [new SnapshotEntity(id:5), new SnapshotEntity(id:3)]),
                          ]
-        expectedLeftValue <<  [1, new LocalDate(2000, 1, 1), instanceId(2,SnapshotEntity)]
-        expectedRightValue << [5, new LocalDate(2002, 2, 2), instanceId(5,SnapshotEntity)]
+        expectedLeftValue <<  [1, LocalDate.of(2000, 1, 1), instanceId(2,SnapshotEntity)]
+        expectedRightValue << [5, LocalDate.of(2002, 2, 2), instanceId(5,SnapshotEntity)]
     }
 
 }

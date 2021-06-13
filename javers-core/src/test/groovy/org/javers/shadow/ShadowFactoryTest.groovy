@@ -95,9 +95,9 @@ abstract class ShadowFactoryTest extends Specification {
                  v2.arrayOfIntegers = [1,2]
                  v2.arrayOfDates = [now()] * 2
                  v2.setOfIntegers = [1,2] as Set
-                 v2.setOfDates = [now(), new LocalDate(2017,1,1)] as Set
+                 v2.setOfDates = [now(), LocalDate.of(2017,1,1)] as Set
                  v2.listOfIntegers = [1,2]
-                 v2.listOfDates = [now(), new LocalDate(2017,1,1)]
+                 v2.listOfDates = [now(), LocalDate.of(2017,1,1)]
                  v2.optionalDate = Optional.of(now())
                  v2.optionalInteger = Optional.of(1)
                  v2.mapOfPrimitives = ['a':1, 'b':2]
@@ -348,7 +348,7 @@ abstract class ShadowFactoryTest extends Specification {
 
     def "should not break on polymorfic Collection"() {
       given:
-      def cdo = new SnapshotEntity(id: 1, polymorficList: [new LocalDate(2017,1,1), new LocalDate(2017,1,2) ])
+      def cdo = new SnapshotEntity(id: 1, polymorficList: [LocalDate.of(2017,1,1), LocalDate.of(2017,1,2) ])
       javers.commit("author", cdo)
       def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())[0]
       //serialize & deserialize

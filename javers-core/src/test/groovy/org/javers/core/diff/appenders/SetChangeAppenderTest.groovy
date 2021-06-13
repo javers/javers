@@ -79,8 +79,8 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append ValueAdded in field of Values"() {
         given:
-        def leftCdo = new SnapshotEntity("$dateFieldName": [new LocalDate(2001, 1, 1)])
-        def rightCdo = new SnapshotEntity("$dateFieldName": [new LocalDate(2001, 5, 5), new LocalDate(2001, 1, 1)])
+        def leftCdo = new SnapshotEntity("$dateFieldName": [LocalDate.of(2001, 1, 1)])
+        def rightCdo = new SnapshotEntity("$dateFieldName": [LocalDate.of(2001, 5, 5), LocalDate.of(2001, 1, 1)])
 
         when:
         def change = setChangeAppender
@@ -89,14 +89,14 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasValueAdded(new LocalDate(2001, 5, 5))
+                .hasValueAdded(LocalDate.of(2001, 5, 5))
 
     }
 
     def "should append ValueRemoved in field of Values"() {
         given:
-        def leftCdo = new SnapshotEntity("$dateFieldName": [new LocalDate(2001, 5, 5), new LocalDate(2001, 1, 1)])
-        def rightCdo = new SnapshotEntity("$dateFieldName": [new LocalDate(2001, 1, 1)])
+        def leftCdo = new SnapshotEntity("$dateFieldName": [LocalDate.of(2001, 5, 5), LocalDate.of(2001, 1, 1)])
+        def rightCdo = new SnapshotEntity("$dateFieldName": [LocalDate.of(2001, 1, 1)])
 
         when:
         def change = setChangeAppender
@@ -105,7 +105,7 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasValueRemoved(new LocalDate(2001, 5, 5))
+                .hasValueRemoved(LocalDate.of(2001, 5, 5))
 
     }
 
