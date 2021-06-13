@@ -8,9 +8,13 @@ import org.javers.core.Javers
 import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
+import org.javers.core.examples.model.Address
 import org.javers.core.json.typeadapter.commit.CdoSnapshotStateTypeAdapter
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
+import org.javers.core.metamodel.annotation.Entity
+import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.object.CdoSnapshot
+import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
@@ -19,6 +23,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
@@ -512,5 +517,36 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         111111111111L | Long
         1.0           | Double
         'a'           | String
+    }
+
+    class WithOptional {
+        Optional<BigDecimal> num
+        Optional<String> str
+        Optional<String> str2
+        Optional<LocalDate> date
+        Optional<Address> address
+    }
+
+    def "should serialize and deserialize Optional properties" () {
+        given:
+        def vo = new WithOptional(
+                num: Optional.of(1.1),
+                str: Optional.of("a"),
+                str2: Optional.empty(),
+                date: Optional.of(LocalDate.of(2001,2,4)),
+                address: Optional.of(new Address("city A"))
+        )
+
+        when:
+        def jsonText = toJson(vo)
+        CdoSnapshot deserialized = fromJson(jsonText)
+
+        then:
+        deserialized.state.getPropertyValue("num") == Optional.of(1.1)
+        deserialized.state.getPropertyValue("str") == Optional.of("a")
+        deserialized.state.getPropertyValue("str2") == Optional.empty()
+        deserialized.state.getPropertyValue("date").get() instanceof LocalDate
+        deserialized.state.getPropertyValue("date") == Optional.of(LocalDate.of(2001,2,4))
+        deserialized.state.getPropertyValue("address").get() instanceof ValueObjectId
     }
 }

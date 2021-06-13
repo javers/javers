@@ -6,6 +6,7 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 
 import java.io.Reader;
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -51,6 +52,9 @@ public class JsonConverter {
     }
 
     public String toJson(Object value) {
+        if (value instanceof Optional) {
+            System.out.printf(value.toString());
+        }
         return gson.toJson(value);
     }
 
@@ -66,12 +70,12 @@ public class JsonConverter {
         return gson.fromJson(json, expectedType);
     }
 
-    public JsonElement fromJsonToJsonElement(String json){
-        return gson.fromJson(json, JsonElement.class);
-    }
-
     public <T> T fromJson(JsonElement json, Class<T> expectedType) {
         return gson.fromJson(json, expectedType);
+    }
+
+    public JsonElement fromJsonToJsonElement(String json){
+        return gson.fromJson(json, JsonElement.class);
     }
 
     public <T> T fromJson(Reader reader, Type expectedType) {

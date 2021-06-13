@@ -32,9 +32,9 @@ class MapChangeTypeAdapterTest extends Specification {
     def "should serialize polymorfic MapChange type-safely when switched on" () {
         when:
         def jsonConverterTypeSafe = javersTestAssemblyTypeSafe().jsonConverter
-        def entryChanges = [new EntryAdded("some",new LocalDate(2001,1,1)),
-                            new EntryRemoved("some",new LocalDate(2002,1,1)),
-                            new EntryValueChange(new LocalDate(2003,1,1), new LocalDate(2004,1,1), new LocalDate(2005,1,1))]
+        def entryChanges = [new EntryAdded("some", LocalDate.of(2001,1,1)),
+                            new EntryRemoved("some", LocalDate.of(2002,1,1)),
+                            new EntryValueChange(LocalDate.of(2003,1,1), LocalDate.of(2004,1,1), LocalDate.of(2005,1,1))]
 
         MapChange change = mapChange(new SnapshotEntity(id:1),"polymorficMap",entryChanges)
 
@@ -69,7 +69,7 @@ class MapChangeTypeAdapterTest extends Specification {
 
     def "should serialize MapChange.EntryValueChange with Values using custom TypeAdapter" () {
         given:
-        def entryChanges = [new EntryValueChange(new LocalDate(2001,1,1), 1.12,1.13)]
+        def entryChanges = [new EntryValueChange(LocalDate.of(2001,1,1), 1.12,1.13)]
         def change = mapChange(new SnapshotEntity(id:1),"mapOfValues",entryChanges)
 
         when:
@@ -117,7 +117,7 @@ class MapChangeTypeAdapterTest extends Specification {
 
         then:
         MapChangeAssert.assertThat(change)
-                       .hasEntryValueChange(new LocalDate(2001,1,1), 1.12, 1.13)
+                       .hasEntryValueChange(LocalDate.of(2001,1,1), 1.12, 1.13)
     }
     def "should serialize MapChange.EntryValueChange with references" () {
         given:

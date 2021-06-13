@@ -153,7 +153,7 @@ class SnapshotFactoryTest extends Specification{
         propertyType << ["Primitive", "Value"]
         propertyName << ["intProperty","dob"]
         cdo <<          [new SnapshotEntity(intProperty: 5),
-                         new SnapshotEntity(dob: new LocalDate(2000,1,1))]
+                         new SnapshotEntity(dob: LocalDate.of(2000,1,1))]
     }
 
     @Unroll
@@ -199,13 +199,13 @@ class SnapshotFactoryTest extends Specification{
         propertyType <<  ["Primitive", "Value", "Entity", "ValueObject"]
         propertyName <<  ["optionalInteger", "optionalDate", "optionalEntity", "optionalValueObject"]
         cdo << [new SnapshotEntity(optionalInteger: Optional.of(1)),
-                new SnapshotEntity(optionalDate: Optional.of(new LocalDate(2000, 1, 1))),
+                new SnapshotEntity(optionalDate: Optional.of(LocalDate.of(2000, 1, 1))),
                 new SnapshotEntity(optionalEntity: Optional.of(new SnapshotEntity(id:5))),
                 new SnapshotEntity(optionalValueObject: Optional.of(new DummyAddress("London")))
         ]
         expectedVal <<[
                 Optional.of(1),
-                Optional.of(new LocalDate(2000, 1, 1)),
+                Optional.of(LocalDate.of(2000, 1, 1)),
                 Optional.of(instanceId(5, SnapshotEntity)),
                 Optional.of(valueObjectId(1, SnapshotEntity,"optionalValueObject"))
         ]
@@ -236,23 +236,23 @@ class SnapshotFactoryTest extends Specification{
         cdo << [
                 new SnapshotEntity(arrayOfInts:         [1, 2]),
                 new SnapshotEntity(arrayOfIntegers:     [1, 2]),
-                new SnapshotEntity(arrayOfDates:        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
+                new SnapshotEntity(arrayOfDates:        [LocalDate.of(2000, 1, 1), LocalDate.of(2002, 1, 1)]),
                 new SnapshotEntity(arrayOfEntities:     [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
                 new SnapshotEntity(arrayOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")]),
                 new SnapshotEntity(listOfIntegers:      [1, 2]),
-                new SnapshotEntity(listOfDates:         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
+                new SnapshotEntity(listOfDates:         [LocalDate.of(2000, 1, 1), LocalDate.of(2002, 1, 1)]),
                 new SnapshotEntity(listOfEntities:      [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
                 new SnapshotEntity(listOfValueObjects:  [new DummyAddress("London"), new DummyAddress("London City")])
         ]
         expectedVal << [
                 [1, 2],
                 [1, 2],
-                [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
+                [LocalDate.of(2000, 1, 1), LocalDate.of(2002, 1, 1)],
                 [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
                 [valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/0"),
                  valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/1")] ,
                 [1, 2],
-                [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
+                [LocalDate.of(2000, 1, 1), LocalDate.of(2002, 1, 1)],
                 [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
                 [valueObjectId(1, SnapshotEntity,"listOfValueObjects/0"),
                  valueObjectId(1, SnapshotEntity,"listOfValueObjects/1")]
@@ -277,13 +277,13 @@ class SnapshotFactoryTest extends Specification{
         propertyName << ["setOfIntegers", "setOfDates", "setOfEntities", "setOfValueObjects"]
         cdo << [
                 new SnapshotEntity(setOfIntegers:     [1, 2]),
-                new SnapshotEntity(setOfDates:        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
+                new SnapshotEntity(setOfDates:        [LocalDate.of(2000, 1, 1), LocalDate.of(2002, 1, 1)]),
                 new SnapshotEntity(setOfEntities:     [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
                 new SnapshotEntity(setOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
         ]
         expectedVal << [
                 [1, 2] as Set,
-                [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
+                [LocalDate.of(2000, 1, 1), LocalDate.of(2002, 1, 1)] as Set,
                 [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
                 [valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London")),
                  valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London City"))] as Set
@@ -315,14 +315,14 @@ class SnapshotFactoryTest extends Specification{
         enrtyType <<    ["<Primitive,Primitive>", "<Value,Value>", "<Primitive,ValueObject>", "<Entity,Entity>"]
         propertyName << ["mapOfPrimitives",       "mapOfValues",   "mapPrimitiveToVO",        "mapOfEntities"]
         cdo << [new SnapshotEntity(mapOfPrimitives:  ["this":1,"that":2]),
-                new SnapshotEntity(mapOfValues:      [(new LocalDate(2000, 1, 1)):1.5]),
+                new SnapshotEntity(mapOfValues:      [(LocalDate.of(2000, 1, 1)):1.5]),
                 new SnapshotEntity(mapPrimitiveToVO: ["key1":new DummyAddress("London")]),
                 new SnapshotEntity(mapOfEntities:    [(new SnapshotEntity(id:2)):new SnapshotEntity(id:3)])
         ]
 
         expectedVal << [
                         ["this":1,"that":2],
-                        [(new LocalDate(2000, 1, 1)):1.5],
+                        [(LocalDate.of(2000, 1, 1)):1.5],
                         ["key1":valueObjectId(1, SnapshotEntity,"mapPrimitiveToVO/key1")],
                         [(javers.instanceId(2,SnapshotEntity)):
                           javers.instanceId(3,SnapshotEntity)]

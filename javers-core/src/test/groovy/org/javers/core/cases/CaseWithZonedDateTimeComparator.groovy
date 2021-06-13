@@ -11,6 +11,7 @@ class CaseWithZonedDateTimeComparator extends Specification {
         ZonedDateTime zonedDateTime
     }
 
+    // !!Priorities!!
     def "should used customValueComparator for ZonedDateTime" () {
         given:
         def javers = JaversBuilder

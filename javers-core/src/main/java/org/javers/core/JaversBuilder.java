@@ -160,7 +160,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new TypeMapperModule(getContainer()));
 
         // boot JSON beans & domain aware typeAdapters
-        additionalTypes.addAll( bootJsonConverter() );
+        bootJsonConverter();
 
         bootDateTimeProvider();
 
@@ -257,6 +257,12 @@ public class JaversBuilder extends AbstractContainerBuilder {
     public JaversBuilder registerType(ClientsClassDefinition clientsClassDefinition) {
         argumentIsNotNull(clientsClassDefinition);
         clientsClassDefinitions.put(clientsClassDefinition.getBaseJavaClass(), clientsClassDefinition);
+        return this;
+    }
+
+    public JaversBuilder registerTypes(Collection<ClientsClassDefinition> clientsClassDefinitions) {
+        argumentIsNotNull(clientsClassDefinitions);
+        clientsClassDefinitions.forEach(it -> registerType(it));
         return this;
     }
 
@@ -410,13 +416,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public <T> JaversBuilder registerValue(Class<T> valueClass, CustomValueComparator<T> customValueComparator) {
         argumentsAreNotNull(valueClass, customValueComparator);
-
-        if (!clientsClassDefinitions.containsKey(valueClass)){
-            registerType(new ValueDefinition(valueClass));
-        }
-        ValueDefinition def = getClassDefinition(valueClass);
-        def.setCustomValueComparator(customValueComparator);
-
+        registerType(new ValueDefinition(valueClass, customValueComparator));
         return this;
     }
 
@@ -873,7 +873,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     /**
      * boots JsonConverter and registers domain aware typeAdapters
      */
-    private Collection<JaversType> bootJsonConverter() {
+    private void bootJsonConverter() {
         JsonConverterBuilder jsonConverterBuilder = jsonConverterBuilder();
         jsonConverterBuilder.prettyPrint(coreConfiguration().isPrettyPrint());
 
@@ -888,8 +888,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
         jsonConverterBuilder.registerNativeGsonDeserializer(Diff.class, new DiffTypeDeserializer());
         JsonConverter jsonConverter = jsonConverterBuilder.build();
         addComponent(jsonConverter);
-
-        return Lists.transform(jsonConverterBuilder.getBuiltInValueTypes(), c -> new ValueType(c));
     }
 
     private void bootDateTimeProvider() {

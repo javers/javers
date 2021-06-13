@@ -7,6 +7,8 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.ListCompareAlgorithm;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
+import org.javers.java8support.Java8TypeAdapters;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -49,9 +51,15 @@ class TypeMapperEngine {
         registerCoreType(new ArrayType(Object[].class));
 
         //well known Value types
-        for (Class valueType : WellKnownValueTypes.getValueTypes()) {
+        for (Class valueType : WellKnownValueTypes.getOldGoodValueTypes()) {
             registerCoreType(new ValueType(valueType));
         }
+
+        //java util and sql types
+        registerCoreTypes((List) UtilTypeCoreAdapters.valueTypes());
+
+        //java time types
+        registerCoreTypes((List) Java8TypeAdapters.valueTypes());
 
         //Collections
         registerCoreType(new CollectionType(Collection.class));
@@ -73,6 +81,10 @@ class TypeMapperEngine {
 
     private void registerCoreType(JaversType jType) {
         putIfAbsent(jType.getBaseJavaType(), jType);
+    }
+
+    private void registerCoreTypes(Collection<JaversType> jTypes) {
+        jTypes.forEach(t -> registerCoreType(t));
     }
 
     JaversType computeIfAbsent(Type javaType, Function<Type, JaversType> computeFunction) {

@@ -1,12 +1,15 @@
 package org.javers.core.json.typeadapter.util;
 
 import org.javers.common.collections.Lists;
+import org.javers.core.json.BasicStringTypeAdapter;
 import org.javers.core.json.JsonTypeAdapter;
+import org.javers.core.metamodel.type.ValueType;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author bartosz.walacik
@@ -69,7 +72,7 @@ public class UtilTypeCoreAdapters {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public static List<JsonTypeAdapter> adapters() {
+    public static List<BasicStringTypeAdapter> adapters() {
         return (List) Lists.immutableListOf(
                 new JavaUtilDateTypeAdapter(),
                 new JavaSqlDateTypeAdapter(),
@@ -78,5 +81,12 @@ public class UtilTypeCoreAdapters {
                 new FileTypeAdapter(),
                 new UUIDTypeAdapter()
         );
+    }
+
+    public static List<ValueType> valueTypes() {
+        return adapters()
+                .stream()
+                .map(c -> new ValueType(c.getValueType()))
+                .collect(Collectors.toList());
     }
 }

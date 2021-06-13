@@ -529,8 +529,8 @@ class JqlExample extends Specification {
 
       when:
       def query = QueryBuilder.byInstanceId("bob", Employee.class)
-              .from(new LocalDate(2016,01,1))
-              .to  (new LocalDate(2018,01,1)).build()
+              .from(LocalDate.of(2016,01,1))
+              .to  (LocalDate.of(2018,01,1)).build()
       Changes changes = javers.findChanges( query )
 
       then:

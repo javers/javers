@@ -584,8 +584,8 @@ class JaversRepositoryE2ETest extends Specification {
         def cdo = new SnapshotEntity(id: 1,
                                      entityRef: ref,
                                      arrayOfIntegers: [1,2],
-                                     listOfDates: [new LocalDate(2001,1,1), new LocalDate(2001,1,2)],
-                                     mapOfValues: [(new LocalDate(2001,1,1)):1.1],
+                                     listOfDates: [LocalDate.of(2001,1,1), LocalDate.of(2001,1,2)],
+                                     mapOfValues: [(LocalDate.of(2001,1,1)):1.1],
                                      mapOfGenericValues: [("enumSet"):EnumSet.of(DummyEnum.val1, DummyEnum.val2)])
         javers.commit("author", cdo) //v. 1
         cdo.intProperty = 5
@@ -603,8 +603,8 @@ class JaversRepositoryE2ETest extends Specification {
         snapshot.getPropertyValue('id') == 1
         snapshot.getPropertyValue('entityRef') == refId
         snapshot.getPropertyValue('arrayOfIntegers') == [1,2]
-        snapshot.getPropertyValue('listOfDates') == [new LocalDate(2001,1,1), new LocalDate(2001,1,2)]
-        snapshot.getPropertyValue('mapOfValues') == [(new LocalDate(2001,1,1)):1.1]
+        snapshot.getPropertyValue('listOfDates') == [LocalDate.of(2001,1,1), LocalDate.of(2001,1,2)]
+        snapshot.getPropertyValue('mapOfValues') == [(LocalDate.of(2001,1,1)):1.1]
         snapshot.getPropertyValue('intProperty') == 5
         snapshot.getPropertyValue('mapOfGenericValues') == [("enumSet"):EnumSet.of(DummyEnum.val1, DummyEnum.val2)]
 

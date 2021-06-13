@@ -43,7 +43,7 @@ public class ValueType extends PrimitiveOrValueType {
         super(baseJavaType);
     }
 
-    ValueType(Type baseJavaType, CustomValueComparator customValueComparator) {
+    public ValueType(Type baseJavaType, CustomValueComparator customValueComparator) {
         super(baseJavaType, customValueComparator);
     }
 
@@ -57,7 +57,12 @@ public class ValueType extends PrimitiveOrValueType {
             return getValueComparator().toString(value);
         }
 
-        if (WellKnownValueTypes.isValueType(value)){
+        if (WellKnownValueTypes.isOldGoodValueType(value)){
+            return value.toString();
+        }
+
+        //since java 16 we can't access core java classes with reflection
+        if (value.getClass().getPackage().getName().startsWith("java")) {
             return value.toString();
         }
 

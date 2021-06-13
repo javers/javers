@@ -33,7 +33,7 @@ class ValueTypeTest extends Specification {
         calculateToString(new BigDecimal(12.2).setScale(1, HALF_UP)) == "12.2"
 
         // java core library class
-        calculateToString(LocalDate.of(2019,02,01)) == "2019,2,1"
+        calculateToString(LocalDate.of(2019,02,13)) == "2019,2,13"
         calculateToString(LocalTime.of(1,2,3)) == "1,2,3,0"
         calculateToString(LocalDateTime.of(2019,02,01,1,2,3)) == "2019-02-01,01:02:03"
         calculateToString(Year.of(2019)) == "2019"
@@ -43,6 +43,7 @@ class ValueTypeTest extends Specification {
         calculateToString(Instant.parse("1980-04-09T10:15:30.00Z")) == "324123330,0"
         calculateToString(Period.between(LocalDate.of(2014, 1, 1), LocalDate.of(2015, 3, 7))) == "1,2,6"
         calculateToString(Duration.ofSeconds(6005)) == "6005,0"
+        calculateToString(Duration.ofHours(3)) == "10800,0"
     }
 
     String calculateToString(def val) {

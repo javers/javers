@@ -160,9 +160,9 @@ class ContainerChangeTypeAdapterTest extends Specification{
             def javers = javersTestAssembly()
             def cdo = new SnapshotEntity(id:1)
 
-            def elementChanges = [new ElementValueChange(1, new LocalDate(2001,1,1), new LocalDate(2001,1,2)),
-                                  new ValueAdded  (2,new LocalDate(2001,1,3)),
-                                  new ValueRemoved(3,new LocalDate(2001,1,4))]
+            def elementChanges = [new ElementValueChange(1, LocalDate.of(2001,1,1), LocalDate.of(2001,1,2)),
+                                  new ValueAdded  (2,LocalDate.of(2001,1,3)),
+                                  new ValueRemoved(3,LocalDate.of(2001,1,4))]
 
             def change = changeType.newInstance(createMetadata(cdo, propertyName), elementChanges)
 
@@ -257,8 +257,8 @@ class ContainerChangeTypeAdapterTest extends Specification{
         where:
         val1given    << [10]*2 + ["2001-01-10"]*2
         val2given    << [11]*2 + ["2001-01-11"]*2
-        val1expected << [10]*2 + [new LocalDate(2001,1,10)]*2
-        val2expected << [11]*2 + [new LocalDate(2001,1,11)]*2
+        val1expected << [10]*2 + [LocalDate.of(2001,1,10)]*2
+        val2expected << [11]*2 + [LocalDate.of(2001,1,11)]*2
         javersType   << ["Primitives"]*2 + ["Values"]*2
         changeType_  << [ListChange, ArrayChange] * 2
         propertyName << ["listOfIntegers","arrayOfIntegers","listOfDates","arrayOfDates",]
