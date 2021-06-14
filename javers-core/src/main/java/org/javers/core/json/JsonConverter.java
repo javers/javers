@@ -6,7 +6,6 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.util.Optional;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
