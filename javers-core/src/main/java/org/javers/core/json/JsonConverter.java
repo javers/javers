@@ -52,9 +52,6 @@ public class JsonConverter {
     }
 
     public String toJson(Object value) {
-        if (value instanceof Optional) {
-            System.out.printf(value.toString());
-        }
         return gson.toJson(value);
     }
 
