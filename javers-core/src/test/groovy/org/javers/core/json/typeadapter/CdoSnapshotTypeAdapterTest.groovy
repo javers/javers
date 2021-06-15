@@ -23,6 +23,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -60,6 +61,36 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         json.globalId.cdoId == "kaz"
         json.type == "INITIAL"
         json.version == 1
+    }
+
+
+    class WithBigDecimal {
+        BigDecimal val
+    }
+
+    def "should serialize and deserialize BigDecimal with trailing zeros"(){
+        given:
+        def value = new BigDecimal(22).setScale(2, RoundingMode.HALF_UP)
+        def obj = new WithBigDecimal(val:value)
+        def snapshot = createSnapshot( obj )
+
+        println("value: ${value}")
+
+        when:
+        def jsonText = javers.jsonConverter.toJson(snapshot)
+        println("jsonText: ${jsonText}")
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        Objects.equals(json.state.val,
+                       new BigDecimal(22).setScale(2, RoundingMode.HALF_UP))
+
+        when:
+        def fromJson = fromJson(jsonText)
+
+        then:
+        Objects.equals(fromJson.getPropertyValue("val"),
+                       new BigDecimal(22).setScale(2, RoundingMode.HALF_UP))
     }
 
     def "should serialize state with primitive values in CdoSnapshot"() {
@@ -423,7 +454,6 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     }
 
     def "should deserialize Snapshot state with collections"() {
-
         given:
         def json = new JsonBuilder()
         def ids = [1, 2]
