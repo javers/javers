@@ -470,7 +470,7 @@ public class QueryBuilder {
 
     /**
      * Only snapshots with a given commit property.
-     * <br/><br/
+     * <br/><br/>
      *
      * If this method is called multiple times,
      * <b>all</b> given properties must match with persisted commit properties.
@@ -479,6 +479,20 @@ public class QueryBuilder {
     public QueryBuilder withCommitProperty(String name, String value) {
         Validate.argumentsAreNotNull(name, value);
         queryParamsBuilder.commitProperty(name, value);
+        return this;
+    }
+
+    /**
+     * Only snapshots with a given commit property, which value must be contained in the collection passed as parameter
+     * <br/><br/>
+     *
+     * If this method is called multiple times,
+     * <b>all</b> given properties must match with persisted commit properties.
+     */
+    public QueryBuilder withCommitPropertyIn(String name, Collection<String> value){
+        Validate.argumentsAreNotNull(name, value);
+        Validate.argumentCheck(!value.isEmpty(),"Argument should not be an empty list");
+        queryParamsBuilder.commitPropertyIn(name, value);
         return this;
     }
 
