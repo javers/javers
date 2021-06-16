@@ -332,4 +332,17 @@ class SnapshotFactoryTest extends Specification{
     def someCommitMetadata(){
         new CommitMetadata("kazik", [:], LocalDateTime.now(), null, new CommitId(1, 0))
     }
+
+    def "should create terminal snapshot when deleting an inexistent object from repository"() {
+        given:
+        def cdo = new SnapshotEntity(id:1)
+        def node = javers.createLiveNode(cdo)
+        def id = javers.instanceId(cdo)
+
+        when:
+        def snapshot = snapshotFactory.createTerminal(id, null, someCommitMetadata())
+
+        then:
+        snapshot.version == 1L
+    }
 }

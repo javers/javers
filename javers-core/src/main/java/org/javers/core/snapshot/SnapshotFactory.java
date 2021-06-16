@@ -35,7 +35,7 @@ public class SnapshotFactory {
                 .withManagedType(managedType)
                 .withCommitMetadata(commitMetadata)
                 .withType(TERMINAL)
-                .withVersion(previous.getVersion()+1)
+                .withVersion(previous != null ? (previous.getVersion() + 1) : 1)
                 .build();
     }
 

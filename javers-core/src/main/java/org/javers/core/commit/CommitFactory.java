@@ -53,9 +53,7 @@ public class CommitFactory {
         Optional<CdoSnapshot> previousSnapshot = javersRepository.getLatest(removedId);
 
         CommitMetadata commitMetadata = newCommitMetadata(author, properties);
-        CdoSnapshot terminalSnapshot = previousSnapshot
-                .map(prev -> snapshotFactory.createTerminal(removedId, prev, commitMetadata))
-                .orElseThrow(() -> new JaversException(JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND, removedId.value()));
+        CdoSnapshot terminalSnapshot = snapshotFactory.createTerminal(removedId, previousSnapshot.orElse(null), commitMetadata);
         Diff diff = diffFactory.singleTerminal(removedId, commitMetadata);
         return new Commit(commitMetadata, Lists.asList(terminalSnapshot), diff);
     }
