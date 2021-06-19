@@ -2,6 +2,7 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
+import org.javers.core.diff.changetype.Atomic;
 import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.type.*;
 
@@ -31,7 +32,8 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         if (!entryChanges.isEmpty()) {
             CollectionType setType = property.getType();
             renderNotParametrizedWarningIfNeeded(setType.getItemType(), "item", "Set", property);
-            return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges);
+            return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges,
+                new Atomic(toSet(leftValue)), new Atomic(toSet(rightValue)));
         } else {
             return null;
         }

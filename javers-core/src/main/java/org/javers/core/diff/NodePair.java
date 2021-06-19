@@ -49,11 +49,11 @@ public class NodePair {
     }
 
     public Object getLeftPropertyValue(Property property) {
-        return left.getPropertyValue(property);
+        return left == null? null : left.getPropertyValue(property);
     }
 
     public Object getRightPropertyValue(Property property) {
-        return right.getPropertyValue(property);
+        return right == null? null : right.getPropertyValue(property);
     }
 
     public GlobalId getRightReference(Property property) {

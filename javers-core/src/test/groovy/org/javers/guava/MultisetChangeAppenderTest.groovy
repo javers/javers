@@ -107,4 +107,29 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
         rightList << [[new DummyAddress(city: "New York"),
                        new DummyAddress(city: "New York")] ]
     }
+
+    def "should set left and right value in change"(){
+        given:
+        def leftNode = buildGraph(new SnapshotEntity(multiSetValueObject: HashMultiset.create(leftList)))
+        def rightNode = buildGraph(new SnapshotEntity(multiSetValueObject: HashMultiset.create(rightList)))
+
+        when:
+        def change = multisetChangeAppender()
+            .calculateChanges(new NodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetValueObject"))
+
+        then:
+        change.left.size() == 3
+        change.right.size() == 2
+        change.left.stream().anyMatch(a -> ((DummyAddress)a).city == "New York")
+        change.left.stream().anyMatch(a -> ((DummyAddress)a).city == "Buffalo")
+        change.right.stream().anyMatch(a -> ((DummyAddress)a).city == "New York")
+        change.right.stream().noneMatch(a -> ((DummyAddress)a).city == "Buffalo")
+
+        where:
+        leftList <<  [[new DummyAddress(city: "New York"),
+                       new DummyAddress(city: "New York"),
+                       new DummyAddress(city: "Buffalo")] ]
+        rightList << [[new DummyAddress(city: "New York"),
+                       new DummyAddress(city: "New York")] ]
+    }
 }
