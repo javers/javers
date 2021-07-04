@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -23,7 +24,8 @@ public class WellKnownValueTypes {
             URL.class,
             CharSequence.class,
             String.class,
-            Number.class
+            Number.class,
+            Locale.class
     );
 
     public static List<Class<?>> getOldGoodValueTypes() {
