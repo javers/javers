@@ -31,6 +31,7 @@ class ValueTypeTest extends Specification {
 
         // WellKnownValueTypes class - delegated to standard toString()
         calculateToString(new BigDecimal(12.2).setScale(1, HALF_UP)) == "12.2"
+        calculateToString(Locale.ENGLISH) == "en"
 
         // java core library class
         calculateToString(LocalDate.of(2019,02,13)) == "2019,2,13"
