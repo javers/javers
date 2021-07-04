@@ -295,6 +295,9 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             if (!params.commitProperties().isEmpty()) {
                 query = addCommitPropertiesFilter(query, params.commitProperties());
             }
+            if (!params.commitPropertiesLike().isEmpty()) {
+                query = addCommitPropertiesLikeFilter(query, params.commitPropertiesLike());
+            }
             if (params.changedProperties().size() > 0) {
                 query = Filters.and(query, Filters.or(params.changedProperties().stream()
                         .map(it -> new BasicDBObject(CHANGED_PROPERTIES, it)).collect(Collectors.toList())));
@@ -334,6 +337,16 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
                 new BasicDBObject("$elemMatch",
                         new BasicDBObject("key", commitProperty.getKey()).append(
                                           "value", commitProperty.getValue())))
+        ).collect(toImmutableList());
+        return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
+    }
+
+    private Bson addCommitPropertiesLikeFilter(Bson query, Map<String, String> commitProperties) {
+        List<Bson> propertyFilters = commitProperties.entrySet().stream().map( commitProperty ->
+                new BasicDBObject(COMMIT_PROPERTIES,
+                        new BasicDBObject("$elemMatch",
+                                new BasicDBObject("key", commitProperty.getKey())
+                                .append("value", new BasicDBObject("$regex",commitProperty.getValue()))))
         ).collect(toImmutableList());
         return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
     }

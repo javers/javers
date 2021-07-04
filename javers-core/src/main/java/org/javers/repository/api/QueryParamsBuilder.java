@@ -26,6 +26,7 @@ public class QueryParamsBuilder {
     private String author;
     private boolean aggregate;
     private Map<String, String> commitProperties = new HashMap<>();
+    private Map<String,String> commitPropertiesLike = new HashMap<>();
     private Set<String> changedProperties = new HashSet<>();
     private SnapshotType snapshotType;
     private boolean loadCommitProps = true;
@@ -45,6 +46,7 @@ public class QueryParamsBuilder {
         that.author().ifPresent((it -> copy.author(it)));
         copy.withChildValueObjects(that.isAggregate());
         copy.commitProperties = that.commitProperties();
+        copy.commitPropertiesLike = that.commitPropertiesLike();
         copy.changedProperties = that.changedProperties();
         that.snapshotType().ifPresent((it -> copy.withSnapshotType(it)));
         copy.loadCommitProps = that.isLoadCommitProps();
@@ -179,6 +181,14 @@ public class QueryParamsBuilder {
     }
 
     /**
+     * @see QueryBuilder#withCommitPropertyLike(String, String)
+     */
+    public QueryParamsBuilder commitPropertyLike(String name, String value) {
+        this.commitPropertiesLike.put(name, value);
+        return this;
+    }
+
+    /**
      * @see QueryBuilder#withVersion(long)
      */
     public QueryParamsBuilder version(Long version) {
@@ -215,6 +225,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
+        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, commitPropertiesLike, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
     }
 }
