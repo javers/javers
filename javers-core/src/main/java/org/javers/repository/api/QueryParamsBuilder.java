@@ -25,7 +25,7 @@ public class QueryParamsBuilder {
     private Long version;
     private String author;
     private boolean aggregate;
-    private Map<String, String> commitProperties = new HashMap<>();
+    private Map<String, Collection<String>> commitProperties = new HashMap<>();
     private Set<String> changedProperties = new HashSet<>();
     private SnapshotType snapshotType;
     private boolean loadCommitProps = true;
@@ -174,6 +174,14 @@ public class QueryParamsBuilder {
      * @see QueryBuilder#withCommitProperty(String, String)
      */
     public QueryParamsBuilder commitProperty(String name, String value) {
+        this.commitProperties.put(name, Collections.singletonList(value));
+        return this;
+    }
+
+    /**
+     * @see QueryBuilder#withCommitPropertyIn(String, String)
+     */
+    public QueryParamsBuilder commitPropertyIn(String name, Collection<String> value) {
         this.commitProperties.put(name, value);
         return this;
     }

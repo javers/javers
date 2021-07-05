@@ -17,6 +17,7 @@ import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.JqlQuery
 import org.javers.repository.jql.QueryBuilder
+import org.junit.rules.ExpectedException
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -1345,4 +1346,60 @@ class JaversRepositoryE2ETest extends Specification {
             assert javers.findSnapshots(QueryBuilder.byInstanceId(it, SnapshotEntity).build()).size() == 1
         }
     }
+
+    def "should query for entity with commit properties in list"() {
+
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'Steve'])
+
+        when:
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyIn('name',['Steve','Bill']).build())
+
+        then:
+        assert snapshots[0].getState().getPropertyValue("id") == 1
+        assert snapshots[0].getState().getPropertyValue("intProperty") == 2
+
+    }
+
+    def "should  not allow  empty commit property list"() {
+
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'Steve'])
+
+        when:
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyIn('name',[]).build())
+        then:
+        def exception = thrown(IllegalArgumentException.class)
+        exception.getLocalizedMessage() == "Argument should not be an empty list"
+
+    }
+
+    def "should  not find snapshot for invalid commit property list"() {
+
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'Steve'])
+
+        when:
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyIn('name',['Bill']).build())
+
+        then:
+        assert snapshots.size() == 0
+
+    }
+
+
+    def "should query for entity with single commit property"() {
+
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'Steve'])
+
+        when:
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitProperty('name','Steve').build())
+
+        then:
+        assert snapshots[0].getState().getPropertyValue("id") == 1
+        assert snapshots[0].getState().getPropertyValue("intProperty") == 2
+
+    }
+
 }

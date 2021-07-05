@@ -29,14 +29,14 @@ public class QueryParams {
     private final Set<CommitId> commitIds;
     private final Long version;
     private final String author;
-    private final Map<String, String> commitProperties;
+    private final Map<String, Collection<String>> commitProperties;
     private final boolean aggregate;
     private final Set<String> changedProperties;
     private final SnapshotType snapshotType;
     private final boolean loadCommitProps;
     private final Integer snapshotQueryLimit;
 
-    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps, Integer snapshotQueryLimit) {
+    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, Collection<String>> commitProperties, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps, Integer snapshotQueryLimit) {
         this.snapshotQueryLimit = snapshotQueryLimit;
         this.limit = limit;
         this.skip = skip;
@@ -133,7 +133,7 @@ public class QueryParams {
     /**
      * @see QueryBuilder#withCommitProperty(String, String)
      */
-    public Map<String, String> commitProperties() {
+    public Map<String, Collection<String>> commitProperties() {
         return commitProperties != null ?
                 commitProperties : Collections.emptyMap();
     }
