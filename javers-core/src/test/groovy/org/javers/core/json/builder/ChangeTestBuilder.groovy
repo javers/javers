@@ -1,6 +1,7 @@
 package org.javers.core.json.builder
 
 import org.javers.core.JaversTestBuilder
+import org.javers.core.diff.changetype.Atomic
 import org.javers.core.diff.changetype.InitialValueChange
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
@@ -34,7 +35,7 @@ class ChangeTestBuilder {
     }
 
     static setChange(Object cdo, String propertyName, List changes) {
-        new SetChange(createMetadata(cdo, propertyName), changes)
+        new SetChange(createMetadata(cdo, propertyName), changes, new Atomic(new ArrayList<>()), new Atomic(new ArrayList<>()) )
     }
     static MapChange mapChange(Object cdo, String propertyName, List<EntryChange> changes) {
         new MapChange(createMetadata(cdo, propertyName), changes)

@@ -1,20 +1,21 @@
 package org.javers.core.diff.changetype.container;
 
-import org.javers.core.diff.changetype.PropertyChangeMetadata;
-
 import java.util.List;
 import java.util.Objects;
+import org.javers.core.diff.changetype.Atomic;
+import org.javers.core.diff.changetype.PropertyChangeMetadata;
 
 /**
  * Changes on a List property
  *
  * @author pawel szymczyk
  */
-public final class ListChange extends CollectionChange {
+public final class ListChange extends CollectionChange<List<Object>> {
 
-    public ListChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes) {
-        super(metadata, changes);
+    public ListChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes ,Atomic left, Atomic right) {
+        super(metadata, changes,left,right);
     }
+
 
     @Override
     public boolean equals(Object obj) {

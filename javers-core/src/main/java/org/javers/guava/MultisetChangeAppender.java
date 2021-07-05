@@ -4,6 +4,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
+import org.javers.core.diff.changetype.Atomic;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
@@ -45,7 +46,9 @@ class MultisetChangeAppender implements PropertyChangeAppender<SetChange> {
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multisetType.getItemType(), "item", "Multiset", property);
-            return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges);
+            return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges,
+                new Atomic(pair.sanitize(pair.getLeftPropertyValue(property),property.getType())), new Atomic(pair.sanitize(pair.getRightPropertyValue(property),
+                property.getType())));
         } else {
             return null;
         }
