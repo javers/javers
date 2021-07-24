@@ -99,8 +99,8 @@ public class JaversMongoAutoConfiguration {
             return getBean(com.mongodb.MongoClient.class).get().getDatabase(mongoProperties.getMongoClientDatabase());
         }
         throw new JaversException(
-                JaversExceptionCode.RUNTIME_EXCEPTION,
-                "Can't fins the default mongoClient bean. It should be crated by the spring-boot-starter-data-mongodb");
+            JaversExceptionCode.RUNTIME_EXCEPTION,
+            "Can't find the default mongoClient bean. It should be created by the spring-boot-starter-data-mongodb");
     }
 
     private <T> Optional<T> getBean(Class<T> ofType) {
