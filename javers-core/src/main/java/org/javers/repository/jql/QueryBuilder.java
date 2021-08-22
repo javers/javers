@@ -484,6 +484,7 @@ public class QueryBuilder {
 
     /**
      * Only snapshots with a given commit property partially containing a String value.
+     * Equivalent to SQL LIKE clause: WHERE property_value LIKE '%value%'
      <br/><br/>
      *
      * If this method is called multiple times,

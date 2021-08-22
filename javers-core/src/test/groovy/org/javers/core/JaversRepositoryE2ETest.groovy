@@ -1346,45 +1346,24 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    def "should query for commit property starting with partial text"() {
-        given:
-        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'John Doe'])
-
-        when:
-        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyLike('name','John').build())
-
-        then:
-        assert snapshots[0].getState().getPropertyValue("id") == 1
-        assert snapshots[0].getState().getPropertyValue("intProperty") == 2
-    }
-
-
-    def "should query for commit property ending with partial text"() {
-        given:
-        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2), [name: 'John Doe'])
-
-        when:
-        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyLike('name', 'Doe').build())
-
-        then:
-        assert snapshots[0].getState().getPropertyValue("id") == 1
-        assert snapshots[0].getState().getPropertyValue("intProperty") == 2
-    }
-
-    def "should query for commit property containing text"() {
+    @Unroll
+    def "should query for commit property containing partial text"() {
         given:
         javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'John Marcus Doe'])
 
         when:
-        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyLike('name','Marcus').build())
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyLike('name',partial).build())
 
         then:
         assert snapshots[0].getState().getPropertyValue("id") == 1
         assert snapshots[0].getState().getPropertyValue("intProperty") == 2
+
+        where:
+        partial << ["John","Doe","Marcus"]
+
     }
 
-
-    def "Result not found for commit property like not valid"() {
+    def "Result not found for commit not containing text"() {
         given:
         javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'John Doe'])
 
