@@ -1345,4 +1345,32 @@ class JaversRepositoryE2ETest extends Specification {
             assert javers.findSnapshots(QueryBuilder.byInstanceId(it, SnapshotEntity).build()).size() == 1
         }
     }
+
+    @Unroll
+    def "should query for commit property containing partial text"() {
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'John Marcus Doe'])
+
+        when:
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyLike('name',partial).build())
+
+        then:
+        assert snapshots[0].getState().getPropertyValue("id") == 1
+        assert snapshots[0].getState().getPropertyValue("intProperty") == 2
+
+        where:
+        partial << ["John","Doe","Marcus"]
+
+    }
+
+    def "Result not found for commit not containing text"() {
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'John Doe'])
+
+        when:
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyLike('name','Mary').build())
+
+        then:
+        assert snapshots.size() == 0
+    }
 }

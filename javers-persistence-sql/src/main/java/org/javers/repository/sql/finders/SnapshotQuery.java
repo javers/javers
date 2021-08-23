@@ -111,6 +111,12 @@ class SnapshotQuery {
             }
         }
 
+        if(queryParams.commitPropertiesLike().size() > 0){
+            for (Map.Entry<String, String> commitProperty : queryParams.commitPropertiesLike().entrySet()) {
+                addCommitPropertyLikeFilter(selectBuilder, commitProperty.getKey(), commitProperty.getValue());
+            }
+        }
+
         queryParams.snapshotType().ifPresent(snapshotType -> selectBuilder.and(SNAPSHOT_TYPE, snapshotType.name()));
     }
 
@@ -176,6 +182,15 @@ class SnapshotQuery {
                 " AND " + COMMIT_PROPERTY_NAME + " = ?" +
                 " AND " + COMMIT_PROPERTY_VALUE + " = ?)",
                 stringParam(propertyName), stringParam(propertyValue));
+    }
+
+    private void addCommitPropertyLikeFilter(SelectBuilder selectBuilder, String propertyName, String propertyValue) {
+        selectBuilder.and("EXISTS (" +
+                " SELECT * FROM " + commitPropertyTableName() +
+                " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
+                " AND " + COMMIT_PROPERTY_NAME + " = ?" +
+                " AND " + COMMIT_PROPERTY_VALUE + " LIKE ?)",
+            stringParam(propertyName), stringParam("%"+propertyValue+"%"));
     }
 
     private class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
