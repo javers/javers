@@ -483,8 +483,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Only snapshots with a given commit property partially containing a String value.
+     * Only snapshots with a given commit property partially containing a given value.
      * Equivalent to SQL LIKE clause: WHERE property_value LIKE '%value%'
+     * <br/><br/>
+     *
+     * The matching is case insensitive on MongoDB and on most SQL databases.
      * <br/><br/>
      *
      * If this method is called multiple times,
