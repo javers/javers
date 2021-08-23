@@ -1347,30 +1347,37 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     @Unroll
-    def "should query for commit property containing partial text"() {
+    def "should query for commit property containing partial text - #value"() {
         given:
-        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'John Marcus Doe'])
+        javers.commit('author', new SnapshotEntity(),[name:'John Marcus Doe'])
 
         when:
-        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyLike('name',partial).build())
+        def snapshots = javers
+                .findSnapshots(byInstanceId(1, SnapshotEntity)
+                .withCommitPropertyLike('name',value).build())
 
         then:
-        assert snapshots[0].getState().getPropertyValue("id") == 1
-        assert snapshots[0].getState().getPropertyValue("intProperty") == 2
+        snapshots.size() == 1
 
         where:
-        partial << ["John","Doe","Marcus"]
+        value << ["John","Doe","Marcus"]
 
     }
 
-    def "Result not found for commit not containing text"() {
+    @Unroll
+    def "should return empty result when commit property doesn't contain a given value - #value"() {
         given:
         javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'John Doe'])
 
         when:
-        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitPropertyLike('name','Mary').build())
+        def snapshots = javers
+                .findSnapshots(byInstanceId(1, SnapshotEntity)
+                .withCommitPropertyLike('name', value).build())
 
         then:
-        assert snapshots.size() == 0
+        snapshots.size() == 0
+
+        where:
+        value << ['john','Mary']
     }
 }
