@@ -5,31 +5,12 @@ import org.javers.core.metamodel.annotation.Id
 import org.javers.repository.jql.QueryBuilder
 import org.javers.core.diff.changetype.Atomic
 import org.javers.core.diff.changetype.InitialValueChange
+import spock.lang.Specification
 
 import java.sql.Connection
 import java.sql.DriverManager
 
-class ListItemRemovalAndReadditionTest extends JaversSqlRepositoryE2ETest {
-
-    @Override
-    Connection createConnection() {
-        DriverManager.getConnection("jdbc:h2:mem:test")
-    }
-
-    @Override
-    DialectName getDialect() {
-        DialectName.H2
-    }
-
-    @Override
-    String getSchema() {
-        return null
-    }
-
-    @Override
-    boolean useRandomCommitIdGenerator() {
-        false
-    }
+class ListItemRemovalAndReadditionTest extends Specification {
 
     static class Value {
         String name;
@@ -43,11 +24,7 @@ class ListItemRemovalAndReadditionTest extends JaversSqlRepositoryE2ETest {
 
     def "should treat re-added (previously removed) list item as new"() {
         given:
-        def javers = JaversBuilder
-            .javers()
-            .withDateTimeProvider(prepareDateProvider())
-            .registerJaversRepository(repository)
-            .build()
+        def javers = JaversBuilder.javers().build()
 
         def entity = new Entity()
         entity.id = 1
@@ -67,11 +44,14 @@ class ListItemRemovalAndReadditionTest extends JaversSqlRepositoryE2ETest {
         javers.commit("author", entity)
 
         when:
-        def commits = javers.findChanges(QueryBuilder.byInstanceId(1, Entity)
+        def resultChanges = javers.findChanges(QueryBuilder.byInstanceId(1, Entity)
             .withChildValueObjects()
             .withScopeDeepPlus()
             .build())
-            .groupByCommit()
+        def commits = resultChanges.groupByCommit()
+
+        println resultChanges.prettyPrint()
+        println commits
 
         then:
         commits[0].changes.size() == 2
