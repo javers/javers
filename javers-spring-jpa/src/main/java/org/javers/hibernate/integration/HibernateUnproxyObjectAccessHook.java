@@ -2,7 +2,6 @@ package org.javers.hibernate.integration;
 
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
-import org.hibernate.proxy.pojo.javassist.JavassistLazyInitializer;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.ObjectAccessProxy;
 
@@ -17,8 +16,8 @@ public class HibernateUnproxyObjectAccessHook<T> implements ObjectAccessHook<T> 
 
             return fromLazyInitializer(lazyInitializer);
         }
-        if (entity instanceof JavassistLazyInitializer){
-            JavassistLazyInitializer proxy = (JavassistLazyInitializer) entity;
+        if (entity instanceof LazyInitializer){
+            LazyInitializer proxy = (LazyInitializer) entity;
             return fromLazyInitializer(proxy);
         }
 
@@ -31,4 +30,3 @@ public class HibernateUnproxyObjectAccessHook<T> implements ObjectAccessHook<T> 
                 lazyInitializer.getIdentifier()));
     }
 }
-
