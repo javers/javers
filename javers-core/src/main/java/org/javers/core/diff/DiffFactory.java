@@ -160,7 +160,7 @@ public class DiffFactory {
 
             final Change change = appender.calculateChanges(pair, property);
             if (change != null) {
-                diff.addChange(change, pair.getFirst().wrappedCdo());
+                diff.addChange(change, pair.getRight().wrappedCdo());
             }
             break;
         }
