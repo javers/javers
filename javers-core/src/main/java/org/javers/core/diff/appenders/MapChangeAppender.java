@@ -2,7 +2,6 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Maps;
 import org.javers.common.exception.JaversException;
-import org.javers.common.validation.Validate;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
 import org.javers.core.metamodel.type.*;
@@ -19,21 +18,14 @@ import static org.javers.core.diff.appenders.CorePropertyChangeAppender.renderNo
  */
 class MapChangeAppender implements PropertyChangeAppender<MapChange> {
 
-    private final TypeMapper typeMapper;
-
-    MapChangeAppender(TypeMapper typeMapper) {
-        Validate.argumentsAreNotNull(typeMapper);
-        this.typeMapper = typeMapper;
-    }
-
     @Override
     public boolean supports(JaversType propertyType) {
         if (!(propertyType instanceof MapType)){
             return false;
         }
 
-        MapContentType mapContentType = typeMapper.getMapContentType((MapType)propertyType);
-        if (mapContentType.getKeyType() instanceof ValueObjectType){
+        MapType mapType = (MapType)propertyType;
+        if (mapType.getKeyJaversType() instanceof ValueObjectType){
             throw new JaversException(VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY, propertyType);
         }
 
@@ -43,17 +35,16 @@ class MapChangeAppender implements PropertyChangeAppender<MapChange> {
     @Override
     public MapChange calculateChanges(NodePair pair, JaversProperty property) {
 
-        MapType mapType = ((JaversProperty) property).getType();
-        MapContentType mapContentType = typeMapper.getMapContentType(mapType);
+        MapType mapType = property.getType();
 
-        Map left =  wrapKeysIfNeeded((Map) pair.getLeftDehydratedPropertyValueAndSanitize(property), mapContentType);
-        Map right = wrapKeysIfNeeded((Map) pair.getRightDehydratedPropertyValueAndSanitize(property), mapContentType);
+        Map left =  wrapKeysIfNeeded((Map) pair.getLeftDehydratedPropertyValueAndSanitize(property), mapType.getKeyJaversType());
+        Map right = wrapKeysIfNeeded((Map) pair.getRightDehydratedPropertyValueAndSanitize(property), mapType.getKeyJaversType());
 
-        List<EntryChange> changes = calculateEntryChanges(left, right, mapContentType);
+        List<EntryChange> changes = calculateEntryChanges(left, right, mapType.getValueJaversType());
 
         if (!changes.isEmpty()){
-            renderNotParametrizedWarningIfNeeded(mapContentType.getKeyType().getBaseJavaType(), "key", "Map", property);
-            renderNotParametrizedWarningIfNeeded(mapContentType.getValueType().getBaseJavaType(), "value", "Map", property);
+            renderNotParametrizedWarningIfNeeded(mapType.getKeyJavaType(), "key", "Map", property);
+            renderNotParametrizedWarningIfNeeded(mapType.getValueJavaType(), "value", "Map", property);
             return new MapChange(pair.createPropertyChangeMetadata(property), changes);
         }
         else {
@@ -61,14 +52,14 @@ class MapChangeAppender implements PropertyChangeAppender<MapChange> {
         }
     }
 
-    private Map wrapKeysIfNeeded(Map map, MapContentType mapContentType) {
-        return HashWrapper.wrapKeysIfNeeded(map, mapContentType.getKeyType());
+    private Map wrapKeysIfNeeded(Map map, JaversType mapKeyType) {
+        return HashWrapper.wrapKeysIfNeeded(map, mapKeyType);
     }
 
     /**
      * @return never returns null
      */
-    List<EntryChange> calculateEntryChanges(Map leftMap, Map rightMap, MapContentType mapContentType) {
+    List<EntryChange> calculateEntryChanges(Map leftMap, Map rightMap, JaversType mapValueType) {
 
         List<EntryChange> changes = new ArrayList<>();
 
@@ -76,7 +67,7 @@ class MapChangeAppender implements PropertyChangeAppender<MapChange> {
             Object leftVal  = leftMap.get(commonKey);
             Object rightVal = rightMap.get(commonKey);
 
-            if (!mapContentType.getValueType().equals(leftVal, rightVal)){
+            if (!mapValueType.equals(leftVal, rightVal)){
                 changes.add( new EntryValueChange(commonKey, leftVal, rightVal));
             }
         }

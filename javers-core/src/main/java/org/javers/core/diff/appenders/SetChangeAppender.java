@@ -11,11 +11,6 @@ import java.util.*;
  * @author pawel szymczyk
  */
 class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
-    private final TypeMapper typeMapper;
-
-    SetChangeAppender(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
-    }
 
     @Override
     public boolean supports(JaversType propertyType) {
@@ -30,7 +25,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         List<ContainerElementChange> entryChanges = calculateDiff(leftSet, rightSet);
         if (!entryChanges.isEmpty()) {
             CollectionType setType = property.getType();
-            renderNotParametrizedWarningIfNeeded(setType.getItemType(), "item", "Set", property);
+            renderNotParametrizedWarningIfNeeded(setType.getItemJavaType(), "item", "Set", property);
             return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges);
         } else {
             return null;
@@ -38,7 +33,8 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     }
 
     private Set wrapValuesIfNeeded(Set set, JaversProperty property) {
-        return HashWrapper.wrapValuesIfNeeded(set, typeMapper.getContainerItemType(property));
+        JaversType itemType = ((ContainerType)property.getType()).getItemJaversType();
+        return HashWrapper.wrapValuesIfNeeded(set, itemType);
     }
 
     private Set toSet(Object collection) {

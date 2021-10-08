@@ -42,8 +42,8 @@ class MultimapChangeAppender implements PropertyChangeAppender<MapChange> {
         if (!(propertyType instanceof MultimapType)){
             return false;
         }
-        MapContentType mapContentType = typeMapper.getMapContentType((KeyValueType) propertyType);
-        if (mapContentType.getKeyType() instanceof ValueObjectType){
+        KeyValueType keyValueType = (KeyValueType) propertyType;
+        if (keyValueType.getKeyJaversType() instanceof ValueObjectType){
             throw new JaversException(VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY, propertyType);
         }
         return true;
@@ -55,13 +55,13 @@ class MultimapChangeAppender implements PropertyChangeAppender<MapChange> {
         Multimap left = (Multimap) pair.getLeftDehydratedPropertyValueAndSanitize(property);
         Multimap right = (Multimap) pair.getRightDehydratedPropertyValueAndSanitize(property);
 
-        MultimapType multimapType = ((JaversProperty) property).getType();
+        MultimapType multimapType = property.getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
 
         List<EntryChange> entryChanges = calculateChanges(multimapType, left, right, owner);
         if (!entryChanges.isEmpty()){
-            renderNotParametrizedWarningIfNeeded(multimapType.getKeyType(), "key", "Multimap", property);
-            renderNotParametrizedWarningIfNeeded(multimapType.getValueType(), "value", "Multimap", property);
+            renderNotParametrizedWarningIfNeeded(multimapType.getKeyJavaType(), "key", "Multimap", property);
+            renderNotParametrizedWarningIfNeeded(multimapType.getValueJavaType(), "value", "Multimap", property);
             return new MapChange(pair.createPropertyChangeMetadata(property), entryChanges);
         } else {
             return null;

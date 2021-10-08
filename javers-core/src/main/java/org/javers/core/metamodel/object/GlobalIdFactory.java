@@ -26,7 +26,7 @@ public class GlobalIdFactory {
     public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook) {
         this.typeMapper = typeMapper;
         this.objectAccessHook = objectAccessHook;
-        this.pathParser = new GlobalIdPathParser(typeMapper);
+        this.pathParser = new GlobalIdPathParser();
     }
 
     public GlobalId createId(Object targetCdo) {

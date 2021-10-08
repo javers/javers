@@ -19,12 +19,6 @@ import static org.javers.common.exception.JaversExceptionCode.UNSUPPORTED_OPTION
  */
 public class OptionalChangeAppender implements PropertyChangeAppender<PropertyChange> {
 
-    private final TypeMapper typeMapper;
-
-    public OptionalChangeAppender(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
-    }
-
     @Override
     public boolean supports(JaversType propertyType) {
         return propertyType instanceof OptionalType;
@@ -32,8 +26,8 @@ public class OptionalChangeAppender implements PropertyChangeAppender<PropertyCh
 
     @Override
     public PropertyChange calculateChanges(NodePair pair, JaversProperty property) {
-        OptionalType optionalType = ((JaversProperty) property).getType();
-        JaversType contentType = typeMapper.getJaversType(optionalType.getItemType());
+        OptionalType optionalType = property.getType();
+        JaversType contentType = optionalType.getItemJaversType();
 
         Optional leftOptional =  normalize((Optional) pair.getLeftDehydratedPropertyValueAndSanitize(property));
         Optional rightOptional = normalize((Optional) pair.getRightDehydratedPropertyValueAndSanitize(property));

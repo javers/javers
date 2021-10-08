@@ -3,7 +3,6 @@ package org.javers.core.json.typeadapter.change;
 import com.google.gson.*;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.PropertyChangeMetadata;
 import org.javers.core.diff.changetype.map.*;
 import org.javers.core.metamodel.type.MapType;
@@ -12,10 +11,6 @@ import org.javers.core.metamodel.type.TypeMapper;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 
 class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
 
@@ -79,21 +74,21 @@ class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
     }
 
     private EntryAdded parseEntryAdded(JsonObject entryChange, JsonDeserializationContext context, MapType mapType){
-        Object key =   decodeValue(entryChange, context, KEY_FIELD, mapType.getKeyType());
-        Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueType());
+        Object key =   decodeValue(entryChange, context, KEY_FIELD, mapType.getKeyJavaType());
+        Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueJavaType());
         return new EntryAdded(key, value);
     }
 
     private EntryRemoved parseEntryRemoved(JsonObject entryChange, JsonDeserializationContext context, MapType mapType){
-        Object key =   decodeValue(entryChange, context, KEY_FIELD,   mapType.getKeyType());
-        Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueType());
+        Object key =   decodeValue(entryChange, context, KEY_FIELD,   mapType.getKeyJavaType());
+        Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueJavaType());
         return new EntryRemoved(key, value);
     }
 
     private EntryValueChange parseEntryValueChange(JsonObject entryChange, JsonDeserializationContext context, MapType mapType){
-        Object key =        decodeValue(entryChange, context, KEY_FIELD , mapType.getKeyType());
-        Object leftValue =  decodeValue(entryChange, context, LEFT_VALUE_FIELD, mapType.getValueType());
-        Object rightValue = decodeValue(entryChange, context, RIGHT_VALUE_FIELD, mapType.getValueType());
+        Object key =        decodeValue(entryChange, context, KEY_FIELD , mapType.getKeyJavaType());
+        Object leftValue =  decodeValue(entryChange, context, LEFT_VALUE_FIELD, mapType.getValueJavaType());
+        Object rightValue = decodeValue(entryChange, context, RIGHT_VALUE_FIELD, mapType.getValueJavaType());
         return new EntryValueChange(key, leftValue, rightValue);
     }
 

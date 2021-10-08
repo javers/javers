@@ -22,12 +22,12 @@ import static org.javers.common.collections.Collections.wrapNull;
 public class OptionalType extends CollectionType {
 
     /** for TypeFactory.spawnFromPrototype() */
-    public OptionalType(Type baseJavaType) {
-        super(baseJavaType);
+    public OptionalType(Type baseJavaType, TypeMapperLazy typeMapperLazy) {
+        super(baseJavaType, typeMapperLazy);
     }
 
-    public OptionalType() {
-        super(java.util.Optional.class);
+    public OptionalType(TypeMapperLazy typeMapperLazy) {
+        super(java.util.Optional.class, typeMapperLazy);
     }
 
     @Override

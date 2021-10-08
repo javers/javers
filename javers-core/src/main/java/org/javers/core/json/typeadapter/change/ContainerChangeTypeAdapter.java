@@ -67,8 +67,8 @@ abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends Cha
     }
 
     private ElementValueChange parseElementValueChange(JsonObject elementChange, JsonDeserializationContext context, ContainerType containerType){
-        Object lValue = decodeValue(elementChange, context, LEFT_VALUE_FIELD, containerType.getItemType());
-        Object rValue = decodeValue(elementChange, context, RIGHT_VALUE_FIELD, containerType.getItemType());
+        Object lValue = decodeValue(elementChange, context, LEFT_VALUE_FIELD, containerType.getItemJavaType());
+        Object rValue = decodeValue(elementChange, context, RIGHT_VALUE_FIELD, containerType.getItemJavaType());
         return new ElementValueChange(parseIndex(elementChange), lValue, rValue);
     }
 

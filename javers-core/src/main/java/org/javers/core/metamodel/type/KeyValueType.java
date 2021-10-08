@@ -1,8 +1,5 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Maps;
-import org.javers.common.validation.Validate;
-
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Stream;
@@ -12,21 +9,21 @@ import java.util.stream.Stream;
  */
 public abstract class KeyValueType extends EnumerableType {
 
-    public KeyValueType(Type baseJavaType, int expectedArgs) {
-        super(baseJavaType, expectedArgs);
+    public KeyValueType(Type baseJavaType, int expectedArgs, TypeMapperLazy typeMapperLazy) {
+        super(baseJavaType, expectedArgs, typeMapperLazy);
     }
 
     /**
      * never returns null
      */
-    public Type getKeyType() {
+    public Type getKeyJavaType() {
         return getConcreteClassTypeArguments().get(0);
     }
 
     /**
      * never returns null
      */
-    public Type getValueType() {
+    public Type getValueJavaType() {
         return getConcreteClassTypeArguments().get(1);
     }
 
@@ -41,4 +38,12 @@ public abstract class KeyValueType extends EnumerableType {
     }
 
     protected abstract Stream<Map.Entry> entries(Object source);
+
+    public JaversType getValueJaversType() {
+        return getTypeMapperLazy().getJaversType(getValueJavaType());
+    }
+
+    public JaversType getKeyJaversType() {
+        return getTypeMapperLazy().getJaversType(getKeyJavaType());
+    }
 }

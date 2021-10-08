@@ -132,6 +132,10 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(TypeMapper)
     }
 
+    TypeFactory getTypeFactory(){
+        javersBuilder.getContainerComponent(TypeFactory)
+    }
+
     QueryRunner getQueryRunner(){
         javersBuilder.getContainerComponent(QueryRunner)
     }

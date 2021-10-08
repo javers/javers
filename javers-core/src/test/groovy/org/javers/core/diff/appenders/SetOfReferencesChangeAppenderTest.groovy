@@ -18,7 +18,7 @@ class SetOfReferencesChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightCdo = new SnapshotEntity(id: 1, setOfEntities: [new SnapshotEntity(id: 2), new SnapshotEntity(id: 5)])
 
         when:
-        def change = setChangeAppender()
+        def change = new SetChangeAppender()
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "setOfEntities"))
 
         then:
@@ -33,7 +33,7 @@ class SetOfReferencesChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightCdo = new SnapshotEntity(id: 1, setOfEntities: [new SnapshotEntity(id: 2)])
 
         when:
-        def change = setChangeAppender()
+        def change = new SetChangeAppender()
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "setOfEntities"))
 
         then:
@@ -48,7 +48,7 @@ class SetOfReferencesChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightCdo = new SnapshotEntity(id: 1, setOfEntities: [new SnapshotEntity(id: 3), new SnapshotEntity(id: 2)])
 
         when:
-        def change = setChangeAppender()
+        def change = new SetChangeAppender()
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "setOfEntities"))
 
         then:
@@ -61,7 +61,7 @@ class SetOfReferencesChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightCdo = new SnapshotEntity(setOfValueObjects: [new DummyAddress("Paris"), new DummyAddress("London")])
 
         when:
-        def change = setChangeAppender()
+        def change = new SetChangeAppender()
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "setOfValueObjects"))
 
         then:

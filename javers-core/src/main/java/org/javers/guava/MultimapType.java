@@ -7,9 +7,7 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Maps;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.type.KeyValueType;
-import org.javers.core.metamodel.type.MapEnumerationOwnerContext;
-import org.javers.core.metamodel.type.MapType;
+import org.javers.core.metamodel.type.*;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -24,12 +22,8 @@ import static org.javers.guava.Multimaps.toNotNullMultimap;
  */
 public class MultimapType extends KeyValueType {
 
-    public static MultimapType getInstance(){
-        return new MultimapType(Multimap.class);
-    }
-
-    public MultimapType(Type baseJavaType) {
-        super(baseJavaType,2);
+    public MultimapType(Type baseJavaType, TypeMapperLazy typeMapperLazy) {
+        super(baseJavaType, 2, typeMapperLazy);
     }
 
     /**
@@ -41,9 +35,9 @@ public class MultimapType extends KeyValueType {
 
         Multimap sourceMultimap = toNotNullMultimap(sourceEnumerable);
         Multimap targetMultimap = ArrayListMultimap.create();
-        MapEnumerationOwnerContext enumeratorContext = new MapEnumerationOwnerContext(owner, true);
+        MapEnumerationOwnerContext enumeratorContext = new MapEnumerationOwnerContext(this, owner, true);
 
-        MapType.mapEntrySet(sourceMultimap.entries(), mapFunction, enumeratorContext, (k,v) -> targetMultimap.put(k,v));
+        MapType.mapEntrySet(this, sourceMultimap.entries(), mapFunction, enumeratorContext, (k,v) -> targetMultimap.put(k,v), false);
 
         return Multimaps.unmodifiableMultimap(targetMultimap);
     }
@@ -63,7 +57,7 @@ public class MultimapType extends KeyValueType {
         Multimap sourceMultimap = toNotNullMultimap(sourceEnumerable);
         Multimap targetMultimap = ArrayListMultimap.create();
 
-        MapType.mapEntrySet(sourceMultimap.entries(), mapFunction, (k,v) -> targetMultimap.put(k,v), filterNulls);
+        MapType.mapEntrySet(this, sourceMultimap.entries(), mapFunction, (k,v) -> targetMultimap.put(k,v), filterNulls);
 
         return targetMultimap;
     }

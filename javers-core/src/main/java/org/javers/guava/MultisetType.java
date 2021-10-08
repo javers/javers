@@ -8,6 +8,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.CollectionType;
+import org.javers.core.metamodel.type.TypeMapperLazy;
 
 import java.lang.reflect.Type;
 import java.util.function.Function;
@@ -17,12 +18,8 @@ import java.util.function.Function;
  */
 public class MultisetType extends CollectionType {
 
-    public static MultisetType getInstance(){
-        return  new MultisetType(Multiset.class);
-    }
-
-    public MultisetType(Type baseJavaType) {
-        super(baseJavaType);
+    public MultisetType(Type baseJavaType, TypeMapperLazy typeMapperLazy) {
+        super(baseJavaType, typeMapperLazy);
     }
 
     /**

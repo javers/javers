@@ -3,8 +3,8 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Maps;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
-
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -16,26 +16,22 @@ import java.util.stream.Stream;
  */
 public class MapType extends KeyValueType {
 
-    public MapType(Type baseJavaType) {
-        super(baseJavaType, 2);
-    }
-
-    @Override
-    public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
-        return mapStatic(sourceEnumerable, mapFunction, owner);
+    public MapType(Type baseJavaType, TypeMapperLazy typeMapperlazy) {
+        super(baseJavaType, 2, typeMapperlazy);
     }
 
     /**
      * @return immutable Map
      */
-    public static Map mapStatic(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
+    @Override
+    public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(mapFunction, owner);
 
         Map sourceMap = Maps.wrapNull(sourceEnumerable);
         Map targetMap = new HashMap(sourceMap.size());
-        MapEnumerationOwnerContext enumeratorContext = new MapEnumerationOwnerContext(owner);
+        MapEnumerationOwnerContext enumeratorContext = new MapEnumerationOwnerContext(this, owner);
 
-        mapEntrySet(sourceMap.entrySet(), mapFunction, enumeratorContext, (k,v) ->  targetMap.put(k,v));
+        mapEntrySet(this, sourceMap.entrySet(), mapFunction, enumeratorContext, (k,v) ->  targetMap.put(k,v), false);
 
         return Collections.unmodifiableMap(targetMap);
     }
@@ -47,7 +43,7 @@ public class MapType extends KeyValueType {
         Map sourceMap = Maps.wrapNull(source);
         Map targetMap = new HashMap(sourceMap.size());
 
-        mapEntrySet(sourceMap.entrySet(), mapFunction, (k,v) -> targetMap.put(k,v), filterNulls);
+        mapEntrySet(this, sourceMap.entrySet(), mapFunction, (k,v) -> targetMap.put(k,v), filterNulls);
 
         return Collections.unmodifiableMap(targetMap);
     }
@@ -57,35 +53,41 @@ public class MapType extends KeyValueType {
         return map == null || ((Map)map).isEmpty();
     }
 
-    public static void mapEntrySet(Collection<Map.Entry<?,?>> sourceEntries,
+    public static void mapEntrySet(KeyValueType keyValueType,
+                              Collection<Map.Entry<?,?>> sourceEntries,
                               EnumerableFunction mapFunction,
                               MapEnumerationOwnerContext mapEnumerationContext,
-                              BiConsumer entryConsumer) {
+                              BiConsumer entryConsumer,
+                              boolean filterNulls) {
         for (Map.Entry entry : sourceEntries) {
             //key
             mapEnumerationContext.switchToKey();
             Object mappedKey = mapFunction.apply(entry.getKey(), mapEnumerationContext);
+            if (mappedKey == null && filterNulls) continue;
 
             //value
             mapEnumerationContext.switchToValue(mappedKey);
-            Object mappedValue = mapFunction.apply(entry.getValue(), mapEnumerationContext);
+
+            Object mappedValue = null;
+            if (keyValueType.getValueJaversType() instanceof ContainerType) {
+                ContainerType containerType = (ContainerType) keyValueType.getValueJaversType();
+                mappedValue = containerType.map(entry.getValue(), mapFunction, mapEnumerationContext);
+            } else {
+                mappedValue = mapFunction.apply(entry.getValue(), mapEnumerationContext);
+            }
 
             entryConsumer.accept(mappedKey, mappedValue);
         }
     }
 
-    public static void mapEntrySet(Collection<Map.Entry<?,?>> sourceEntries,
-                                              Function mapFunction,
-                                              BiConsumer entryConsumer,
-                                              boolean filterNulls) {
-        for (Map.Entry entry : sourceEntries) {
-            Object mappedKey = mapFunction.apply(entry.getKey());
-            if (mappedKey == null && filterNulls) continue;
-
-            Object mappedValue = mapFunction.apply(entry.getValue());
-
-            entryConsumer.accept(mappedKey, mappedValue);
-        }
+    public static void mapEntrySet(KeyValueType keyValueType,
+                                   Collection<Map.Entry<?,?>> sourceEntries,
+                                   Function mapFunction,
+                                   BiConsumer entryConsumer,
+                                   boolean filterNulls) {
+        MapEnumerationOwnerContext enumeratorContext = MapEnumerationOwnerContext.dummy(keyValueType);
+        EnumerableFunction enumerableFunction = (input, ownerContext) -> mapFunction.apply(input);
+        mapEntrySet(keyValueType, sourceEntries, enumerableFunction, enumeratorContext, entryConsumer,  filterNulls);
     }
 
     @Override

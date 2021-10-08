@@ -26,7 +26,7 @@ class ArrayTypeTest extends Specification{
         Type intArray   =    getFieldFromClass(Dummy, "intArray").genericType
 
         when:
-        ArrayType aType = new ArrayType(intArray)
+        ArrayType aType = arrayType(intArray)
 
         then:
         aType.baseJavaType == Integer[]
@@ -39,7 +39,7 @@ class ArrayTypeTest extends Specification{
         given:
         def nonConcreteArray = getFieldFromClass(domainClass, "array").genericType
         when:
-        def itemType = new ArrayType(nonConcreteArray).getItemClass()
+        def itemType = arrayType(nonConcreteArray).getItemClass()
 
         then:
         itemType == Object
@@ -47,5 +47,9 @@ class ArrayTypeTest extends Specification{
         where:
         lang << ["java", "groovy"]
         domainClass << [GenericArrayContainerInJava, GenericArrayContainerInGroovy]
+    }
+
+    ArrayType arrayType(Type type) {
+        new ArrayType(type, { it -> new ValueType(Object) })
     }
 }

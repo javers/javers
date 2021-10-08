@@ -6,15 +6,14 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.metamodel.type.CollectionType;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.Collection;
 import java.util.List;
 
 class CollectionAsListChangeAppender extends ListToMapAppenderAdapter  {
 
-    CollectionAsListChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
-        super(mapChangeAppender, typeMapper);
+    CollectionAsListChangeAppender(MapChangeAppender mapChangeAppender) {
+        super(mapChangeAppender);
     }
 
     @Override

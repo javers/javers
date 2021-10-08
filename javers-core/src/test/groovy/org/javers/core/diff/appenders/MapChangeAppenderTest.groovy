@@ -25,7 +25,7 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
         def valueMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         expect:
-        def change = mapChangeAppender().calculateChanges(realNodePair(left,right),valueMap)
+        def change = new MapChangeAppender().calculateChanges(realNodePair(left,right),valueMap)
         change == null
 
         where:
@@ -41,7 +41,7 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
         def primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         when:
-        def change =  mapChangeAppender().calculateChanges(realNodePair(left,right),primitiveMap)
+        def change = new MapChangeAppender().calculateChanges(realNodePair(left,right),primitiveMap)
 
         then:
         assertThat(change)
@@ -57,7 +57,7 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
         Property primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         expect:
-        def change = mapChangeAppender().calculateChanges(realNodePair(left,right),primitiveMap)
+        def change = new MapChangeAppender().calculateChanges(realNodePair(left,right),primitiveMap)
         EntryAddOrRemove entryAddOrRemove = change.entryChanges[0]
         entryAddOrRemove.key == "some"
         entryAddOrRemove.value == 1
@@ -76,7 +76,7 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
         Property primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         when:
-        def change =  mapChangeAppender().calculateChanges(realNodePair(left,right),primitiveMap)
+        def change = new MapChangeAppender().calculateChanges(realNodePair(left,right),primitiveMap)
 
         then:
         EntryValueChange entryValueChanged = change.entryChanges[0]
@@ -96,7 +96,7 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
         Property valueMap = getEntity(DummyUser).getProperty("valueMap")
 
         when:
-        def change = mapChangeAppender().calculateChanges(realNodePair(left,right),valueMap)
+        def change = new MapChangeAppender().calculateChanges(realNodePair(left,right),valueMap)
 
         then:
         EntryValueChange entryValueChanged = change.entryChanges[0]

@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import java.util.*;
 
+import org.javers.common.collections.Arrays;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
@@ -11,6 +12,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.function.Function;
 
 /**
  * Managed property type
@@ -44,11 +46,19 @@ public abstract class JaversType {
      */
     JaversType spawn(Type baseJavaType) {
         try {
-            Constructor c = this.getClass().getConstructor(Type.class);
-            return (JaversType)c.newInstance(new Object[]{baseJavaType});
+            Constructor c = this.getClass().getConstructor(spawnConstructorArgTypes());
+            return (JaversType)c.newInstance(spawnConstructorArgs(baseJavaType));
         } catch (ReflectiveOperationException exception) {
             throw new RuntimeException("error calling Constructor for " + this.getClass().getName(), exception);
         }
+    }
+
+    protected Object[] spawnConstructorArgs(Type baseJavaType) {
+        return new Object[]{baseJavaType};
+    }
+
+    protected Class[] spawnConstructorArgTypes() {
+        return new Class[]{Type.class};
     }
 
     public boolean isGenericType() {

@@ -8,7 +8,7 @@ import spock.lang.Specification
 
 class Case1099NPEinUnboundedValueObjectId extends Specification {
 
-    public class E {
+    class E {
         String profile
         List<String> roles
 
@@ -20,6 +20,7 @@ class Case1099NPEinUnboundedValueObjectId extends Specification {
 
     class A {
           Map<String, List<E>> map
+          List<E> list
      }
 
     def "should support Map from String to List of ValueObjects" () {
@@ -33,13 +34,25 @@ class Case1099NPEinUnboundedValueObjectId extends Specification {
             "key2" : [ new E("p2", ["student", "pupil"]) ]
         ]
 
-        def a = new A(map: map)
+        def a = new A(map: map, list: [new E("p1", ["teacher", "director"])])
 
         when:
-        def commit = javers.commit("a", a)
+        javers.commit("a", a)
         def snapshots = javers.findSnapshots(QueryBuilder.byClass(A).build())
 
+        def mapSnapshot = snapshots[0].getPropertyValue('map')
+
         then:
-        snapshots
+        mapSnapshot['key1'][0].value().endsWith('Case1099NPEinUnboundedValueObjectId$A/#map/key1/0')
+        mapSnapshot['key1'][1].value().endsWith('Case1099NPEinUnboundedValueObjectId$A/#map/key1/1')
+        mapSnapshot['key2'][0].value().endsWith('Case1099NPEinUnboundedValueObjectId$A/#map/key2/0')
+
+        when:
+        def voSnapshots = javers.findSnapshots(QueryBuilder.byClass(E).build())
+
+        then:
+        voSnapshots.size() == 4
+        def e1Snapshot = voSnapshots.find{it.globalId.value().endsWith('Case1099NPEinUnboundedValueObjectId$A/#map/key1/0')}
+        e1Snapshot.getPropertyValue('profile') == 'p1'
     }
 }

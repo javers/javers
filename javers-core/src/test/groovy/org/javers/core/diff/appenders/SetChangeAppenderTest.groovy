@@ -25,7 +25,7 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
     String dateFieldName
 
     def setupSpec() {
-        setChangeAppender = setChangeAppender()
+        setChangeAppender = new SetChangeAppender()
         commonFieldName = "stringSet"
         dateFieldName = "setOfDates"
     }

@@ -17,9 +17,24 @@ import static java.util.Collections.unmodifiableList;
  * @author bartosz walacik
  */
 public abstract class EnumerableType extends ClassType {
+    private final TypeMapperLazy typeMapperLazy;
 
-    EnumerableType(Type baseJavaType, int expectedArgs) {
+    EnumerableType(Type baseJavaType, int expectedArgs, TypeMapperLazy typeMapperLazy) {
         super(baseJavaType, Optional.empty(), expectedArgs);
+        this.typeMapperLazy = typeMapperLazy;
+    }
+
+    @Override
+    protected Object[] spawnConstructorArgs(Type baseJavaType) {
+        return new Object[]{baseJavaType, getTypeMapperLazy()};
+    }
+
+    protected Class[] spawnConstructorArgTypes() {
+        return new Class[]{Type.class, TypeMapperLazy.class};
+    }
+
+    protected TypeMapperLazy getTypeMapperLazy() {
+        return typeMapperLazy;
     }
 
     /**
