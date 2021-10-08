@@ -19,7 +19,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
     @Unroll
     def "should append EntryAdded for #what"() {
         when:
-        def change = mapChangeAppender()
+        def change = new MapChangeAppender()
                     .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, property))
 
         then:
@@ -42,7 +42,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
     @Unroll
     def "should append EntryRemoved for #what"() {
         when:
-        def change = mapChangeAppender()
+        def change = new MapChangeAppender()
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, property))
 
         then:
@@ -68,7 +68,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightCdo = new SnapshotEntity(id:1,  mapOfEntities: [(new SnapshotEntity(id:2)): new SnapshotEntity(id:5)])
 
         when:
-        def change = mapChangeAppender()
+        def change = new MapChangeAppender()
                     .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "mapOfEntities"))
 
         then:
@@ -83,7 +83,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightCdo = new SnapshotEntity(id:1,  mapPrimitiveToEntity: [a:new SnapshotEntity(id:2), b:new SnapshotEntity(id:5)])
 
         when:
-        def change = mapChangeAppender()
+        def change = new MapChangeAppender()
                     .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "mapPrimitiveToEntity"))
 
         then:
@@ -93,7 +93,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should not support Map of ValueObject to ?, no good idea how to handle this"() {
         when:
-            mapChangeAppender().supports(getJaversType(new TypeToken<Map<DummyAddress, String>>(){}.getType()))
+            new MapChangeAppender().supports(getJaversType(new TypeToken<Map<DummyAddress, String>>(){}.getType()))
 
         then:
             def e = thrown(JaversException)
@@ -106,7 +106,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
             def rightCdo = new SnapshotEntity(id:1,  mapPrimitiveToVO: [a: new DummyAddress("London","Street")])
 
         when:
-             def change = mapChangeAppender()
+             def change = new MapChangeAppender()
                          .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "mapPrimitiveToVO"))
 
         then:
@@ -120,7 +120,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
             def rightCdo  = new SnapshotEntity(id:1,  mapOfEntities: [(new SnapshotEntity(id:12)): new SnapshotEntity(id:5)])
 
         when:
-          def change = mapChangeAppender()
+          def change = new MapChangeAppender()
                       .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "mapOfEntities"))
 
         then:

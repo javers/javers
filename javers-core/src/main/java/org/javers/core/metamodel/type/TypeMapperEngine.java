@@ -6,6 +6,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.java8support.Java8TypeAdapters;
@@ -24,6 +25,12 @@ class TypeMapperEngine {
 
     private final Map<String, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
+    private final TypeMapperLazy typeMapperlazy;
+
+    TypeMapperEngine(TypeMapperLazy typeMapperlazy, CoreConfiguration javersCoreConfiguration) {
+        this.typeMapperlazy = typeMapperlazy;
+        this.registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
+    }
 
     private void putIfAbsent(Type javaType, final JaversType jType) {
         Validate.argumentsAreNotNull(javaType, jType);
@@ -48,7 +55,7 @@ class TypeMapperEngine {
         registerCoreType(new PrimitiveType(Enum.class));
 
         //array
-        registerCoreType(new ArrayType(Object[].class));
+        registerCoreType(new ArrayType(Object[].class, typeMapperlazy));
 
         //well known Value types
         for (Class valueType : WellKnownValueTypes.getOldGoodValueTypes()) {
@@ -62,17 +69,17 @@ class TypeMapperEngine {
         registerCoreTypes((List) Java8TypeAdapters.valueTypes());
 
         //Collections
-        registerCoreType(new CollectionType(Collection.class));
-        registerCoreType(new SetType(Set.class));
+        registerCoreType(new CollectionType(Collection.class, typeMapperlazy));
+        registerCoreType(new SetType(Set.class, typeMapperlazy));
         if (listCompareAlgorithm == ListCompareAlgorithm.AS_SET) {
-            registerCoreType(new ListAsSetType(List.class));
+            registerCoreType(new ListAsSetType(List.class, typeMapperlazy));
         } else {
-            registerCoreType(new ListType(List.class));
+            registerCoreType(new ListType(List.class, typeMapperlazy));
         }
-        registerCoreType(new OptionalType());
+        registerCoreType(new OptionalType(typeMapperlazy));
 
         //& Maps
-        registerCoreType(new MapType(Map.class));
+        registerCoreType(new MapType(Map.class, typeMapperlazy));
     }
 
     void registerExplicitType(JaversType javersType) {

@@ -2,6 +2,7 @@ package org.javers.core;
 
 import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.TypeMapperLazy;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -15,7 +16,7 @@ public abstract class ConditionalTypesPlugin implements JaversBuilderPlugin {
         return Collections.emptyList();
     }
 
-    public Collection<JaversType> getNewTypes() {
+    public Collection<JaversType> getNewTypes(TypeMapperLazy typeMapperLazy) {
         return Collections.emptyList();
     }
 }

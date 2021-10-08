@@ -11,8 +11,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 public class ListAsSetType extends CollectionType {
 
-    public ListAsSetType(Type baseJavaType) {
-        super(baseJavaType);
+    public ListAsSetType(Type baseJavaType, TypeMapperLazy typeMapperLazy) {
+        super(baseJavaType, typeMapperLazy);
     }
 
     @Override

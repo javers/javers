@@ -1,12 +1,13 @@
 package org.javers.core.diff.appenders.levenshtein;
 
-import org.javers.common.validation.Validate;
 import org.javers.core.diff.EqualsFunction;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ListType;
 
 import java.util.List;
 
@@ -15,13 +16,6 @@ import java.util.List;
  */
 public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<ListChange> {
 
-    private final TypeMapper typeMapper;
-
-    LevenshteinListChangeAppender(TypeMapper typeMapper) {
-        Validate.argumentsAreNotNull(typeMapper);
-        this.typeMapper = typeMapper;
-    }
-
     @Override
     public boolean supports(JaversType propertyType) {
         return propertyType instanceof ListType;
@@ -29,7 +23,7 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
 
     @Override
     public ListChange calculateChanges(Object leftValue, Object rightValue, NodePair pair, JaversProperty property) {
-        JaversType itemType = typeMapper.getContainerItemType(property);
+        JaversType itemType = ((ListType)property.getType()).getItemJaversType();
 
         final List leftList =  (List) leftValue;
         final List rightList = (List) rightValue;

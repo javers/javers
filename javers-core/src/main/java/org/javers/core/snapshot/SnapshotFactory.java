@@ -60,7 +60,7 @@ public class SnapshotFactory {
     public CdoSnapshotState createSnapshotStateNoRefs(ManagedType managedType, Object instance) {
         CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
         for (JaversProperty property : managedType.getProperties()) {
-            if (typeMapper.isManagedType(property.getType()) ||
+            if (property.getType() instanceof ManagedType ||
                 typeMapper.isEnumerableOfManagedTypes(property.getType())) {
                 continue;
             }

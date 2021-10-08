@@ -131,7 +131,7 @@ class CdoSnapshotStateDeserializer {
         }
 
         JsonElement firstItem = propertyArray.get(0);
-        JaversType itemType = typeMapper.getJaversType(expectedContainerType.getItemType());
+        JaversType itemType = expectedContainerType.getItemJaversType();
         return unmatchedPrimitivesOnBothSides(itemType, firstItem);
     }
 

@@ -1,7 +1,6 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.AbstractDiffTest
-import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender;
 
 /**
  * @author bartosz walacik
@@ -9,26 +8,10 @@ import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender;
 abstract class AbstractDiffAppendersTest extends AbstractDiffTest {
 
     SimpleListChangeAppender listChangeAppender() {
-        new SimpleListChangeAppender(mapChangeAppender(), javers.typeMapper)
-    }
-
-    MapChangeAppender mapChangeAppender() {
-        new MapChangeAppender(javers.typeMapper)
-    }
-
-    OptionalChangeAppender optionalChangeAppender(){
-        new OptionalChangeAppender(javers.typeMapper)
-    }
-
-    LevenshteinListChangeAppender levenshteinListChangeAppender() {
-        new LevenshteinListChangeAppender(javers.typeMapper)
+        new SimpleListChangeAppender(new MapChangeAppender())
     }
 
     ArrayChangeAppender arrayChangeAppender() {
-        new ArrayChangeAppender(mapChangeAppender(), javers.typeMapper)
-    }
-
-    SetChangeAppender setChangeAppender() {
-        new SetChangeAppender(javers.typeMapper)
+        new ArrayChangeAppender(new MapChangeAppender())
     }
 }

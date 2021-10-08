@@ -16,8 +16,8 @@ import static java.util.stream.Collectors.toList;
 
 public class ListType extends CollectionType{
 
-    public ListType(Type baseJavaType) {
-        super(baseJavaType);
+    public ListType(Type baseJavaType, TypeMapperLazy typeMapperLazy) {
+        super(baseJavaType, typeMapperLazy);
     }
 
     /**

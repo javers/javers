@@ -6,7 +6,9 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.ArrayChange;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.map.EntryChange;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.ArrayType;
+import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.JaversType;
 
 import java.util.List;
 import java.util.Map;
@@ -16,11 +18,9 @@ import java.util.Map;
  */
 class ArrayChangeAppender implements PropertyChangeAppender<ArrayChange>{
     private final MapChangeAppender mapChangeAppender;
-    private final TypeMapper typeMapper;
 
-    ArrayChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
+    ArrayChangeAppender(MapChangeAppender mapChangeAppender) {
         this.mapChangeAppender = mapChangeAppender;
-        this.typeMapper = typeMapper;
     }
 
     @Override
@@ -35,10 +35,9 @@ class ArrayChangeAppender implements PropertyChangeAppender<ArrayChange>{
         Map rightMap = Arrays.asMap(pair.getRightDehydratedPropertyValueAndSanitize(property));
 
         ArrayType arrayType = property.getType();
-        MapContentType mapContentType = typeMapper.getMapContentType(arrayType);
 
         List<EntryChange> entryChanges =
-                mapChangeAppender.calculateEntryChanges(leftMap, rightMap, mapContentType);
+                mapChangeAppender.calculateEntryChanges(leftMap, rightMap, arrayType.getItemJaversType());
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());

@@ -26,11 +26,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @author bartosz walacik
  */
-public class TypeMapper {
+public class TypeMapper implements TypeMapperLazy {
     static final Logger logger = LoggerFactory.getLogger("org.javers.TypeMapper");
     static final ValueType OBJECT_TYPE = new ValueType(Object.class);
 
-    private final TypeMapperEngine engine = new TypeMapperEngine();
+    private final TypeMapperEngine engine;
     private final TypeFactory typeFactory;
 
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
@@ -38,9 +38,8 @@ public class TypeMapper {
     public TypeMapper(ClassScanner classScanner, CoreConfiguration javersCoreConfiguration, DynamicMappingStrategy dynamicMappingStrategy) {
         //Pico doesn't support cycles, so manual construction
         TypeFactory typeFactory = new TypeFactory(classScanner, this, dynamicMappingStrategy);
-
-        engine.registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
         this.typeFactory = typeFactory;
+        this.engine = new TypeMapperEngine(this, javersCoreConfiguration);
     }
 
     /**
@@ -48,28 +47,9 @@ public class TypeMapper {
      * no better idea how to writhe this test without additional constructor
      */
     @Deprecated
-    protected TypeMapper(TypeFactory typeFactory) {
+    protected TypeMapper(TypeFactory typeFactory, TypeMapperEngine engine) {
         this.typeFactory = typeFactory;
-    }
-
-    public MapContentType getMapContentType(KeyValueType mapType){
-        JaversType keyType = getJaversType(mapType.getKeyType());
-        JaversType valueType = getJaversType(mapType.getValueType());
-        return new MapContentType(keyType, valueType);
-    }
-
-    /**
-     * only for change appenders
-     */
-    public MapContentType getMapContentType(ContainerType containerType){
-        JaversType keyType = getJaversType(Integer.class);
-        JaversType valueType = getJaversType(containerType.getItemType());
-        return new MapContentType(keyType, valueType);
-    }
-
-    public JaversType getContainerItemType(JaversProperty property) {
-        ContainerType containerType = property.getType();
-        return getJaversType(containerType.getItemType());
+        this.engine = engine;
     }
 
     /**
@@ -80,7 +60,7 @@ public class TypeMapper {
             return false;
         }
 
-        return getJaversType(((ContainerType)javersType).getItemType()) instanceof ManagedType;
+        return ((ContainerType)javersType).getItemJaversType() instanceof ManagedType;
     }
 
     /**
@@ -90,17 +70,15 @@ public class TypeMapper {
         if (enumerableType instanceof KeyValueType){
             KeyValueType mapType = (KeyValueType)enumerableType;
 
-            JaversType keyType = getJaversType(mapType.getKeyType());
-            JaversType valueType = getJaversType(mapType.getValueType());
+            JaversType keyType = mapType.getKeyJaversType();
+            JaversType valueType = mapType.getValueJaversType();
 
-            return keyType instanceof ManagedType || valueType instanceof ManagedType;
+            return keyType instanceof ManagedType ||
+                   valueType instanceof ManagedType ||
+                   isContainerOfManagedTypes(valueType);
         } else{
             return false;
         }
-    }
-
-    public boolean isManagedType(JaversType javersType){
-        return javersType instanceof ManagedType;
     }
 
     public boolean isEnumerableOfManagedTypes(JaversType javersType){

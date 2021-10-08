@@ -152,12 +152,12 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new ShadowModule(getContainer()));
         addModule(new JqlModule(getContainer()));
 
-        // boot add-ons modules
-        Set<JaversType> additionalTypes = bootAddOns();
-
         // boot TypeMapper module
         addComponent(new DynamicMappingStrategy(ignoredClassesStrategy));
         addModule(new TypeMapperModule(getContainer()));
+
+        // boot add-ons modules
+        Set<JaversType> additionalTypes = bootAddOns();
 
         // boot JSON beans & domain aware typeAdapters
         bootJsonConverter();
@@ -845,6 +845,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return getContainerComponent(TypeMapper.class);
     }
 
+    private TypeMapperLazy typeMapperLazy() {
+        return (TypeMapperLazy)typeMapper();
+    }
+
     private CoreConfigurationBuilder configurationBuilder() {
         return this.coreConfigurationBuilder;
     }
@@ -861,7 +865,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
             plugin.beforeAssemble(this);
 
-            additionalTypes.addAll(plugin.getNewTypes());
+            additionalTypes.addAll(plugin.getNewTypes(typeMapperLazy()));
 
             AddOnsModule addOnsModule = new AddOnsModule(getContainer(), (Collection)plugin.getPropertyChangeAppenders());
             addModule(addOnsModule);

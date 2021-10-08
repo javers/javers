@@ -14,8 +14,8 @@ import static java.util.Collections.unmodifiableSet;
 
 public class SetType extends CollectionType{
 
-    public SetType(Type baseJavaType) {
-        super(baseJavaType);
+    public SetType(Type baseJavaType, TypeMapperLazy typeMapperLazy) {
+        super(baseJavaType, typeMapperLazy);
     }
 
     @Override

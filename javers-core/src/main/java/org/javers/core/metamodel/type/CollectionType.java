@@ -19,8 +19,8 @@ import static java.util.stream.Collectors.toList;
  */
 public class CollectionType extends ContainerType {
 
-    public CollectionType(Type baseJavaType) {
-        super(baseJavaType);
+    public CollectionType(Type baseJavaType, TypeMapperLazy typeMapperLazy) {
+        super(baseJavaType, typeMapperLazy);
     }
 
     @Override

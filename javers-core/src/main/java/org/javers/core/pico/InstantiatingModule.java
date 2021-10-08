@@ -13,6 +13,8 @@ import org.picocontainer.adapters.AbstractAdapter;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class InstantiatingModule {
 
@@ -29,6 +31,14 @@ public abstract class InstantiatingModule {
             ConstructorInjector constructorInjector = new ConstructorInjector(implementation);
             container.addAdapter(constructorInjector);
         }
+
+        for (Object bean : getBeans()) {
+            container.addComponent(bean);
+        }
+    }
+
+    protected List<?> getBeans() {
+        return Collections.emptyList();
     }
 
     protected abstract Collection<Class> getImplementations();
@@ -57,4 +67,7 @@ public abstract class InstantiatingModule {
         }
     }
 
+    protected MutablePicoContainer getContainer() {
+        return container;
+    }
 }

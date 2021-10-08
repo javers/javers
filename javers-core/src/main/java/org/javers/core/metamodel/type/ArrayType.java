@@ -24,8 +24,8 @@ import static org.javers.common.collections.Collections.wrapNull;
  */
 public class ArrayType extends ContainerType {
 
-    public ArrayType(Type baseJavaType) {
-        super(baseJavaType);
+    public ArrayType(Type baseJavaType, TypeMapperLazy typeMapperLazy) {
+        super(baseJavaType, typeMapperLazy);
     }
 
     @Override

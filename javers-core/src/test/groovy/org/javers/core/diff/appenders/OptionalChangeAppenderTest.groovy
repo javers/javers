@@ -21,7 +21,7 @@ class OptionalChangeAppenderTest extends AbstractDiffAppendersTest {
         def property = getProperty(SnapshotEntity, "optionalInteger")
 
         when:
-        def change = optionalChangeAppender()
+        def change = new OptionalChangeAppender()
                 .calculateChanges(realNodePair(left, right), property)
         then:
         !change
@@ -41,7 +41,7 @@ class OptionalChangeAppenderTest extends AbstractDiffAppendersTest {
         def property = getProperty(SnapshotEntity, "optionalEntity")
 
         when:
-        def change = optionalChangeAppender()
+        def change = new OptionalChangeAppender()
                 .calculateChanges(realNodePair(left, right), property)
 
         then:
@@ -70,7 +70,7 @@ class OptionalChangeAppenderTest extends AbstractDiffAppendersTest {
         def property = getProperty(SnapshotEntity, "optionalInteger")
 
         when:
-        def change = optionalChangeAppender()
+        def change = new OptionalChangeAppender()
                 .calculateChanges(realNodePair(left, right), property)
         then:
         change instanceof ValueChange

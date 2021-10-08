@@ -4,12 +4,15 @@ import com.google.common.reflect.TypeToken
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.lang.reflect.Type
+
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
 /**
  * @author bartosz walacik
  */
 class CollectionTypeTest extends Specification{
+
     class Dummy <T> {
         Set rawType
         Set<?> unboundedWildcardType
@@ -25,7 +28,7 @@ class CollectionTypeTest extends Specification{
         def noGeneric = getFieldFromClass(Dummy, fieldName).genericType
 
         when:
-        def itemType = new ListType(noGeneric).getItemClass()
+        def itemType = listType(noGeneric).getItemClass()
 
         then:
         itemType == Object
@@ -39,12 +42,12 @@ class CollectionTypeTest extends Specification{
         def genericWithArgument = getFieldFromClass(Dummy, "parametrizedType").genericType
 
         when:
-        def cType = new ListType(genericWithArgument)
+        def cType = listType(genericWithArgument)
 
         then:
         cType.baseJavaType == new TypeToken<Set<String>>(){}.type
         cType.genericType == true
-        cType.itemType == String
+        cType.itemJavaType == String
     }
 
     def "should treat wildcards with an upper bound as the type of its upper bound" () {
@@ -52,12 +55,12 @@ class CollectionTypeTest extends Specification{
         def genericWithArgument = getFieldFromClass(Dummy, "boundedWildcardType").genericType
 
         when:
-        def cType = new ListType(genericWithArgument)
+        def cType = listType(genericWithArgument)
 
         then:
         cType.baseJavaType == new TypeToken<Set<? extends String>>(){}.type
         cType.genericType == true
-        cType.itemType == String
+        cType.itemJavaType == String
     }
 
     def "should scan nested generic type from Set type parameter" () {
@@ -65,10 +68,18 @@ class CollectionTypeTest extends Specification{
         def genericWithArgument = getFieldFromClass(Dummy, "nestedParametrizedType").genericType
 
         when:
-        def cType = new SetType(genericWithArgument)
+        def cType = setType(genericWithArgument)
 
         then:
         cType.baseJavaType == new TypeToken< Set<ThreadLocal<String>> >(){}.type
-        cType.itemType ==  new TypeToken< ThreadLocal<String> >(){}.type
+        cType.itemJavaType ==  new TypeToken< ThreadLocal<String> >(){}.type
+    }
+
+    ListType listType(Type type) {
+        new ListType(type, { it -> new ValueType(Object) })
+    }
+
+    SetType setType(Type type) {
+        new SetType(type, { it -> new ValueType(Object) })
     }
 }

@@ -16,7 +16,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode =  new SnapshotEntity(id:1, listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
         def rightNode = new SnapshotEntity(id:1, listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "listOfEntities"))
 
         then:
@@ -30,7 +30,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode =  new SnapshotEntity(id:1, listOfEntities: [new SnapshotEntity(id:2)])
         def rightNode = new SnapshotEntity(id:1, listOfEntities: [new SnapshotEntity(id:2), added])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "listOfEntities"))
 
         then:
@@ -47,7 +47,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightNode = dummyUser().withIntegerList(rightList)
 
         when:
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                      realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
@@ -67,7 +67,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode = dummyUser().withIntegerList([1, 2, 3])
         def rightNode = dummyUser().withIntegerList([1, 2, 3])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
@@ -80,7 +80,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode = dummyUser().withIntegerList([1, 2, 3])
         def rightNode = dummyUser().withIntegerList([1, 2, 3, 4])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
@@ -95,7 +95,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode = dummyUser().withIntegerList([1, 2, 3])
         def rightNode = dummyUser().withIntegerList([1, 2, 4, 3])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
@@ -110,7 +110,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode = dummyUser().withIntegerList([1, 2, 4, 3])
         def rightNode = dummyUser().withIntegerList([1, 2, 3])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
@@ -125,7 +125,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode =   dummyUser().withIntegerList([1, 2, 3])
         def rightNode =  dummyUser().withIntegerList([1, 2])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
@@ -140,7 +140,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode = dummyUser().withIntegerList([1, 2, 4, 3])
         def rightNode = dummyUser().withIntegerList([1, 2, 5, 3])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
 
@@ -155,7 +155,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode = dummyUser().withIntegerList([0, 1, 2, 4])
         def rightNode = dummyUser().withIntegerList([0, 1, 2, 5])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
@@ -170,7 +170,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
       def rightNode = dummyUser().withIntegerList([5])
 
       when:
-      def change = levenshteinListChangeAppender().calculateChanges(
+      def change = new LevenshteinListChangeAppender().calculateChanges(
               realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
       then:
@@ -184,7 +184,7 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
         def leftNode = dummyUser().withIntegerList([0, 1, 2, 4])
         def rightNode = dummyUser().withIntegerList([0, 1, 3, 5, 6])
 
-        def change = levenshteinListChangeAppender().calculateChanges(
+        def change = new LevenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:

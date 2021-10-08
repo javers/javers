@@ -13,12 +13,6 @@ import java.util.LinkedList;
  */
 class GlobalIdPathParser {
 
-    private final TypeMapper typeMapper;
-
-    public GlobalIdPathParser(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
-    }
-
     ValueObjectType parseChildValueObject(ManagedType ownerType, String path){
         return parseChildValueObjectFromPathSegments(ownerType, pathToSegments(path), path);
     }
@@ -48,14 +42,14 @@ class GlobalIdPathParser {
         }
 
         if (voPropertyType instanceof ContainerType) {
-            JaversType contentType  = typeMapper.getJaversType(((ContainerType) voPropertyType).getItemType());
+            JaversType contentType  = ((ContainerType) voPropertyType).getItemJaversType();
             if (contentType instanceof ValueObjectType){
                 return (ValueObjectType)contentType;
             }
         }
 
         if (voPropertyType instanceof MapType){
-            JaversType valueType  = typeMapper.getJaversType(((MapType) voPropertyType).getValueType());
+            JaversType valueType  = ((MapType) voPropertyType).getValueJaversType();
             if (valueType instanceof ValueObjectType){
                 return (ValueObjectType)valueType;
             }
