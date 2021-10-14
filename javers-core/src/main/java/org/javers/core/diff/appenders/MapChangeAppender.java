@@ -34,7 +34,6 @@ class MapChangeAppender implements PropertyChangeAppender<MapChange> {
 
     @Override
     public MapChange calculateChanges(NodePair pair, JaversProperty property) {
-
         MapType mapType = property.getType();
 
         Map left =  wrapKeysIfNeeded((Map) pair.getLeftDehydratedPropertyValueAndSanitize(property), mapType.getKeyJaversType());

@@ -91,15 +91,6 @@ class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
                         valueObjectId(1, SnapshotEntity, "multimapPrimitiveToValueObject/a/fe9f8f0d164b49489301b7eaefc00c13")]
     }
 
-    def "should not support Map of ValueObject to ?"() {
-        when:
-        multimapChangeAppender().supports(getJaversType(new TypeToken<Multimap<DummyAddress, String>>() {}.getType()))
-
-        then:
-        def e = thrown(JaversException)
-        e.code == VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
-    }
-
     def "should EntryAdded & EntryRemoved when key is changed"() {
         given:
         def leftCdo = new SnapshotEntity(id: 1, multiMapEntityToEntity: create((new SnapshotEntity(id: 10)): [new SnapshotEntity(id: 5)]))
