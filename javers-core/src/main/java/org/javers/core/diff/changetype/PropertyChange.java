@@ -14,7 +14,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @author bartosz walacik
  */
-public abstract class PropertyChange extends Change {
+public abstract class PropertyChange<T> extends Change {
     private final PropertyChangeType changeType;
     private final String propertyName;
 
@@ -23,6 +23,16 @@ public abstract class PropertyChange extends Change {
         this.propertyName = propertyChangeMetadata.getPropertyName();
         this.changeType = propertyChangeMetadata.getChangeType();
     }
+
+    /**
+     * Left (or old) property value
+     */
+    public abstract T getLeft();
+
+    /**
+     * Right (or new) property value
+     */
+    public abstract T getRight();
 
     public String getPropertyName(){
         return propertyName;

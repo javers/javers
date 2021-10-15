@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  * @author bartosz walacik
  */
-public class ValueChange extends PropertyChange {
+public class ValueChange extends PropertyChange<Object> {
     private final Atomic left;
     private final Atomic right;
 
@@ -20,10 +20,12 @@ public class ValueChange extends PropertyChange {
         this.right = new Atomic(rightValue);
     }
 
+    @Override
     public Object getLeft() {
         return left.unwrap();
     }
 
+    @Override
     public Object getRight() {
         return right.unwrap();
     }

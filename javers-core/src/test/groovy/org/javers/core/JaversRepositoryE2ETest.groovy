@@ -10,6 +10,7 @@ import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.annotation.TypeName
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository
@@ -1219,9 +1220,6 @@ class JaversRepositoryE2ETest extends Specification {
           lastCommit = javers.commit("a", entity)
       }
 
-      println firstCommit
-      println lastCommit
-
       when:
       def snapshots = javers
               .findSnapshots(QueryBuilder.anyDomainObject()
@@ -1376,5 +1374,78 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         snapshots.size() == 0
+    }
+
+    def "should provide old and new Collections in Changes loaded from Repository" () {
+        given:
+        def s = new SnapshotEntity(
+                id:1,
+                arrayOfIntegers : [1,3],
+                arrayOfInts : [1,3],
+                arrayOfEntities : [new SnapshotEntity(id:2)],
+                listOfEntities: [new SnapshotEntity(id:2)],
+                setOfEntities: [new SnapshotEntity(id:2)] as Set,
+                mapPrimitiveToEntity: ['k':new SnapshotEntity(id:2)]
+        )
+
+        when:
+        javers.commit('author', s)
+        s = new SnapshotEntity(
+                id:1,
+                arrayOfIntegers : [1,2],
+                arrayOfInts : [1,2],
+                arrayOfEntities : [new SnapshotEntity(id:3)],
+                listOfEntities: [new SnapshotEntity(id:3)],
+                setOfEntities: [new SnapshotEntity(id:3)] as Set,
+                mapPrimitiveToEntity: ['k':new SnapshotEntity(id:3)]
+        )
+        javers.commit('author', s)
+
+        def changes = javers.findChanges(byInstanceId(1, SnapshotEntity).build())
+        println(changes.prettyPrint())
+
+        then:
+        with(changes.getPropertyChanges('arrayOfIntegers')[0]) {
+            it.left instanceof Integer[]
+            it.left == [1,3]
+            it.right instanceof Integer[]
+            it.right == [1,2]
+        }
+        with (changes.getPropertyChanges('arrayOfInts')[0]) {
+            it.left instanceof int[]
+            it.left == [1,3]
+            it.right instanceof int[]
+            it.right == [1,2]
+        }
+        with (changes.getPropertyChanges('arrayOfEntities')[0]) {
+            it.left instanceof Object[]
+            it.left[0].value().endsWith('SnapshotEntity/2')
+            it.right instanceof Object[]
+            it.right[0].value().endsWith('SnapshotEntity/3')
+        }
+        with (changes.getPropertyChanges('listOfEntities')[0]) {
+            it.left instanceof List
+            it.left[0].value().endsWith('SnapshotEntity/2')
+            it.right instanceof List
+            it.right[0].value().endsWith('SnapshotEntity/3')
+        }
+        with (changes.getPropertyChanges('setOfEntities')[0]) {
+            it.left instanceof Set
+            it.left[0].value().endsWith('SnapshotEntity/2')
+            it.right instanceof Set
+            it.right[0].value().endsWith('SnapshotEntity/3')
+        }
+        with (changes.getPropertyChanges('setOfEntities')[0]) {
+            it.left instanceof Set
+            it.left[0].value().endsWith('SnapshotEntity/2')
+            it.right instanceof Set
+            it.right[0].value().endsWith('SnapshotEntity/3')
+        }
+        with (changes.getPropertyChanges('mapPrimitiveToEntity')[0]) {
+            it.left instanceof Map
+            it.left['k'].value().endsWith('SnapshotEntity/2')
+            it.right instanceof Map
+            it.right['k'].value().endsWith('SnapshotEntity/3')
+        }
     }
 }

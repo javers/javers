@@ -8,6 +8,8 @@ import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ListAsSetType;
 
+import java.util.List;
+
 /**
  * @author Sergey Kobyshev
  */
@@ -30,8 +32,8 @@ public class ListAsSetChangeAppender implements PropertyChangeAppender<ListChang
 
         if (setChange != null) {
             return new ListChange(pair.createPropertyChangeMetadata(property), setChange.getChanges(),
-                new Atomic(pair.sanitize(pair.getLeftPropertyValue(property), property.getType()))
-                    ,new Atomic(pair.sanitize(pair.getRightPropertyValue(property), property.getType())));
+                    (List)pair.getLeftPropertyValueAndSanitize(property),
+                    (List)pair.getRightPropertyValueAndSanitize(property));
         }
         return null;
     }

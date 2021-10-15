@@ -5,9 +5,6 @@ import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
-
-import java.time.LocalDate
-
 import static org.javers.core.diff.appenders.ContainerChangeAssert.assertThat
 import static org.javers.core.model.DummyUser.dummyUser
 
@@ -196,23 +193,5 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
                 .hasValueChange(2, 2, 3)
                 .hasValueChange(3, 4, 5)
                 .hasValueAdded(4, 6)
-    }
-
-    def "should set left and right value in change"(){
-        given:
-        def leftCdo = new SnapshotEntity("listOfDates": [LocalDate.of(2001, 5, 5), LocalDate.of(2001, 1, 1)])
-        def rightCdo = new SnapshotEntity("listOfDates": [LocalDate.of(2001, 1, 1)])
-
-        when:
-        def change = levenshteinListChangeAppender()
-            .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "listOfDates"))
-
-        then:
-        change.left.size() == 2
-        change.right.size() == 1
-        change.left.contains(LocalDate.of(2001,5,5))
-        change.left.contains(LocalDate.of(2001,1,1))
-        change.right.contains(LocalDate.of(2001,1,1))
-        !change.right.contains(LocalDate.of(2001,5,5))
     }
 }

@@ -10,9 +10,9 @@ import org.javers.core.diff.changetype.PropertyChangeMetadata;
  *
  * @author bartosz walacik
  */
-public abstract class CollectionChange<T extends Collection<Object>> extends ContainerChange<T> {
+public abstract class CollectionChange<T extends Collection<?>> extends ContainerChange<T> {
 
-    public CollectionChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes, Atomic left, Atomic right) {
-        super(metadata, changes,left,right);
+    public CollectionChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes, Collection left, Collection right) {
+        super(metadata, changes, (T)left, (T)right);
     }
 }

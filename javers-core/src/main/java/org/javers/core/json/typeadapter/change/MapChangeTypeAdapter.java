@@ -99,7 +99,7 @@ class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
     private void appendBody(MapChange change, JsonObject toJson, JsonSerializationContext context) {
         JsonArray jsonArray = new JsonArray();
 
-        for (EntryChange entryChange : change.getEntryChanges()) {
+        for (EntryChange entryChange : (List<EntryChange>)change.getEntryChanges()) {
             JsonObject jsonElement = new JsonObject();
             jsonElement.addProperty(ENTRY_CHANGE_TYPE_FIELD, entryChange.getClass().getSimpleName());
 

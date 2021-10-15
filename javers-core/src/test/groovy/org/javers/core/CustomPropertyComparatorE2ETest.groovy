@@ -216,8 +216,8 @@ class CustomPropertyComparatorE2ETest extends Specification {
         println(diff.prettyPrint())
         diff.changes.size() == 1
         MapChange change = diff.changes[0]
-        change.changes.size() == 1
-        with(change.changes[0]) {
+        change.entryChanges.size() == 1
+        with(change.entryChanges[0]) {
             it instanceof EntryValueChange
             it.key.toLowerCase() == "aaa"
             it.leftValue == "aa"
@@ -335,9 +335,9 @@ class CustomPropertyComparatorE2ETest extends Specification {
         with(diff.changes[0]) {
             affectedGlobalId instanceof UnboundedValueObjectId
             propertyName == "multimap"
-            changes[0].key == "a"
-            changes[0].leftValue == 1
-            changes[0].rightValue == 2
+            entryChanges[0].key == "a"
+            entryChanges[0].leftValue == 1
+            entryChanges[0].rightValue == 2
         }
     }
 }

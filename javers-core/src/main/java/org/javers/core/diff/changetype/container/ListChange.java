@@ -1,5 +1,6 @@
 package org.javers.core.diff.changetype.container;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.javers.core.diff.changetype.Atomic;
@@ -10,12 +11,15 @@ import org.javers.core.diff.changetype.PropertyChangeMetadata;
  *
  * @author pawel szymczyk
  */
-public final class ListChange extends CollectionChange<List<Object>> {
+public final class ListChange extends CollectionChange<List<?>> {
 
-    public ListChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes ,Atomic left, Atomic right) {
+    public ListChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes, List left, List right) {
         super(metadata, changes,left,right);
     }
 
+    public ListChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes) {
+        super(metadata, changes, Collections.emptyList(), Collections.emptyList());
+    }
 
     @Override
     public boolean equals(Object obj) {

@@ -32,7 +32,7 @@ class CustomPropertyComparatorExample extends Specification {
             Sets.difference(leftSet, rightSet).forEach{c -> changes.add(new ValueRemoved(c))}
             Sets.difference(rightSet, leftSet).forEach{c -> changes.add(new ValueAdded(c))}
 
-            return Optional.of(new SetChange(metadata, changes,new Atomic(leftSet), new Atomic(rightSet)))
+            return Optional.of(new SetChange(metadata, changes, leftSet, rightSet));
         }
 
         @Override

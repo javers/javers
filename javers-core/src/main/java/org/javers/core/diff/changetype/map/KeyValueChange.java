@@ -1,9 +1,8 @@
-package org.javers.core.diff.changetype.container;
+package org.javers.core.diff.changetype.map;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
-import org.javers.core.diff.changetype.Atomic;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.PropertyChangeMetadata;
 
@@ -12,18 +11,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Changes on an Array or Collection property
- *
- * @author bartosz walacik
- */
-public abstract class ContainerChange<T> extends PropertyChange<T> {
-    private final List<ContainerElementChange> changes;
+public abstract class KeyValueChange<T> extends PropertyChange<T> {
+    private final List<EntryChange> changes;
 
     private transient final T left;
     private transient final T right;
 
-    ContainerChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes, T left, T right) {
+    public KeyValueChange(PropertyChangeMetadata metadata, List<EntryChange> changes, T left, T right) {
         super(metadata);
         Validate.argumentIsNotNull(changes);
         Validate.argumentCheck(!changes.isEmpty(),"changes list should not be empty");
@@ -42,33 +36,32 @@ public abstract class ContainerChange<T> extends PropertyChange<T> {
         return left;
     }
 
-    public List<ContainerElementChange> getChanges() {
+    public List<EntryChange> getEntryChanges() {
         return changes;
     }
 
-    public List<ValueAdded> getValueAddedChanges() {
-        return (List)Lists.positiveFilter(changes, input -> input instanceof ValueAdded);
+    public List<EntryAdded> getEntryAddedChanges() {
+        return filterChanges(EntryAdded.class);
     }
 
-    public List<ValueRemoved> getValueRemovedChanges() {
-        return (List)Lists.positiveFilter(changes, input -> input instanceof ValueRemoved);
+    public List<EntryRemoved> getEntryRemovedChanges() {
+        return filterChanges(EntryRemoved.class);
     }
 
-    public List<?> getAddedValues() {
-        return Lists.transform(getValueAddedChanges(), input -> input.getAddedValue());
+    public List<EntryValueChange> getEntryValueChanges() {
+        return filterChanges(EntryValueChange.class);
     }
 
-    public List<?> getRemovedValues() {
-        return Lists.transform(getValueRemovedChanges(), input -> input.getRemovedValue());
+    private <T extends EntryChange> List<T> filterChanges(final Class<T> ofType) {
+        return (List) Lists.positiveFilter(changes, input -> ofType.isAssignableFrom(input.getClass()));
     }
 
     @Override
     public String prettyPrint(PrettyValuePrinter valuePrinter) {
         Validate.argumentIsNotNull(valuePrinter);
-
         StringBuilder builder = new StringBuilder();
 
-        builder.append(valuePrinter.formatWithQuotes(getPropertyNameWithPath()) + " collection changes :\n");
+        builder.append(valuePrinter.formatWithQuotes(getPropertyNameWithPath()) + " map changes :\n");
 
         changes.forEach(cc -> builder.append("   " + cc.prettyPrint(valuePrinter)+"\n"));
 
@@ -81,8 +74,8 @@ public abstract class ContainerChange<T> extends PropertyChange<T> {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof ContainerChange) {
-            ContainerChange that = (ContainerChange) obj;
+        if (obj instanceof KeyValueChange) {
+            KeyValueChange that = (KeyValueChange) obj;
             return super.equals(that)
                     && Objects.equals(this.changes, that.changes);
         }
@@ -91,12 +84,12 @@ public abstract class ContainerChange<T> extends PropertyChange<T> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), changes);
+        return Objects.hash(super.hashCode(), this.changes);
     }
 
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
-                " elementChanges:"+changes.size()+" }";
+                " entryChanges:"+changes.size()+" }";
     }
 }

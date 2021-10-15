@@ -36,22 +36,20 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
         final BacktrackSteps[][] steps = backtrack.evaluateSteps(leftList, rightList);
         final List<ContainerElementChange> changes = stepsToChanges.convert(steps, leftList, rightList);
 
-        ListChange result = getListChange(pair, property, changes);
+        ListChange result = createListChange(pair, property, changes, leftList, rightList);
         if (result != null) {
             renderNotParametrizedWarningIfNeeded(itemType.getBaseJavaType(), "item", "List", property);
         }
         return result;
     }
 
-    private ListChange getListChange(NodePair pair, JaversProperty property, List<ContainerElementChange> changes) {
+    private ListChange createListChange(NodePair pair, JaversProperty property, List<ContainerElementChange> changes, List left, List right) {
         final ListChange result;
 
         if (changes.isEmpty()) {
             result = null;
         } else {
-            result = new ListChange(pair.createPropertyChangeMetadata(property), changes,
-                new Atomic(pair.sanitize(pair.getLeftPropertyValue(property),property.getType())), new Atomic(pair.sanitize(pair.getRightPropertyValue(property),
-                property.getType())));
+            result = new ListChange(pair.createPropertyChangeMetadata(property), changes, left, right);
         }
         return result;
     }

@@ -3,6 +3,7 @@ package org.javers.core.diff.appenders
 import com.google.gson.reflect.TypeToken
 import org.javers.common.exception.JaversException
 import org.javers.core.JaversBuilder
+import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.map.EntryAddOrRemove
 import org.javers.core.diff.changetype.map.EntryAdded
 import org.javers.core.diff.changetype.map.EntryRemoved
@@ -12,6 +13,7 @@ import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
+import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
 
 import java.time.LocalDateTime
@@ -63,15 +65,15 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
         def diff = javers.compare(a,b)
 
         then:
-        with(diff.getPropertyChanges('mapWithValueKey')[0].changes[0]) {
+        with(diff.getPropertyChanges('mapWithValueKey')[0].entryChanges[0]) {
             it.key == En.A
             it.value == "a"
         }
-        with(diff.getPropertyChanges('mapWithPrimitiveKey')[0].changes[0]) {
+        with(diff.getPropertyChanges('mapWithPrimitiveKey')[0].entryChanges[0]) {
             it.key == "a"
             it.value == "b"
         }
-        with(diff.getPropertyChanges('mapWithEntityKey')[0].changes[0]) {
+        with(diff.getPropertyChanges('mapWithEntityKey')[0].entryChanges[0]) {
             it.key instanceof InstanceId
             it.key.value().endsWith('MapChangeAppenderTest$Entity/2')
             it.value == "b"

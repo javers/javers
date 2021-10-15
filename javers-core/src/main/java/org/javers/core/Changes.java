@@ -4,6 +4,7 @@ import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.jql.JqlQuery;
 
@@ -79,6 +80,13 @@ public class Changes extends AbstractList<Change> implements Serializable {
         });
 
         return unmodifiableList(result);
+    }
+
+    public List<PropertyChange> getPropertyChanges(String propertyName) {
+        return (List)changes.stream()
+                .filter(it -> it instanceof PropertyChange
+                        && ((PropertyChange) it).getPropertyName().equals(propertyName))
+                .collect(Collectors.toList());
     }
 
     /**

@@ -40,13 +40,12 @@ class ArrayChangeAppender implements PropertyChangeAppender<ArrayChange>{
 
         List<EntryChange> entryChanges =
                 mapChangeAppender.calculateEntryChanges(leftMap, rightMap, arrayType.getItemJaversType());
-        Object leftProperty = pair.getLeftDehydratedPropertyValueAndSanitize(property);
-        Object rightProperty = pair.getRightDehydratedPropertyValueAndSanitize(property);
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-            return new ArrayChange(pair.createPropertyChangeMetadata(property), elementChanges, new Atomic(leftProperty == null ? Collections.emptyList() : Arrays.asList(leftProperty)),
-                new Atomic(rightProperty == null ? Collections.emptyList() : Arrays.asList(rightProperty)));
+            return new ArrayChange(pair.createPropertyChangeMetadata(property), elementChanges,
+                pair.getLeftPropertyValueAndSanitize(property),
+                pair.getRightPropertyValueAndSanitize(property));
         }
         else {
             return null;

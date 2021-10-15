@@ -44,7 +44,9 @@ class MapChangeAppender implements PropertyChangeAppender<MapChange> {
         if (!changes.isEmpty()){
             renderNotParametrizedWarningIfNeeded(mapType.getKeyJavaType(), "key", "Map", property);
             renderNotParametrizedWarningIfNeeded(mapType.getValueJavaType(), "value", "Map", property);
-            return new MapChange(pair.createPropertyChangeMetadata(property), changes);
+            return new MapChange(pair.createPropertyChangeMetadata(property), changes,
+                    (Map)pair.getLeftPropertyValueAndSanitize(property),
+                    (Map)pair.getRightPropertyValueAndSanitize(property));
         }
         else {
             return null;

@@ -49,11 +49,11 @@ public class NodePair {
     }
 
     public Object getLeftPropertyValue(Property property) {
-        return left == null? null : left.getPropertyValue(property);
+        return left.getPropertyValue(property);
     }
 
     public Object getRightPropertyValue(Property property) {
-        return right == null? null : right.getPropertyValue(property);
+        return right.getPropertyValue(property);
     }
 
     public GlobalId getRightReference(Property property) {
@@ -137,6 +137,14 @@ public class NodePair {
 
     public Object getLeftDehydratedPropertyValueAndSanitize(JaversProperty property) {
         return sanitize(getLeft().getDehydratedPropertyValue(property), property.getType());
+    }
+
+    public Object getLeftPropertyValueAndSanitize(JaversProperty property) {
+        return sanitize(getLeft().getPropertyValue(property), property.getType());
+    }
+
+    public Object getRightPropertyValueAndSanitize(JaversProperty property) {
+        return sanitize(getRight().getPropertyValue(property), property.getType());
     }
 
     public Object sanitize(Object value, JaversType expectedType) {
