@@ -1,6 +1,7 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
+import org.javers.core.diff.changetype.Atomic;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.metamodel.type.JaversProperty;
@@ -28,8 +29,11 @@ public class ListAsSetChangeAppender implements PropertyChangeAppender<ListChang
         SetChange setChange = setChangeAppender.calculateChanges(pair, property);
 
         if (setChange != null) {
-            return new ListChange(pair.createPropertyChangeMetadata(property), setChange.getChanges());
+            return new ListChange(pair.createPropertyChangeMetadata(property), setChange.getChanges(),
+                new Atomic(pair.sanitize(pair.getLeftPropertyValue(property), property.getType()))
+                    ,new Atomic(pair.sanitize(pair.getRightPropertyValue(property), property.getType())));
         }
         return null;
     }
+
 }
