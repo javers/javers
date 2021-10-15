@@ -1,5 +1,5 @@
 ./gradlew -v
 
-./gradlew clean build -x test publish closeAndReleaseSonatypeStagingRepository
+./gradlew clean build -x test publishToSonatype closeAndReleaseSonatypeStagingRepository
 
 echo "published"
