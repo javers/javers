@@ -5,6 +5,7 @@ import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.changetype.*
+import org.javers.core.diff.changetype.container.CollectionChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.ValueAdded
 import org.javers.core.examples.model.Person
@@ -680,5 +681,41 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       changes[0].propertyRemoved
       changes[1].propertyRemoved
       changes[2].propertyRemoved
+    }
+
+    def "should store both states from Collection diff after value removed"(){
+        given:
+        def javers = javers().build()
+        def object1 = new Entity2(id:1,propsList: ["1","2","3"])
+        def object2 = new Entity2(id:1,propsList: ["1","2"])
+
+        when:
+        def diff = javers.compare(object1, object2)
+        def changes = diff.getChangesByType(CollectionChange)
+
+        then:
+        def right = changes.get(0).right
+        def left = changes.get(0).left
+
+        assert right == ["1","2"]
+        assert left == ["1","2","3"]
+    }
+
+    def "should store both states from Collection diff after value added"(){
+        given:
+        def javers = javers().build()
+        def object1 = new Entity2(id:1,propsList: ["1","2","3"])
+        def object2 = new Entity2(id:1,propsList: ["1","2","3","4"])
+
+        when:
+        def diff = javers.compare(object1, object2)
+        def changes = diff.getChangesByType(CollectionChange)
+
+        then:
+        def right = changes.get(0).right
+        def left = changes.get(0).left
+
+        assert right == ["1","2","3","4"]
+        assert left == ["1","2","3"]
     }
 }

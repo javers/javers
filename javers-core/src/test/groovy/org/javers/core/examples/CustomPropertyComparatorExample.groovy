@@ -2,6 +2,7 @@ package org.javers.core.examples
 
 import org.javers.common.collections.Sets
 import org.javers.core.JaversBuilder
+import org.javers.core.diff.changetype.Atomic
 import org.javers.core.diff.changetype.PropertyChangeMetadata
 import org.javers.core.diff.changetype.container.*
 import org.javers.core.diff.custom.CustomPropertyComparator
@@ -31,7 +32,7 @@ class CustomPropertyComparatorExample extends Specification {
             Sets.difference(leftSet, rightSet).forEach{c -> changes.add(new ValueRemoved(c))}
             Sets.difference(rightSet, leftSet).forEach{c -> changes.add(new ValueAdded(c))}
 
-            return Optional.of(new SetChange(metadata, changes))
+            return Optional.of(new SetChange(metadata, changes,new Atomic(leftSet), new Atomic(rightSet)))
         }
 
         @Override

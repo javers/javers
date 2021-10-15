@@ -3,6 +3,7 @@ package org.javers.core.diff.appenders.levenshtein;
 import org.javers.core.diff.EqualsFunction;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
+import org.javers.core.diff.changetype.Atomic;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.metamodel.type.JaversProperty;
@@ -45,10 +46,12 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
     private ListChange getListChange(NodePair pair, JaversProperty property, List<ContainerElementChange> changes) {
         final ListChange result;
 
-        if (changes.size() == 0) {
+        if (changes.isEmpty()) {
             result = null;
         } else {
-            result = new ListChange(pair.createPropertyChangeMetadata(property), changes);
+            result = new ListChange(pair.createPropertyChangeMetadata(property), changes,
+                new Atomic(pair.sanitize(pair.getLeftPropertyValue(property),property.getType())), new Atomic(pair.sanitize(pair.getRightPropertyValue(property),
+                property.getType())));
         }
         return result;
     }
