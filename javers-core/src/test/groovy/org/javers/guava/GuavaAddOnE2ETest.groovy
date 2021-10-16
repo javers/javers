@@ -2,11 +2,13 @@ package org.javers.guava
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.HashMultiset
+import com.google.common.collect.Multiset
 import org.javers.common.exception.JaversException
 import org.javers.core.Javers
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ReferenceChange
+import org.javers.core.diff.changetype.container.ContainerChange
 import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.container.ValueAdded
 import org.javers.core.diff.changetype.map.EntryAdded
@@ -14,6 +16,7 @@ import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
@@ -38,7 +41,7 @@ class GuavaAddOnE2ETest extends Specification {
 
         then:
         diff.changes.size() == 1
-        diff.changes[0] instanceof SetChange
+        diff.changes[0] instanceof MultisetChange
         diff.changes[0].changes.size() == expectedContainerChanges
 
         where:
@@ -103,7 +106,7 @@ class GuavaAddOnE2ETest extends Specification {
 
         then:
         diff.changes.size() == 1
-        diff.changes[0] instanceof SetChange
+        diff.changes[0] instanceof MultisetChange
         diff.changes[0].changes.size() == 1
         with(diff.changes[0].changes[0]){
             it instanceof ValueAdded
@@ -151,6 +154,7 @@ class GuavaAddOnE2ETest extends Specification {
         extpectedChanges << [2, 2, 1]
     }
 
+    @Unroll
     def "should detect value changes in Multimap of ValueObjects "() {
         given:
         def left = new SnapshotEntity(multimapPrimitiveToValueObject: leftMultimap)
@@ -160,7 +164,7 @@ class GuavaAddOnE2ETest extends Specification {
         def diff = javers.compare(left, right)
 
         then:
-        def actualContainerChanges = getContainerChanges(diff.changes)
+        def actualContainerChanges = diff.changes.getChangesByType(MapChange)
         actualContainerChanges.size() == 1
         actualContainerChanges[0].entryChanges.size() == expectedContainerChanges
 
@@ -229,9 +233,9 @@ class GuavaAddOnE2ETest extends Specification {
         then:
         diff.changes.size() == 1
         diff.changes[0] instanceof MapChange
-        diff.changes[0].changes.size() == 1
+        diff.changes[0].entryChanges.size() == 1
 
-        def object = diff.changes[0].changes[0]
+        def object = diff.changes[0].entryChanges[0]
         with(object){
             it instanceof EntryAdded
             it.value.value() == SnapshotEntity.name + '/' + 2
@@ -280,6 +284,6 @@ class GuavaAddOnE2ETest extends Specification {
     }
 
     private static Collection<Change> getContainerChanges(final Collection<Change> changes) {
-        changes.findAll { it instanceof MapChange || it instanceof SetChange }
+        changes.findAll { it instanceof ContainerChange }
     }
 }

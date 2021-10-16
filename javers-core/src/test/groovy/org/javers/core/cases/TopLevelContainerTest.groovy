@@ -28,7 +28,11 @@ class TopLevelContainerTest extends Specification {
         diff.changes.size() == 1
         with(diff.changes[0]) {
             propertyName == pName
-            changes.size() == 1
+            if (expectedChangeType == MapChange) {
+                assert entryChanges.size() == 1
+            } else {
+                assert changes.size() == 1
+            }
         }
 
         where:

@@ -5,7 +5,6 @@ import com.google.common.collect.Multisets;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
-import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.changetype.container.ValueRemoved;
 import org.javers.core.metamodel.object.OwnerContext;
@@ -26,7 +25,7 @@ import static org.javers.core.diff.appenders.CorePropertyChangeAppender.renderNo
  *
  * @author akrystian
  */
-class MultisetChangeAppender implements PropertyChangeAppender<SetChange> {
+class MultisetChangeAppender implements PropertyChangeAppender<MultisetChange> {
 
     @Override
     public boolean supports(JaversType propertyType) {
@@ -34,18 +33,20 @@ class MultisetChangeAppender implements PropertyChangeAppender<SetChange> {
     }
 
     @Override
-    public SetChange calculateChanges(NodePair pair, JaversProperty property) {
+    public MultisetChange calculateChanges(NodePair pair, JaversProperty property) {
 
         Multiset left = (Multiset) pair.getLeftDehydratedPropertyValueAndSanitize(property);
         Multiset right = (Multiset) pair.getRightDehydratedPropertyValueAndSanitize(property);
 
-        MultisetType multisetType = ((JaversProperty) property).getType();
+        MultisetType multisetType = property.getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
 
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multisetType.getItemJavaType(), "item", "Multiset", property);
-            return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges);
+            return new MultisetChange(pair.createPropertyChangeMetadata(property), entryChanges,
+                (Multiset) pair.getLeftPropertyValue(property),
+                (Multiset) pair.getRightPropertyValue(property));
         } else {
             return null;
         }

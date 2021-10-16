@@ -26,7 +26,9 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         if (!entryChanges.isEmpty()) {
             CollectionType setType = property.getType();
             renderNotParametrizedWarningIfNeeded(setType.getItemJavaType(), "item", "Set", property);
-            return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges);
+            return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges,
+                    toSet(leftValue),
+                    toSet(rightValue));
         } else {
             return null;
         }

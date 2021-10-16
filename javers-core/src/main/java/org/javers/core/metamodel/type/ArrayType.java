@@ -101,9 +101,8 @@ public class ArrayType extends ContainerType {
     }
 
     @Override
-    public boolean equals(Object left, Object right) {
-        //see https://github.com/javers/javers/issues/546
-        return Arrays.equals((Object[]) left, (Object[]) right);
+    public boolean equals(Object one, Object two) {
+        return org.javers.common.collections.Arrays.equals(one , two);
     }
 
     @Override

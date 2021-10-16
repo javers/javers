@@ -16,22 +16,22 @@ public class MapChangeAssert {
     }
 
     MapChangeAssert hasSize(int expected) {
-        assert actual.changes.size() == expected
+        assert actual.entryChanges.size() == expected
         this
     }
 
     MapChangeAssert hasEntryValueChange(def key, def expectedLeftVal, def expectedRightVal) {
-        assert actual.changes.find{it.key == key && it instanceof EntryValueChange && it.leftValue == expectedLeftVal && it.rightValue == expectedRightVal}
+        assert actual.entryChanges.find{it.key == key && it instanceof EntryValueChange && it.leftValue == expectedLeftVal && it.rightValue == expectedRightVal}
         this
     }
 
     MapChangeAssert hasEntryAdded(def expectedKey, def expectedVal) {
-        assert actual.changes.find{it.key == expectedKey && it instanceof EntryAdded && it.value == expectedVal}
+        assert actual.entryChanges.find{it.key == expectedKey && it instanceof EntryAdded && it.value == expectedVal}
         this
     }
 
     MapChangeAssert hasEntryRemoved(def expectedKey, def expectedVal) {
-        assert actual.changes.find{it.key == expectedKey && it instanceof EntryRemoved && it.value == expectedVal}
+        assert actual.entryChanges.find{it.key == expectedKey && it instanceof EntryRemoved && it.value == expectedVal}
         this
     }
 }

@@ -139,6 +139,14 @@ public class NodePair {
         return sanitize(getLeft().getDehydratedPropertyValue(property), property.getType());
     }
 
+    public Object getLeftPropertyValueAndSanitize(JaversProperty property) {
+        return sanitize(getLeft().getPropertyValue(property), property.getType());
+    }
+
+    public Object getRightPropertyValueAndSanitize(JaversProperty property) {
+        return sanitize(getRight().getPropertyValue(property), property.getType());
+    }
+
     public Object sanitize(Object value, JaversType expectedType) {
         //all Enumerables (except Arrays) are sanitized
         if (expectedType instanceof EnumerableType && !(expectedType instanceof ArrayType)) {

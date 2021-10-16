@@ -1,8 +1,10 @@
 package org.javers.core.diff.appenders;
 
+import java.util.Collections;
 import org.javers.common.collections.Arrays;
 import org.javers.common.collections.Lists;
 import org.javers.core.diff.NodePair;
+import org.javers.core.diff.changetype.Atomic;
 import org.javers.core.diff.changetype.container.ArrayChange;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.map.EntryChange;
@@ -41,7 +43,9 @@ class ArrayChangeAppender implements PropertyChangeAppender<ArrayChange>{
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-            return new ArrayChange(pair.createPropertyChangeMetadata(property), elementChanges);
+            return new ArrayChange(pair.createPropertyChangeMetadata(property), elementChanges,
+                pair.getLeftPropertyValueAndSanitize(property),
+                pair.getRightPropertyValueAndSanitize(property));
         }
         else {
             return null;

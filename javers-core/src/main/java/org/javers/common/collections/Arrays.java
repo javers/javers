@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static org.javers.common.validation.Validate.argumentCheck;
 
@@ -32,7 +31,7 @@ public class Arrays {
         }
 
         return result;
-    } 
+    }
     /**
      * @return new list with elements from array
      * @throws java.lang.IllegalArgumentException
@@ -65,7 +64,7 @@ public class Arrays {
      */
     public static boolean equals(Object arr1, Object arr2) {
         Class<?> c = arr1.getClass();
-        argumentCheck(c.isArray(), arr1 + " is not an array");
+        argumentCheck(c.isArray(), arr1 + " is not an Array");
 
         if (!c.getComponentType().isPrimitive()) {
             c = Object[].class;
@@ -78,5 +77,40 @@ public class Arrays {
         catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static int length(Object arr) {
+        if (arr == null) {
+            return 0;
+        }
+
+        Class<?> c = arr.getClass();
+        argumentCheck(c.isArray(), arr + " is not an Array");
+
+        if (arr instanceof byte[]) {
+            return ((byte[]) arr).length;
+        }
+        if (arr instanceof char[]) {
+            return ((char[]) arr).length;
+        }
+        if (arr instanceof short[]) {
+            return ((short[]) arr).length;
+        }
+        if (arr instanceof int[]) {
+            return ((int[]) arr).length;
+        }
+        if (arr instanceof long[]) {
+            return ((long[]) arr).length;
+        }
+        if (arr instanceof boolean[]) {
+            return ((boolean[]) arr).length;
+        }
+        if (arr instanceof float[]) {
+            return ((float[]) arr).length;
+        }
+        if (arr instanceof double[]) {
+            return ((double[]) arr).length;
+        }
+        return ((Object[]) arr).length;
     }
 }

@@ -1,5 +1,6 @@
 package org.javers.core.diff.changetype.container;
 
+import org.javers.common.collections.Arrays;
 import org.javers.core.diff.changetype.PropertyChangeMetadata;
 
 import java.util.List;
@@ -10,10 +11,30 @@ import java.util.Objects;
  *
  * @author pawel szymczyk
  */
-public final class ArrayChange extends ContainerChange {
+public final class ArrayChange extends ContainerChange<Object> {
+
+    public ArrayChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes, Object left, Object right) {
+        super(metadata, changes, left, right);
+    }
 
     public ArrayChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes) {
-        super(metadata, changes);
+        super(metadata, changes, null, null);
+    }
+
+    /**
+     * size of right (or old) Array at {@link #getRight()}
+     */
+    @Override
+    public int getRightSize() {
+        return Arrays.length(getRight());
+    }
+
+    /**
+     * size of left (or old) Array at {@link #getLeft()}
+     */
+    @Override
+    public int getLeftSize() {
+        return Arrays.length(getLeft());
     }
 
     @Override

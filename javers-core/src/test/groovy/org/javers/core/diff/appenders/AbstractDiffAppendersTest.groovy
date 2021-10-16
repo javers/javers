@@ -14,4 +14,12 @@ abstract class AbstractDiffAppendersTest extends AbstractDiffTest {
     ArrayChangeAppender arrayChangeAppender() {
         new ArrayChangeAppender(new MapChangeAppender())
     }
+
+    ListAsSetChangeAppender listAsSetChangeAppender(){
+        return new ListAsSetChangeAppender(new SetChangeAppender())
+    }
+
+    CollectionAsListChangeAppender collectionAsListChangeAppender(){
+        return new CollectionAsListChangeAppender(new MapChangeAppender())
+    }
 }

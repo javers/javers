@@ -3,6 +3,7 @@ package org.javers.core.diff.appenders.levenshtein;
 import org.javers.core.diff.EqualsFunction;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
+import org.javers.core.diff.changetype.Atomic;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.metamodel.type.JaversProperty;
@@ -35,20 +36,20 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
         final BacktrackSteps[][] steps = backtrack.evaluateSteps(leftList, rightList);
         final List<ContainerElementChange> changes = stepsToChanges.convert(steps, leftList, rightList);
 
-        ListChange result = getListChange(pair, property, changes);
+        ListChange result = createListChange(pair, property, changes, leftList, rightList);
         if (result != null) {
             renderNotParametrizedWarningIfNeeded(itemType.getBaseJavaType(), "item", "List", property);
         }
         return result;
     }
 
-    private ListChange getListChange(NodePair pair, JaversProperty property, List<ContainerElementChange> changes) {
+    private ListChange createListChange(NodePair pair, JaversProperty property, List<ContainerElementChange> changes, List left, List right) {
         final ListChange result;
 
-        if (changes.size() == 0) {
+        if (changes.isEmpty()) {
             result = null;
         } else {
-            result = new ListChange(pair.createPropertyChangeMetadata(property), changes);
+            result = new ListChange(pair.createPropertyChangeMetadata(property), changes, left, right);
         }
         return result;
     }

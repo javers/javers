@@ -6,6 +6,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.PropertyChangeMetadata;
 import org.javers.core.diff.changetype.container.*;
+import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.type.ContainerType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -116,7 +117,9 @@ abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends Cha
     private void appendBody(ContainerChange change, JsonObject toJson, JsonSerializationContext context) {
         JsonArray jsonArray = new JsonArray();
 
-        for (ContainerElementChange elementChange : change.getChanges()) {
+
+
+        for (ContainerElementChange elementChange : (List<ContainerElementChange>)change.getChanges()) {
             JsonObject jsonElement = new JsonObject();
             jsonElement.addProperty(ELEMENT_CHANGE_TYPE_FIELD, elementChange.getClass().getSimpleName());
 

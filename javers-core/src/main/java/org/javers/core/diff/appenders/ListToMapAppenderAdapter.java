@@ -2,6 +2,7 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Lists;
 import org.javers.core.diff.NodePair;
+import org.javers.core.diff.changetype.Atomic;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
@@ -27,7 +28,7 @@ abstract class ListToMapAppenderAdapter extends CorePropertyChangeAppender<ListC
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
             renderNotParametrizedWarningIfNeeded(listType.getItemJavaType(), "item", "List", property);
-            return new ListChange(pair.createPropertyChangeMetadata(property), elementChanges);
+            return new ListChange(pair.createPropertyChangeMetadata(property), elementChanges, leftList, rightList);
         }
         else {
             return null;
