@@ -26,11 +26,17 @@ public abstract class KeyValueChange<T> extends PropertyChange<T> {
         this.right = right;
     }
 
+    /**
+     * Right (or new) Map
+     */
     @Override
     public T getRight() {
         return right;
     }
 
+    /**
+     * Left (or new) Map
+     */
     @Override
     public T getLeft() {
         return left;

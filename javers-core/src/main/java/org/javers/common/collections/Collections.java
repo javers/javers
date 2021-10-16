@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static org.javers.common.validation.Validate.argumentCheck;
+
 /**
  * @author pawel szymczyk
  */
@@ -25,5 +27,14 @@ public class Collections {
         else{
             return (Collection)sourceCollection;
         }
+    }
+
+    public static int size(Object col) {
+        if (col == null) {
+            return 0;
+        }
+        argumentCheck(col instanceof Collection, col + " is not a Collection");
+
+        return ((Collection) col).size();
     }
 }

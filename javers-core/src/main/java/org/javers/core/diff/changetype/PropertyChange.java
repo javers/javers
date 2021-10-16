@@ -25,12 +25,12 @@ public abstract class PropertyChange<T> extends Change {
     }
 
     /**
-     * Left (or old) property value
+     * Left (or old) value of a changed property
      */
     public abstract T getLeft();
 
     /**
-     * Right (or new) property value
+     * Right (or new) value of a changed property
      */
     public abstract T getRight();
 

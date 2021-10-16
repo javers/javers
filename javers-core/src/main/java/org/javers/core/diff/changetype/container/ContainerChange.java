@@ -32,15 +32,25 @@ public abstract class ContainerChange<T> extends PropertyChange<T> {
         this.right = right;
     }
 
+    /**
+     * Right (or new) Collection or array
+     */
     @Override
     public T getRight() {
         return right;
     }
 
+    /**
+     * Left (or old) Collection or array
+     */
     @Override
     public T getLeft() {
         return left;
     }
+
+    public abstract int getRightSize();
+
+    public abstract int getLeftSize();
 
     public List<ContainerElementChange> getChanges() {
         return changes;
@@ -97,6 +107,6 @@ public abstract class ContainerChange<T> extends PropertyChange<T> {
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{ property: '"+getPropertyName() +"'," +
-                " elementChanges:"+changes.size()+" }";
+                " elementChanges:"+changes.size() + ", left.size: "+getLeftSize()+", right.size: "+getRightSize()+"}";
     }
 }
