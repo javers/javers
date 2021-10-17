@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static org.javers.common.collections.Lists.asList;
@@ -470,28 +471,37 @@ public class QueryBuilder {
 
     /**
      * Only snapshots with a given commit property.
-     * <br/><br/
+     * <br/><br/>
      *
-     * If this method is called multiple times,
-     * <b>all</b> given properties must match with persisted commit properties.
-     * @since 2.0
+     * If this method is called multiple times, <b>all</b> given conditions must match.
      */
     public QueryBuilder withCommitProperty(String name, String value) {
-        Validate.argumentsAreNotNull(name, value);
-        queryParamsBuilder.commitProperty(name, value);
+        return withCommitPropertyIn(name, Collections.singletonList(value));
+    }
+
+    /**
+     * Only snapshots with a given commit property having any of given values.<br/>
+     * Equivalent to SQL clause: WHERE property_value IN ('value1', ...)
+     * <br/><br/>
+     *
+     * If this method is called multiple times, <b>all</b> given conditions must match.
+     */
+    public QueryBuilder withCommitPropertyIn(String name, Collection<String> values){
+        Validate.argumentsAreNotNull(name, values);
+        Validate.argumentCheck(!values.isEmpty(), "Argument should not be an empty list");
+        queryParamsBuilder.commitPropertyIn(name, values);
         return this;
     }
 
     /**
-     * Only snapshots with a given commit property partially containing a given value.
-     * Equivalent to SQL LIKE clause: WHERE property_value LIKE '%value%'
+     * Only snapshots with a given commit property partially containing a given value.<br/>
+     * Equivalent to SQL clause: WHERE property_value LIKE '%value%'
      * <br/><br/>
      *
      * The matching is case insensitive on MongoDB and on most SQL databases.
      * <br/><br/>
      *
-     * If this method is called multiple times,
-     * <b>all</b> given values must match with persisted commit properties.
+     * If this method is called multiple times, <b>all</b> given conditions must match.
      */
     public QueryBuilder withCommitPropertyLike(String name, String value){
         Validate.argumentsAreNotNull(name, value);

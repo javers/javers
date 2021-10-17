@@ -36,8 +36,7 @@ abstract class Query {
     void injectValuesTo(PreparedStatement preparedStatement) throws SQLException {
         int parameterNumber = 1;
         for (Parameter parameter : orderedParameters) {
-            parameter.injectValuesTo(preparedStatement,parameterNumber);
-            parameterNumber++;
+            parameterNumber = parameter.injectValuesTo(preparedStatement, parameterNumber);
         }
     }
 
