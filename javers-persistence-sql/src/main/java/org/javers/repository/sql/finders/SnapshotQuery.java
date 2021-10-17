@@ -1,7 +1,7 @@
 package org.javers.repository.sql.finders;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
+
 import org.javers.common.string.ToStringBuilder;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.repository.api.QueryParams;
@@ -16,12 +16,7 @@ import org.javers.repository.sql.session.Session;
 import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
-import org.polyjdbc.core.util.StringUtils;
-
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 import static org.javers.repository.sql.session.Parameter.*;
 
@@ -180,14 +175,14 @@ class SnapshotQuery {
 
     private void addCommitPropertyFilter(SelectBuilder selectBuilder, String propertyName, Collection<String> propertyValue) {
 
-        String parameters = StringUtils.concatenate(",",
-            propertyValue.stream().map(property -> "?").toArray());
+        String nMarks = Collections.nCopies(propertyValue.size(), "?")
+                .stream().collect( Collectors.joining( "," ) );
 
         selectBuilder.and("EXISTS (" +
                 " SELECT * FROM " + commitPropertyTableName() +
                 " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
                 " AND " + COMMIT_PROPERTY_NAME + " = ?" +
-                " AND " + COMMIT_PROPERTY_VALUE + " IN ( "+parameters+" ))",
+                " AND " + COMMIT_PROPERTY_VALUE + " IN ( "+nMarks+ "))",
                 stringParam(propertyName), listParam(propertyValue));
     }
 

@@ -1,9 +1,7 @@
 package org.javers.repository.sql.session;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.repository.sql.session.Parameter.ListParameter;
 import org.polyjdbc.core.type.ColumnTypeMapper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -36,9 +34,9 @@ abstract class Query {
     }
 
     void injectValuesTo(PreparedStatement preparedStatement) throws SQLException {
-        AtomicInteger parameterNumber = new AtomicInteger(1);
+        int parameterNumber = 1;
         for (Parameter parameter : orderedParameters) {
-            parameter.injectValuesTo(preparedStatement,parameterNumber);
+            parameterNumber = parameter.injectValuesTo(preparedStatement, parameterNumber);
         }
     }
 

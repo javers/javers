@@ -21,7 +21,7 @@ public abstract class Parameter<T> {
         this.value = value;
     }
 
-    abstract void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException;
+    abstract int injectValuesTo(PreparedStatement preparedStatement, int orderStart) throws SQLException;
 
     public static Parameter<Long> longParam(Long value){
         return new LongParameter(null, value);
@@ -65,8 +65,9 @@ public abstract class Parameter<T> {
         }
 
         @Override
-        void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException {
-            preparedStatement.setString(order.getAndIncrement(), getValue());
+        int injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setString(order, getValue());
+            return order + 1;
         }
     }
 
@@ -76,11 +77,12 @@ public abstract class Parameter<T> {
         }
 
         @Override
-        void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException {
+        int injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            int k = order;
             for (String val : getValue()) {
-                preparedStatement.setString(order.getAndIncrement(), val);
+                preparedStatement.setString(k++, val);
             }
-
+            return k;
         }
     }
 
@@ -90,8 +92,9 @@ public abstract class Parameter<T> {
         }
 
         @Override
-        void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException {
-            preparedStatement.setLong(order.getAndIncrement(), getValue());
+        int injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setLong(order, getValue());
+            return order + 1;
         }
     }
 
@@ -101,8 +104,8 @@ public abstract class Parameter<T> {
         }
 
         @Override
-        void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException {
-            return;
+        int injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            return order;
         }
 
         @Override
@@ -117,8 +120,9 @@ public abstract class Parameter<T> {
         }
 
         @Override
-        void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException {
-            preparedStatement.setInt(order.getAndIncrement(), getValue());
+        int injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setInt(order, getValue());
+            return order + 1;
         }
     }
 
@@ -128,8 +132,9 @@ public abstract class Parameter<T> {
         }
 
         @Override
-        void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException {
-            preparedStatement.setBigDecimal(order.getAndIncrement(), getValue());
+        int injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setBigDecimal(order, getValue());
+            return order + 1;
         }
     }
 
@@ -139,8 +144,9 @@ public abstract class Parameter<T> {
         }
 
         @Override
-        void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException {
-            preparedStatement.setTimestamp(order.getAndIncrement(), toTimestamp(getValue()));
+        int injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setTimestamp(order, toTimestamp(getValue()));
+            return order + 1;
         }
 
         private Timestamp toTimestamp(LocalDateTime value) {
@@ -154,23 +160,9 @@ public abstract class Parameter<T> {
         }
 
         @Override
-        void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException {
-            preparedStatement.setString(order.getAndIncrement(), getValue().toString());
-        }
-    }
-
-    static class SqlLiteralParameter extends Parameter<String> {
-        SqlLiteralParameter(String name, String value) {
-            super(name, value);
-        }
-
-        @Override
-        String getRawSqlRepresentation() {
-            return getValue();
-        }
-
-        @Override
-        void injectValuesTo(PreparedStatement preparedStatement, AtomicInteger order) throws SQLException {
+        int injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setString(order, getValue().toString());
+            return order + 1;
         }
     }
 }
