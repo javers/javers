@@ -25,7 +25,7 @@ public class QueryParamsBuilder {
     private Long version;
     private String author;
     private boolean aggregate;
-    private Map<String, String> commitProperties = new HashMap<>();
+    private Map<String, Collection<String>> commitProperties = new HashMap<>();
     private Map<String,String> commitPropertiesLike = new HashMap<>();
     private Set<String> changedProperties = new HashSet<>();
     private SnapshotType snapshotType;
@@ -33,8 +33,7 @@ public class QueryParamsBuilder {
     private Integer snapshotQueryLimit;
 
     public static QueryParamsBuilder copy(QueryParams that) {
-        QueryParamsBuilder copy =  new QueryParamsBuilder(that.limit())
-                .skip(that.skip());
+        QueryParamsBuilder copy =  new QueryParamsBuilder(that.limit()).skip(that.skip());
 
         that.from().ifPresent(it -> copy.from(it));
         that.to().ifPresent(it -> copy.to(it));
@@ -73,7 +72,7 @@ public class QueryParamsBuilder {
 
 
     /**
-     * @see QueryBuilder#snapshotQueryLimit(int)
+     * @see QueryBuilder#snapshotQueryLimit(Integer)
      */
     public QueryParamsBuilder snapshotQueryLimit(Integer snapshotQueryLimit) {
         this.snapshotQueryLimit = snapshotQueryLimit;
@@ -176,6 +175,14 @@ public class QueryParamsBuilder {
      * @see QueryBuilder#withCommitProperty(String, String)
      */
     public QueryParamsBuilder commitProperty(String name, String value) {
+        this.commitProperties.put(name, Collections.singletonList(value));
+        return this;
+    }
+
+    /**
+     * @see QueryBuilder#withCommitPropertyIn(String, Collection)
+     */
+    public QueryParamsBuilder commitPropertyIn(String name, Collection<String> value) {
         this.commitProperties.put(name, value);
         return this;
     }

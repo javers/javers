@@ -191,12 +191,12 @@ public class InMemoryRepository implements JaversRepository {
         return true;
     }
 
-    private List<CdoSnapshot> filterSnapshotsByCommitProperties(List<CdoSnapshot> snapshots, final Map<String, String> commitProperties) {
+    private List<CdoSnapshot> filterSnapshotsByCommitProperties(List<CdoSnapshot> snapshots, final Map<String, Collection<String>> commitProperties) {
         return Lists.positiveFilter(snapshots, snapshot ->
             commitProperties.entrySet().stream().allMatch(commitProperty -> {
                 Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
                 return actualCommitProperties.containsKey(commitProperty.getKey()) &&
-                        actualCommitProperties.get(commitProperty.getKey()).equals(commitProperty.getValue());
+                        commitProperty.getValue().contains( actualCommitProperties.get(commitProperty.getKey()));
             })
         );
     }

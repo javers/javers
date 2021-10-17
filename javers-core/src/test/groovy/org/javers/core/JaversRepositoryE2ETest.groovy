@@ -18,6 +18,7 @@ import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.JqlQuery
 import org.javers.repository.jql.QueryBuilder
+import org.junit.rules.ExpectedException
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -1344,6 +1345,7 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
+    /** test for {@link QueryBuilder#withCommitPropertyLike} */
     @Unroll
     def "should query for commit property containing partial text - #value"() {
         given:
@@ -1363,6 +1365,7 @@ class JaversRepositoryE2ETest extends Specification {
 
     }
 
+    /** test for {@link QueryBuilder#withCommitPropertyLike} */
     def "should return empty result when commit properties doesn't contain a given value"() {
         given:
         javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'John Doe'])
@@ -1447,5 +1450,50 @@ class JaversRepositoryE2ETest extends Specification {
             it.right instanceof Map
             it.right['k'].value().endsWith('SnapshotEntity/3')
         }
+    }
+
+    /** test for {@link QueryBuilder#withCommitPropertyIn} */
+    @Unroll
+    def "should query for entity with commit properties in list - #queryProps"() {
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'Steve'])
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 3),[name:'John'])
+
+        when:
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity)
+                .withCommitPropertyIn('name',queryProps).build())
+
+        then:
+        snapshots.size() == expectedSnapshots
+        if (expectedSnapshots ==1) {
+           assert snapshots[0].getPropertyValue("intProperty") == 2
+        }
+
+        where:
+        queryProps << [
+                ['Steve','Bill'],
+                ['Steve'],
+                ['Mad', 'Kaz']
+        ]
+        expectedSnapshots << [
+                1,
+                1,
+                0
+        ]
+    }
+
+    /** test for {@link QueryBuilder#withCommitPropertyIn} */
+    def "should query for entity with single commit property"() {
+
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'Steve'])
+
+        when:
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withCommitProperty('name','Steve').build())
+
+        then:
+        assert snapshots[0].getState().getPropertyValue("id") == 1
+        assert snapshots[0].getState().getPropertyValue("intProperty") == 2
+
     }
 }

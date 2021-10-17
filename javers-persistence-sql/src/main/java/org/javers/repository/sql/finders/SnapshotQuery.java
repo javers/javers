@@ -1,5 +1,7 @@
 package org.javers.repository.sql.finders;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.repository.api.QueryParams;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.polyjdbc.core.util.StringUtils;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 import static org.javers.repository.sql.session.Parameter.*;
@@ -106,7 +109,7 @@ class SnapshotQuery {
         queryParams.author().ifPresent(author -> selectBuilder.and(COMMIT_AUTHOR, author));
 
         if (queryParams.commitProperties().size() > 0) {
-            for (Map.Entry<String, String> commitProperty : queryParams.commitProperties().entrySet()) {
+            for (Map.Entry<String, Collection<String>> commitProperty : queryParams.commitProperties().entrySet()) {
                 addCommitPropertyFilter(selectBuilder, commitProperty.getKey(), commitProperty.getValue());
             }
         }
@@ -175,13 +178,17 @@ class SnapshotQuery {
         return selectBuilder.executeQuery(cdoSnapshotMapper);
     }
 
-    private void addCommitPropertyFilter(SelectBuilder selectBuilder, String propertyName, String propertyValue) {
+    private void addCommitPropertyFilter(SelectBuilder selectBuilder, String propertyName, Collection<String> propertyValue) {
+
+        String parameters = StringUtils.concatenate(",",
+            propertyValue.stream().map(property -> "?").toArray());
+
         selectBuilder.and("EXISTS (" +
                 " SELECT * FROM " + commitPropertyTableName() +
                 " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
                 " AND " + COMMIT_PROPERTY_NAME + " = ?" +
-                " AND " + COMMIT_PROPERTY_VALUE + " = ?)",
-                stringParam(propertyName), stringParam(propertyValue));
+                " AND " + COMMIT_PROPERTY_VALUE + " IN ( "+parameters+" ))",
+                stringParam(propertyName), listParam(propertyValue));
     }
 
     private void addCommitPropertyLikeFilter(SelectBuilder selectBuilder, String propertyName, String propertyValue) {

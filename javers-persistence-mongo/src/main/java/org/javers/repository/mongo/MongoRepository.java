@@ -331,12 +331,12 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         return  findIterable;
     }
 
-    private Bson addCommitPropertiesFilter(Bson query, Map<String, String> commitProperties) {
+    private Bson addCommitPropertiesFilter(Bson query, Map<String, Collection<String>> commitProperties) {
         List<Bson> propertyFilters = commitProperties.entrySet().stream().map( commitProperty ->
             new BasicDBObject(COMMIT_PROPERTIES,
                 new BasicDBObject("$elemMatch",
                         new BasicDBObject("key", commitProperty.getKey()).append(
-                                          "value", commitProperty.getValue())))
+                                          "value",new BasicDBObject("$in",commitProperty.getValue()))))
         ).collect(toImmutableList());
         return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
     }
