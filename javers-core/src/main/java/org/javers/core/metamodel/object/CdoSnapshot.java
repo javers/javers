@@ -97,6 +97,10 @@ public final class CdoSnapshot extends Cdo {
         return changed.contains(propertyName);
     }
 
+    public boolean isFirstVersion(){
+        return version == 1;
+    }
+
     @Override
     public boolean isNull(Property property) {
         Validate.argumentIsNotNull(property);
