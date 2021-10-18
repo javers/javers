@@ -39,7 +39,7 @@ public class SnapshotDiffer {
             if (snapshot.isInitial()) {
                 changes.addAll(addInitialChanges(snapshot));
             }
-            if (snapshot.isTerminal()) {
+            if (snapshot.isTerminal() && !snapshot.isFirstVersion()) {
                 CdoSnapshot previousSnapshot = previousSnapshots.get(SnapshotIdentifier.from(snapshot).previous());
                 addTerminalChanges(changes, snapshot, previousSnapshot);
             }
