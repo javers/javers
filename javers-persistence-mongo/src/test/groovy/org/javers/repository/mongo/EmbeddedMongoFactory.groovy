@@ -3,45 +3,45 @@ package org.javers.repository.mongo
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import de.flapdoodle.embed.mongo.MongodExecutable
-import de.flapdoodle.embed.mongo.MongodProcess
 import de.flapdoodle.embed.mongo.MongodStarter
-import de.flapdoodle.embed.mongo.config.IMongodConfig
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder
+import de.flapdoodle.embed.mongo.config.MongodConfig
 import de.flapdoodle.embed.mongo.config.Net
 import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.runtime.Network
 
-class EmbeddedMongoFactory {
-
-    static MongodStarter starter = MongodStarter.getDefaultInstance()
+class EmbeddedMongo {
     static final String BIND_IP = "localhost"
     static int PORT = 12345
+    int port
+    MongodExecutable mongodExecutable
 
-    static class EmbeddedMongo {
-        private MongodExecutable mongodExecutable
-        private MongoClient mongoClient
+    EmbeddedMongo(int port = PORT) {
+        this.port = port
+        MongodStarter starter = MongodStarter.getDefaultInstance();
+        MongodConfig mongodConfig = MongodConfig.builder()
+                .version(Version.Main.PRODUCTION)
+                .net(new Net(port, Network.localhostIsIPv6()))
+                .build()
 
-        EmbeddedMongo (int port) {
-            mongodExecutable = starter.prepare(new MongodConfigBuilder()
-                    .version(Version.Main.PRODUCTION)
-                    .net(new Net(BIND_IP, port, Network.localhostIsIPv6()))
-                    .build())
-            mongodExecutable.start()
-            mongoClient = MongoClients.create("mongodb://$BIND_IP:$port")
-        }
-
-        MongoClient getClient () {
-            mongoClient
-        }
-
-        void stop () {
-            if (mongodExecutable != null) {
-                mongodExecutable.stop()
-            }
-        }
+        mongodExecutable = starter.prepare(mongodConfig)
+        mongodExecutable.start()
     }
 
-    static EmbeddedMongo create(int port = PORT) {
-        return new EmbeddedMongo(port)
+    MongoClient getClient() {
+        MongoClient mongo = MongoClients.create(String.format("mongodb://$BIND_IP:$port"))
+        mongo
+    }
+
+    void stop() {
+        if (mongodExecutable) {
+            mongodExecutable.stop()
+        }
+    }
+}
+
+class EmbeddedMongoFactory {
+
+    static EmbeddedMongo create(int port) {
+        new EmbeddedMongo(port)
     }
 }
