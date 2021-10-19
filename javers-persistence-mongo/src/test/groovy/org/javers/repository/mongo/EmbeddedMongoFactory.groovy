@@ -11,11 +11,10 @@ import de.flapdoodle.embed.process.runtime.Network
 
 class EmbeddedMongo {
     static final String BIND_IP = "localhost"
-    static int PORT = 12345
     int port
     MongodExecutable mongodExecutable
 
-    EmbeddedMongo(int port = PORT) {
+    EmbeddedMongo(int port) {
         this.port = port
         MongodStarter starter = MongodStarter.getDefaultInstance();
         MongodConfig mongodConfig = MongodConfig.builder()
@@ -40,8 +39,9 @@ class EmbeddedMongo {
 }
 
 class EmbeddedMongoFactory {
+    static int PORT = 12345
 
-    static EmbeddedMongo create(int port) {
+    static EmbeddedMongo create(int port = PORT) {
         new EmbeddedMongo(port)
     }
 }
