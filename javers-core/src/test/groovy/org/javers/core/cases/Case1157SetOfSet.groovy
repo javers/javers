@@ -2,14 +2,8 @@ package org.javers.core.cases
 
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
-import org.javers.core.diff.Diff
-import org.javers.core.metamodel.annotation.ValueObject
-import org.javers.core.metamodel.type.ManagedType
-import org.javers.repository.jql.QueryBuilder
 import org.junit.Test
 import spock.lang.Specification
-
-import javax.persistence.Id
 
 /**
  * @author Maik Toepfer
