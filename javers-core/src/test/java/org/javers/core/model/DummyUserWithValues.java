@@ -14,6 +14,7 @@ public class DummyUserWithValues {
 
     private BigDecimal    salary;
     private LocalDateTime dob;
+    private String        position;
 
     private DummyUserWithValues(String name) {
         this.name = name;
@@ -30,6 +31,11 @@ public class DummyUserWithValues {
         this.salary = salary;
     }
 
+    private DummyUserWithValues(String name, String position) {
+        this.name = name;
+        this.position = position;
+    }
+
     public static DummyUserWithValues dummyUserWithDate(String name){
         return new DummyUserWithValues(name);
     }
@@ -40,6 +46,10 @@ public class DummyUserWithValues {
 
     public static DummyUserWithValues dummyUserWithSalary(String name, BigDecimal salary){
         return new DummyUserWithValues(name,salary);
+    }
+
+    public static DummyUserWithValues dummyUserWithPosition(String name, String position){
+        return new DummyUserWithValues(name,position);
     }
 
     public BigDecimal getSalary() {
@@ -53,5 +63,9 @@ public class DummyUserWithValues {
 
     public LocalDateTime getDob() {
         return dob;
+    }
+
+    public String getPosition() {
+        return position;
     }
 }
