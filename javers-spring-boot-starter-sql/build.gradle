@@ -8,4 +8,5 @@ dependencies {
     testCompile 'com.h2database:h2:1.4.187'
     testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
+    testCompile project(path: ":javers-spring", configuration: "testArtifacts")
 }

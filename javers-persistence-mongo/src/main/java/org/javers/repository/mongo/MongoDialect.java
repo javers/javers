@@ -1,6 +1,6 @@
 package org.javers.repository.mongo;
 
-enum MongoDialect {
+public enum MongoDialect {
     MONGO_DB,
 
     /** Amazon DocumentDB */

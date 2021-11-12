@@ -1,4 +1,4 @@
-package org.javers.spring.jpa;
+package org.javers.spring.transactions;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
@@ -17,15 +17,9 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
-import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.shadow.Shadow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.*;
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -42,19 +36,12 @@ import java.util.stream.Stream;
  *
  * @author bartosz walacik
  */
-public class JaversTransactionalDecorator implements InitializingBean, Javers {
-    private static final Logger logger = LoggerFactory.getLogger(JaversTransactionalDecorator.class);
-
+public abstract class JaversTransactionalDecorator implements Javers {
     private final Javers delegate;
-    private final JaversSqlRepository javersSqlRepository;
 
-    private final PlatformTransactionManager txManager;
-
-    JaversTransactionalDecorator(Javers delegate, JaversSqlRepository javersSqlRepository, PlatformTransactionManager txManager) {
-        Validate.argumentsAreNotNull(delegate, javersSqlRepository, txManager);
+    protected JaversTransactionalDecorator(Javers delegate) {
+        Validate.argumentsAreNotNull(delegate);
         this.delegate = delegate;
-        this.javersSqlRepository = javersSqlRepository;
-        this.txManager = txManager;
     }
 
     @Override
@@ -72,14 +59,12 @@ public class JaversTransactionalDecorator implements InitializingBean, Javers {
     @Override
     @Transactional
     public Commit commit(String author, Object currentVersion) {
-        registerRollbackListener();
         return delegate.commit(author, currentVersion);
     }
 
     @Override
     @Transactional
     public Commit commit(String author, Object currentVersion, Map<String, String> commitProperties) {
-        registerRollbackListener();
         return delegate.commit(author, currentVersion, commitProperties);
     }
 
@@ -174,47 +159,13 @@ public class JaversTransactionalDecorator implements InitializingBean, Javers {
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-       ensureSchema();
-    }
-
-    @Override
     public CoreConfiguration getCoreConfiguration() {
         return delegate.getCoreConfiguration();
-    }
-
-    private void ensureSchema() {
-        if (javersSqlRepository.getConfiguration().isSchemaManagementEnabled()) {
-            TransactionTemplate tmpl = new TransactionTemplate(txManager);
-            tmpl.execute(new TransactionCallbackWithoutResult() {
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    javersSqlRepository.ensureSchema();
-                }
-            });
-        }
     }
 
     @Override
     public Property getProperty(PropertyChange propertyChange) {
         return delegate.getProperty(propertyChange);
     }
-
-    private void registerRollbackListener() {
-        if (javersSqlRepository.getConfiguration().isGlobalIdCacheDisabled()) {
-            return;
-        }
-        if(TransactionSynchronizationManager.isSynchronizationActive() &&
-           TransactionSynchronizationManager.isActualTransactionActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
-                @Override
-                public void afterCompletion(int status) {
-                    if (TransactionSynchronization.STATUS_ROLLED_BACK == status) {
-                        logger.info("evicting javersSqlRepository local cache due to transaction rollback");
-                        javersSqlRepository.evictCache();
-                    }
-                }
-            });
-        }
-    }
 }
+

@@ -6,7 +6,7 @@ import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepository
 import org.javers.repository.sql.SqlRepositoryBuilder
 import org.javers.spring.jpa.JpaHibernateConnectionProvider
-import org.javers.spring.jpa.TransactionalJaversBuilder
+import org.javers.spring.jpa.TransactionalJpaJaversBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
@@ -36,7 +36,7 @@ class JaversFieldHibernateProxyConfig {
                 .withDialect(DialectName.H2)
                 .build()
 
-        return TransactionalJaversBuilder
+        return TransactionalJpaJaversBuilder
                 .javers()
                 .withTxManager(txManager)
                 .registerJaversRepository(sqlRepository)

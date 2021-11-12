@@ -12,8 +12,8 @@ dependencies {
     api project(':javers-core')
 
     implementation "org.aspectj:aspectjweaver:$aspectjweaverVersion"
-    implementation "org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:$jbossTransactionApiVersion"
 
+    springImplementation "org.springframework:spring-tx:$springVersion"
     springImplementation "org.springframework:spring-context:$springVersion"
     springImplementation "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
     springImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
@@ -25,4 +25,17 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     testCompile project(':javers-persistence-mongo')
     testCompile "com.google.guava:guava:$guavaVersion"
+}
+
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+configurations {
+    testArtifacts
+}
+
+artifacts {
+    testArtifacts testJar
 }

@@ -1,6 +1,7 @@
 package org.javers.repository.mongo;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;

@@ -2,10 +2,7 @@ package org.javers.repository.mongo;
 
 import com.google.gson.JsonObject;
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -51,8 +48,10 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private final LatestSnapshotCache cache;
     private MongoDialect mongoDialect;
 
+    private final JaversMongoTransactionTemplate transactionTemplate;
+
     public MongoRepository(MongoDatabase mongo) {
-        this(mongo, DEFAULT_CACHE_SIZE, MONGO_DB);
+        this(mongo, DEFAULT_CACHE_SIZE, MONGO_DB, NoTransactionTemplate.instance());
     }
 
     /**
@@ -65,27 +64,30 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
      * See <a href="http://docs.aws.amazon.com/documentdb/latest/developerguide/functional-differences.html">functional differences</a>.
      */
     public static MongoRepository mongoRepositoryWithDocumentDBCompatibility(MongoDatabase mongo, int cacheSize) {
-        return new MongoRepository(mongo, cacheSize, DOCUMENT_DB);
+        return new MongoRepository(mongo, cacheSize, DOCUMENT_DB, NoTransactionTemplate.instance());
     }
 
     /**
      * @param cacheSize Size of the latest snapshots cache, default is 5000. Set 0 to disable.
      */
     public MongoRepository(MongoDatabase mongo, int cacheSize) {
-        this(mongo, cacheSize, MONGO_DB);
+        this(mongo, cacheSize, MONGO_DB, NoTransactionTemplate.instance());
     }
 
-    MongoRepository(MongoDatabase mongo, int cacheSize, MongoDialect dialect) {
-        Validate.argumentsAreNotNull(mongo, dialect);
+    public MongoRepository(MongoDatabase mongo, int cacheSize, MongoDialect dialect, JaversMongoTransactionTemplate transactionTemplate) {
+        Validate.argumentsAreNotNull(mongo, dialect, transactionTemplate);
         this.mongoDialect = dialect;
         this.mongoSchemaManager = new MongoSchemaManager(mongo);
         cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
+        this.transactionTemplate = transactionTemplate;
     }
 
     @Override
     public void persist(Commit commit) {
-        persistSnapshots(commit);
-        persistHeadId(commit);
+        transactionTemplate.execute(clientSession -> {
+            persistSnapshots(commit, clientSession);
+            persistHeadId(commit, clientSession);
+        });
     }
 
     void clean(){
@@ -224,24 +226,25 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         return mongoSchemaManager.headCollection();
     }
 
-    private void persistSnapshots(Commit commit) {
+    private void persistSnapshots(Commit commit, Optional<ClientSession> clientSession) {
         MongoCollection<Document> collection = snapshotsCollection();
         commit.getSnapshots().forEach(snapshot -> {
-            collection.insertOne(writeToDBObject(snapshot));
+            transactionalInsert(collection, writeToDBObject(snapshot), clientSession);
+            //TODO should be evicted on transaction rollback
             cache.put(snapshot);
         });
     }
 
-    private void persistHeadId(Commit commit) {
+    private void persistHeadId(Commit commit, Optional<ClientSession> clientSession) {
         MongoCollection<Document> headIdCollection = headCollection();
 
         Document oldHead = headIdCollection.find().first();
         MongoHeadId newHeadId = new MongoHeadId(commit.getId());
 
         if (oldHead == null) {
-            headIdCollection.insertOne(newHeadId.toDocument());
+            transactionalInsert(headIdCollection, newHeadId.toDocument(), clientSession);
         } else {
-            headIdCollection.updateOne(objectIdFiler(oldHead), newHeadId.getUpdateCommand());
+            transactionalUpdate(headIdCollection, objectIdFiler(oldHead), newHeadId.getUpdateCommand(), clientSession);
         }
     }
 
@@ -384,5 +387,21 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     //enables index range scan
     private static Bson prefixQuery(String fieldName, String prefix){
         return Filters.regex(fieldName, "^" + RegexEscape.escape(prefix) + ".*");
+    }
+
+    private void transactionalInsert(
+            MongoCollection<Document> collection,
+            Document document,
+            Optional<ClientSession> clientSession) {
+        clientSession.map(s-> collection.insertOne(s, document))
+                .orElseGet(() -> collection.insertOne(document));
+    }
+
+    private void transactionalUpdate(
+            MongoCollection<Document> collection,
+            Bson filter, Bson update,
+            Optional<ClientSession> clientSession) {
+        clientSession.map(s-> collection.updateOne(s, filter, update))
+                .orElseGet(() -> collection.updateOne(filter, update));
     }
 }

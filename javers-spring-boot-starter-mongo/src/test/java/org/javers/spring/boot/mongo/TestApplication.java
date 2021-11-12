@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan("org.javers.spring.boot.mongo")
+@ComponentScan({"org.javers.spring.boot.mongo", "org.javers.spring.transactions"})
 public class TestApplication {
 
     @Bean
