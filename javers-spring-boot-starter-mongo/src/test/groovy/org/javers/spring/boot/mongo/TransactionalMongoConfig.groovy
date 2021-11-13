@@ -45,15 +45,12 @@ class TransactionalMongoConfig {
 
     @Bean
     MongoDatabaseFactory mongoDatabaseFactory(MongoClient mongoClient) {
-        println("my mongoClient: "+ mongoClient)
         new SimpleMongoClientDatabaseFactory(mongoClient, "test")
     }
 
     @Bean
     MongoTransactionManager transactionManager(MongoDatabaseFactory mongoDatabaseFactory) {
-        println("my mongoDatabaseFactory: "+ mongoDatabaseFactory)
         def t = new MongoTransactionManager(mongoDatabaseFactory)
-        println("my mongoTransactionManager: "+ t)
         t
     }
 
