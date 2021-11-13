@@ -48,10 +48,8 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private final LatestSnapshotCache cache;
     private MongoDialect mongoDialect;
 
-    private final JaversMongoTransactionTemplate transactionTemplate;
-
     public MongoRepository(MongoDatabase mongo) {
-        this(mongo, DEFAULT_CACHE_SIZE, MONGO_DB, NoTransactionTemplate.instance());
+        this(mongo, DEFAULT_CACHE_SIZE, MONGO_DB);
     }
 
     /**
@@ -64,30 +62,32 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
      * See <a href="http://docs.aws.amazon.com/documentdb/latest/developerguide/functional-differences.html">functional differences</a>.
      */
     public static MongoRepository mongoRepositoryWithDocumentDBCompatibility(MongoDatabase mongo, int cacheSize) {
-        return new MongoRepository(mongo, cacheSize, DOCUMENT_DB, NoTransactionTemplate.instance());
+        return new MongoRepository(mongo, cacheSize, DOCUMENT_DB);
     }
 
     /**
      * @param cacheSize Size of the latest snapshots cache, default is 5000. Set 0 to disable.
      */
     public MongoRepository(MongoDatabase mongo, int cacheSize) {
-        this(mongo, cacheSize, MONGO_DB, NoTransactionTemplate.instance());
+        this(mongo, cacheSize, MONGO_DB);
     }
 
-    public MongoRepository(MongoDatabase mongo, int cacheSize, MongoDialect dialect, JaversMongoTransactionTemplate transactionTemplate) {
-        Validate.argumentsAreNotNull(mongo, dialect, transactionTemplate);
+    MongoRepository(MongoDatabase mongo, int cacheSize, MongoDialect dialect) {
+        Validate.argumentsAreNotNull(mongo, dialect);
         this.mongoDialect = dialect;
         this.mongoSchemaManager = new MongoSchemaManager(mongo);
         cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
-        this.transactionTemplate = transactionTemplate;
     }
 
     @Override
     public void persist(Commit commit) {
-        transactionTemplate.execute(clientSession -> {
-            persistSnapshots(commit, clientSession);
-            persistHeadId(commit, clientSession);
-        });
+        persistSnapshots(commit, Optional.empty());
+        persistHeadId(commit, Optional.empty());
+    }
+
+    public void persist(Commit commit, ClientSession clientSession) {
+        persistSnapshots(commit, Optional.of(clientSession));
+        persistHeadId(commit, Optional.of(clientSession));
     }
 
     void clean(){

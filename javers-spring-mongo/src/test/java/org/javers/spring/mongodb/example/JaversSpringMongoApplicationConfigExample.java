@@ -5,9 +5,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
-import org.javers.repository.mongo.JaversMongoTransactionTemplate;
 import org.javers.repository.mongo.MongoRepository;
-import org.javers.repository.mongo.NoTransactionTemplate;
 import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.annotation.JaversAuditableAsync;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
@@ -17,7 +15,6 @@ import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
-import org.javers.spring.mongodb.SpringJaversMongoTransactionTemplate;
 import org.javers.spring.mongodb.TransactionalMongoJaversBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,12 +24,12 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 
 @Configuration
 @ComponentScan(basePackages = "org.javers.spring.repository")
@@ -46,32 +43,19 @@ public class JaversSpringMongoApplicationConfigExample {
 
     /**
      * Creates JaVers instance backed by {@link MongoRepository}
+     * <br/><br/>
+     *
+     * If you are using multi-document ACID transactions
+     * introduced in MongoDB 4.0 -- you can configure
+     * Javers' to participate in your application's transactions
+     * managed by MongoTransactionManager.
      */
     @Bean
     public Javers javers() {
-        JaversMongoTransactionTemplate transactionTemplate = javersMongoTransactionTemplate();
-
-        MongoRepository mongoRepository = new MongoRepository(
-                mongo(),
-                5000,
-                MONGO_DB,
-                transactionTemplate);
-
-        return new TransactionalMongoJaversBuilder(transactionTemplate)
-                .registerJaversRepository(mongoRepository)
+        return TransactionalMongoJaversBuilder.javers()
+                .registerJaversRepository(new MongoRepository(mongo()))
+                .withTxManager(mongoTransactionManager.orElse(null))
                 .build();
-    }
-
-    /**
-     * If you are using multi-document ACID transactions
-     * introduced in MongoDB 4.0 -- you can configure
-     * Javers' MongoRepository to participate in your application's transactions
-     * managed by MongoTransactionManager.
-     */
-    private JaversMongoTransactionTemplate javersMongoTransactionTemplate() {
-        return mongoTransactionManager
-                .map(it -> (JaversMongoTransactionTemplate)new SpringJaversMongoTransactionTemplate(it))
-                .orElseGet(() -> NoTransactionTemplate.instance());
     }
 
     /**
