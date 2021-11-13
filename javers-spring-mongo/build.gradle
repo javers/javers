@@ -11,4 +11,7 @@ dependencies {
 
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
+    testCompile project(path: ":javers-spring", configuration: "testArtifacts")
+    testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
+    testCompile "com.google.guava:guava:$guavaVersion"
 }

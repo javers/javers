@@ -1,12 +1,13 @@
-package org.javers.spring.example;
+package org.javers.spring.mongodb.example;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
-import org.javers.core.JaversBuilder;
+import org.javers.repository.mongo.JaversMongoTransactionTemplate;
 import org.javers.repository.mongo.MongoRepository;
+import org.javers.repository.mongo.NoTransactionTemplate;
 import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.annotation.JaversAuditableAsync;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
@@ -16,56 +17,78 @@ import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.javers.spring.mongodb.SpringJaversMongoTransactionTemplate;
+import org.javers.spring.mongodb.TransactionalMongoJaversBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-
-import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.Executor;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 
 @Configuration
 @ComponentScan(basePackages = "org.javers.spring.repository")
 @EnableMongoRepositories({"org.javers.spring.repository"})
 @EnableAspectJAutoProxy
-public class JaversSpringMongoApplicationConfig {
+public class JaversSpringMongoApplicationConfigExample {
     private static final String DATABASE_NAME = "mydatabase";
+
+    @Autowired
+    Optional<MongoTransactionManager> mongoTransactionManager;
 
     /**
      * Creates JaVers instance backed by {@link MongoRepository}
      */
     @Bean
     public Javers javers() {
-        MongoRepository javersMongoRepository =
-                new MongoRepository(mongo().getDatabase(DATABASE_NAME));
+        JaversMongoTransactionTemplate transactionTemplate = javersMongoTransactionTemplate();
 
-        return JaversBuilder.javers()
-                .registerJaversRepository(javersMongoRepository)
+        MongoRepository mongoRepository = new MongoRepository(
+                mongo(),
+                5000,
+                MONGO_DB,
+                transactionTemplate);
+
+        return new TransactionalMongoJaversBuilder(transactionTemplate)
+                .registerJaversRepository(mongoRepository)
                 .build();
     }
 
     /**
-     * MongoDB setup
+     * If you are using multi-document ACID transactions
+     * introduced in MongoDB 4.0 -- you can configure
+     * Javers' MongoRepository to participate in your application's transactions
+     * managed by MongoTransactionManager.
      */
-    @Bean(name="realMongoClient")
-    @ConditionalOnMissingBean
-    public MongoClient mongo() {
-        return MongoClients.create();
+    private JaversMongoTransactionTemplate javersMongoTransactionTemplate() {
+        return mongoTransactionManager
+                .map(it -> (JaversMongoTransactionTemplate)new SpringJaversMongoTransactionTemplate(it))
+                .orElseGet(() -> NoTransactionTemplate.instance());
     }
 
     /**
-     * required by Spring Data MongoDB
+     * You can configure Javers' MongoRepository to use
+     * your application's primary database or a dedicated database.
      */
     @Bean
-    public MongoTemplate mongoTemplate() throws Exception {
-        return new MongoTemplate(mongo(), DATABASE_NAME);
+    public MongoDatabase mongo() {
+        return MongoClients.create().getDatabase(DATABASE_NAME);
+    }
+
+    /**
+     * Required by Spring Data Mongo
+     */
+    @Bean
+    public MongoTemplate mongoTemplate() {
+        return new MongoTemplate(MongoClients.create(), DATABASE_NAME);
     }
 
     /**
@@ -137,10 +160,7 @@ public class JaversSpringMongoApplicationConfig {
         return new CommitPropertiesProvider() {
             @Override
             public Map<String, String> provideForCommittedObject(Object domainObject) {
-                if (domainObject instanceof DummyObject) {
-                    return Maps.of("dummyObject.name", ((DummyObject)domainObject).getName());
-                }
-                return Collections.emptyMap();
+                    return Maps.of("key", "ok");
             }
         };
     }
