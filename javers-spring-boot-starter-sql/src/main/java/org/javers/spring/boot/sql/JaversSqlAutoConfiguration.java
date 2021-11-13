@@ -13,7 +13,7 @@ import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
-import org.javers.spring.jpa.TransactionalJaversBuilder;
+import org.javers.spring.jpa.TransactionalJpaJaversBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
-import java.util.List;
 
 /**
  * @author pawelszymczyk
@@ -85,7 +84,7 @@ public class JaversSqlAutoConfiguration {
     @ConditionalOnMissingBean
     public Javers javers(JaversSqlRepository sqlRepository,
                          PlatformTransactionManager transactionManager) {
-        JaversBuilder javersBuilder = TransactionalJaversBuilder
+        JaversBuilder javersBuilder = TransactionalJpaJaversBuilder
                 .javers()
                 .withTxManager(transactionManager)
                 .registerJaversRepository(sqlRepository)

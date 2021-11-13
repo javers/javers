@@ -2,15 +2,17 @@ package org.javers.spring.boot.mongo;
 
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoDatabase;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
+import org.javers.repository.mongo.JaversMongoTransactionTemplate;
 import org.javers.repository.mongo.MongoRepository;
+import org.javers.repository.mongo.NoTransactionTemplate;
 import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
+import org.javers.spring.mongodb.SpringJaversMongoTransactionTemplate;
+import org.javers.spring.mongodb.TransactionalMongoJaversBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -27,9 +29,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.MongoDatabaseUtils;
+import org.springframework.data.mongodb.MongoTransactionManager;
 
 import java.util.Optional;
 
+import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
 
 /**
@@ -55,8 +61,15 @@ public class JaversMongoAutoConfiguration {
     @Qualifier("javersMongoClientSettings")
     private Optional<MongoClientSettings> mongoClientSettings;
 
+    //dbFactory should be created by the spring-boot-starter-data-mongodb
+    @Autowired
+    private MongoDatabaseFactory dbFactory;
+
     @Autowired
     private RegisterJsonTypeAdaptersPlugin registerJsonTypeAdaptersPlugin;
+
+    @Autowired
+    private Optional<MongoTransactionManager> mongoTransactionManager;
 
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
@@ -65,9 +78,12 @@ public class JaversMongoAutoConfiguration {
 
         MongoDatabase mongoDatabase = initJaversMongoDatabase();
 
-        MongoRepository javersRepository = createMongoRepository(mongoDatabase);
+        JaversMongoTransactionTemplate transactionTemplate =
+                createJaversMongoTransactionTemplate();
 
-        JaversBuilder javersBuilder = JaversBuilder.javers()
+        MongoRepository javersRepository = createMongoRepository(mongoDatabase, transactionTemplate);
+
+        JaversBuilder javersBuilder = new TransactionalMongoJaversBuilder(transactionTemplate)
                 .registerJaversRepository(javersRepository)
                 .withProperties(javersMongoProperties)
                 .withObjectAccessHook(javersMongoProperties.createObjectAccessHookInstance());
@@ -78,29 +94,20 @@ public class JaversMongoAutoConfiguration {
     private MongoDatabase initJaversMongoDatabase() {
         if (!javersMongoProperties.isDedicatedMongodbConfigurationEnabled()) {
             MongoDatabase mongoDatabase = getDefaultMongoDatabase();
-            logger.info("connecting Javers to Mongo database '{}' configured in spring.data.mongodb properties",
+            logger.info("connecting Javers to primary Mongo database '{}' configured in spring.data.mongodb properties",
                         mongoDatabase.getName());
             return mongoDatabase;
         } else {
             MongoDatabase mongoDatabase = JaversDedicatedMongoFactory
                     .createMongoDatabase(javersMongoProperties, mongoClientSettings);
-            logger.info("connecting Javers to Mongo database '{}' configured in javers.mongodb properties",
+            logger.info("connecting Javers to dedicated Mongo database '{}' configured in javers.mongodb properties",
                     mongoDatabase.getName());
             return mongoDatabase;
         }
     }
 
-    //from the spring-boot-starter-data-mongodb
     private MongoDatabase getDefaultMongoDatabase() {
-        if (getBean(com.mongodb.client.MongoClient.class).isPresent()) {
-            return getBean(com.mongodb.client.MongoClient.class).get().getDatabase(mongoProperties.getMongoClientDatabase());
-        }
-        if (getBean(com.mongodb.MongoClient.class).isPresent()) {
-            return getBean(com.mongodb.MongoClient.class).get().getDatabase(mongoProperties.getMongoClientDatabase());
-        }
-        throw new JaversException(
-            JaversExceptionCode.RUNTIME_EXCEPTION,
-            "Can't find the default mongoClient bean. It should be created by the spring-boot-starter-data-mongodb");
+        return MongoDatabaseUtils.getDatabase(dbFactory);
     }
 
     private <T> Optional<T> getBean(Class<T> ofType) {
@@ -111,12 +118,31 @@ public class JaversMongoAutoConfiguration {
         }
     }
 
-    private MongoRepository createMongoRepository(MongoDatabase mongoDatabase) {
+    private JaversMongoTransactionTemplate createJaversMongoTransactionTemplate () {
+        return mongoTransactionManager
+                .filter(it -> !javersMongoProperties.isDedicatedMongodbConfigurationEnabled())
+                .map(it -> {
+                    logger.info("creating Javers' MongoRepository with multi-document transactions support");
+                    return (JaversMongoTransactionTemplate)new SpringJaversMongoTransactionTemplate(it);
+                })
+                .orElseGet(() -> {
+                    logger.info("creating Javers' MongoRepository without multi-document transactions support, " +
+                            "as there is no MongoTransactionManager defined");
+                    return NoTransactionTemplate.instance();
+                });
+    }
+
+    private MongoRepository createMongoRepository(MongoDatabase mongoDatabase, JaversMongoTransactionTemplate javersMongoTransactionTemplate) {
         if (javersMongoProperties.isDocumentDbCompatibilityEnabled()) {
             logger.info("enabling Amazon DocumentDB compatibility");
             return mongoRepositoryWithDocumentDBCompatibility(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
         }
-        return new MongoRepository(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
+
+        return new MongoRepository(
+                mongoDatabase,
+                javersMongoProperties.getSnapshotsCacheSize(),
+                MONGO_DB,
+                javersMongoTransactionTemplate);
     }
 
     @Bean(name = "SpringSecurityAuthorProvider")

@@ -13,4 +13,6 @@ dependencies {
     testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
     testCompile project(path: ":javers-persistence-mongo", configuration: "testArtifacts")
+    testCompile project(path: ":javers-spring", configuration: "testArtifacts")
+    testCompile "com.github.silaev:mongodb-replica-set:0.4.3"
 }

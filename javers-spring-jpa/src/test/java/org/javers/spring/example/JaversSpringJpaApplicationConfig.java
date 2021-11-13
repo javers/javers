@@ -13,7 +13,7 @@ import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
-import org.javers.spring.jpa.TransactionalJaversBuilder;
+import org.javers.spring.jpa.TransactionalJpaJaversBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -55,7 +54,7 @@ public class JaversSpringJpaApplicationConfig {
                 .withDialect(DialectName.H2)
                 .build();
 
-        return TransactionalJaversBuilder
+        return TransactionalJpaJaversBuilder
                 .javers()
                 .withTxManager(txManager)
                 .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())

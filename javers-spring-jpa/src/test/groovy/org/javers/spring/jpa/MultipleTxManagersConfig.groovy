@@ -2,7 +2,6 @@ package org.javers.spring.jpa
 
 import org.javers.core.Javers
 import org.javers.hibernate.integration.config.HibernateConfig
-import org.javers.hibernate.integration.config.HibernateConfig
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepository
 import org.javers.repository.sql.SqlRepositoryBuilder
@@ -52,7 +51,7 @@ class MultipleTxManagersConfig extends HibernateConfig implements TransactionMan
     @Bean
     Javers javers(JaversSqlRepository sqlRepository,
                   @Qualifier("transactionManager") PlatformTransactionManager transactionManager) {
-        TransactionalJaversBuilder
+        TransactionalJpaJaversBuilder
                 .javers()
                 .withTxManager(transactionManager)
                 .registerJaversRepository(sqlRepository)

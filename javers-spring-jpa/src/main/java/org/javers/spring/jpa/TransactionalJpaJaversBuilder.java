@@ -10,17 +10,17 @@ import org.springframework.transaction.PlatformTransactionManager;
 /**
  * @author bartosz walacik
  */
-public final class TransactionalJaversBuilder extends JaversBuilder {
+public final class TransactionalJpaJaversBuilder extends JaversBuilder {
     private PlatformTransactionManager txManager;
 
-    private TransactionalJaversBuilder() {
+    private TransactionalJpaJaversBuilder() {
     }
 
-    public static TransactionalJaversBuilder javers() {
-        return new TransactionalJaversBuilder();
+    public static TransactionalJpaJaversBuilder javers() {
+        return new TransactionalJpaJaversBuilder();
     }
 
-    public TransactionalJaversBuilder withTxManager(PlatformTransactionManager txManager) {
+    public TransactionalJpaJaversBuilder withTxManager(PlatformTransactionManager txManager) {
         this.txManager = txManager;
         return this;
     }
@@ -34,7 +34,7 @@ public final class TransactionalJaversBuilder extends JaversBuilder {
         Javers javersCore = super.assembleJaversInstance();
 
         Javers javersTransactional =
-                new JaversTransactionalDecorator(javersCore, getContainerComponent(JaversSqlRepository.class), txManager);
+                new JaversTransactionalJpaDecorator(javersCore, getContainerComponent(JaversSqlRepository.class), txManager);
 
         return javersTransactional;
     }

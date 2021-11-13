@@ -31,7 +31,7 @@ class CacheEvictSpringConfig extends HibernateConfig {
 
     @Bean
     Javers javers(JaversSqlRepository sqlRepository, PlatformTransactionManager txManager) {
-        TransactionalJaversBuilder
+        TransactionalJpaJaversBuilder
                 .javers()
                 .withTxManager(txManager)
                 .registerJaversRepository(sqlRepository)
