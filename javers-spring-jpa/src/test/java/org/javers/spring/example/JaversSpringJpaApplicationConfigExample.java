@@ -39,7 +39,7 @@ import java.util.Properties;
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
 @EnableJpaRepositories({"org.javers.spring.repository"})
-public class JaversSpringJpaApplicationConfig {
+public class JaversSpringJpaApplicationConfigExample {
 
     //.. JaVers setup ..
 

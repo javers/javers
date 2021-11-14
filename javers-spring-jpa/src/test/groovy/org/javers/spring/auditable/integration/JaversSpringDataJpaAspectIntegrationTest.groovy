@@ -1,7 +1,7 @@
 package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
-import org.javers.spring.example.JaversSpringJpaApplicationConfig
+import org.javers.spring.example.JaversSpringJpaApplicationConfigExample
 import org.javers.spring.model.DummyObject
 import org.javers.spring.repository.DummyAuditedJpaRepository
 import org.javers.spring.repository.DummyNoAuditJpaRepository
@@ -12,7 +12,7 @@ import spock.lang.Specification
 
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
-@ContextConfiguration(classes = [JaversSpringJpaApplicationConfig])
+@ContextConfiguration(classes = [JaversSpringJpaApplicationConfigExample])
 class JaversSpringDataJpaAspectIntegrationTest extends Specification {
     @Autowired
     ApplicationContext context
