@@ -9,7 +9,9 @@ import org.springframework.data.mongodb.MongoTransactionManager;
 import static org.javers.common.validation.Validate.argumentCheck;
 
 /**
- * Creates transactional Javers instance. <br/>
+ * Creates transactional Javers instance if {@link MongoTransactionManager} is provided.
+ * <br/><br/>
+ *
  * Allows Javers' {@link MongoRepository} to participate in application's transactions
  * managed by {@link MongoTransactionManager}.
  * <br/><br/>
