@@ -18,9 +18,9 @@ class CaseIllegalStateExceptionWhenGroupByCommit extends Specification {
 
         when:
         def diff = javers.compare(new MyClass(value: "abc"), new MyClass(value: "cde"))
-        diff.changes.prettyPrint()
 
         then:
+        println (diff.changes.prettyPrint() )
         diff.changes
     }
 }
