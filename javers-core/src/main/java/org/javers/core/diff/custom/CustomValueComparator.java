@@ -68,4 +68,22 @@ public interface CustomValueComparator<T> {
      * @param value not null
      */
     String toString(T value);
+
+    /**
+     * This flag is used to indicate to Javers whether the comparator will
+     * safely handle nulls itself.
+     * <br /><br />
+     *
+     * By default, this value is false and Javers will first
+     * check that both values are non-null before calling the comparator and will identify
+     * a difference if only one of the compared values is null.
+     * <br /><br />
+     *
+     * Setting this value to true will cause these checks to be skipped.
+     * This allows the comparator to handle nulls itself, and incurs the
+     * responsibility for doing so safely.
+     */
+    default boolean handlesNulls() {
+        return false;
+    }
 }

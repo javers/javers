@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public abstract class PrimitiveOrValueType<T> extends ClassType implements CustomComparableType {
-    private final CustomValueComparatorNullSafe<T> valueComparator;
+    private final CustomValueComparator<T> valueComparator;
 
     @Override
     public boolean hasCustomValueComparator() {
@@ -23,7 +23,9 @@ public abstract class PrimitiveOrValueType<T> extends ClassType implements Custo
 
     PrimitiveOrValueType(Type baseJavaType, CustomValueComparator<T> comparator) {
         super(baseJavaType);
-        this.valueComparator = comparator == null ? null : new CustomValueComparatorNullSafe<>(comparator);
+        this.valueComparator = (comparator == null || comparator.handlesNulls()) ?
+            comparator :
+            new CustomValueComparatorNullSafe<>(comparator);
     }
 
     @Override
