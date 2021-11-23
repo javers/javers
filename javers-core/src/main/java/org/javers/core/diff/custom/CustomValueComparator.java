@@ -71,7 +71,7 @@ public interface CustomValueComparator<T> {
 
     /**
      * This flag is used to indicate to Javers whether
-     * a comparator implementation is safely handling nulls on its own.
+     * a comparator implementation wants to handle nulls.
      * <br /><br />
      *
      * By default, the flag is <b>false</b> and Javers
@@ -86,9 +86,11 @@ public interface CustomValueComparator<T> {
      *
      * <br/>
      *
-     * Set the flag to <b>true</b> to skip these checks.
-     * That allows a comparator to handle nulls itself, and incurs the
-     * responsibility for doing so safely.
+     * If the flag is <b>true</b> &mdash; Javers skips that logic and
+     * allows a comparator to handle nulls on its own.
+     * In that case, a comparator holds responsibility for null-safety.
+     *
+     * @see NullAsBlankStringComparator
      */
     default boolean handlesNulls() {
         return false;
