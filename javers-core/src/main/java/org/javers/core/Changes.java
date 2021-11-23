@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
@@ -70,6 +71,16 @@ public class Changes extends AbstractList<Change> implements Serializable {
      * @since 3.9
      */
     public List<ChangesByCommit> groupByCommit() {
+        if (changes.size() == 0) {
+            return Collections.emptyList();
+        }
+
+        if (!changes.get(0).getCommitMetadata().isPresent()) {
+            return Lists.immutableListOf(
+                    new ChangesByCommit(CommitMetadata.nullObject(), changes, valuePrinter)
+            );
+        }
+
         Map<CommitMetadata, List<Change>> changesByCommit = changes.stream().collect(
                 groupingBy(c -> c.getCommitMetadata().orElseThrow( () -> new IllegalStateException("No CommitMetadata in this Change")),
                            () -> new LinkedHashMap<>(), toList()));

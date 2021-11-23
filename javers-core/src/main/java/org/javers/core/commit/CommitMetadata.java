@@ -32,6 +32,10 @@ public class CommitMetadata implements Serializable {
         this.commitDateInstant = initCommitDateInstant(commitDate, commitDateInstant);
     }
 
+    public static CommitMetadata nullObject() {
+        return NullCommitMetadata.instance();
+    }
+
     private Instant initCommitDateInstant(LocalDateTime commitDate, Instant commitDateInstant) {
         if (commitDateInstant != null) {
             return commitDateInstant;
