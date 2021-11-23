@@ -25,10 +25,10 @@ import org.javers.core.metamodel.type.ValueType;
  */
 public interface CustomValueComparator<T> {
     /**
-     * Called by JaVers to compare two Values.
+     * Called by Javers to compare two Values.
      *
-     * @param a not null
-     * @param b not null
+     * @param a not null if {@link #handlesNulls()} returns false
+     * @param b not null if {@link #handlesNulls()} returns false
      */
     boolean equals(T a, T b);
 
@@ -65,7 +65,32 @@ public interface CustomValueComparator<T> {
      *
      * See full example <a href="https://github.com/javers/javers/blob/master/javers-core/src/test/groovy/org/javers/core/examples/CustomToStringExample.groovy">CustomToStringExample.groovy</a>.
      *
-     * @param value not null
+     * @param value not null if {@link #handlesNulls()} returns false
      */
     String toString(T value);
+
+    /**
+     * This flag is used to indicate to Javers whether
+     * a comparator implementation is safely handling nulls on its own.
+     * <br /><br />
+     *
+     * By default, the flag is <b>false</b> and Javers
+     * checks if both values are non-null before calling a comparator.
+     * <br/>
+     * If any of given values is null &mdash; Javers compares them using the
+     * standard Java logic:
+     * <ul>
+     *     <li>null == null</li>
+     *     <li>null != non-null</li>
+     * </ul>
+     *
+     * <br/>
+     *
+     * Set the flag to <b>true</b> to skip these checks.
+     * That allows a comparator to handle nulls itself, and incurs the
+     * responsibility for doing so safely.
+     */
+    default boolean handlesNulls() {
+        return false;
+    }
 }
