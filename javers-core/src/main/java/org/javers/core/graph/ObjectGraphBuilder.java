@@ -67,7 +67,15 @@ class ObjectGraphBuilder {
 
         List<LiveNode> nodes = nodeReuser.nodes();
 
+        //TODO
+        System.out.println("Nodes:");
+        nodes.forEach(it -> System.out.println (it.getCdo().getGlobalId().value()));
+
+        //TODO
+        System.out.println("enrichHashes:");
         enrichHashes(nodes);
+        nodes.forEach(it -> System.out.println (it.getCdo().getGlobalId().value()));
+
         switchToBuilt();
 
         return new LiveGraph(root, new HashSet<>(nodes));

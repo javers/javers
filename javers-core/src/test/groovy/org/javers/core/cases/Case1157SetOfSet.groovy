@@ -10,16 +10,16 @@ import spock.lang.Specification
  */
 class Case1157SetOfSet extends Specification {
 
-    static class A {
-        Set<B> bs;
+    class ValueObject {
+        Set<SetHolder> bs
     }
 
-    static class B {
-        Set<C> cs;
+    class SetHolder {
+        Set<C> cs
     }
 
-    static class C {
-        String foo;
+    class C {
+        String foo
 
         C(String foo) {
             this.foo = foo
@@ -32,20 +32,21 @@ class Case1157SetOfSet extends Specification {
         Javers javers = JaversBuilder.javers().build()
 
         // object "a1" and "a2" are semantically identical
-        B b1 = new B()
+        SetHolder b1 = new SetHolder()
         b1.cs = [new C("a"), new C("b")] as Set
-        A a1 = new A()
-        a1.bs = [b1] as Set
+        ValueObject left = new ValueObject()
+        left.bs = [b1] as Set
 
-        B b2 = new B()
+        SetHolder b2 = new SetHolder()
         b2.cs = [new C("a"), new C("b")] as Set
-        A a2 = new A()
-        a2.bs = [b2] as Set
+        ValueObject right = new ValueObject()
+        right.bs = [b2] as Set
 
          when:
          def detectedDiffs = 0
          100.times {
-             def diff = javers.compare(a1, a2)
+             def diff = javers.compare(left, right)
+             println (it +"."+diff.prettyPrint())
              if (diff.hasChanges()) detectedDiffs++
          }
 
