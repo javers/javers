@@ -11,11 +11,11 @@ import spock.lang.Specification
 class Case1157SetOfSet extends Specification {
 
     class ValueObject {
-        Set<SetHolder> bs
+        Set<SetHolder> setWithSets
     }
 
     class SetHolder {
-        Set<C> cs
+        Set<C> setWithC
     }
 
     class C {
@@ -33,20 +33,19 @@ class Case1157SetOfSet extends Specification {
 
         // object "a1" and "a2" are semantically identical
         SetHolder b1 = new SetHolder()
-        b1.cs = [new C("a"), new C("b")] as Set
+        b1.setWithC = [new C("a"), new C("b")] as Set
         ValueObject left = new ValueObject()
-        left.bs = [b1] as Set
+        left.setWithSets = [b1] as Set
 
         SetHolder b2 = new SetHolder()
-        b2.cs = [new C("a"), new C("b")] as Set
+        b2.setWithC = [new C("a"), new C("b")] as Set
         ValueObject right = new ValueObject()
-        right.bs = [b2] as Set
+        right.setWithSets = [b2] as Set
 
          when:
          def detectedDiffs = 0
-         100.times {
+         50.times {
              def diff = javers.compare(left, right)
-             println (it +"."+diff.prettyPrint())
              if (diff.hasChanges()) detectedDiffs++
          }
 

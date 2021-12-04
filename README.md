@@ -69,7 +69,7 @@ JaVers project.
 
 #### Organizations
 
-Support this project with your organization.
+Support Javers as an organization.
 Your logo will show up here with a link to your website.
 
 <a href="https://opencollective.com/javers/organization/0/website"><img src="https://opencollective.com/javers/organization/0/avatar.svg"></a>

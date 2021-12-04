@@ -2,13 +2,11 @@ package org.javers.core.graph
 
 import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.*
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
-
 import static NodeAssert.assertThat
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserDetails.dummyUserDetails
@@ -397,7 +395,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                ]
     }
 
-    def "should assign proper hashes to ValueObjects in Set multi edge"() {
+    def "should generate proper hashes for ValueObjects in Sets"() {
         given:
         def graphBuilder = newBuilder()
         def user = new SnapshotEntity(id:1, setOfValueObjects:[
@@ -415,6 +413,59 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ] as Set
 
         node.getEdge("setOfValueObjects").references.collect{it.globalId} as Set == expectedIds
+    }
+
+    @Unroll
+    def "should generate proper hashes for ValueObjects in Sets and propagate them to descendants"() {
+        given:
+        def graphBuilder = newBuilder()
+        def user = new SnapshotEntity(id: 1, setOfValueObjects: [
+                new DummyAddress(city: "London City", networkAddress: new DummyNetworkAddress(address: address))
+        ])
+
+        when:
+        LiveNode node = graphBuilder.buildGraph(user).root()
+
+        then:
+        node.getEdge("setOfValueObjects").references[0].globalId.value()
+                .endsWith("/1#setOfValueObjects/"+expectedHash)
+        node.getEdge("setOfValueObjects").references[0].getEdge("networkAddress").referencedNode.globalId.value()
+                .endsWith("/1#setOfValueObjects/"+expectedHash+"/networkAddress")
+
+        where:
+        address << ["a","b"]
+        expectedHash << ["76da12268001287215997529b2bdfac6","4b76ea1316a7db71624692e7692b0bce"]
+    }
+
+    def "should generate proper hashes for ValueObjects in Sets for both parent and descendant"() {
+        given:
+        def graphBuilder = newBuilder()
+        def user = new SnapshotEntity(id: 1, setOfValueObjects: [
+                new DummyAddress(
+                        city: "London City",
+                        networkAddress: new DummyNetworkAddress(address: "a", nestedSet: [
+                                new DummyNetworkAddress(address: "b")
+                        ]))
+        ])
+
+        when:
+        LiveNode node = graphBuilder.buildGraph(user).root()
+
+        then:
+        node.getEdge("setOfValueObjects").references[0]
+                .globalId.value()
+                .endsWith("/1#setOfValueObjects/76da12268001287215997529b2bdfac6")
+
+        node.getEdge("setOfValueObjects").references[0]
+                .getEdge("networkAddress").referencedNode
+                .globalId.value()
+                .endsWith("/1#setOfValueObjects/76da12268001287215997529b2bdfac6/networkAddress")
+
+        node.getEdge("setOfValueObjects").references[0]
+                .getEdge("networkAddress").referencedNode
+                .getEdge("nestedSet").references[0]
+                .globalId.value()
+                .endsWith("/1#setOfValueObjects/76da12268001287215997529b2bdfac6/networkAddress/nestedSet/c98cefb2f234a503839f960a37c62705")
     }
 
     def "should assign proper indexes to ValueObjects in List multi edge"() {

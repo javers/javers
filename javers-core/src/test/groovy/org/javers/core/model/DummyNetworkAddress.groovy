@@ -14,4 +14,5 @@ class DummyNetworkAddress {
 
     String address
     Version version
+    Set<DummyNetworkAddress> nestedSet
 }

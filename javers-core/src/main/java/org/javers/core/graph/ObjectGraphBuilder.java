@@ -67,15 +67,8 @@ class ObjectGraphBuilder {
 
         List<LiveNode> nodes = nodeReuser.nodes();
 
-        //TODO
-        System.out.println("Nodes:");
-        nodes.forEach(it -> System.out.println (it.getCdo().getGlobalId().value()));
-
-        //TODO
-        System.out.println("enrichHashes:");
         enrichHashes(nodes);
-        nodes.forEach(it -> System.out.println (it.getCdo().getGlobalId().value()));
-
+        reloadHashFromParent(nodes);
         switchToBuilt();
 
         return new LiveGraph(root, new HashSet<>(nodes));
@@ -83,15 +76,18 @@ class ObjectGraphBuilder {
 
     private void enrichHashes(List<LiveNode> nodes) {
         nodes.forEach(this::enrichHashIfNeeded);
+    }
+
+    private void reloadHashFromParent (List<LiveNode> nodes) {
         nodes.forEach(this::reloadHashFromParentIfNeeded);
     }
 
     private void enrichHashIfNeeded(final LiveNode node) {
-        node.getCdo().enrichHashIfNeeded(cdoFactory, () -> node.descendants(MAX_VO_HASHING_DEPTH));
+        node.getCdo().enrichHashIfNeeded(cdoFactory, () -> node.descendantVOs(MAX_VO_HASHING_DEPTH));
     }
 
     private void reloadHashFromParentIfNeeded(final LiveNode node) {
-        node.getCdo().reloadHashFromParentIfNeeded(cdoFactory);
+        node.getCdo().reloadHashFromParentIfNeeded();
     }
 
     private void buildEdges(LiveNode nodeStub) {

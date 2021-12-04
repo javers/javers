@@ -33,7 +33,7 @@ public class ValueObjectId extends GlobalId {
 
     /**
      * Path to ValueObject, should be unique in the Entity <b>instance</b> scope.
-     * Usually, property name.
+     * Usually, a property name.
      * It works like <i>fragment identifier</i> in URL
      */
     public String getFragment() {
