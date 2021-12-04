@@ -32,12 +32,12 @@ abstract class LiveCdo extends Cdo {
                     .filter(cdo -> cdo.getGlobalId() instanceof ValueObjectId)
                     .collect(Collectors.toList());
 
-            ValueObjectId newId = liveCdoFactory.regenerateValueObjectHash(this, descendantVOs);
+            ValueObjectId newId = liveCdoFactory.generateValueObjectHash(this, descendantVOs);
             swapId(newId);
         }
     }
 
-    void reloadHashFromParentIfNeeded(LiveCdoFactory liveCdoFactory) {
+    void reloadHashFromParentIfNeeded() {
         if (hasHashOnParent()) {
             ValueObjectIdWithHash id = (ValueObjectIdWithHash)getGlobalId();
             swapId(id.freeze());

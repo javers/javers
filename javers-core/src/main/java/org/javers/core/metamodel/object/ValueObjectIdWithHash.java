@@ -2,11 +2,20 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.validation.Validate;
+import java.util.function.Supplier;
 
 public abstract class ValueObjectIdWithHash extends ValueObjectId {
     private static final String HASH_PLACEHOLDER = "{hashPlaceholder}";
 
-    private ValueObjectIdWithHash(String typeName, GlobalId ownerId, String fragment) {
+    public static boolean containsHashPlaceholder(String fragment) {
+        if (fragment == null) {
+            return false;
+        }
+        return fragment.contains(HASH_PLACEHOLDER);
+    }
+
+    public ValueObjectIdWithHash(String typeName, GlobalId ownerId, String fragment) {
         super(typeName, ownerId, fragment);
     }
 
@@ -14,9 +23,9 @@ public abstract class ValueObjectIdWithHash extends ValueObjectId {
 
     public abstract boolean hasHashOnParent();
 
-    public abstract ValueObjectId freeze(String hash);
-
     public abstract ValueObjectId freeze();
+
+    public abstract ValueObjectId freeze(String hash);
 
     @Override
     public String toString() {
@@ -24,78 +33,62 @@ public abstract class ValueObjectIdWithHash extends ValueObjectId {
     }
 
     static class ValueObjectIdWithPlaceholder extends ValueObjectIdWithHash {
-        private final String pathFromRoot;
+        private final Supplier<String> parentFragment;
+        private final String localPath;
         private String hash;
+        private final boolean requiresHash;
+        private final boolean hasHashOnParent;
 
-        ValueObjectIdWithPlaceholder(String typeName, GlobalId ownerId, String pathFromRoot) {
-            super(typeName, ownerId, pathFromRoot + "/" + HASH_PLACEHOLDER);
-            this.pathFromRoot = pathFromRoot;
-            this.hash = HASH_PLACEHOLDER;
+        ValueObjectIdWithPlaceholder(String typeName, GlobalId ownerId, Supplier<String> parentFragment,
+                                     String localPath, boolean requiresHash) {
+            super(typeName, ownerId, parentFragment.get() + localPath +
+                    (requiresHash ? "/" + HASH_PLACEHOLDER : ""));
+            this.parentFragment = parentFragment;
+            this.localPath = localPath;
+            this.hash = requiresHash ? HASH_PLACEHOLDER : "";
+            this.requiresHash = requiresHash;
+            this.hasHashOnParent = containsHashPlaceholder(parentFragment.get());
         }
 
+        @Override
         public ValueObjectId freeze(String hash) {
+            Validate.conditionFulfilled(requiresHash, "Illegal state - hash not required");
             if (!HASH_PLACEHOLDER.equals(this.hash)) {
                 throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "already frozen");
             }
             this.hash = hash;
+            if (!hasHashOnParent()) {
+                return new ValueObjectId(getTypeName(), getOwnerId(), this.getFragment());
+            }
+            return new ValueObjectIdWithPlaceholder(getTypeName(), getOwnerId(), parentFragment,
+                    localPath +"/"+hash, false);
+        }
+
+        @Override
+        public ValueObjectId freeze() {
+            Validate.conditionFulfilled(!requiresHash, "Illegal state - hash required");
+            if (getFragment().contains(HASH_PLACEHOLDER)) {
+                throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "can't freeze ValueObjectId, there is still a hash in parent fragment");
+            }
             return new ValueObjectId(getTypeName(), getOwnerId(), this.getFragment());
         }
 
         @Override
         public boolean requiresHash() {
-            return true;
+            return requiresHash;
         }
 
         @Override
         public boolean hasHashOnParent() {
-            return false;
+            return hasHashOnParent;
         }
 
         @Override
         public String getFragment() {
-            return pathFromRoot + "/" + hash;
-        }
-
-        @Override
-        public ValueObjectId freeze() {
-            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
-        }
-    }
-
-    static class ValueObjectIdWithPlaceholderOnParent extends ValueObjectIdWithHash {
-        private final ValueObjectIdWithHash parentId;
-        private final String localPath;
-
-        ValueObjectIdWithPlaceholderOnParent(String typeName, ValueObjectIdWithHash parentId, String localPath) {
-            super(typeName, parentId.getOwnerId(), "{lazy}");
-
-            this.parentId = parentId;
-            this.localPath = localPath;
-        }
-
-        @Override
-        public String getFragment() {
-            return parentId.getFragment() + "/" + localPath;
-        }
-
-        @Override
-        public boolean requiresHash() {
-            return false;
-        }
-
-        @Override
-        public boolean hasHashOnParent() {
-            return true;
-        }
-
-        @Override
-        public ValueObjectId freeze(String hash) {
-            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
-        }
-
-        @Override
-        public ValueObjectId freeze() {
-            return new ValueObjectId(getTypeName(), getOwnerId(), this.getFragment());
+            if (requiresHash) {
+                return parentFragment.get() + localPath + "/" + hash;
+            }
+            return parentFragment.get() + localPath;
         }
     }
 }

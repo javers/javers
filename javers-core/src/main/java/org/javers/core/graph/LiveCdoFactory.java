@@ -25,10 +25,9 @@ public class LiveCdoFactory {
         this.objectHasher = objectHasher;
     }
 
-    ValueObjectId regenerateValueObjectHash(LiveCdo valueObject, List<LiveCdo> descendantVOs) {
+    ValueObjectId generateValueObjectHash(LiveCdo valueObject, List<LiveCdo> descendantVOs) {
         List<LiveCdo> objectsToBeHashed = Lists.immutableListOf(descendantVOs, valueObject);
         String newHash = objectHasher.hash(objectsToBeHashed);
-
         ValueObjectIdWithHash id = (ValueObjectIdWithHash) valueObject.getGlobalId();
 
         return id.freeze(newHash);

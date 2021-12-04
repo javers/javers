@@ -23,6 +23,7 @@ class ObjectHasher {
     String hash(List<LiveCdo> objects) {
         String jsonState = objects.stream().map(cdo -> snapshotFactory.createSnapshotStateNoRefs(cdo))
                         .map(state -> jsonConverter.toJson(state))
+                        .sorted()
                         .collect(Collectors.joining( "\n" ));
         return ShaDigest.longDigest(jsonState);
     }

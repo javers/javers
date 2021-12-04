@@ -2,11 +2,13 @@ package org.javers.core.graph;
 
 import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 
@@ -96,30 +98,45 @@ public class LiveNode extends ObjectNode<LiveCdo>{
         this.edges.put(edge.getProperty().getName(), edge);
     }
 
-    List<LiveCdo> descendants(int maxDepth) {
-        return Lists.immutableListOf(new NodeTraverser(this, maxDepth).descendants);
+    Set<LiveCdo> descendants(int maxDepth) {
+        return new NodeTraverser(this, maxDepth, null).descendantsSet();
+    }
+
+    List<LiveCdo> descendantVOs(int maxDepth) {
+        return new NodeTraverser(this, maxDepth,
+                (LiveNode n) -> n.getGlobalId() instanceof ValueObjectId).descendantsList();
     }
 
     private static class NodeTraverser {
-        private final Set<LiveCdo> descendants = new HashSet();
+        private final List<LiveCdo> descendantsList = new ArrayList<>();
         private final int maxDepth;
         private final ObjectNode root;
+        private final Predicate<LiveNode> filter;
 
-        NodeTraverser(LiveNode root, int maxDepth) {
+        NodeTraverser(LiveNode root, int maxDepth, Predicate<LiveNode> filter) {
             this.maxDepth = maxDepth;
             this.root = root;
+            this.filter = filter != null ? filter : (LiveNode n) -> true ;
             followEdges(root, 1);
         }
 
         void follow(Edge edge, int depth) {
             edge.getReferences().forEach(n -> {
-                if(!descendants.contains(n.getCdo()) && !n.equals(root)) {
-                    descendants.add(n.getCdo());
+                if(!n.equals(root) && filter.test(n)) {
+                    descendantsList.add(n.getCdo());
                     if (depth < maxDepth) {
                         followEdges(n, depth + 1);
                     }
                 }
             });
+        }
+
+        List<LiveCdo> descendantsList() {
+            return Lists.immutableListOf(descendantsList);
+        }
+
+        Set<LiveCdo> descendantsSet() {
+            return Collections.unmodifiableSet(new HashSet<>(descendantsList));
         }
 
         void followEdges(LiveNode node, int depth) {

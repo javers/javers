@@ -7,13 +7,13 @@ import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.ObjectAccessProxy;
 import org.javers.core.metamodel.object.ValueObjectIdWithHash.ValueObjectIdWithPlaceholder;
-import org.javers.core.metamodel.object.ValueObjectIdWithHash.ValueObjectIdWithPlaceholderOnParent;
 import org.javers.core.metamodel.type.*;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
 import org.javers.repository.jql.ValueObjectIdDTO;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * @author bartosz walacik
@@ -58,23 +58,33 @@ public class GlobalIdFactory {
         }
 
         if (targetManagedType instanceof ValueObjectType && hasOwner(ownerContext)) {
-            String pathFromRoot = createPathFromRoot(ownerContext.getOwnerId(), ownerContext.getPath());
+            Supplier<String> parentFragment = createParentFragment(ownerContext.getOwnerId());
+            String localPath = ownerContext.getPath();
 
-            if (ownerContext.requiresObjectHasher()) {
-                return new ValueObjectIdWithPlaceholder(targetManagedType.getName(),
+            if (ownerContext.requiresObjectHasher() ||
+                   ValueObjectIdWithHash.containsHashPlaceholder(parentFragment.get())) {
+                return new ValueObjectIdWithPlaceholder(
+                        targetManagedType.getName(),
                         getRootOwnerId(ownerContext),
-                        pathFromRoot);
-            } else if (ownerContext.getOwnerId() instanceof ValueObjectIdWithHash) {
-                return new ValueObjectIdWithPlaceholderOnParent(targetManagedType.getName(),
-                        (ValueObjectIdWithHash)ownerContext.getOwnerId(),
-                        ownerContext.getPath());
+                        parentFragment,
+                        localPath,
+                        ownerContext.requiresObjectHasher());
             }
             else {
-                return new ValueObjectId(targetManagedType.getName(), getRootOwnerId(ownerContext), pathFromRoot);
+                return new ValueObjectId(targetManagedType.getName(), getRootOwnerId(ownerContext),
+                        parentFragment.get() + localPath);
             }
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
+    }
+
+    private Supplier<String> createParentFragment(GlobalId parentId) {
+        if (parentId instanceof ValueObjectId){
+            return () -> ((ValueObjectId)parentId).getFragment() +"/";
+        } else{
+            return () -> "";
+        }
     }
 
     private GlobalId getRootOwnerId(OwnerContext ownerContext) {
@@ -82,14 +92,6 @@ public class GlobalIdFactory {
             return ((ValueObjectId)ownerContext.getOwnerId()).getOwnerId();
         } else{
             return ownerContext.getOwnerId();
-        }
-    }
-
-    private String createPathFromRoot(GlobalId parentId, String fragment) {
-        if (parentId instanceof ValueObjectId){
-           return ((ValueObjectId)parentId).getFragment()+"/"+fragment;
-        } else{
-           return fragment;
         }
     }
 
