@@ -1,7 +1,6 @@
 package org.javers.repository.mongo;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
@@ -18,9 +17,8 @@ import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 /**
  * @author bartosz.walacik
  */
-class MongoSchemaManager {
+public class MongoSchemaManager {
     static final int ASC = 1;
-    static final String SNAPSHOTS = "jv_snapshots";
     static final String COMMIT_ID = "commitMetadata.id";
     static final String COMMIT_DATE = "commitMetadata.commitDate";
     static final String COMMIT_DATE_INSTANT = "commitMetadata.commitDateInstant";
@@ -40,9 +38,11 @@ class MongoSchemaManager {
     private static final Logger logger = LoggerFactory.getLogger(MongoSchemaManager.class);
 
     private final MongoDatabase mongo;
+    private final CollectionNameProvider collectionNameProvider;
 
-    MongoSchemaManager(MongoDatabase mongo) {
+    MongoSchemaManager(MongoDatabase mongo, CollectionNameProvider collectionNameProvider) {
         this.mongo = mongo;
+        this.collectionNameProvider = collectionNameProvider;
     }
 
     public void ensureSchema(MongoDialect dialect) {
@@ -74,10 +74,10 @@ class MongoSchemaManager {
 
                 Document update = new Document("eval",
                         "function() { \n"+
-                                "    db.jv_snapshots.find().forEach( \n"+
+                                "    db." + collectionNameProvider.getSnapshotCollectionName() + ".find().forEach( \n"+
                                 "      function(snapshot) { \n"+
                                 "        snapshot.commitMetadata.id = Number(snapshot.commitMetadata.id); \n"+
-                                "        db.jv_snapshots.save(snapshot); } \n" +
+                                "        db." + collectionNameProvider.getSnapshotCollectionName() + ".save(snapshot); } \n" +
                                 "    ); "+
                                 "    return 'ok'; \n"+
                                 "}"
@@ -90,7 +90,7 @@ class MongoSchemaManager {
     }
 
     MongoCollection<Document> snapshotsCollection() {
-        return mongo.getCollection(SNAPSHOTS);
+        return mongo.getCollection(collectionNameProvider.getSnapshotCollectionName());
     }
 
     MongoCollection<Document> headCollection() {
