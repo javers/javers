@@ -38,11 +38,11 @@ public class MongoSchemaManager {
     private static final Logger logger = LoggerFactory.getLogger(MongoSchemaManager.class);
 
     private final MongoDatabase mongo;
-    private final CollectionNameProvider collectionNameProvider;
+    private final String snapshotCollectionName;
 
-    MongoSchemaManager(MongoDatabase mongo, CollectionNameProvider collectionNameProvider) {
+    MongoSchemaManager(MongoDatabase mongo, String snapshotCollectionName) {
         this.mongo = mongo;
-        this.collectionNameProvider = collectionNameProvider;
+        this.snapshotCollectionName = snapshotCollectionName;
     }
 
     public void ensureSchema(MongoDialect dialect) {
@@ -74,10 +74,10 @@ public class MongoSchemaManager {
 
                 Document update = new Document("eval",
                         "function() { \n"+
-                                "    db." + collectionNameProvider.getSnapshotCollectionName() + ".find().forEach( \n"+
+                                "    db." + snapshotCollectionName + ".find().forEach( \n"+
                                 "      function(snapshot) { \n"+
                                 "        snapshot.commitMetadata.id = Number(snapshot.commitMetadata.id); \n"+
-                                "        db." + collectionNameProvider.getSnapshotCollectionName() + ".save(snapshot); } \n" +
+                                "        db." + snapshotCollectionName + ".save(snapshot); } \n" +
                                 "    ); "+
                                 "    return 'ok'; \n"+
                                 "}"
@@ -90,7 +90,7 @@ public class MongoSchemaManager {
     }
 
     MongoCollection<Document> snapshotsCollection() {
-        return mongo.getCollection(collectionNameProvider.getSnapshotCollectionName());
+        return mongo.getCollection(snapshotCollectionName);
     }
 
     MongoCollection<Document> headCollection() {
