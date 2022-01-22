@@ -31,13 +31,13 @@ import static org.javers.repository.mongo.DocumentConverter.fromDocument;
 import static org.javers.repository.mongo.DocumentConverter.toDocument;
 import static org.javers.repository.mongo.MongoDialect.DOCUMENT_DB;
 import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
+import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mongoRepositoryConfiguration;
 import static org.javers.repository.mongo.MongoSchemaManager.*;
 
 /**
  * @author pawel szymczyk
  */
 public class MongoRepository implements JaversRepository, ConfigurationAware {
-    private final static int DEFAULT_CACHE_SIZE = 5000;
     private final static double COMMIT_ID_PRECISION = 0.005;
 
     private static final int DESC = -1;
@@ -49,7 +49,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private MongoDialect mongoDialect;
 
     public MongoRepository(MongoDatabase mongo) {
-        this(mongo, DEFAULT_CACHE_SIZE, MONGO_DB);
+        this(mongo, mongoRepositoryConfiguration().build());
     }
 
     /**
@@ -62,21 +62,30 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
      * See <a href="http://docs.aws.amazon.com/documentdb/latest/developerguide/functional-differences.html">functional differences</a>.
      */
     public static MongoRepository mongoRepositoryWithDocumentDBCompatibility(MongoDatabase mongo, int cacheSize) {
-        return new MongoRepository(mongo, cacheSize, DOCUMENT_DB);
+        return new MongoRepository(mongo, mongoRepositoryConfiguration()
+                .withDialect(DOCUMENT_DB)
+                .withCacheSize(cacheSize).build());
     }
 
     /**
      * @param cacheSize Size of the latest snapshots cache, default is 5000. Set 0 to disable.
      */
     public MongoRepository(MongoDatabase mongo, int cacheSize) {
-        this(mongo, cacheSize, MONGO_DB);
+        this(mongo, mongoRepositoryConfiguration().withCacheSize(cacheSize).build());
     }
 
     MongoRepository(MongoDatabase mongo, int cacheSize, MongoDialect dialect) {
-        Validate.argumentsAreNotNull(mongo, dialect);
-        this.mongoDialect = dialect;
-        this.mongoSchemaManager = new MongoSchemaManager(mongo);
-        cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
+        this(mongo, mongoRepositoryConfiguration()
+                .withDialect(dialect)
+                .withCacheSize(cacheSize).build());
+    }
+
+    public MongoRepository(MongoDatabase mongo, MongoRepositoryConfiguration mongoRepositoryConfiguration) {
+        Validate.argumentsAreNotNull(mongo);
+        this.mongoDialect = mongoRepositoryConfiguration.getMongoDialect();
+        this.mongoSchemaManager = new MongoSchemaManager(mongo, mongoRepositoryConfiguration.getSnapshotCollectionName());
+        int cacheSize = mongoRepositoryConfiguration.getCacheSize();
+        this.cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
     }
 
     @Override
