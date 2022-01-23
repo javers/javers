@@ -1,8 +1,6 @@
 package org.javers.spring.boot.mongo
 
-import com.mongodb.client.MongoDatabase
 import org.javers.core.Javers
-import org.javers.core.metamodel.type.EntityType
 import org.javers.repository.jql.QueryBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -10,6 +8,10 @@ import spock.lang.Specification
 
 @SpringBootTest(classes = [TestApplication])
 class JaversMongoStarterIntegrationTest extends Specification{
+
+    class ValueObject {
+        BigDecimal value
+    }
 
     @Autowired
     Javers javers
@@ -34,5 +36,10 @@ class JaversMongoStarterIntegrationTest extends Specification{
     def "should register custom JSON type adapter from spring context"() {
         expect:
         javers.jsonConverter.toJson(new TestApplication.DummyBigDecimalEntity(BigDecimal.TEN)) == '"10"'
+    }
+
+    def "should allow javers customization from spring context" () {
+        expect:
+        javers.compare(new ValueObject(value: 1.123), new ValueObject(value: 1.124)).changes.size() == 0
     }
 }

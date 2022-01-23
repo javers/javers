@@ -4,9 +4,14 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoDatabase;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
+import org.javers.core.JaversBuilderPlugin;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
-import org.javers.spring.auditable.*;
+import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.EmptyPropertiesProvider;
+import org.javers.spring.auditable.MockAuthorProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.mongodb.TransactionalMongoJaversBuilder;
@@ -29,6 +34,8 @@ import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoDatabaseUtils;
 import org.springframework.data.mongodb.MongoTransactionManager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
@@ -60,8 +67,8 @@ public class JaversMongoAutoConfiguration {
     @Autowired
     private MongoDatabaseFactory dbFactory;
 
-    @Autowired
-    private RegisterJsonTypeAdaptersPlugin registerJsonTypeAdaptersPlugin;
+    @Autowired(required = false)
+    private List<JaversBuilderPlugin> plugins = new ArrayList<>();
 
     @Autowired
     private Optional<MongoTransactionManager> mongoTransactionManager;
@@ -81,7 +88,8 @@ public class JaversMongoAutoConfiguration {
                 .withProperties(javersMongoProperties)
                 .withObjectAccessHook(javersMongoProperties.createObjectAccessHookInstance());
 
-        registerJsonTypeAdaptersPlugin.beforeAssemble(javersBuilder);
+        plugins.forEach(plugin -> plugin.beforeAssemble(javersBuilder));
+
         return javersBuilder.build();
     }
 
