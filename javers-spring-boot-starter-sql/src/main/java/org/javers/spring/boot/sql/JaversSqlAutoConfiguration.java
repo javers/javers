@@ -4,12 +4,17 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
+import org.javers.core.JaversBuilderPlugin;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
-import org.javers.spring.auditable.*;
+import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.EmptyPropertiesProvider;
+import org.javers.spring.auditable.MockAuthorProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
@@ -25,10 +30,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author pawelszymczyk
@@ -46,8 +56,8 @@ public class JaversSqlAutoConfiguration {
     @Autowired
     private JaversSqlProperties javersSqlProperties;
 
-    @Autowired
-    private RegisterJsonTypeAdaptersPlugin registerJsonTypeAdaptersPlugin;
+    @Autowired(required = false)
+    private List<JaversBuilderPlugin> plugins = new ArrayList<>();
 
     @Autowired
     private EntityManagerFactory entityManagerFactory;
@@ -90,7 +100,9 @@ public class JaversSqlAutoConfiguration {
                 .registerJaversRepository(sqlRepository)
                 .withObjectAccessHook(javersSqlProperties.createObjectAccessHookInstance())
                 .withProperties(javersSqlProperties);
-        registerJsonTypeAdaptersPlugin.beforeAssemble(javersBuilder);
+
+        plugins.forEach(plugin -> plugin.beforeAssemble(javersBuilder));
+
         return javersBuilder.build();
     }
 

@@ -1,6 +1,8 @@
 package org.javers.spring.boot.mongo;
 
 import org.javers.common.collections.Maps;
+import org.javers.core.JaversBuilderPlugin;
+import org.javers.core.diff.custom.CustomBigDecimalComparator;
 import org.javers.core.json.BasicStringTypeAdapter;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.spring.auditable.CommitPropertiesProvider;
@@ -61,5 +63,11 @@ public class TestApplication {
                 return DummyBigDecimalEntity.class;
             }
         };
+    }
+
+    @Bean
+    JaversBuilderPlugin javersBuilderPlugin() {
+        return builder -> builder
+                .registerValue(BigDecimal.class, new CustomBigDecimalComparator(2));
     }
 }
