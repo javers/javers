@@ -2,6 +2,7 @@ package org.javers.core.json.typeadapter.commit;
 
 import com.google.gson.*;
 import org.javers.common.collections.Lists;
+import org.javers.common.validation.Validate;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
@@ -51,6 +52,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     }
 
     private ValueObjectId parseValueObjectId(JsonObject jsonObject, JsonDeserializationContext context) {
+        Validate.argumentCheck(jsonObject.get(VALUE_OBJECT_FIELD) != null, "empty "+ VALUE_OBJECT_FIELD + " in json:" +jsonObject);
         String typeName = jsonObject.get(VALUE_OBJECT_FIELD).getAsString();
         String fragment = jsonObject.get(FRAGMENT_FIELD).getAsString();
         GlobalId ownerId = context.deserialize(jsonObject.get(OWNER_ID_FIELD), GlobalId.class);

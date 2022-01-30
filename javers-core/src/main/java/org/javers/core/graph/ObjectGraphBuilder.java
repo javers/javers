@@ -1,6 +1,9 @@
 package org.javers.core.graph;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.ValueObjectIdWithHash;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
@@ -69,25 +72,24 @@ class ObjectGraphBuilder {
 
         enrichHashes(nodes);
         reloadHashFromParent(nodes);
+        freezeValueObjectIds(nodes);
         switchToBuilt();
 
         return new LiveGraph(root, new HashSet<>(nodes));
     }
 
+    private void freezeValueObjectIds(List<LiveNode> nodes) {
+        nodes.forEach(n -> n.getCdo().freezeValueObjectIdIfNeeded());
+    }
+
     private void enrichHashes(List<LiveNode> nodes) {
-        nodes.forEach(this::enrichHashIfNeeded);
+        nodes.forEach(node ->
+            node.getCdo().enrichHashIfNeeded(cdoFactory, () -> node.descendantVOs(MAX_VO_HASHING_DEPTH))
+        );
     }
 
     private void reloadHashFromParent (List<LiveNode> nodes) {
-        nodes.forEach(this::reloadHashFromParentIfNeeded);
-    }
-
-    private void enrichHashIfNeeded(final LiveNode node) {
-        node.getCdo().enrichHashIfNeeded(cdoFactory, () -> node.descendantVOs(MAX_VO_HASHING_DEPTH));
-    }
-
-    private void reloadHashFromParentIfNeeded(final LiveNode node) {
-        node.getCdo().reloadHashFromParentIfNeeded();
+        nodes.forEach(node -> node.getCdo().reloadHashFromParentIfNeeded());
     }
 
     private void buildEdges(LiveNode nodeStub) {
@@ -119,6 +121,7 @@ class ObjectGraphBuilder {
     }
 
     private void switchToBuilt() {
+
         if (built){
             throw new IllegalStateException("ObjectGraphBuilder is a stateful builder (not a Service)");
         }
