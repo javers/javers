@@ -37,10 +37,16 @@ abstract class LiveCdo extends Cdo {
         }
     }
 
+    void freezeValueObjectIdIfNeeded() {
+        if (getGlobalId() instanceof ValueObjectIdWithHash) {
+            swapId(((ValueObjectIdWithHash) getGlobalId()).freeze());
+        }
+    }
+
     void reloadHashFromParentIfNeeded() {
         if (hasHashOnParent()) {
             ValueObjectIdWithHash id = (ValueObjectIdWithHash)getGlobalId();
-            swapId(id.freeze());
+            swapId(id.applyHash());
         }
     }
 

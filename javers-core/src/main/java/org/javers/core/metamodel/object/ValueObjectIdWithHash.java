@@ -23,9 +23,13 @@ public abstract class ValueObjectIdWithHash extends ValueObjectId {
 
     public abstract boolean hasHashOnParent();
 
-    public abstract ValueObjectId freeze();
+    public abstract ValueObjectId applyHash();
 
-    public abstract ValueObjectId freeze(String hash);
+    public abstract ValueObjectId applyHash(String hash);
+
+    public ValueObjectId freeze() {
+        return new ValueObjectId(getTypeName(), getOwnerId(), this.getFragment());
+    }
 
     @Override
     public String toString() {
@@ -51,7 +55,7 @@ public abstract class ValueObjectIdWithHash extends ValueObjectId {
         }
 
         @Override
-        public ValueObjectId freeze(String hash) {
+        public ValueObjectId applyHash(String hash) {
             Validate.conditionFulfilled(requiresHash, "Illegal state - hash not required");
             if (!HASH_PLACEHOLDER.equals(this.hash)) {
                 throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "already frozen");
@@ -65,7 +69,7 @@ public abstract class ValueObjectIdWithHash extends ValueObjectId {
         }
 
         @Override
-        public ValueObjectId freeze() {
+        public ValueObjectId applyHash() {
             Validate.conditionFulfilled(!requiresHash, "Illegal state - hash required");
             if (getFragment().contains(HASH_PLACEHOLDER)) {
                 throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "can't freeze ValueObjectId, there is still a hash in parent fragment");

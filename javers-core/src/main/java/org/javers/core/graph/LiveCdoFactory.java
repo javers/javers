@@ -30,7 +30,7 @@ public class LiveCdoFactory {
         String newHash = objectHasher.hash(objectsToBeHashed);
         ValueObjectIdWithHash id = (ValueObjectIdWithHash) valueObject.getGlobalId();
 
-        return id.freeze(newHash);
+        return id.applyHash(newHash);
     }
 
     LiveCdo create(Object cdo, OwnerContext owner) {
