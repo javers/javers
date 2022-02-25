@@ -1,12 +1,12 @@
 package org.javers.repository.sql.schema;
 
-import com.google.gson.internal.LinkedHashTreeMap;
 import org.polyjdbc.core.dialect.*;
 import org.polyjdbc.core.schema.model.LongAttributeBuilder;
 import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,7 +51,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     }
 
     Map<String, Schema> allTablesSchema(Dialect dialect) {
-        Map<String, Schema> schema = new LinkedHashTreeMap<>();
+        Map<String, Schema> schema = new HashMap<>();
 
         schema.put(getGlobalIdTableName().localName(), globalIdTableSchema(dialect));
         schema.put(getCommitTableName().localName(),    commitTableSchema(dialect));
