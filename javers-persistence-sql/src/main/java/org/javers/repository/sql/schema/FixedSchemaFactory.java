@@ -6,8 +6,8 @@ import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.StringUtils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * non-configurable schema factory, gives schema with default table names
@@ -51,7 +51,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     }
 
     Map<String, Schema> allTablesSchema(Dialect dialect) {
-        Map<String, Schema> schema = new HashMap<>();
+        Map<String, Schema> schema = new TreeMap<>();
 
         schema.put(getGlobalIdTableName().localName(), globalIdTableSchema(dialect));
         schema.put(getCommitTableName().localName(),    commitTableSchema(dialect));
