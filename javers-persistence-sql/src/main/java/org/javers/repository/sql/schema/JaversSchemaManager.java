@@ -43,9 +43,7 @@ public class JaversSchemaManager extends SchemaNameAware {
         this.schemaInspector = polyJDBC.schemaInspector();
         this.schemaManager = polyJDBC.schemaManager();
 
-        for (Map.Entry<String, Schema> e : schemaFactory.allTablesSchema(dialect).entrySet()) {
-            ensureTable(e.getKey(), e.getValue());
-        }
+        schemaFactory.allTablesSchema(dialect).forEach(p -> ensureTable(p.left(), p.right()));
 
         alterCommitIdColumnIfNeeded(); // JaVers 2.5 to 2.6 schema migration
 
