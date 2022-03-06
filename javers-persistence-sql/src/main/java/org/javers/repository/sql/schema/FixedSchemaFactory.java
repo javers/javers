@@ -1,13 +1,14 @@
 package org.javers.repository.sql.schema;
 
+import org.javers.common.collections.Pair;
 import org.polyjdbc.core.dialect.*;
 import org.polyjdbc.core.schema.model.LongAttributeBuilder;
 import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.StringUtils;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * non-configurable schema factory, gives schema with default table names
@@ -50,15 +51,15 @@ public class FixedSchemaFactory extends SchemaNameAware {
         this.dialect = dialect;
     }
 
-    Map<String, Schema> allTablesSchema(Dialect dialect) {
-        Map<String, Schema> schema = new TreeMap<>();
+    List<Pair<String, Schema>> allTablesSchema(Dialect dialect) {
+        List<Pair<String, Schema>> schemas = new ArrayList<>();
 
-        schema.put(getGlobalIdTableName().localName(), globalIdTableSchema(dialect));
-        schema.put(getCommitTableName().localName(),    commitTableSchema(dialect));
-        schema.put(getCommitPropertyTableName().localName(), commitPropertiesTableSchema(dialect));
-        schema.put(getSnapshotTableName().localName(),  snapshotTableSchema(dialect));
+        schemas.add(new Pair(getGlobalIdTableName().localName(), globalIdTableSchema(dialect)));
+        schemas.add(new Pair(getCommitTableName().localName(),    commitTableSchema(dialect)));
+        schemas.add(new Pair(getCommitPropertyTableName().localName(), commitPropertiesTableSchema(dialect)));
+        schemas.add(new Pair(getSnapshotTableName().localName(),  snapshotTableSchema(dialect)));
 
-        return schema;
+        return schemas;
     }
 
     private Schema snapshotTableSchema(Dialect dialect){
