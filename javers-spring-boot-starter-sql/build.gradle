@@ -5,7 +5,7 @@ dependencies {
     springImplementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-    testCompile 'com.h2database:h2:1.4.187'
+    testCompile 'com.h2database:h2:2.1.210'
     testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
     testCompile project(path: ":javers-spring", configuration: "testArtifacts")

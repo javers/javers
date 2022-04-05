@@ -35,7 +35,7 @@ class Dialects {
 
         @Override
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
-            return (SequenceDefinition) seqName ->  seqName + ".nextval";
+            return (SequenceDefinition) seqName ->  "NEXT VALUE FOR " + seqName;
         }
     }
 
