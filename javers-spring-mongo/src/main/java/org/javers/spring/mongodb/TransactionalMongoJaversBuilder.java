@@ -65,7 +65,6 @@ public final class TransactionalMongoJaversBuilder extends JaversBuilder {
             super.registerJaversRepository(mongoRepository);
 
         }
-        Javers javersCore = super.assembleJaversInstance();
-        return javersCore;
+        return super.assembleJaversInstanceAndEnsureSchema();
     }
 }
