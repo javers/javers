@@ -11,7 +11,7 @@ dependencies {
 
     testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
 
-    testCompile 'com.h2database:h2:1.4.184'
+    testCompile "com.h2database:h2:$h2Version"
     testCompile "org.springframework:spring-orm:$springVersion"
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
