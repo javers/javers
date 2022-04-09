@@ -129,11 +129,16 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     public Javers build() {
 
-        Javers javers = assembleJaversInstance();
-        repository.ensureSchema();
+        Javers javers = assembleJaversInstanceAndEnsureSchema();
 
         long boot = System.currentTimeMillis() - bootStart;
         logger.info("JaVers instance started in {} ms", boot);
+        return javers;
+    }
+
+    protected Javers assembleJaversInstanceAndEnsureSchema() {
+        Javers javers = assembleJaversInstance();
+        repository.ensureSchema();
         return javers;
     }
 
