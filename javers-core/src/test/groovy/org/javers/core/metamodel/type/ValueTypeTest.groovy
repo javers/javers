@@ -4,6 +4,8 @@ import org.javers.core.JaversBuilder
 import org.javers.core.examples.model.Address
 import spock.lang.Shared
 import spock.lang.Specification
+import sun.util.calendar.ZoneInfo
+
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -12,8 +14,10 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.Period
 import java.time.Year
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.time.zone.ZoneRules
 
 import static java.math.RoundingMode.HALF_UP
 
@@ -32,6 +36,10 @@ class ValueTypeTest extends Specification {
         // WellKnownValueTypes class - delegated to standard toString()
         calculateToString(new BigDecimal(12.2).setScale(1, HALF_UP)) == "12.2"
         calculateToString(Locale.ENGLISH) == "en"
+        calculateToString(ZoneRules.of(ZoneOffset.UTC)) == "ZoneRules[currentStandardOffset=Z]"
+        calculateToString(ZoneId.of("UTC")) == "UTC"
+        calculateToString(TimeZone.getTimeZone("UTC")) == "sun.util.calendar.ZoneInfo[id=\"UTC\",offset=0,dstSavings=0,useDaylight=false,transitions=0,lastRule=null]"
+        calculateToString(ZoneInfo.getTimeZone("UTC")) == "sun.util.calendar.ZoneInfo[id=\"UTC\",offset=0,dstSavings=0,useDaylight=false,transitions=0,lastRule=null]"
 
         // java core library class
         calculateToString(LocalDate.of(2019,02,13)) == "2019,2,13"

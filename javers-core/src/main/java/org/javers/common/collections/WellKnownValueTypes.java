@@ -1,5 +1,8 @@
 package org.javers.common.collections;
 
+import java.time.ZoneId;
+import java.time.zone.ZoneRules;
+import java.util.TimeZone;
 import org.javers.common.reflection.ReflectionUtil;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -9,6 +12,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import sun.util.calendar.ZoneInfo;
 
 /**
  * @author bartosz.walacik
@@ -25,7 +29,11 @@ public class WellKnownValueTypes {
             CharSequence.class,
             String.class,
             Number.class,
-            Locale.class
+            Locale.class,
+            TimeZone.class,
+            ZoneRules.class,
+            ZoneId.class,
+            ZoneInfo.class
     );
 
     public static List<Class<?>> getOldGoodValueTypes() {
