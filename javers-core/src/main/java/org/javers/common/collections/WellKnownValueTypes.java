@@ -12,7 +12,6 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import sun.util.calendar.ZoneInfo;
 
 /**
  * @author bartosz.walacik
@@ -32,8 +31,7 @@ public class WellKnownValueTypes {
             Locale.class,
             TimeZone.class,
             ZoneRules.class,
-            ZoneId.class,
-            ZoneInfo.class
+            ZoneId.class
     );
 
     public static List<Class<?>> getOldGoodValueTypes() {
