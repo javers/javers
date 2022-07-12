@@ -1,6 +1,11 @@
 package org.javers.spring.mongodb;
 
 import com.mongodb.client.ClientSession;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
+import io.vavr.CheckedFunction0;
+import io.vavr.control.Try;
 import org.javers.core.CoreConfiguration;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -29,9 +34,15 @@ class TransactionalMongoRepository implements JaversRepository, ConfigurationAwa
 
     private final TransactionTemplate transactionTemplate;
 
+    private final Retry persistRetry;
+    private final static RetryConfig config = RetryConfig.ofDefaults();
+    private final static RetryRegistry retryRegistry = RetryRegistry.of(config);
+
     TransactionalMongoRepository(MongoRepository delegate, MongoTransactionManager txManager) {
         this.delegate = delegate;
         this.transactionTemplate = new TransactionTemplate(txManager);
+
+        this.persistRetry = retryRegistry.retry("persist", config);
     }
 
     @Override
@@ -71,11 +82,13 @@ class TransactionalMongoRepository implements JaversRepository, ConfigurationAwa
 
     @Override
     public void persist(Commit commit) {
-        transactionTemplate.execute(status -> {
-            ClientSession session = ClientSessionExtractor.getFrom((DefaultTransactionStatus)status);
-            delegate.persist(commit, session);
-            return null;
-        });
+        final CheckedFunction0<Object> retryable = Retry.decorateCheckedSupplier(persistRetry, () ->
+                transactionTemplate.execute(status -> {
+                    ClientSession session = ClientSessionExtractor.getFrom((DefaultTransactionStatus) status);
+                    delegate.persist(commit, session);
+                    return null;
+                }));
+        Try.of(retryable);
     }
 
     @Override

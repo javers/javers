@@ -9,6 +9,8 @@ dependencies {
 
     springImplementation "org.springframework.data:spring-data-mongodb:$springDataMongoVersion"
 
+    implementation 'io.github.resilience4j:resilience4j-retry:1.7.1'
+
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
     testCompile project(path: ":javers-spring", configuration: "testArtifacts")
