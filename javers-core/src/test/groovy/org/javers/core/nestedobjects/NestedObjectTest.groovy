@@ -23,10 +23,10 @@ class NestedObjectTest extends Specification {
 
     The behaviour can be reproduced with other data types.
     */
-    def javers = JaversBuilder.javers().build()
 
-    def "should recognize removed nested object a different value then Defaults.int.class"() {
+    def "should recognize removed nested object with a different value then Defaults.int.class with default ignoring config"() {
         given:
+        def javers = JaversBuilder.javers().whithUsePrimitiveDefaults(false).build()
         def item = new Item(1)
         def itemParentA = new ItemParent(item)
         def itemParentB = new ItemParent()
@@ -34,14 +34,15 @@ class NestedObjectTest extends Specification {
         when:
         def diff = javers.compare(itemParentA, itemParentB)
 
-        println (diff.prettyPrint())
+        println(diff.prettyPrint())
 
         then:
         diff.getChangesByType(PropertyChange).size() == 1
     }
 
-    def "should recognize removed nested object with same value as Defaults.int.class"() {
+    def "should recognize removed nested object with same value as Defaults.int.class with default ignoring config"() {
         given:
+        def javers = JaversBuilder.javers().whithUsePrimitiveDefaults(false).build()
         def item = new Item(0)
         def itemParentA = new ItemParent(item)
         def itemParentB = new ItemParent()
@@ -49,9 +50,74 @@ class NestedObjectTest extends Specification {
         when:
         def diff = javers.compare(itemParentA, itemParentB)
 
-        println (diff.prettyPrint())
+        println(diff.prettyPrint())
 
         then:
         diff.getChangesByType(PropertyChange).size() == 1
     }
+
+    def "should recognize added nested object with same value as Defaults.int.class with default ignoring config"() {
+        given:
+        def javers = JaversBuilder.javers().whithUsePrimitiveDefaults(false).build()
+        def item = new Item(0)
+        def itemParentA = new ItemParent()
+        def itemParentB = new ItemParent(item)
+
+        when:
+        def diff = javers.compare(itemParentA, itemParentB)
+
+        println(diff.prettyPrint())
+
+        then:
+        diff.getChangesByType(PropertyChange).size() == 1
+    }
+
+    def "should recognize removed nested object with a different value then Defaults.int.class with default config"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+        def item = new Item(1)
+        def itemParentA = new ItemParent(item)
+        def itemParentB = new ItemParent()
+
+        when:
+        def diff = javers.compare(itemParentA, itemParentB)
+
+        println(diff.prettyPrint())
+
+        then:
+        diff.getChangesByType(PropertyChange).size() == 1
+    }
+
+    def "should recognize removed nested object with same value as Defaults.int.class with default config"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+        def item = new Item(0)
+        def itemParentA = new ItemParent(item)
+        def itemParentB = new ItemParent()
+
+        when:
+        def diff = javers.compare(itemParentA, itemParentB)
+
+        println(diff.prettyPrint())
+
+        then:
+        diff.getChangesByType(PropertyChange).size() == 0
+    }
+
+    def "should recognize added nested object with same value as Defaults.int.class with default config"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+        def item = new Item(0)
+        def itemParentA = new ItemParent()
+        def itemParentB = new ItemParent(item)
+
+        when:
+        def diff = javers.compare(itemParentA, itemParentB)
+
+        println(diff.prettyPrint())
+
+        then:
+        diff.getChangesByType(PropertyChange).size() == 0
+    }
+
 }
