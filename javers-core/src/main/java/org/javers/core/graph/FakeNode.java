@@ -12,8 +12,11 @@ import java.util.List;
 
 public class FakeNode extends ObjectNode<Cdo>{
 
-    public FakeNode(Cdo cdo) {
+    private boolean usePrimitiveDefaults;
+
+    public FakeNode(Cdo cdo, boolean usePrimitiveDefaults) {
         super(cdo);
+        this.usePrimitiveDefaults = usePrimitiveDefaults;
     }
 
     @Override
@@ -38,12 +41,18 @@ public class FakeNode extends ObjectNode<Cdo>{
 
     @Override
     public Object getPropertyValue(Property property) {
-        return Defaults.defaultValue(property.getGenericType());
+        if (this.usePrimitiveDefaults) {
+            return Defaults.defaultValue(property.getGenericType());
+        }
+        return null;
     }
 
     @Override
     public Object getDehydratedPropertyValue(JaversProperty property) {
-        return Defaults.defaultValue(property.getGenericType());
+        if (this.usePrimitiveDefaults) {
+            return Defaults.defaultValue(property.getGenericType());
+        }
+        return null;
     }
 
     @Override
