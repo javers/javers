@@ -50,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -120,7 +119,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         if (isClassPresent("groovy.lang.MetaClass")) {
             conditionalTypesPlugins.add(new GroovyAddOns());
         }
-        if (isClassPresent("org.joda.time.LocalDate")) {
+        if (isClassPresent("org.joda.time.LocalDate")){
             conditionalTypesPlugins.add(new JodaAddOns());
         }
         if (isClassPresent("com.google.common.collect.Multimap")) {
@@ -147,9 +146,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return javers;
     }
 
-    protected Javers assembleJaversInstance() {
-        CoreConfiguration coreConfiguration = configurationBuilder().withUsePrimitiveDefaults(usePrimitiveDefaults)
-                .build();
+    protected Javers assembleJaversInstance(){
+        CoreConfiguration coreConfiguration = configurationBuilder().build();
         addComponent(coreConfiguration);
 
         // boot main modules
@@ -176,7 +174,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         bootDateTimeProvider();
 
         // clases to scan & additionalTypes
-        for (Class c : classesToScan) {
+        for (Class c : classesToScan){
             typeMapper().getJaversType(c);
         }
         typeMapper().addPluginTypes(additionalTypes);
@@ -189,8 +187,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * @see <a
-     * href="http://javers.org/documentation/repository-configuration">http://javers.org/documentation/repository-configuration</a>
+     * @see <a href="http://javers.org/documentation/repository-configuration">http://javers.org/documentation/repository-configuration</a>
      */
     public JaversBuilder registerJaversRepository(JaversRepository repository) {
         argumentsAreNotNull(repository);
@@ -213,7 +210,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         argumentIsNotNull(entityClass);
-        return registerEntity(new EntityDefinition(entityClass));
+        return registerEntity( new EntityDefinition(entityClass));
     }
 
     /**
@@ -257,7 +254,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @see <a href="http://javers.org/documentation/domain-configuration/#entity">http://javers.org/documentation/domain-configuration/#entity</a>
      * @see EntityDefinitionBuilder#entityDefinition(Class)
      */
-    public JaversBuilder registerEntity(EntityDefinition entityDefinition) {
+    public JaversBuilder registerEntity(EntityDefinition entityDefinition){
         argumentIsNotNull(entityDefinition);
         return registerType(entityDefinition);
     }
@@ -346,17 +343,20 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
         long start = System.currentTimeMillis();
         logger.info("scanning package(s): {}", packagesToScan);
-        List<Class<?>> scan = findClasses(TypeName.class, packagesToScan.replaceAll(" ", "").split(","));
-        for (Class<?> c : scan) {
-            scanTypeName(c);
-        }
-        long delta = System.currentTimeMillis() - start;
+        List<Class<?>> scan = findClasses(TypeName.class, packagesToScan.replaceAll(" ","").split(","));
+		for (Class<?> c : scan) {
+			scanTypeName(c);
+		}
+		long delta = System.currentTimeMillis() - start;
         logger.info("  found {} ManagedClass(es) with @TypeName in {} ms", scan.size(), delta);
 
         return this;
     }
 
-    public JaversBuilder whithUsePrimitiveDefaults(boolean usePrimitiveDefaults) {
+    /**
+     * TODO
+     */
+    public JaversBuilder withUsePrimitiveDefaults(boolean usePrimitiveDefaults) {
         this.usePrimitiveDefaults = usePrimitiveDefaults;
         return this;
     }
@@ -374,7 +374,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * @since 1.4
      */
-    public JaversBuilder scanTypeName(Class userType) {
+    public JaversBuilder scanTypeName(Class userType){
         classesToScan.add(userType);
         return this;
     }
@@ -455,14 +455,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @since 5.8
      */
     public <T> JaversBuilder registerValue(Class<T> valueClass,
-            BiFunction<T, T, Boolean> equalsFunction,
-            Function<T, String> toStringFunction) {
+                                           BiFunction<T, T, Boolean> equalsFunction,
+                                           Function<T, String> toStringFunction) {
         Validate.argumentsAreNotNull(valueClass, equalsFunction, toStringFunction);
 
         return registerValue(valueClass, new CustomValueComparator<T>() {
             @Override
             public boolean equals(T a, T b) {
-                return equalsFunction.apply(a, b);
+                return equalsFunction.apply(a,b);
             }
 
             @Override
@@ -490,7 +490,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return registerValue(valueClass, new CustomValueComparator<T>() {
             @Override
             public boolean equals(T a, T b) {
-                return equalsFunction.apply(a, b);
+                return equalsFunction.apply(a,b);
             }
 
             @Override
@@ -509,7 +509,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     @Deprecated
     public <T> JaversBuilder registerValueWithCustomToString(Class<T> valueClass, Function<T, String> toStringFunction) {
         Validate.argumentsAreNotNull(valueClass, toStringFunction);
-        return registerValue(valueClass, (a, b) -> Objects.equals(a, b), toStringFunction);
+        return registerValue(valueClass, (a,b) -> Objects.equals(a,b), toStringFunction);
     }
 
     /**
@@ -559,7 +559,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @see JsonTypeAdapter
      */
     public JaversBuilder registerValueTypeAdapter(JsonTypeAdapter typeAdapter) {
-        for (Class c : (List<Class>) typeAdapter.getValueTypes()) {
+        for (Class c : (List<Class>)typeAdapter.getValueTypes()){
             registerValue(c);
         }
 
@@ -635,14 +635,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     public JaversBuilder registerEntities(Class<?>... entityClasses) {
-        for (Class clazz : entityClasses) {
+        for(Class clazz : entityClasses) {
             registerEntity(clazz);
         }
         return this;
     }
 
     public JaversBuilder registerValueObjects(Class<?>... valueObjectClasses) {
-        for (Class clazz : valueObjectClasses) {
+        for(Class clazz : valueObjectClasses) {
             registerValueObject(clazz);
         }
         return this;
@@ -706,7 +706,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * </pre>
      * @see NewObject
      */
-    public JaversBuilder withInitialChanges(boolean initialChanges) {
+    public JaversBuilder withInitialChanges(boolean initialChanges){
         configurationBuilder().withInitialChanges(initialChanges);
         return this;
     }
@@ -715,7 +715,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * Use {@link #withInitialChanges(boolean)}
      */
     @Deprecated
-    public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot) {
+    public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
         return this.withInitialChanges(newObjectsSnapshot);
     }
 
@@ -742,7 +742,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @since 6.0
      * @see ObjectRemoved
      */
-    public JaversBuilder withTerminalChanges(boolean terminalChanges) {
+    public JaversBuilder withTerminalChanges(boolean terminalChanges){
         configurationBuilder().withTerminalChanges(terminalChanges);
         return this;
     }
@@ -770,7 +770,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @param <T> Custom Type
      * @see <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
      */
-    public <T> JaversBuilder registerCustomType(Class<T> customType, CustomPropertyComparator<T, ?> comparator) {
+    public <T> JaversBuilder registerCustomType(Class<T> customType, CustomPropertyComparator<T, ?> comparator){
         registerType(new CustomDefinition(customType, comparator));
         bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
@@ -780,7 +780,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @deprecated Renamed to {@link #registerCustomType(Class, CustomPropertyComparator)}
      */
     @Deprecated
-    public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType) {
+    public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
         return registerCustomType(customType, comparator);
     }
 
@@ -863,14 +863,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     private TypeMapperLazy typeMapperLazy() {
-        return (TypeMapperLazy) typeMapper();
+        return (TypeMapperLazy)typeMapper();
     }
 
     private CoreConfigurationBuilder configurationBuilder() {
         return this.coreConfigurationBuilder;
     }
 
-    private JsonConverterBuilder jsonConverterBuilder() {
+    private JsonConverterBuilder jsonConverterBuilder(){
         return getContainerComponent(JsonConverterBuilder.class);
     }
 
@@ -878,7 +878,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         Set<JaversType> additionalTypes = new HashSet<>();
 
         for (ConditionalTypesPlugin plugin : conditionalTypesPlugins) {
-            logger.info("loading " + plugin.getClass().getSimpleName() + " ...");
+            logger.info("loading "+plugin.getClass().getSimpleName()+" ...");
 
             plugin.beforeAssemble(this);
 
@@ -918,16 +918,16 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addComponent(dateProvider);
     }
 
-    private void bootRepository() {
+    private void bootRepository(){
         CoreConfiguration coreConfiguration = coreConfiguration();
         if (repository == null){
             logger.info("using fake InMemoryRepository, register actual Repository implementation via JaversBuilder.registerJaversRepository()");
             repository = new InMemoryRepository();
         }
 
-        repository.setJsonConverter(getContainerComponent(JsonConverter.class));
+        repository.setJsonConverter( getContainerComponent(JsonConverter.class));
 
-        if (repository instanceof ConfigurationAware) {
+        if (repository instanceof ConfigurationAware){
             ((ConfigurationAware) repository).setConfiguration(coreConfiguration);
         }
 
@@ -938,7 +938,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     private <T extends ClientsClassDefinition> T getClassDefinition(Class<?> baseJavaClass) {
-        return (T) clientsClassDefinitions.get(baseJavaClass);
+        return (T)clientsClassDefinitions.get(baseJavaClass);
     }
 
     private CoreConfiguration coreConfiguration() {
