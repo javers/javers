@@ -44,7 +44,7 @@ public class DiffFactory {
         this.javersCoreConfiguration = javersCoreConfiguration;
 
         //sort by priority
-        Collections.sort(propertyChangeAppender, (p1, p2) -> ((Integer) p1.priority()).compareTo(p2.priority()));
+        Collections.sort(propertyChangeAppender, (p1, p2) -> ((Integer)p1.priority()).compareTo(p2.priority()));
         this.propertyChangeAppender = propertyChangeAppender;
     }
 
@@ -70,7 +70,7 @@ public class DiffFactory {
         return createAndAppendChanges(graphPair);
     }
 
-    public Diff singleTerminal(GlobalId removedId, CommitMetadata commitMetadata) {
+    public Diff singleTerminal(GlobalId removedId, CommitMetadata commitMetadata){
         Validate.argumentsAreNotNull(removedId, commitMetadata);
 
         DiffBuilder diff = new DiffBuilder(javersCoreConfiguration.getPrettyValuePrinter());
@@ -95,7 +95,7 @@ public class DiffFactory {
         }
 
         JaversType jType = typeMapper.getJaversType(handle.getClass());
-        if (jType instanceof ValueType || jType instanceof PrimitiveType) {
+        if (jType instanceof ValueType || jType instanceof PrimitiveType){
             throw new JaversException(JaversExceptionCode.COMPARING_TOP_LEVEL_VALUES_NOT_SUPPORTED,
                     jType.getClass().getSimpleName(), handle.getClass().getSimpleName());
         }
@@ -158,7 +158,7 @@ public class DiffFactory {
 
     private void appendChanges(DiffBuilder diff, NodePair pair, JaversProperty property, JaversType javersType) {
         for (PropertyChangeAppender appender : propertyChangeAppender) {
-            if (!appender.supports(javersType)) {
+            if (! appender.supports(javersType)){
                 continue;
             }
 
