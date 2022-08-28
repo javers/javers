@@ -78,12 +78,10 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  *                              .build();
  * </pre>
  *
+ * @see <a href="http://javers.org/documentation/domain-configuration/">http://javers.org/documentation/domain-configuration</a>
  * @author bartosz walacik
- * @see <a
- * href="http://javers.org/documentation/domain-configuration/">http://javers.org/documentation/domain-configuration</a>
  */
 public class JaversBuilder extends AbstractContainerBuilder {
-
     public static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
     private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new LinkedHashMap<>();
@@ -93,8 +91,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
     private final Set<Class> classesToScan = new HashSet<>();
 
     private final Set<ConditionalTypesPlugin> conditionalTypesPlugins;
-
-    private boolean usePrimitiveDefaults = true;
 
     private CoreConfigurationBuilder coreConfigurationBuilder = CoreConfigurationBuilder.coreConfiguration();
     private JaversRepository repository;
@@ -350,14 +346,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
 		long delta = System.currentTimeMillis() - start;
         logger.info("  found {} ManagedClass(es) with @TypeName in {} ms", scan.size(), delta);
 
-        return this;
-    }
-
-    /**
-     * TODO
-     */
-    public JaversBuilder withUsePrimitiveDefaults(boolean usePrimitiveDefaults) {
-        this.usePrimitiveDefaults = usePrimitiveDefaults;
         return this;
     }
 
@@ -710,6 +698,15 @@ public class JaversBuilder extends AbstractContainerBuilder {
         configurationBuilder().withInitialChanges(initialChanges);
         return this;
     }
+
+    /**
+     * TODO
+     */
+    public JaversBuilder withUsePrimitiveDefaults(boolean usePrimitiveDefaults) {
+        this.configurationBuilder().withUsePrimitiveDefaults(usePrimitiveDefaults);
+        return this;
+    }
+
 
     /**
      * Use {@link #withInitialChanges(boolean)}

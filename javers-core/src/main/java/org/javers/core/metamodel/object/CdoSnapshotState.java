@@ -27,7 +27,7 @@ public class CdoSnapshotState {
     }
 
     /**
-     * returns default values for null primitives
+     * returns default values for empty primitives
      */
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
