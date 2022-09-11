@@ -23,3 +23,4 @@ javers:
   sqlCommitTableName: 'cust_jv_commit'
   sqlSnapshotTableName: 'cust_jv_snapshot'
   sqlCommitPropertyTableName: 'cust_jv_commit_property'
+  usePrimitiveDefaults: false

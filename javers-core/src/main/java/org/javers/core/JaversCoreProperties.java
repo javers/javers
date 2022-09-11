@@ -19,6 +19,7 @@ public abstract class JaversCoreProperties {
     private Boolean typeSafeValues;
     private String packagesToScan = "";
     private PrettyPrintDateFormats prettyPrintDateFormats = new PrettyPrintDateFormats();
+    private Boolean usePrimitiveDefaults;
 
     public String getAlgorithm() {
         return algorithm;
@@ -58,6 +59,14 @@ public abstract class JaversCoreProperties {
 
     public Boolean isPrettyPrint() {
         return prettyPrint;
+    }
+
+    public Boolean isUsePrimitiveDefaults() {
+        return usePrimitiveDefaults;
+    }
+
+    public void setUsePrimitiveDefaults(Boolean usePrimitiveDefaults) {
+        this.usePrimitiveDefaults = usePrimitiveDefaults;
     }
 
     public Boolean isTypeSafeValues() {
