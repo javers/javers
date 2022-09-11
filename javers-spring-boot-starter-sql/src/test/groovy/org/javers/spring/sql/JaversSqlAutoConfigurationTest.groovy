@@ -40,6 +40,7 @@ class JaversSqlAutoConfigurationTest extends Specification {
        !javers.coreConfiguration.terminalChanges
        !javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
+       !javers.coreConfiguration.usePrimitiveDefaults
 
         javersProperties.typeSafeValues
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"

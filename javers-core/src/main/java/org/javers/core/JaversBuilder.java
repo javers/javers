@@ -2,7 +2,7 @@ package org.javers.core;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
-import org.javers.common.collections.Lists;
+
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.validation.Validate;
@@ -346,7 +346,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 		long delta = System.currentTimeMillis() - start;
         logger.info("  found {} ManagedClass(es) with @TypeName in {} ms", scan.size(), delta);
 
-		return this;
+        return this;
     }
 
     /**
@@ -665,7 +665,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * The Initial Changes switch, enabled by default since Javers 6.0.
+     * The <b>Initial Changes</b> switch, enabled by default since Javers 6.0.
      * <br/><br/>
      *
      * When the switch is enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
@@ -686,16 +686,54 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * with all elements from this list reflected as {@link ValueAdded}.
      * <br/><br/>
      *
-     * In Javers Spring Boot starter you can disabled initial Value Changes in `application.yml`:
+     * In Javers Spring Boot starter you can disable Initial Value in `application.yml`:
      *
      * <pre>
      * javers:
      *   initialChanges: false
      * </pre>
      * @see NewObject
+     * @see JaversBuilder#withUsePrimitiveDefaults(boolean)
+     * @see JaversBuilder#withTerminalChanges(boolean) (boolean)
      */
     public JaversBuilder withInitialChanges(boolean initialChanges){
         configurationBuilder().withInitialChanges(initialChanges);
+        return this;
+    }
+
+    /**
+     * The <b>Use Primitive Defaults</b> switch, enabled by default.
+     * Works only if {@link #withInitialChanges(boolean)} or
+     * {@link #withTerminalChanges(boolean)} is enabled.
+     * <br/><br/>
+     *
+     * This switch affects how {@link InitialValueChange} and {@link TerminalValueChange}
+     * are calculated in the situation when a primitive property with a default value
+     * appears in {@link NewObject} or disappears in {@link ObjectRemoved}.
+     * <br/><br/>
+     *
+     * When enabled, no changes are calculated if
+     * a primitive property with a default value (for example 0 for int)
+     * is compared to an added or removed property.
+     * <br/>
+     * When disabled, Javers calculates {@link InitialValueChange} or
+     * {@link TerminalValueChange} with null on one side and a primitive default
+     * value on the other side.
+     *
+     * <br/><br/>
+     *
+     * In Javers Spring Boot starter you can disable this switch in `application.yml`:
+     *
+     * <pre>
+     * javers:
+     *   usePrimitiveDefaults: false
+     * </pre>
+     *
+     * @see JaversBuilder#withInitialChanges(boolean)
+     * @see JaversBuilder#withTerminalChanges(boolean)
+     */
+    public JaversBuilder withUsePrimitiveDefaults(boolean usePrimitiveDefaults) {
+        this.configurationBuilder().withUsePrimitiveDefaults(usePrimitiveDefaults);
         return this;
     }
 
@@ -708,7 +746,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Enabled by default since Javers 6.0.
+     * The <b>Terminal Changes</b> switch, enabled by default since Javers 6.0.
      * <br/><br/>
      *
      * When the switch is enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
@@ -720,7 +758,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * a real Removed Object with a virtual, totally empty object.
      * <br/><br/>
      *
-     * In Javers Spring Boot starter you can disabled terminal Value Changes in `application.yml`:
+     * In Javers Spring Boot starter you can disable Terminal Changes in `application.yml`:
      *
      * <pre>
      * javers:
@@ -729,6 +767,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * @since 6.0
      * @see ObjectRemoved
+     * @see JaversBuilder#withUsePrimitiveDefaults(boolean)
+     * @see JaversBuilder#withInitialChanges(boolean) (boolean)
      */
     public JaversBuilder withTerminalChanges(boolean terminalChanges){
         configurationBuilder().withTerminalChanges(terminalChanges);
@@ -833,6 +873,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
         }
         if (javersProperties.isTerminalChanges() != null) {
             withTerminalChanges(javersProperties.isTerminalChanges());
+        }
+        if (javersProperties.isUsePrimitiveDefaults() != null) {
+            withUsePrimitiveDefaults(javersProperties.isUsePrimitiveDefaults());
         }
 
         withPrettyPrintDateFormats(javersProperties.getPrettyPrintDateFormats());

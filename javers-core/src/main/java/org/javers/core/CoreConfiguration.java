@@ -23,11 +23,14 @@ public class CoreConfiguration {
 
     private final boolean terminalChanges;
 
+    private final boolean usePrimitiveDefaults;
+
     private final CommitIdGenerator commitIdGenerator;
 
     private final Supplier<CommitId> customCommitIdGenerator;
 
-    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean initialChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean terminalChanges, boolean prettyPrint) {
+    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean initialChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean terminalChanges, boolean prettyPrint,
+            boolean usePrimitiveDefaults) {
         this.prettyValuePrinter = prettyValuePrinter;
         this.mappingStyle = mappingStyle;
         this.listCompareAlgorithm = listCompareAlgorithm;
@@ -36,6 +39,7 @@ public class CoreConfiguration {
         this.customCommitIdGenerator = customCommitIdGenerator;
         this.terminalChanges = terminalChanges;
         this.prettyPrint = prettyPrint;
+        this.usePrimitiveDefaults = usePrimitiveDefaults;
     }
 
     public PrettyValuePrinter getPrettyValuePrinter() {
@@ -52,6 +56,10 @@ public class CoreConfiguration {
 
     public boolean isInitialChanges() {
         return initialChanges;
+    }
+
+    public boolean getUsePrimitiveDefaults() {
+        return usePrimitiveDefaults;
     }
 
     public boolean isTerminalChanges() {

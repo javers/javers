@@ -38,6 +38,7 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javers.coreConfiguration.terminalChanges
         javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.SYNCHRONIZED_SEQUENCE
+        javers.coreConfiguration.usePrimitiveDefaults
 
         javersProperties.auditableAspectEnabled
         javersProperties.springDataAuditableRepositoryAspectEnabled
