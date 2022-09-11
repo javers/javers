@@ -18,6 +18,7 @@ javers:
     zonedDateTime: "dd-mm-yyyy HH mm ss Z"
     localDate: "dd-mm-yyyy"
     localTime: "HH mm ss"
+  usePrimitiveDefaults: false
 
 spring:
   data:

@@ -41,6 +41,7 @@ class JaversMongoStarterTest extends Specification{
        !javers.coreConfiguration.terminalChanges
        !javers.coreConfiguration.prettyPrint
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
+       !javers.coreConfiguration.usePrimitiveDefaults
 
         javersProperties.typeSafeValues
         javersProperties.packagesToScan == "org.javers.spring.boot"
