@@ -108,7 +108,7 @@ public class QueryParamsBuilder {
      * @see QueryBuilder#skip(int)
      */
     public QueryParamsBuilder skip(int skip) {
-        Validate.argumentCheck(limit >= 0, "Skip is not a non-negative number.");
+        Validate.argumentCheck(skip >= 0, "Skip is not a non-negative number.");
         this.skip = skip;
         return this;
     }
