@@ -494,11 +494,8 @@ public class QueryBuilder {
     }
 
     /**
-     * Only snapshots with a given commit property partially containing a given value.<br/>
-     * Equivalent to SQL clause: WHERE property_value LIKE '%value%'
-     * <br/><br/>
-     *
-     * The matching is case insensitive on MongoDB and on most SQL databases.
+     * Only snapshots with a given commit property partially containing a given value, ignoring case.<br/>
+     * Equivalent to SQL clause: WHERE lower(property_value) LIKE lower('%value%')
      * <br/><br/>
      *
      * If this method is called multiple times, <b>all</b> given conditions must match.
@@ -619,6 +616,15 @@ public class QueryBuilder {
     public QueryBuilder byAuthor(String author) {
         Validate.argumentIsNotNull(author);
         queryParamsBuilder.author(author);
+        return this;
+    }
+
+    /**
+     * Only snapshots committed by a partially matching author.
+     */
+    public QueryBuilder byAuthorLikeIgnoreCase(String author) {
+        Validate.argumentIsNotNull(author);
+        queryParamsBuilder.authorLikeIgnoreCase(author);
         return this;
     }
 

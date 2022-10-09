@@ -132,6 +132,9 @@ public class InMemoryRepository implements JaversRepository {
         if (queryParams.author().isPresent()) {
             snapshots = filterSnapshotsByAuthor(snapshots, queryParams.author().get());
         }
+        if (queryParams.authorLikeIgnoreCase().isPresent()) {
+            snapshots = filterSnapshotsByAuthorLikeIgnoreCase(snapshots, queryParams.authorLikeIgnoreCase().get());
+        }
         if (hasDates(queryParams)) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
         }
@@ -146,6 +149,7 @@ public class InMemoryRepository implements JaversRepository {
         }
         snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
         snapshots = filterSnapshotsByCommitPropertiesLike(snapshots, queryParams.commitPropertiesLike());
+
         return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());
     }
 
@@ -159,6 +163,11 @@ public class InMemoryRepository implements JaversRepository {
 
     private List<CdoSnapshot> filterSnapshotsByAuthor(List<CdoSnapshot> snapshots, final String author) {
         return Lists.positiveFilter(snapshots, snapshot -> author.equals(snapshot.getCommitMetadata().getAuthor()));
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByAuthorLikeIgnoreCase(List<CdoSnapshot> snapshots, final String author) {
+        return Lists.positiveFilter(snapshots, snapshot -> snapshot.getCommitMetadata().getAuthor().toLowerCase(Locale.ROOT)
+                .contains(author.toLowerCase(Locale.ROOT)));
     }
 
     private List<CdoSnapshot> filterSnapshotsByCommitDate(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
@@ -206,7 +215,7 @@ public class InMemoryRepository implements JaversRepository {
             commitPropertiesLike.entrySet().stream().allMatch(commitProperty -> {
                 Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
                 return actualCommitProperties.containsKey(commitProperty.getKey()) &&
-                    actualCommitProperties.get(commitProperty.getKey()).contains(commitProperty.getValue());
+                        actualCommitProperties.get(commitProperty.getKey()).toLowerCase(Locale.ROOT).contains(commitProperty.getValue().toLowerCase(Locale.ROOT));
             })
         );
     }

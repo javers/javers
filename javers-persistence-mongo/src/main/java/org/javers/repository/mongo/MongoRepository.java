@@ -304,6 +304,10 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             if (params.author().isPresent()) {
                 query = Filters.and(query, new BasicDBObject(COMMIT_AUTHOR, params.author().get()));
             }
+            if (params.authorLikeIgnoreCase().isPresent()) {
+                query = Filters.and(query, new BasicDBObject(COMMIT_AUTHOR,
+                        new BasicDBObject("$regex", ".*" + params.authorLikeIgnoreCase().get().toLowerCase(Locale.ROOT) + ".*").append("$options", "i")));
+            }
             if (!params.commitProperties().isEmpty()) {
                 query = addCommitPropertiesFilter(query, params.commitProperties());
             }
@@ -354,11 +358,11 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     }
 
     private Bson addCommitPropertiesLikeFilter(Bson query, Map<String, String> commitProperties) {
-        List<Bson> propertyFilters = commitProperties.entrySet().stream().map( commitProperty ->
+        List<Bson> propertyFilters = commitProperties.entrySet().stream().map(commitProperty ->
                 new BasicDBObject(COMMIT_PROPERTIES,
                         new BasicDBObject("$elemMatch",
                                 new BasicDBObject("key", commitProperty.getKey())
-                                .append("value", new BasicDBObject("$regex",commitProperty.getValue()))))
+                                        .append("value", new BasicDBObject("$regex",".*" + commitProperty.getValue().toLowerCase(Locale.ROOT) + ".*").append("$options", "i"))))
         ).collect(toImmutableList());
         return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
     }

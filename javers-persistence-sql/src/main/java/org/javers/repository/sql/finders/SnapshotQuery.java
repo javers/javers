@@ -103,6 +103,8 @@ class SnapshotQuery {
 
         queryParams.author().ifPresent(author -> selectBuilder.and(COMMIT_AUTHOR, author));
 
+        queryParams.authorLikeIgnoreCase().ifPresent(author -> selectBuilder.andLike("LOWER(" + COMMIT_AUTHOR + ")", "%"+author.toLowerCase(Locale.ROOT)+"%"));
+
         if (queryParams.commitProperties().size() > 0) {
             for (Map.Entry<String, Collection<String>> commitProperty : queryParams.commitProperties().entrySet()) {
                 addCommitPropertyFilter(selectBuilder, commitProperty.getKey(), commitProperty.getValue());
@@ -111,7 +113,8 @@ class SnapshotQuery {
 
         if(queryParams.commitPropertiesLike().size() > 0){
             for (Map.Entry<String, String> commitProperty : queryParams.commitPropertiesLike().entrySet()) {
-                addCommitPropertyLikeFilter(selectBuilder, commitProperty.getKey(), commitProperty.getValue());
+                addCommitPropertyLikeIgnoreCaseFilter(selectBuilder, commitProperty.getKey(), commitProperty.getValue()
+                        .toLowerCase(Locale.ROOT));
             }
         }
 
@@ -193,6 +196,15 @@ class SnapshotQuery {
                 " AND " + COMMIT_PROPERTY_NAME + " = ?" +
                 " AND " + COMMIT_PROPERTY_VALUE + " LIKE ?)",
             stringParam(propertyName), stringParam("%"+propertyValue+"%"));
+    }
+
+    private void addCommitPropertyLikeIgnoreCaseFilter(SelectBuilder selectBuilder, String propertyName, String propertyValue) {
+        selectBuilder.and("EXISTS (" +
+                        " SELECT * FROM " + commitPropertyTableName() +
+                        " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
+                        " AND " + COMMIT_PROPERTY_NAME + " = ?" +
+                        " AND " + "LOWER(" + COMMIT_PROPERTY_VALUE + ") LIKE ?)",
+                stringParam(propertyName), stringParam("%"+propertyValue+"%"));
     }
 
     private class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
