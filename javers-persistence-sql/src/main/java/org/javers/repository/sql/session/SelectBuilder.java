@@ -44,6 +44,10 @@ public class SelectBuilder extends QueryBuilder<SelectBuilder> {
         return and(columnName, "=", longParam(value));
     }
 
+    public SelectBuilder andLike(String columnName, String value) {
+        return and(columnName, "LIKE", stringParam(value));
+    }
+
     public SelectBuilder and(String columnName, String value) {
         return and(columnName, "=", stringParam(value));
     }

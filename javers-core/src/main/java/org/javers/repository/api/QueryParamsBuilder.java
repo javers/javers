@@ -24,6 +24,7 @@ public class QueryParamsBuilder {
     private Set<CommitId> commitIds = new HashSet<>();
     private Long version;
     private String author;
+    private String authorLikeIgnoreCase;
     private boolean aggregate;
     private Map<String, Collection<String>> commitProperties = new HashMap<>();
     private Map<String,String> commitPropertiesLike = new HashMap<>();
@@ -43,6 +44,7 @@ public class QueryParamsBuilder {
         copy.commitIds = that.commitIds();
         that.version().ifPresent((it -> copy.version(it)));
         that.author().ifPresent((it -> copy.author(it)));
+        that.authorLikeIgnoreCase().ifPresent(it -> copy.authorLikeIgnoreCase(it));
         copy.withChildValueObjects(that.isAggregate());
         copy.commitProperties = that.commitProperties();
         copy.commitPropertiesLike = that.commitPropertiesLike();
@@ -227,11 +229,19 @@ public class QueryParamsBuilder {
         return this;
     }
 
+    /**
+     * @see QueryBuilder#byAuthorLikeIgnoreCase(String)
+     */
+    public QueryParamsBuilder authorLikeIgnoreCase(String authorLikeIgnoreCase) {
+        this.authorLikeIgnoreCase = authorLikeIgnoreCase;
+        return this;
+    }
+
     private static void checkLimit(int limit) {
         Validate.argumentCheck(limit > 0, "Limit is not a positive number.");
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, commitProperties, commitPropertiesLike, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
+        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, authorLikeIgnoreCase, commitProperties, commitPropertiesLike, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
     }
 }
