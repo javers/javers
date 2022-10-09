@@ -29,6 +29,7 @@ public class QueryParams {
     private final Set<CommitId> commitIds;
     private final Long version;
     private final String author;
+    private final String authorLikeIgnoreCase;
     private final Map<String, Collection<String>> commitProperties;
     private final Map<String, String> commitPropertiesLike;
     private final boolean aggregate;
@@ -37,7 +38,7 @@ public class QueryParams {
     private final boolean loadCommitProps;
     private final Integer snapshotQueryLimit;
 
-    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, Map<String, Collection<String>> commitProperties, Map<String,String> commitPropertiesLike, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps, Integer snapshotQueryLimit) {
+    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, String authorLikeIgnoreCase, Map<String, Collection<String>> commitProperties, Map<String,String> commitPropertiesLike, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps, Integer snapshotQueryLimit) {
         this.snapshotQueryLimit = snapshotQueryLimit;
         this.limit = limit;
         this.skip = skip;
@@ -48,6 +49,7 @@ public class QueryParams {
         this.commitIds = Collections.unmodifiableSet(commitIds);
         this.version = version;
         this.author = author;
+        this.authorLikeIgnoreCase = authorLikeIgnoreCase;
         this.commitProperties = Collections.unmodifiableMap(commitProperties);
         this.aggregate = aggregate;
         this.changedProperties = Collections.unmodifiableSet(changedProperties);
@@ -166,6 +168,13 @@ public class QueryParams {
      */
     public Optional<String> author() {
         return Optional.ofNullable(author);
+    }
+
+    /**
+     * @see QueryBuilder#byAuthorLikeIgnoreCase(String)
+     */
+    public Optional<String> authorLikeIgnoreCase() {
+        return Optional.ofNullable(authorLikeIgnoreCase);
     }
 
     /**

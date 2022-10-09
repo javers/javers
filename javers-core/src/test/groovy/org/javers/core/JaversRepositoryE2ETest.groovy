@@ -1366,6 +1366,24 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     /** test for {@link QueryBuilder#withCommitPropertyLike} */
+    @Unroll
+    def "should query for commit property containing partial text, ignoring case - #value"() {
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[comment:'Changed name of user'])
+
+        when:
+        def snapshots = javers
+                .findSnapshots(byInstanceId(1, SnapshotEntity)
+                        .withCommitPropertyLike('comment',value).build())
+
+        then:
+        snapshots.size() == 1
+
+        where:
+        value << ["anged","change","User","NAME"]
+    }
+
+    /** test for {@link QueryBuilder#withCommitPropertyLike} */
     def "should return empty result when commit properties doesn't contain a given value"() {
         given:
         javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2),[name:'John Doe'])
@@ -1377,6 +1395,38 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         snapshots.size() == 0
+    }
+
+    /** test for {@link QueryBuilder#byAuthorLikeIgnoreCase} */
+    def "should return empty result when author doesn't match a given value"() {
+        given:
+        javers.commit('author', new SnapshotEntity(id: 1, intProperty: 2))
+
+        when:
+        def snapshots = javers
+                .findSnapshots(byInstanceId(1, SnapshotEntity)
+                        .byAuthorLikeIgnoreCase('agatha').build())
+
+        then:
+        snapshots.size() == 0
+    }
+
+    /** test for {@link QueryBuilder#byAuthorLikeIgnoreCase} */
+    @Unroll
+    def "should query for author containing partial text, ignoring case - #value"() {
+        given:
+        javers.commit('etidbold2', new SnapshotEntity(id: 1, intProperty: 2))
+
+        when:
+        def snapshots = javers
+                .findSnapshots(byInstanceId(1, SnapshotEntity)
+                        .byAuthorLikeIgnoreCase(value).build())
+
+        then:
+        snapshots.size() == 1
+
+        where:
+        value << ["2","Etid","BOLD", "idb"]
     }
 
     def "should provide old and new Collections in Changes loaded from Repository" () {
