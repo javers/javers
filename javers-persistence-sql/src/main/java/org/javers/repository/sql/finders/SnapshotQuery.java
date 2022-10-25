@@ -189,15 +189,6 @@ class SnapshotQuery {
                 stringParam(propertyName), listParam(propertyValue));
     }
 
-    private void addCommitPropertyLikeFilter(SelectBuilder selectBuilder, String propertyName, String propertyValue) {
-        selectBuilder.and("EXISTS (" +
-                " SELECT * FROM " + commitPropertyTableName() +
-                " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
-                " AND " + COMMIT_PROPERTY_NAME + " = ?" +
-                " AND " + COMMIT_PROPERTY_VALUE + " LIKE ?)",
-            stringParam(propertyName), stringParam("%"+propertyValue+"%"));
-    }
-
     private void addCommitPropertyLikeIgnoreCaseFilter(SelectBuilder selectBuilder, String propertyName, String propertyValue) {
         selectBuilder.and("EXISTS (" +
                         " SELECT * FROM " + commitPropertyTableName() +
