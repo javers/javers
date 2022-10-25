@@ -12,6 +12,7 @@ target
 build
 out
 classes
+lib
 
 # mac os x
 .DS_Store
