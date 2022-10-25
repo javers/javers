@@ -495,14 +495,14 @@ public class QueryBuilder {
 
     /**
      * Only snapshots with a given commit property partially containing a given value, ignoring case.<br/>
-     * Equivalent to SQL clause: WHERE lower(property_value) LIKE lower('%value%')
+     * Equivalent to SQL clause: WHERE lower(property_value) LIKE lower('%valueFragment%')
      * <br/><br/>
      *
-     * If this method is called multiple times, <b>all</b> given conditions must match.
+     * If this method is called multiple times -- <b>all</b> given conditions must match.
      */
-    public QueryBuilder withCommitPropertyLike(String name, String value){
-        Validate.argumentsAreNotNull(name, value);
-        queryParamsBuilder.commitPropertyLike(name, value);
+    public QueryBuilder withCommitPropertyLike(String name, String valueFragment){
+        Validate.argumentsAreNotNull(name, valueFragment);
+        queryParamsBuilder.commitPropertyLike(name, valueFragment);
         return this;
     }
 
@@ -620,11 +620,14 @@ public class QueryBuilder {
     }
 
     /**
-     * Only snapshots committed by a partially matching author.
+     * Only snapshots committed by a partially matching author name, ignoring case.
+     * <br/><br/>
+     *
+     * Equivalent to SQL clause: WHERE lower(author) LIKE lower('%authorFragment%')
      */
-    public QueryBuilder byAuthorLikeIgnoreCase(String author) {
-        Validate.argumentIsNotNull(author);
-        queryParamsBuilder.authorLikeIgnoreCase(author);
+    public QueryBuilder byAuthorLikeIgnoreCase(String authorFragment) {
+        Validate.argumentIsNotNull(authorFragment);
+        queryParamsBuilder.authorLikeIgnoreCase(authorFragment);
         return this;
     }
 
