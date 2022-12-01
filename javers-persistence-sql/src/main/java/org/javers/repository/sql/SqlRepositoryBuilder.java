@@ -1,6 +1,7 @@
 package org.javers.repository.sql;
 
 import org.javers.core.AbstractContainerBuilder;
+import org.javers.repository.sql.codecs.CdoSnapshotStateCodec;
 import org.javers.repository.sql.pico.JaversSqlModule;
 import org.javers.repository.sql.session.SessionFactory;
 import org.polyjdbc.core.PolyJDBC;
@@ -21,6 +22,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     private DialectName dialectName;
     private ConnectionProvider connectionProvider;
+    private CdoSnapshotStateCodec cdoSnapshotStateCodec = CdoSnapshotStateCodec.noop();
 
     private String schemaName;
     private boolean globalIdCacheDisabled;
@@ -45,6 +47,11 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     public SqlRepositoryBuilder withConnectionProvider(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
+        return this;
+    }
+
+    public SqlRepositoryBuilder withCdoSnapshotStateCodec(CdoSnapshotStateCodec cdoSnapshotStateCodec) {
+        this.cdoSnapshotStateCodec = cdoSnapshotStateCodec;
         return this;
     }
 
@@ -123,6 +130,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
         addComponent(polyJDBC);
         addComponent(sessionFactory);
+        addComponent(cdoSnapshotStateCodec);
 
         addModule(new JaversSqlModule());
 
