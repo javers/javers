@@ -2,6 +2,7 @@ package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Sets;
+import org.javers.repository.sql.codecs.CdoSnapshotStateCodec;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -30,11 +31,13 @@ public class CdoSnapshotFinder {
     private final CdoSnapshotsEnricher cdoSnapshotsEnricher = new CdoSnapshotsEnricher();
     private JsonConverter jsonConverter;
     private final TableNameProvider tableNameProvider;
+    private final CdoSnapshotStateCodec cdoSnapshotStateCodec;
 
-    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameProvider tableNameProvider) {
+    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameProvider tableNameProvider, CdoSnapshotStateCodec cdoSnapshotStateCodec) {
         this.globalIdRepository = globalIdRepository;
         this.commitPropertyFinder = commitPropertyFinder;
         this.tableNameProvider = tableNameProvider;
+        this.cdoSnapshotStateCodec = cdoSnapshotStateCodec;
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId, Session session, boolean loadCommitProps) {
@@ -87,7 +90,7 @@ public class CdoSnapshotFinder {
 
     private List<CdoSnapshot> fetchCdoSnapshots(Consumer<SnapshotQuery> additionalFilter,
                                                 QueryParams queryParams, Session session) {
-        SnapshotQuery query = new SnapshotQuery(tableNameProvider, queryParams, session);
+        SnapshotQuery query = new SnapshotQuery(tableNameProvider, queryParams, session, cdoSnapshotStateCodec);
         additionalFilter.accept(query);
         List<CdoSnapshotSerialized> serializedSnapshots = query.run();
 

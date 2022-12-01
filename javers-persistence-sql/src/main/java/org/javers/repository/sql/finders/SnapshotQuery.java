@@ -3,6 +3,7 @@ package org.javers.repository.sql.finders;
 import java.util.*;
 
 import org.javers.common.string.ToStringBuilder;
+import org.javers.repository.sql.codecs.CdoSnapshotStateCodec;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.SnapshotIdentifier;
@@ -26,8 +27,9 @@ class SnapshotQuery {
     private final TableNameProvider tableNameProvider;
     private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
     private final DialectName dialectName;
+    private final CdoSnapshotStateCodec cdoSnapshotStateCodec;
 
-    public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
+    public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session, CdoSnapshotStateCodec cdoSnapshotStateCodec) {
         this.dialectName = session.getDialectName();
 
         this.selectBuilder = session
@@ -58,6 +60,7 @@ class SnapshotQuery {
 
         this.queryParams = queryParams;
         this.tableNameProvider = tableNames;
+        this.cdoSnapshotStateCodec = cdoSnapshotStateCodec;
         applyQueryParams();
     }
 
@@ -209,7 +212,7 @@ class SnapshotQuery {
                     .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
                     .withCommitPk(resultSet.getLong(COMMIT_PK))
                     .withVersion(resultSet.getLong(SNAPSHOT_VERSION))
-                    .withSnapshotState(fetchSnapshotState(resultSet))
+                    .withSnapshotState(cdoSnapshotStateCodec.decode(fetchSnapshotState(resultSet)))
                     .withChangedProperties(resultSet.getString(SNAPSHOT_CHANGED))
                     .withSnapshotType(resultSet.getString(SNAPSHOT_TYPE))
                     .withGlobalIdFragment(resultSet.getString(GLOBAL_ID_FRAGMENT))
