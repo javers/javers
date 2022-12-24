@@ -4,9 +4,9 @@ dependencies {
     springImplementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
     springImplementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-    testCompile 'com.h2database:h2:1.4.187'
-    testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
-    testCompile "org.spockframework:spock-spring:$spockVersion"
-    testCompile project(path: ":javers-spring", configuration: "testArtifacts")
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation 'com.h2database:h2:1.4.187'
+    testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
+    testImplementation "org.spockframework:spock-spring:$spockVersion"
+    testImplementation project(path: ":javers-spring", configuration: "testArtifacts")
 }
