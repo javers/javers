@@ -3,11 +3,11 @@ dependencies {
     implementation "org.mongodb:mongodb-driver-legacy:$mongoDbDriverVersion"
     implementation "com.google.guava:guava:$guavaVersion"
 
-    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
-    testCompile project(path: ":javers-core", configuration: "testArtifacts")
-    testCompile "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
-    testCompile 'org.codehaus.gpars:gpars:1.2.1'
-    testCompile 'org.picocontainer:picocontainer:2.15'
+    testImplementation 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+    testImplementation project(path: ":javers-core", configuration: "testArtifacts")
+    testImplementation "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
+    testImplementation 'org.codehaus.gpars:gpars:1.2.1'
+    testImplementation 'org.picocontainer:picocontainer:2.15'
 }
 
 task integrationTest(type: Test) {

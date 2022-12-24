@@ -9,11 +9,11 @@ dependencies {
     implementation "org.hibernate:hibernate-core:$hibernateVersion"
     springImplementation "org.springframework.data:spring-data-jpa:$springBootVersion"
 
-    testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
+    testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
 
-    testCompile 'com.h2database:h2:1.4.184'
-    testCompile "org.springframework:spring-orm:$springVersion"
-    testCompile "org.springframework:spring-test:$springVersion"
-    testCompile "org.spockframework:spock-spring:$spockVersion"
-    testCompile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+    testImplementation 'com.h2database:h2:1.4.184'
+    testImplementation "org.springframework:spring-orm:$springVersion"
+    testImplementation "org.springframework:spring-test:$springVersion"
+    testImplementation "org.spockframework:spock-spring:$spockVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
 }
