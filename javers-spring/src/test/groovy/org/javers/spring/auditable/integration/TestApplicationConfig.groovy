@@ -2,6 +2,7 @@ package org.javers.spring.auditable.integration
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.mongodb.client.MongoClients
+import com.mongodb.client.MongoDatabase
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.repository.mongo.MongoRepository
@@ -11,10 +12,13 @@ import org.javers.spring.auditable.SpringSecurityAuthorProvider
 import org.javers.spring.auditable.aspect.JaversAuditableAspect
 import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
+import org.springframework.data.mongodb.MongoDatabaseFactory
+import org.springframework.data.mongodb.MongoDatabaseUtils
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
 
@@ -26,22 +30,18 @@ import java.util.concurrent.ThreadFactory
 @ComponentScan(basePackages = "org.javers.spring.repository")
 @EnableMongoRepositories(["org.javers.spring.repository"])
 @EnableAspectJAutoProxy
+@EnableAutoConfiguration
 class TestApplicationConfig {
-    static final String DATABASE_NAME = "mydatabase"
 
     @Bean
-    Javers javers() {
-        MongoRepository javersMongoRepository =
-                new MongoRepository(MongoClients.create().getDatabase(DATABASE_NAME))
+    Javers javers(MongoDatabaseFactory dbFactory) {
+        def mongoDatabase = MongoDatabaseUtils.getDatabase(dbFactory)
+
+        MongoRepository javersMongoRepository = new MongoRepository(mongoDatabase)
 
         JaversBuilder.javers()
                 .registerJaversRepository(javersMongoRepository)
                 .build()
-    }
-
-    @Bean
-    MongoTemplate mongoTemplate() throws Exception {
-        new MongoTemplate(MongoClients.create(), DATABASE_NAME)
     }
 
     @Bean
