@@ -1,8 +1,8 @@
 package org.javers.repository.mongo;
 
+import com.mongodb.client.*;
 import com.google.gson.JsonObject;
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -30,7 +30,6 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
 import static org.javers.repository.mongo.DocumentConverter.fromDocument;
 import static org.javers.repository.mongo.DocumentConverter.toDocument;
 import static org.javers.repository.mongo.MongoDialect.DOCUMENT_DB;
-import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mongoRepositoryConfiguration;
 import static org.javers.repository.mongo.MongoSchemaManager.*;
 
