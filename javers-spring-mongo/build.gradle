@@ -5,7 +5,7 @@ javadoc {
 dependencies {
     api project(':javers-spring')
     api project(':javers-persistence-mongo')
-    implementation "org.mongodb:mongodb-driver-legacy:$mongoDbDriverVersion"
+    implementation "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
 
     springImplementation "org.springframework.data:spring-data-mongodb:$springDataMongoVersion"
 

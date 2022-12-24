@@ -3,7 +3,7 @@ dependencies {
     api project(':javers-spring-mongo')
     api project(':javers-persistence-mongo')
 
-    implementation "org.mongodb:mongodb-driver-legacy:$mongoDbDriverVersion"
+    implementation "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
     springImplementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     springImplementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
