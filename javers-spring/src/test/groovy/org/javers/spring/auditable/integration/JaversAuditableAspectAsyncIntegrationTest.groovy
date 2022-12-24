@@ -6,6 +6,7 @@ import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync
 import org.javers.spring.model.DummyObject
 import org.javers.spring.repository.DummyAuditedAsyncRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
