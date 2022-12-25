@@ -3,14 +3,10 @@ package org.javers.spring.boot.mongo.cases
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.JaversSpringProperties
-import org.javers.spring.boot.mongo.TestApplication
+import org.javers.spring.boot.mongo.BaseSpecification
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import spock.lang.Specification
 
-@SpringBootTest(classes = [TestApplication])
-class SnapshotStateViolationCase extends Specification {
+class SnapshotStateViolationCase extends BaseSpecification {
 
 	@Autowired Javers javers
 

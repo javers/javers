@@ -2,16 +2,12 @@ package org.javers.spring.boot.mongo.dbref
 
 import org.javers.core.Javers
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.spring.boot.mongo.TestApplication
+import org.javers.spring.boot.mongo.BaseSpecification
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.convert.LazyLoadingProxy
-import org.springframework.test.context.ActiveProfiles
-import spock.lang.Specification
 import spock.lang.Unroll
 
-@SpringBootTest(classes = [TestApplication])
-class DBRefUnproxyObjectAccessHookTest extends Specification {
+class DBRefUnproxyObjectAccessHookTest extends BaseSpecification {
 
     @Autowired
     MyDummyEntityRepository dummyEntityRepository
