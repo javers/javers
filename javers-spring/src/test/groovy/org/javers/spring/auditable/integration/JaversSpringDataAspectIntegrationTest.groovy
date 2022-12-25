@@ -6,14 +6,11 @@ import org.javers.spring.repository.DummyAuditedCrudRepository
 import org.javers.spring.repository.DummyNoAuditedCrudRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
-import org.springframework.test.context.ContextConfiguration
-import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
-@ContextConfiguration(classes = [TestApplicationConfig])
-class JaversSpringDataAspectIntegrationTest extends Specification {
+class JaversSpringDataAspectIntegrationTest extends BaseSpecification {
     @Autowired
     ApplicationContext context
 

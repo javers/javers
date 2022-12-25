@@ -2,20 +2,14 @@ package org.javers.spring.boot.mongo
 
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
-import org.junit.Test
-import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
-import spock.lang.Specification
 
 /**
  * @author mwesolowski
  */
-@SpringBootTest(classes = [TestApplication])
 @ActiveProfiles("test")
-class JaversMongoRepositoryAspectDisabledTest extends Specification{
+class JaversMongoRepositoryAspectDisabledTest extends BaseSpecification {
 
     @Autowired
     Javers javers
