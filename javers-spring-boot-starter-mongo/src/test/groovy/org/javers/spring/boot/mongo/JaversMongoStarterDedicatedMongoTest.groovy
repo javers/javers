@@ -7,9 +7,8 @@ import org.javers.repository.jql.QueryBuilder
 import org.javers.repository.mongo.EmbeddedMongoFactory
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
-import spock.lang.Specification
 
-abstract class JaversMongoStarterDedicatedMongoTest extends Specification {
+abstract class JaversMongoStarterDedicatedMongoTest extends BaseSpecification {
 
     static int PORT = 32001
 

@@ -7,14 +7,11 @@ import org.javers.core.MappingStyle
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.repository.jql.QueryBuilder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import spock.lang.Specification
 
 /**
  * @author pawelszymczyk
  */
-@SpringBootTest(classes = [TestApplication])
-class JaversMongoStarterDefaultsTest extends Specification{
+class JaversMongoStarterDefaultsTest extends BaseSpecification{
     static String DB_NAME = 'spring-mongo-default'
 
     @Autowired Javers javers

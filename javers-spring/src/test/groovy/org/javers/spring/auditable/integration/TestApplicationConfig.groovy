@@ -1,8 +1,6 @@
 package org.javers.spring.auditable.integration
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
-import com.mongodb.client.MongoClients
-import com.mongodb.client.MongoDatabase
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.repository.mongo.MongoRepository
@@ -19,7 +17,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.data.mongodb.MongoDatabaseFactory
 import org.springframework.data.mongodb.MongoDatabaseUtils
-import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
 
 import java.util.concurrent.ExecutorService

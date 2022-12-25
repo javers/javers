@@ -7,11 +7,8 @@ import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.model.DummyObject
 import org.javers.spring.repository.DummyAuditedRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.ContextConfiguration
-import spock.lang.Specification
 
-@ContextConfiguration(classes = [TestApplicationConfig])
-class JaversAuditableDeleteAspectIntegrationTest extends Specification {
+class JaversAuditableDeleteAspectIntegrationTest extends BaseSpecification {
 
     @Autowired
     Javers javers
