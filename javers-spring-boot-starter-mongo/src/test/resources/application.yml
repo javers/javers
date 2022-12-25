@@ -2,3 +2,6 @@ spring:
   data:
     mongodb:
       database: spring-mongo-default
+  mongodb:
+    embedded:
+        version: 3.4.11
