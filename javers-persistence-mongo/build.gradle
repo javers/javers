@@ -12,17 +12,6 @@ dependencies {
     testImplementation "org.testcontainers:spock:$testcontainers"
 }
 
-task integrationTest(type: Test) {
-    useJUnitPlatform()
-    filter {
-        includeTestsMatching 'org.javers.repository.mongo.integration.**'
-    }
-    testLogging {
-        exceptionFormat = 'full'
-        events 'failed', 'passed'
-    }
-}
-
 test {
     exclude 'org/javers/repository/mongo/integration/**'
 }
