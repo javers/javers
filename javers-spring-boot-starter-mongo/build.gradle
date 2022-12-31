@@ -7,12 +7,17 @@ dependencies {
     springImplementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     springImplementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
+    testImplementation project(path: ":javers-spring", configuration: "testArtifacts")
+    testImplementation project(path: ":javers-persistence-mongo", configuration: "testArtifacts")
+
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testImplementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
-    testImplementation "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
     testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
     testImplementation "org.spockframework:spock-spring:$spockVersion"
-    testImplementation project(path: ":javers-persistence-mongo", configuration: "testArtifacts")
-    testImplementation project(path: ":javers-spring", configuration: "testArtifacts")
+
     testImplementation "com.github.silaev:mongodb-replica-set:0.4.3"
+    testImplementation "org.testcontainers:spock:$testcontainers"
+    testImplementation "org.testcontainers:mongodb:$testcontainers"
+
+
 }

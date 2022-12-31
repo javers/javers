@@ -1,10 +1,25 @@
 package org.javers.spring.boot.mongo
 
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
-import org.springframework.test.context.ContextConfiguration
+import org.javers.repository.mongo.DockerizedMongoContainer
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import org.testcontainers.spock.Testcontainers
+import spock.lang.Shared
 import spock.lang.Specification
 
-@DataMongoTest
-@ContextConfiguration(classes = [TestApplication])
-abstract class BaseSpecification extends Specification{
+@SpringBootTest(classes = [TestApplication])
+@Testcontainers
+abstract class BaseSpecification extends Specification {
+    @Shared
+    static DockerizedMongoContainer dockerizedMongoContainer = new DockerizedMongoContainer()
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", () -> dockerizedMongoContainer.replicaSetUrl)
+    }
+
+    static int getMongoPort() {
+        dockerizedMongoContainer.mongoPort
+    }
 }

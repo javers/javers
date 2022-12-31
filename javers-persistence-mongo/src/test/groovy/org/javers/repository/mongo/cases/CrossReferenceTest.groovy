@@ -1,14 +1,12 @@
 package org.javers.repository.mongo.cases
 
-import com.mongodb.client.MongoClient
+
 import com.mongodb.client.MongoDatabase
 import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.DiffIgnore
 import org.javers.core.metamodel.annotation.Value
-import org.javers.repository.mongo.EmbeddedMongoFactory
 import org.javers.repository.mongo.MongoRepository
-import spock.lang.Shared
-import spock.lang.Specification
+import org.javers.repository.mongo.BaseMongoTest
 
 import javax.persistence.Id
 import javax.persistence.OneToMany
@@ -18,18 +16,7 @@ import javax.persistence.OneToMany
  *
  * @author hank cp
  */
-class CrossReferenceTest extends Specification {
-
-    @Shared def embeddedMongo = EmbeddedMongoFactory.create()
-    @Shared MongoClient mongoClient
-
-    def setupSpec() {
-        mongoClient = embeddedMongo.getClient()
-    }
-
-    void cleanupSpec() {
-        embeddedMongo.stop()
-    }
+class CrossReferenceTest extends BaseMongoTest  {
 
     class CrossReferenceHost {
         @Id long id

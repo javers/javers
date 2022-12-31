@@ -1,6 +1,6 @@
 package org.javers.repository.mongo
 
-class EmbeddedMongoE2EWithRandomGeneratorTest extends EmbeddedMongoE2ETest {
+class MongoE2EWithRandomGeneratorTest extends MongoE2ETest {
 
     @Override
     boolean useRandomCommitIdGenerator() {
