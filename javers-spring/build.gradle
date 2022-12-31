@@ -13,13 +13,16 @@ dependencies {
     springImplementation "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
     springImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
 
+    testImplementation project(path: ":javers-persistence-mongo", configuration: "testArtifacts")
+    testImplementation project(':javers-persistence-mongo')
+
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testImplementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
-    testImplementation "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
     testImplementation "org.spockframework:spock-spring:$spockVersion"
 
-    testImplementation project(':javers-persistence-mongo')
     testImplementation "com.google.guava:guava:$guavaVersion"
+    testImplementation "org.testcontainers:spock:$testcontainers"
+    testImplementation "org.testcontainers:mongodb:$testcontainers"
 }
 
 task testJar(type: Jar) {

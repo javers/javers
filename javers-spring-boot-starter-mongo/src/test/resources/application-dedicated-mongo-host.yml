@@ -1,5 +1,0 @@
-javers:
-  mongodb:
-    host: localhost
-    port: 32001
-    database: javers-dedicated
