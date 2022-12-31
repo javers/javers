@@ -32,8 +32,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 @Configuration
-@ComponentScan(basePackages = "org.javers.spring.repository")
-@EnableMongoRepositories({"org.javers.spring.repository"})
+@ComponentScan(basePackages = "org.javers.spring.mongodb.example")
+@EnableMongoRepositories({"org.javers.spring.mongodb.example"})
 @EnableAspectJAutoProxy
 public class JaversSpringMongoApplicationConfigExample {
     private static final String DATABASE_NAME = "mydatabase";
