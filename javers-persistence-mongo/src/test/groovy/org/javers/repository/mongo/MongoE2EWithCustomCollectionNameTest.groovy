@@ -5,7 +5,7 @@ import org.javers.repository.api.JaversRepository
 
 import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mongoRepositoryConfiguration
 
-class EmbeddedMongoE2EWithCustomCollectionNameTest extends EmbeddedMongoE2ETest {
+class MongoE2EWithCustomCollectionNameTest extends MongoE2ETest {
 
     @Override
     protected JaversRepository prepareJaversRepository() {

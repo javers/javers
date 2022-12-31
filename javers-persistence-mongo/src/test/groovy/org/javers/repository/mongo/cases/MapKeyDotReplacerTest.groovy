@@ -1,38 +1,22 @@
 package org.javers.repository.mongo.cases
 
-import com.mongodb.client.MongoClient
 
-import static org.javers.repository.jql.QueryBuilder.byInstanceId
+import com.mongodb.client.MongoDatabase
+import groovy.transform.EqualsAndHashCode
+import org.javers.core.JaversBuilder
+import org.javers.repository.mongo.MongoRepository
+import org.javers.repository.mongo.BaseMongoTest
 
 import javax.persistence.Id
 
-import org.javers.core.JaversBuilder
-import org.javers.repository.mongo.EmbeddedMongoFactory
-import org.javers.repository.mongo.MongoRepository
-
-import com.mongodb.client.MongoDatabase
-
-import groovy.transform.EqualsAndHashCode
-import spock.lang.Shared
-import spock.lang.Specification
+import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 /**
  * Map Dot Replacer Test
  *
  * @author luca010
  */
-class MapKeyDotReplacerTest extends Specification {
-
-	@Shared def embeddedMongo = EmbeddedMongoFactory.create()
-	@Shared MongoClient mongoClient
-
-	def setupSpec() {
-		mongoClient = embeddedMongo.getClient()
-	}
-
-	void cleanupSpec() {
-		embeddedMongo.stop()
-	}
+class MapKeyDotReplacerTest extends BaseMongoTest {
 
 	@EqualsAndHashCode
 	class SampleDoc {
