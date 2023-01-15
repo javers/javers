@@ -1,6 +1,6 @@
 package org.javers.common.reflection
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 class AbstractGeneric<ID, V> {
     @Id

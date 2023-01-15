@@ -5,7 +5,7 @@ import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.object.InstanceId
 import spock.lang.Specification
 
-import javax.persistence.IdClass
+import jakarta.persistence.IdClass
 
 class CompositeIdExample extends Specification {
 

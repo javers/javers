@@ -2,8 +2,6 @@ package org.javers.core.graph
 
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.test.assertion.MultiEdgeAssert
-import org.javers.test.assertion.SingleEdgeAssert
 
 /**
  * @author bartosz walacik
@@ -12,7 +10,7 @@ class NodeAssert {
 
     ObjectNode actual
 
-    static assertThat = { ObjectNode actual ->
+    static assertThat( ObjectNode actual) {
         new NodeAssert(actual: actual)
     }
 

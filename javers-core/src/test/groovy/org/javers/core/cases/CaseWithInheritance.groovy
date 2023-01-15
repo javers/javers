@@ -5,7 +5,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore
 import org.javers.core.metamodel.annotation.TypeName
 import spock.lang.Specification
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 /**
  * @author bartosz.walacik

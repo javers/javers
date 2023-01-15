@@ -1,6 +1,6 @@
 package org.javers.core.model;
 
-import javax.persistence.EmbeddedId;
+import jakarta.persistence.EmbeddedId;
 
 /**
  * @author bartosz.walacik

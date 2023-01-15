@@ -4,7 +4,6 @@ import org.javers.core.JaversBuilder
 import org.javers.core.examples.model.Address
 import spock.lang.Shared
 import spock.lang.Specification
-import sun.util.calendar.ZoneInfo
 
 import java.time.Duration
 import java.time.Instant
@@ -39,7 +38,6 @@ class ValueTypeTest extends Specification {
         calculateToString(ZoneRules.of(ZoneOffset.UTC)) == "ZoneRules[currentStandardOffset=Z]"
         calculateToString(ZoneId.of("UTC")) == "UTC"
         calculateToString(TimeZone.getTimeZone("UTC")) == "sun.util.calendar.ZoneInfo[id=\"UTC\",offset=0,dstSavings=0,useDaylight=false,transitions=0,lastRule=null]"
-        calculateToString(ZoneInfo.getTimeZone("UTC")) == "sun.util.calendar.ZoneInfo[id=\"UTC\",offset=0,dstSavings=0,useDaylight=false,transitions=0,lastRule=null]"
 
         // java core library class
         calculateToString(LocalDate.of(2019,02,13)) == "2019,2,13"

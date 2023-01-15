@@ -1,6 +1,6 @@
 package org.javers.core.model;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 
 /**
  * @author Pawel Cierpiatka

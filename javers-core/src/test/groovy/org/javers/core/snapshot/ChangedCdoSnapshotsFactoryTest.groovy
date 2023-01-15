@@ -12,7 +12,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.GlobalIdTestBuilder.valueObjectId
-import static org.javers.core.snapshot.SnapshotsAssert.getAssertThat
+import static org.javers.core.snapshot.SnapshotsAssert.assertThat
 
 /**
  * @author bartosz walacik

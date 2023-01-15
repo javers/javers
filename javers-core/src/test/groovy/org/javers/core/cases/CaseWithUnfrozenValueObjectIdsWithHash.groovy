@@ -4,7 +4,7 @@ import org.javers.core.JaversBuilder
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 class LimitEntity {
     @Id

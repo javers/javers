@@ -1,3 +1,9 @@
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 javadoc {
     failOnError = false
 }
@@ -8,7 +14,7 @@ dependencies {
 
     implementation "org.aspectj:aspectjweaver:$aspectjweaverVersion"
     implementation "org.hibernate:hibernate-core:$hibernateVersion"
-    springImplementation "org.springframework.data:spring-data-jpa:$springDataCommonsVersion"
+    optionalImplementation "org.springframework.data:spring-data-jpa:$springDataCommonsVersion"
 
     testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
 

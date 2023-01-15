@@ -20,7 +20,7 @@ import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.*
 import spock.lang.Unroll
 
-import javax.persistence.EmbeddedId
+import jakarta.persistence.EmbeddedId
 
 import static GlobalIdTestBuilder.instanceId
 import static org.javers.core.JaversBuilder.javers

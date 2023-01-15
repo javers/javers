@@ -1,12 +1,12 @@
 package org.javers.core.metamodel.clazz;
 
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 
 /**
  * @author bartosz walacik
  */
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 public class JpaEntity {
     @Id
     private int id;

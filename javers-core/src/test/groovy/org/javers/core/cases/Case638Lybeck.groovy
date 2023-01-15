@@ -5,7 +5,7 @@ import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.metamodel.object.InstanceId
 import spock.lang.Specification
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 class Case638Lybeck extends Specification {
 

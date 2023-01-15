@@ -1,11 +1,16 @@
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 dependencies {
     api project(':javers-spring-mongo')
     api project(':javers-persistence-mongo')
 
     implementation "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
-    springImplementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
-    springImplementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
+    optionalImplementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
+    optionalImplementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
     testImplementation project(path: ":javers-spring", configuration: "testArtifacts")
     testImplementation project(path: ":javers-persistence-mongo", configuration: "testArtifacts")
@@ -18,6 +23,4 @@ dependencies {
     testImplementation "com.github.silaev:mongodb-replica-set:0.4.3"
     testImplementation "org.testcontainers:spock:$testcontainers"
     testImplementation "org.testcontainers:mongodb:$testcontainers"
-
-
 }

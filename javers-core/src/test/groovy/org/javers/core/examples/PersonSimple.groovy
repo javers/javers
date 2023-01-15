@@ -1,6 +1,6 @@
 package org.javers.core.examples
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 class PersonSimple {
     @Id
