@@ -4,7 +4,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 
 import static org.javers.core.GlobalIdTestBuilder.valueObjectId
-import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
+import static org.javers.core.diff.appenders.ContainerChangeAssert.assertThat
 import static org.javers.core.GlobalIdTestBuilder.instanceId
 
 /**

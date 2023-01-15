@@ -7,7 +7,7 @@ import org.javers.repository.jql.QueryBuilder
 import org.junit.Test
 import spock.lang.Specification
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 /**
  * @author adriano.machado

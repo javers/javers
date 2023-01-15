@@ -16,7 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.annotation.TransactionManagementConfigurer
 
-import javax.persistence.EntityManagerFactory
+import jakarta.persistence.EntityManagerFactory
 
 @Configuration()
 @EnableJpaRepositories(basePackages = ["org.javers.hibernate.entity"])

@@ -1,6 +1,6 @@
 package org.javers.core.examples.model;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import java.util.List;
 import java.util.Map;
 

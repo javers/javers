@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.clazz;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 
 /**
  * @author bartosz walacik

@@ -2,8 +2,8 @@ package org.javers.core.model
 
 import org.javers.core.metamodel.annotation.DiffIgnore
 import java.time.LocalDateTime
-import javax.persistence.Id
-import javax.persistence.Transient
+import jakarta.persistence.Id
+import jakarta.persistence.Transient
 
 /**
  * @author bartosz walacik

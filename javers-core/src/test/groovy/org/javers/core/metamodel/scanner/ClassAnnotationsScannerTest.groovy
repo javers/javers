@@ -21,8 +21,8 @@ class ClassAnnotationsScannerTest extends Specification {
         result.entity
 
         where:
-        annotation << [javax.persistence.Entity,
-                       javax.persistence.MappedSuperclass,
+        annotation << [jakarta.persistence.Entity,
+                       jakarta.persistence.MappedSuperclass,
                        org.javers.core.metamodel.annotation.Entity]
         classToScan << [JpaEntity, JpaMappedSuperclass, JaversEntity]
     }
@@ -37,7 +37,7 @@ class ClassAnnotationsScannerTest extends Specification {
         result.valueObject
 
         where:
-        annotation << [javax.persistence.Embeddable,
+        annotation << [jakarta.persistence.Embeddable,
                        org.javers.core.metamodel.annotation.ValueObject]
         classToScan << [JpaEmbeddable, JaversValueObject]
     }

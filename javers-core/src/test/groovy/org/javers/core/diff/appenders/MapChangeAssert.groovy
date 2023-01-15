@@ -11,7 +11,7 @@ import org.javers.core.diff.changetype.map.MapChange
 public class MapChangeAssert {
     MapChange actual
 
-    static assertThat = { MapChange actual ->
+    static MapChangeAssert assertThat(MapChange actual) {
         new MapChangeAssert(actual: actual)
     }
 

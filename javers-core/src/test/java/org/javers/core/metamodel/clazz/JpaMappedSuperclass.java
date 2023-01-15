@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.clazz;
 
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.MappedSuperclass;
 
 /**
  * @author bartosz walacik

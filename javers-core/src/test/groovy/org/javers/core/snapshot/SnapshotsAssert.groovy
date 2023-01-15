@@ -8,7 +8,7 @@ import org.javers.core.metamodel.object.CdoSnapshot
 class SnapshotsAssert {
     Collection<CdoSnapshot> actual
 
-    static assertThat = { Collection actual ->
+    static assertThat(Collection actual) {
         new SnapshotsAssert(actual: actual)
     }
 

@@ -36,7 +36,6 @@ import org.javers.core.pico.AddOnsModule;
 import org.javers.core.snapshot.SnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
 import org.javers.guava.GuavaAddOns;
-import org.javers.jodasupport.JodaAddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
 import org.javers.repository.api.ConfigurationAware;
@@ -114,9 +113,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
         if (isClassPresent("groovy.lang.MetaClass")) {
             conditionalTypesPlugins.add(new GroovyAddOns());
-        }
-        if (isClassPresent("org.joda.time.LocalDate")){
-            conditionalTypesPlugins.add(new JodaAddOns());
         }
         if (isClassPresent("com.google.common.collect.Multimap")) {
             conditionalTypesPlugins.add(new GuavaAddOns());

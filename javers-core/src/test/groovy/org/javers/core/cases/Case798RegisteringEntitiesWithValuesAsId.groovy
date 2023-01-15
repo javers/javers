@@ -10,7 +10,7 @@ import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.ValueType
 import spock.lang.Specification
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 class Case798RegisteringEntitiesWithValuesAsId extends Specification {
     

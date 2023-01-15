@@ -1,9 +1,15 @@
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
 dependencies {
     api project(':javers-core')
     implementation "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
     implementation "com.google.guava:guava:$guavaVersion"
 
-    testImplementation 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+    testImplementation 'jakarta.persistence:jakarta.persistence-api:3.0.0'
     testImplementation project(path: ":javers-core", configuration: "testArtifacts")
     testImplementation 'org.codehaus.gpars:gpars:1.2.1'
     testImplementation 'org.picocontainer:picocontainer:2.15'
