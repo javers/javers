@@ -10,7 +10,7 @@ import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.annotation.TypeName
-import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.type.EntityType
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository
@@ -22,7 +22,7 @@ import org.junit.rules.ExpectedException
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -253,12 +253,12 @@ class JaversRepositoryE2ETest extends Specification {
         where:
         what <<    ["Entity", "Unbounded ValueObject", "Bounded ValueObject"]
         objects << [
-                    (1..5).collect{ new SnapshotEntity(id:1,intProperty: it) }
-                     + new SnapshotEntity(id:2), //noise
-                    (1..5).collect{ new DummyAddress(city: "London${it}")}
-                     + new DummyPoint(1,2), //noise
-                    (1..5).collect{ new SnapshotEntity(id:1,valueObjectRef: new DummyAddress(city: "London${it}")) }
-                     + new SnapshotEntity(id:2,valueObjectRef: new DummyAddress(city: "London1")) //noise
+                    (1..5).collect{ new SnapshotEntity(id:1,intProperty: it) } +
+                     new SnapshotEntity(id:2), //noise
+                    (1..5).collect{ new DummyAddress(city: "London${it}")} +
+                     new DummyPoint(1,2), //noise
+                    (1..5).collect{ new SnapshotEntity(id:1,valueObjectRef: new DummyAddress(city: "London${it}")) } +
+                     new SnapshotEntity(id:2,valueObjectRef: new DummyAddress(city: "London1")) //noise
                    ]
         query   << [byInstanceId(1, SnapshotEntity).limit(3).build(),
                     QueryBuilder.byClass(DummyAddress).limit(3).build(),

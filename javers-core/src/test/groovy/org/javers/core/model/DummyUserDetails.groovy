@@ -2,7 +2,7 @@ package org.javers.core.model
 
 import org.javers.core.metamodel.annotation.PropertyName
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 /**
  * @author bartosz walacik

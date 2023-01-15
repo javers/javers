@@ -4,7 +4,7 @@ import org.javers.common.collections.Sets;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.core.metamodel.annotation.TypeName;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import java.time.ZonedDateTime;
 import java.util.*;
 

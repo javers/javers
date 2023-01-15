@@ -1,3 +1,8 @@
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 javadoc {
     failOnError = false
@@ -8,10 +13,10 @@ dependencies {
 
     implementation "org.aspectj:aspectjweaver:$aspectjweaverVersion"
 
-    springImplementation "org.springframework:spring-tx:$springVersion"
-    springImplementation "org.springframework:spring-context:$springVersion"
-    springImplementation "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
-    springImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
+    optionalImplementation "org.springframework:spring-tx:$springVersion"
+    optionalImplementation "org.springframework:spring-context:$springVersion"
+    optionalImplementation "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
+    optionalImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
 
     testImplementation project(path: ":javers-persistence-mongo", configuration: "testArtifacts")
     testImplementation project(':javers-persistence-mongo')

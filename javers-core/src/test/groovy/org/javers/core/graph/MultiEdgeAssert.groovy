@@ -1,7 +1,6 @@
-package org.javers.test.assertion
+package org.javers.core.graph
 
-import org.javers.core.graph.MultiEdge
-import org.javers.core.graph.NodeAssert
+
 import org.javers.core.metamodel.object.CdoSnapshot
 
 /**

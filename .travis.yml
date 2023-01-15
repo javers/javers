@@ -1,6 +1,6 @@
 language: java
 jdk:
-- openjdk11
+- openjdk17
 services:
   - postgresql
   - mysql

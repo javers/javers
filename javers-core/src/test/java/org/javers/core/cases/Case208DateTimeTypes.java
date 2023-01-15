@@ -1,7 +1,8 @@
 package org.javers.core.cases;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * @author bartosz.walacik
@@ -12,7 +13,7 @@ public class Case208DateTimeTypes {
 
     java.util.Date date = new java.util.Date();
 
-    org.joda.time.LocalDateTime yodaDate = org.joda.time.LocalDateTime.now();
+    java.time.LocalDateTime yodaDate = LocalDateTime.now();
 
     java.time.LocalDateTime java8Date = java.time.LocalDateTime.now();
     java.time.ZonedDateTime java8ZonedDate = java.time.ZonedDateTime.now();

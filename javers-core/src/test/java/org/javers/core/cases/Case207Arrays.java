@@ -2,7 +2,7 @@ package org.javers.core.cases;
 
 import org.javers.core.metamodel.annotation.ValueObject;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 
 /**
  * @author bartosz.walacik

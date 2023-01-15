@@ -1,8 +1,7 @@
 package org.javers.core.model;
 
 import org.javers.core.metamodel.annotation.ShallowReference;
-
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 
 /**
  * @author akrystian
