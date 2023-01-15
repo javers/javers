@@ -11,7 +11,7 @@ import org.javers.core.model.IgnoredSubType
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.persistence.MappedSuperclass
+import jakarta.persistence.MappedSuperclass
 
 /**
  * @author Pawel Cierpiatka

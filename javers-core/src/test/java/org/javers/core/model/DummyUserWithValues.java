@@ -2,7 +2,7 @@ package org.javers.core.model;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import java.math.BigDecimal;
 
 /**

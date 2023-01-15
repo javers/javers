@@ -3,7 +3,7 @@ package org.javers.spring.jpa
 import org.javers.hibernate.entity.Person
 import org.javers.hibernate.entity.PersonCrudRepository
 
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 class ErrorThrowingService {
     private PersonCrudRepository repository

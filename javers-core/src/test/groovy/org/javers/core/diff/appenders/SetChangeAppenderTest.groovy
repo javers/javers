@@ -7,8 +7,7 @@ import spock.lang.Shared
 import spock.lang.Unroll
 
 import java.time.LocalDate
-
-import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
+import static org.javers.core.diff.appenders.ContainerChangeAssert.assertThat
 
 /**
  * @author pawel szymczyk

@@ -11,7 +11,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 

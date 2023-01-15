@@ -9,7 +9,7 @@ import org.javers.repository.jql.QueryBuilder;
 import org.javers.shadow.Shadow;
 import org.junit.Test;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;

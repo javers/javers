@@ -3,7 +3,7 @@ package org.javers.core.metamodel.clazz;
 /**
  * @author bartosz walacik
  */
-@javax.persistence.Embeddable
+@jakarta.persistence.Embeddable
 public class JpaEmbeddable {
     private String some;
 }

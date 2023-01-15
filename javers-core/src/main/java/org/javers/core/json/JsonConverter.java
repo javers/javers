@@ -34,7 +34,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * </ul>
  *
  * Javers provides JsonTypeAdapters for some well known Values like java.time.LocalDateTime,
- * org.joda.time.LocalDateTime.
+ * java.time.LocalDateTime.
  *
  * @author bartosz walacik
  */

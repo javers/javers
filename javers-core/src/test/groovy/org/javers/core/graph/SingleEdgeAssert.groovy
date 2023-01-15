@@ -1,8 +1,6 @@
-package org.javers.test.assertion
+package org.javers.core.graph
 
 import org.fest.assertions.api.Assertions
-import org.javers.core.graph.NodeAssert
-import org.javers.core.graph.SingleEdge
 
 /**
  * @author bartosz walacik

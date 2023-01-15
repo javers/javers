@@ -2,14 +2,14 @@ package org.javers.repository.mongo.cases
 
 
 import com.mongodb.client.MongoDatabase
+import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.DiffIgnore
 import org.javers.core.metamodel.annotation.Value
 import org.javers.repository.mongo.MongoRepository
 import org.javers.repository.mongo.BaseMongoTest
 
-import javax.persistence.Id
-import javax.persistence.OneToMany
 
 /**
  * Decouple cross reference object by DiffIgnore

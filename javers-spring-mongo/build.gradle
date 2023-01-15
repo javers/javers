@@ -1,3 +1,9 @@
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 javadoc {
     failOnError = false
 }
@@ -7,7 +13,7 @@ dependencies {
     api project(':javers-persistence-mongo')
     implementation "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
 
-    springImplementation "org.springframework.data:spring-data-mongodb:$springDataMongoVersion"
+    optionalImplementation "org.springframework.data:spring-data-mongodb:$springDataMongoVersion"
 
     testImplementation "org.springframework:spring-test:$springVersion"
     testImplementation "org.spockframework:spock-spring:$spockVersion"

@@ -20,8 +20,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.persistence.Id
-import javax.persistence.Transient
+import jakarta.persistence.Id
+import jakarta.persistence.Transient
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.MappingStyle.BEAN
@@ -182,13 +182,13 @@ class TypeFactoryTest extends Specification {
         e.code == JaversExceptionCode.PROPERTY_NOT_FOUND
     }
 
-    @javax.persistence.Entity
+    @jakarta.persistence.Entity
     @org.javers.core.metamodel.annotation.ValueObject
     class AmbiguousValueObjectType {
         @Id int id
     }
 
-    @javax.persistence.Embeddable
+    @jakarta.persistence.Embeddable
     @org.javers.core.metamodel.annotation.Entity
     class AmbiguousEntityType {
         @Id int id

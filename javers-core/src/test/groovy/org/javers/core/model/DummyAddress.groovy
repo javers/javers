@@ -2,7 +2,7 @@ package org.javers.core.model
 
 import groovy.transform.ToString
 
-import javax.persistence.Transient
+import jakarta.persistence.Transient
 
 /**
  * sample Value Object

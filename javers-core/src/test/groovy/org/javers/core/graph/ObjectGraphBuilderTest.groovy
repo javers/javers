@@ -7,7 +7,8 @@ import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
-import static NodeAssert.assertThat
+
+import static org.javers.core.graph.NodeAssert.assertThat
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserDetails.dummyUserDetails
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
@@ -50,7 +51,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(user).root()
 
         then:
-        NodeAssert.assertThat(node).hasNoEdges()
+        assertThat(node).hasNoEdges()
                 .hasCdo(user)
                 .hasInstanceId(DummyUser, "Mad Kaz")
     }
@@ -64,7 +65,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(address).root()
 
         then:
-        NodeAssert.assertThat(node).hasNoEdges()
+        assertThat(node).hasNoEdges()
                 .hasCdo(address)
                 .hasUnboundedValueObjectId(DummyAddress)
     }
@@ -78,7 +79,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(user).root()
 
         then:
-        NodeAssert.assertThat(node).hasCdo(user)
+        assertThat(node).hasCdo(user)
                 .hasSingleEdge("dummyAddress")
                 .andTargetNode()
                 .hasNoEdges()
@@ -95,7 +96,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(user).root()
 
         then:
-        NodeAssert.assertThat(node).hasEdges(1)
+        assertThat(node).hasEdges(1)
                 .hasCdoId("Mad Kaz")
                 .hasEdge("supervisor") //jump to EdgeAssert
                 .isSingleEdgeTo("Mad Stach")
@@ -111,7 +112,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(user).root()
 
         then:
-        NodeAssert.assertThat(node).hasEdges(1)
+        assertThat(node).hasEdges(1)
                 .hasCdoId("Mad Kaz")
                 .hasEdge("dummyUserDetails")//jump to EdgeAssert
                 .isSingleEdgeTo(1L)
@@ -132,7 +133,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
       def node = graphBuilder.buildGraph(cat1).root()
 
       then:
-      NodeAssert.assertThat(node)
+      assertThat(node)
                 .hasSingleEdge("parent")
                 .andTargetNode()
                 .hasValueObjectId("org.javers.core.model.CategoryVo/#parent")
@@ -165,7 +166,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(kazik).root()
 
         then:
-        NodeAssert.assertThat(node).hasEdges(1)
+        assertThat(node).hasEdges(1)
                 .hasCdoId("Mad Kaz 0")
                 .hasSingleEdge("supervisor")
                 .andTargetNode()
@@ -190,7 +191,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(kaz).root()
 
         then:
-        NodeAssert.assertThat(node).hasEdges(2)
+        assertThat(node).hasEdges(2)
                 .hasCdoId("Mad Kaz")
                 .and().hasEdge("supervisor")
                 .isSingleEdge()
@@ -199,7 +200,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .hasEdge("dummyUserDetails")
                 .isSingleEdgeTo(2L)
 
-        NodeAssert.assertThat(node).hasEdge("dummyUserDetails")
+        assertThat(node).hasEdge("dummyUserDetails")
                 .isSingleEdgeTo(1L)
     }
 
@@ -218,9 +219,9 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(stach).root()
 
         then:
-        NodeAssert.assertThat(node).hasEdges(2)
-        NodeAssert.assertThat(node).hasSingleEdge("dummyUserDetails")
-        NodeAssert.assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3)
+        assertThat(node).hasEdges(2)
+        assertThat(node).hasSingleEdge("dummyUserDetails")
+        assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3)
 
         and: "should get descendants"
         node.descendants(10).size() == 3
@@ -244,7 +245,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(kaz).root()
 
         then:
-        NodeAssert.assertThat(node).hasCdoId("Mad Kaz")
+        assertThat(node).hasCdoId("Mad Kaz")
                 .hasEdge("supervisor")
                 .isSingleEdgeTo("Stach")
                 .andTargetNode()
@@ -273,7 +274,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(kaz).root()
 
         then:
-        NodeAssert.assertThat(node).hasCdoId("kaz")
+        assertThat(node).hasCdoId("kaz")
                 .and().hasEdge("supervisor")
                 .isSingleEdgeTo("stach")
                 .andTargetNode()
@@ -303,7 +304,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
         then:
         //small cycle
-        NodeAssert.assertThat(node).hasCdoId("superKaz")
+        assertThat(node).hasCdoId("superKaz")
                 .hasEdge("employeesList")
                 .isMultiEdge("kaz", "microKaz")
                 .andTargetNode("kaz")
@@ -311,7 +312,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .isSingleEdgeTo("superKaz")
 
         //large cycle
-        NodeAssert.assertThat(node).hasCdoId("superKaz")
+        assertThat(node).hasCdoId("superKaz")
                 .hasMultiEdge("employeesList")
                 .andTargetNode("microKaz")
                 .hasEdge("supervisor")
@@ -333,7 +334,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(dummyUser).root()
 
         then:
-        NodeAssert.assertThat(node).hasNoEdges()
+        assertThat(node).hasNoEdges()
     }
 
 
@@ -346,7 +347,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(dummyUser).root()
 
         then:
-        NodeAssert.assertThat(node).hasNoEdges()
+        assertThat(node).hasNoEdges()
     }
 
     @Unroll

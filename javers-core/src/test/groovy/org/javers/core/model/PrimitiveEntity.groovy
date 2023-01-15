@@ -2,7 +2,7 @@ package org.javers.core.model
 
 import groovy.transform.EqualsAndHashCode
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 /**
  * @author bartosz walacik

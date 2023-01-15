@@ -3,7 +3,7 @@ package org.javers.core.diff.appenders
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 
-import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
+import static org.javers.core.diff.appenders.ContainerChangeAssert.assertThat
 import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 

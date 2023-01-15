@@ -3,11 +3,10 @@ package org.javers.repository.mongo.cases
 
 import com.mongodb.client.MongoDatabase
 import groovy.transform.EqualsAndHashCode
+import jakarta.persistence.Id
 import org.javers.core.JaversBuilder
 import org.javers.repository.mongo.MongoRepository
 import org.javers.repository.mongo.BaseMongoTest
-
-import javax.persistence.Id
 
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
