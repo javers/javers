@@ -109,10 +109,10 @@ public final class Commit {
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
-        b.append("Commit(id:" + commitMetadata.getId());
-        b.append(", snapshots:" + snapshots.size());
-        b.append(", author:" + commitMetadata.getAuthor());
-        b.append(", " + diff.changesSummary());
+        b.append("Commit(id:").append(commitMetadata.getId());
+        b.append(", snapshots:").append(snapshots.size());
+        b.append(", author:").append(commitMetadata.getAuthor());
+        b.append(", ").append(diff.changesSummary());
         b.append(")");
         return b.toString();
     }
