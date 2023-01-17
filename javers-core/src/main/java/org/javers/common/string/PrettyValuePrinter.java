@@ -26,7 +26,7 @@ public class PrettyValuePrinter {
     }
 
     public String formatWithQuotes(Object value) {
-        return "'" + format(value) + "'";
+        return String.format("'%s'", format(value));
     }
 
     public String format(Object value) {
@@ -41,16 +41,16 @@ public class PrettyValuePrinter {
             }
         }
 
-        if ( value instanceof Set) {
-            return ToStringBuilder.setToString((Set)value);
+        if (value instanceof Set) {
+            return ToStringBuilder.setToString((Set) value);
         }
 
-        if ( value instanceof List) {
-            return ToStringBuilder.listToString((List)value);
+        if (value instanceof List) {
+            return ToStringBuilder.listToString((List) value);
         }
 
-        if ( value instanceof Optional) {
-            if ( ((Optional)value).isPresent()) {
+        if (value instanceof Optional) {
+            if (((Optional) value).isPresent()) {
                 return format(((Optional) value).get());
             } else {
                 return "empty";
