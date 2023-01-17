@@ -82,7 +82,8 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     public MongoRepository(MongoDatabase mongo, MongoRepositoryConfiguration mongoRepositoryConfiguration) {
         Validate.argumentsAreNotNull(mongo);
         this.mongoDialect = mongoRepositoryConfiguration.getMongoDialect();
-        this.mongoSchemaManager = new MongoSchemaManager(mongo, mongoRepositoryConfiguration.getSnapshotCollectionName());
+        this.mongoSchemaManager = new MongoSchemaManager(
+            mongo, mongoRepositoryConfiguration.getSnapshotCollectionName(), mongoRepositoryConfiguration.getHeadCollectionName());
         int cacheSize = mongoRepositoryConfiguration.getCacheSize();
         this.cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
     }
