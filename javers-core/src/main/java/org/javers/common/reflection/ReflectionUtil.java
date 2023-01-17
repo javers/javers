@@ -260,7 +260,7 @@ public class ReflectionUtil {
         for (JaversField f : getAllPersistentFields(obj.getClass()) ){
             Object val = f.getEvenIfPrivate(obj);
             if (val != null) {
-                ret.append(val.toString());
+                ret.append(val);
             }
             ret.append(",");
         }
