@@ -5,6 +5,7 @@ import static org.javers.common.string.Strings.isNonEmpty;
 public class MongoRepositoryConfigurationBuilder {
 
     private String snapshotCollectionName;
+    private String headCollectionName;
     private Integer cacheSize;
     private MongoDialect dialect;
 
@@ -33,7 +34,12 @@ public class MongoRepositoryConfigurationBuilder {
         return this;
     }
 
+    public MongoRepositoryConfigurationBuilder withHeadCollectionName(String headCollectionName) {
+        this.headCollectionName = headCollectionName;
+        return this;
+    }
+
     public MongoRepositoryConfiguration build() {
-        return new MongoRepositoryConfiguration(snapshotCollectionName, cacheSize, dialect);
+        return new MongoRepositoryConfiguration(snapshotCollectionName, headCollectionName, cacheSize, dialect);
     }
 }
