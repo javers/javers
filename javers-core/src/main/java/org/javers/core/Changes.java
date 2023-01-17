@@ -237,13 +237,13 @@ public class Changes extends AbstractList<Change> implements Serializable {
      */
     public String devPrint() {
         StringBuilder b = new StringBuilder();
-        b.append("Changes ("+size()+"):\n");
+        b.append("Changes (").append(size()).append("):\n");
 
         groupByCommit().forEach(byCommit -> {
-            b.append("commit " + byCommit.getCommit().getId() + " \n");
+            b.append("commit ").append(byCommit.getCommit().getId()).append(" \n");
             byCommit.groupByObject().forEach(byObject -> {
-                b.append("* changes on " + byObject.getGlobalId().value() + " :\n");
-                byObject.get().forEach(change -> b.append("  - " + change + " \n"));
+                b.append("* changes on ").append(byObject.getGlobalId().value()).append(" :\n");
+                byObject.get().forEach(change -> b.append("  - ").append(change).append(" \n"));
             });
         });
 
