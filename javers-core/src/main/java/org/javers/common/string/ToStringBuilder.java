@@ -29,12 +29,12 @@ public class ToStringBuilder {
             parameterizedType.getActualTypeArguments();
 
             StringBuilder out = new StringBuilder();
-            out.append(typeName(parameterizedType.getRawType()) + "<");
+            out.append(typeName(parameterizedType.getRawType())).append("<");
             Type[] args  = ((ParameterizedType)type).getActualTypeArguments();
 
             out.append( typeName(args[0]));
             for (int i=1;i<args.length;i++){
-                out.append(", "+typeName(args[i]) );
+                out.append(", ").append(typeName(args[i]));
             }
             out.append(">");
             return out.toString();
@@ -50,7 +50,7 @@ public class ToStringBuilder {
     }
 
     public static String listToString(List list){
-        return "[" + join(list) + "]";
+        return String.format("[%s]", join(list));
     }
 
     public static String join(Collection list){
@@ -88,10 +88,10 @@ public class ToStringBuilder {
             if (isNullOrEmpty(value)) continue;
 
             if (first){
-                out.append(addFirstField(name + "", value));
+                out.append(addFirstField(String.valueOf(name), value));
             }
             else{
-                out.append(addField(name + "", value, sep));
+                out.append(addField(String.valueOf(name), value, sep));
             }
             first = false;
         }
