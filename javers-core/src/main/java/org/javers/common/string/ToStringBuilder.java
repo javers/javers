@@ -29,12 +29,12 @@ public class ToStringBuilder {
             parameterizedType.getActualTypeArguments();
 
             StringBuilder out = new StringBuilder();
-            out.append(typeName(parameterizedType.getRawType())).append("<");
+            out.append(typeName(parameterizedType.getRawType()) + "<");
             Type[] args  = ((ParameterizedType)type).getActualTypeArguments();
 
             out.append( typeName(args[0]));
             for (int i=1;i<args.length;i++){
-                out.append(", ").append(typeName(args[i]));
+                out.append(", "+typeName(args[i]) );
             }
             out.append(">");
             return out.toString();
@@ -50,7 +50,7 @@ public class ToStringBuilder {
     }
 
     public static String listToString(List list){
-        return String.format("[%s]", join(list));
+        return "[" + join(list) + "]";
     }
 
     public static String join(Collection list){
@@ -88,10 +88,10 @@ public class ToStringBuilder {
             if (isNullOrEmpty(value)) continue;
 
             if (first){
-                out.append(addFirstField(String.valueOf(name), value));
+                out.append(addFirstField(name + "", value));
             }
             else{
-                out.append(addField(String.valueOf(name), value, sep));
+                out.append(addField(name + "", value, sep));
             }
             first = false;
         }
@@ -122,9 +122,9 @@ public class ToStringBuilder {
     }
 
     public static String toString(Object instance, Object... fieldsMap) {
-         argumentIsNotNull(instance);
-         return instance.getClass().getSimpleName()+"{ "+toStringSimple(fieldsMap)+" }";
-     }
+        argumentIsNotNull(instance);
+        return instance.getClass().getSimpleName()+"{ "+toStringSimple(fieldsMap)+" }";
+    }
 
     public static String addField(String fieldName, Object value) {
         return addField(fieldName, value, ", ");
