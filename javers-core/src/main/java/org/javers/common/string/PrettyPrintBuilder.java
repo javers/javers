@@ -7,28 +7,28 @@ import java.util.List;
  */
 public class PrettyPrintBuilder {
 
-    private final StringBuilder out = new StringBuilder();
+    private StringBuilder out = new StringBuilder();
 
     public PrettyPrintBuilder(Object instance) {
-        println(instance.getClass().getSimpleName() + "{");
+        println(instance.getClass().getSimpleName()+"{");
     }
 
     public PrettyPrintBuilder addField(String fieldName, Object value) {
-        println(String.format("  %s: %s", fieldName, value));
+        println("  " + fieldName + ": " + value);
         return this;
     }
 
     public PrettyPrintBuilder addMultiField(String fieldName, List<?> values) {
-        println(String.format("  %s:", fieldName));
+        println("  " + fieldName + ":");
         for (Object v : values) {
-            println(String.format("    %s", v));
+            println("    " + v);
         }
         return this;
     }
 
 
     private void println(String text) {
-        out.append(text).append("\n");
+        out.append(text + "\n");
     }
 
     private void print(String text) {

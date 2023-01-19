@@ -73,7 +73,7 @@ public class ReflectionUtil {
                     params[i] = resolver.resolve(types[i]);
                 } catch (JaversException e){
                     logger.error("failed to create new instance of "+clazz.getName()+", argument resolver for arg["+i+"] " +
-                                 types[i].getName() + " thrown exception: "+e.getMessage());
+                            types[i].getName() + " thrown exception: "+e.getMessage());
                     throw e;
                 }
             }
@@ -145,8 +145,8 @@ public class ReflectionUtil {
 
     private static boolean isPersistentField(Field field) {
         return !Modifier.isTransient(field.getModifiers()) &&
-               !Modifier.isStatic(field.getModifiers()) &&
-               !field.getName().equals("this$0"); //owner of inner class
+                !Modifier.isStatic(field.getModifiers()) &&
+                !field.getName().equals("this$0"); //owner of inner class
     }
 
     private static boolean isPrivate(Member member){
@@ -174,7 +174,7 @@ public class ReflectionUtil {
 
     public static List<Class<?>> findClasses(Class<? extends Annotation> annotation, String... packages) {
         Validate.argumentsAreNotNull(annotation, packages);
-    	return new ClassGraph()
+        return new ClassGraph()
                 .whitelistPackages(packages)
                 .enableAnnotationInfo()
                 .scan()
@@ -260,7 +260,7 @@ public class ReflectionUtil {
         for (JaversField f : getAllPersistentFields(obj.getClass()) ){
             Object val = f.getEvenIfPrivate(obj);
             if (val != null) {
-                ret.append(val);
+                ret.append(val.toString());
             }
             ret.append(",");
         }

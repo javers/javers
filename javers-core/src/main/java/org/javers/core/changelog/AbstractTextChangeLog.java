@@ -117,7 +117,7 @@ public abstract class AbstractTextChangeLog implements ChangeProcessor<String> {
      */
     protected void append(Object text){
         if (text != null) {
-            builder.append(text);
+            builder.append(text.toString());
         }
     }
 
@@ -126,7 +126,7 @@ public abstract class AbstractTextChangeLog implements ChangeProcessor<String> {
      */
     protected void appendln(String text){
         if (text != null) {
-            builder.append(text).append("\n");
+            builder.append(text+"\n");
         }
     }
 
@@ -135,7 +135,7 @@ public abstract class AbstractTextChangeLog implements ChangeProcessor<String> {
      */
     protected void appendln(Object text){
         if (text != null) {
-            builder.append(text).append("\n");
+            builder.append(text.toString()+"\n");
         }
     }
 }
