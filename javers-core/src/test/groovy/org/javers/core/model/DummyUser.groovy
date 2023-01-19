@@ -12,9 +12,7 @@ import javax.persistence.Transient
  */
 @DiffIgnoreFields(["propertyIgnoredInDiffIgnoreFields1", "propertyIgnoredInDiffIgnoreFields2"])
 class DummyUser extends AbstractDummyUser {
-    public enum Sex {
-        FEMALE, MALE, OCCASIONALLY
-    }
+    public enum Sex {FEMALE, MALE, OCCASIONALLY}
 
     transient int someTransientField
 
@@ -56,7 +54,7 @@ class DummyUser extends AbstractDummyUser {
     int[] intArray
     LocalDateTime[] dateTimes
 
-    //reference
+     //reference
     DummyUser supervisor
     DummyUserDetails dummyUserDetails
     List<DummyUserDetails> dummyUserDetailsList
@@ -74,12 +72,12 @@ class DummyUser extends AbstractDummyUser {
         this.surname = surname
     }
 
-    static DummyUser dummyUser(String name) {
-        new DummyUser(name: name)
+    static DummyUser dummyUser(String name){
+        new DummyUser(name:name)
     }
 
-    static DummyUser dummyUser() {
-        new DummyUser(name: 'name')
+    static DummyUser dummyUser(){
+        new DummyUser(name:'name')
     }
 
     def addEmployee(DummyUser employee) {
@@ -114,12 +112,12 @@ class DummyUser extends AbstractDummyUser {
         propertyWithDiffIgnoreAnn
     }
 
-    DummyUser withDetails(int id) {
-        this.dummyUserDetails = new DummyUserDetails(id: id)
+    DummyUser withDetails(int id){
+        this.dummyUserDetails = new DummyUserDetails(id:id)
         this
     }
 
-    DummyUser withDetails() {
+    DummyUser withDetails(){
         withDetails(1)
     }
 
@@ -193,7 +191,7 @@ class DummyUser extends AbstractDummyUser {
 
     DummyUser withEmployees(int numberOfEmployees) {
         numberOfEmployees.times {
-            this.addEmployee(new DummyUser("Em${it + 1}"))
+            this.addEmployee(new DummyUser("Em${it+1}"))
         }
         this
     }
@@ -206,13 +204,13 @@ class DummyUser extends AbstractDummyUser {
     }
 
     DummyUser withDetailsList(int numberOfDetailsInList) {
-        this.dummyUserDetailsList = (1..numberOfDetailsInList).collect({
-            new DummyUserDetails(id: it)
+        this.dummyUserDetailsList = (1 .. numberOfDetailsInList).collect({
+            new DummyUserDetails(id:it)
         })
         this
     }
 
-    DummyUser withIntArray(List<Integer> ints) {
+    DummyUser withIntArray(List<Integer> ints){
         this.intArray = ints as int[]
         this
     }
