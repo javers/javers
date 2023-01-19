@@ -5,7 +5,10 @@ import org.javers.common.collections.Sets;
 import org.javers.common.reflection.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author bartosz walacik
@@ -23,7 +26,7 @@ class AnnotationNamesProvider {
 
 
     AnnotationNamesProvider() {
-        for (AnnotationsNameSpace provider : namesProviders){
+        for (AnnotationsNameSpace provider : namesProviders) {
             entityAliases.addAll(provider.getEntityAliases());
             valueObjectAliases.addAll(provider.getValueObjectAliases());
             valueAliases.addAll(provider.getValueAliases());
@@ -41,13 +44,33 @@ class AnnotationNamesProvider {
         return annTypes.stream().anyMatch(annType -> valueObjectAliases.contains(annType.getSimpleName()));
     }
 
-    boolean hasValueAnnAlias(Set<Class<? extends Annotation>> annTypes){
+    boolean hasValueAnnAlias(Set<Class<? extends Annotation>> annTypes) {
         return annTypes.stream().anyMatch(annType -> valueAliases.contains(annType.getSimpleName()));
     }
 
-    boolean hasTransientPropertyAnn(Set<Class<? extends Annotation>> annTypes){
+    boolean hasTransientPropertyAnn(Set<Class<? extends Annotation>> annTypes) {
         return annTypes.contains(JaversAnnotationsNameSpace.DIFF_IGNORE_ANN) ||
-               annTypes.stream().anyMatch(annType -> transientPropertyAliases.contains(annType.getSimpleName()));
+                annTypes.stream().anyMatch(annType -> transientPropertyAliases.contains(annType.getSimpleName()));
+    }
+
+    /**
+     * Checks if provided class has {@code JaversAnnotationsNameSpace.DIFF_IGNORE_FIELDS_ANN} present.
+     *
+     * @param type class to scan
+     */
+    boolean hasIgnoreFieldsAnn(Class<?> type) {
+        return type.isAnnotationPresent(JaversAnnotationsNameSpace.DIFF_IGNORE_FIELDS_ANN);
+    }
+
+    /**
+     * Finds {@code JaversAnnotationsNameSpace.DIFF_IGNORE_FIELDS_ANN} and return a set of property names from configured in the annotation.
+     *
+     * @param annotations annotation set
+     */
+    Set<String> getIgnoreFieldsAnnValue(Set<Annotation> annotations) {
+        return Sets.asSet(findAnnotation(annotations, JaversAnnotationsNameSpace.DIFF_IGNORE_FIELDS_ANN, new HashSet<>())
+                .map(an -> (String[]) ReflectionUtil.getAnnotationValue(an, "value"))
+                .orElseGet(() -> new String[0]));
     }
 
     boolean hasDiffIncludeAnn(Set<Class<? extends Annotation>> annTypes) {
