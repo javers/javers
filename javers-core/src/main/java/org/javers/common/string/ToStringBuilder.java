@@ -122,9 +122,9 @@ public class ToStringBuilder {
     }
 
     public static String toString(Object instance, Object... fieldsMap) {
-        argumentIsNotNull(instance);
-        return instance.getClass().getSimpleName()+"{ "+toStringSimple(fieldsMap)+" }";
-    }
+         argumentIsNotNull(instance);
+         return instance.getClass().getSimpleName()+"{ "+toStringSimple(fieldsMap)+" }";
+     }
 
     public static String addField(String fieldName, Object value) {
         return addField(fieldName, value, ", ");
