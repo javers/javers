@@ -414,6 +414,22 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         javers.getTypeMapping(IgnoredSubType) instanceof IgnoredType
     }
 
+    def "should ignore properties listed in @DiffIgnoreFields"(){
+        given:
+        def javers = javers().build()
+
+        def left =  new DummyUser("name":"a",
+                propertyIgnoredInDiffIgnoreFields1: 1,
+                propertyIgnoredInDiffIgnoreFields2: 1);
+        def right = new DummyUser("name":"a", propertyIgnoredInDiffIgnoreFields1: 2, propertyIgnoredInDiffIgnoreFields2: 2);
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 0
+    }
+
     class Foo {
         Bar bar
         BarBar barBar
