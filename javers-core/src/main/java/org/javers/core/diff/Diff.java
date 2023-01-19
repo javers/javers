@@ -84,7 +84,7 @@ public class Diff implements Serializable {
      * @since 3.9
      */
     public List<ChangesByObject> groupByObject() {
-        return new Changes(changes, valuePrinter).groupByObject();
+       return new Changes(changes, valuePrinter).groupByObject();
     }
 
     /**
