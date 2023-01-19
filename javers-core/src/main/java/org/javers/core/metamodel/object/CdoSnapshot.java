@@ -178,7 +178,7 @@ public final class CdoSnapshot extends Cdo {
                 .append("Snapshot{commit:").append(getCommitMetadata().getId()).append(", ")
                 .append("id:").append(getGlobalId()).append(", ")
                 .append("version:").append(getVersion()).append(", ")
-                .append("state:").append(getState()).append("}");
+                .append("state:" + getState()+"}");
         return stringBuilder.toString();
     }
 
