@@ -84,7 +84,7 @@ public class Diff implements Serializable {
      * @since 3.9
      */
     public List<ChangesByObject> groupByObject() {
-       return new Changes(changes, valuePrinter).groupByObject();
+        return new Changes(changes, valuePrinter).groupByObject();
     }
 
     /**
@@ -135,7 +135,7 @@ public class Diff implements Serializable {
 
         b.append("changes - ");
         for (Map.Entry<Class<? extends Change>, Integer> e : countByType().entrySet()){
-            b.append(String.format("%s:%s ",e.getKey().getSimpleName(), e.getValue()));
+            b.append(e.getKey().getSimpleName()+ ":"+e.getValue()+" ");
         }
         return b.toString().trim();
     }

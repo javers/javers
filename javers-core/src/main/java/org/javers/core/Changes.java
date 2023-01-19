@@ -83,7 +83,7 @@ public class Changes extends AbstractList<Change> implements Serializable {
 
         Map<CommitMetadata, List<Change>> changesByCommit = changes.stream().collect(
                 groupingBy(c -> c.getCommitMetadata().orElseThrow( () -> new IllegalStateException("No CommitMetadata in this Change")),
-                           () -> new LinkedHashMap<>(), toList()));
+                        () -> new LinkedHashMap<>(), toList()));
 
         List<ChangesByCommit> result = new ArrayList<>();
         changesByCommit.forEach((k,v) -> {
@@ -237,13 +237,13 @@ public class Changes extends AbstractList<Change> implements Serializable {
      */
     public String devPrint() {
         StringBuilder b = new StringBuilder();
-        b.append("Changes (").append(size()).append("):\n");
+        b.append("Changes ("+size()+"):\n");
 
         groupByCommit().forEach(byCommit -> {
-            b.append("commit ").append(byCommit.getCommit().getId()).append(" \n");
+            b.append("commit " + byCommit.getCommit().getId() + " \n");
             byCommit.groupByObject().forEach(byObject -> {
-                b.append("* changes on ").append(byObject.getGlobalId().value()).append(" :\n");
-                byObject.get().forEach(change -> b.append("  - ").append(change).append(" \n"));
+                b.append("* changes on " + byObject.getGlobalId().value() + " :\n");
+                byObject.get().forEach(change -> b.append("  - " + change + " \n"));
             });
         });
 
