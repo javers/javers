@@ -67,9 +67,9 @@ public abstract class KeyValueChange<T> extends PropertyChange<T> {
         Validate.argumentIsNotNull(valuePrinter);
         StringBuilder builder = new StringBuilder();
 
-        builder.append(valuePrinter.formatWithQuotes(getPropertyNameWithPath())).append(" map changes :\n");
+        builder.append(valuePrinter.formatWithQuotes(getPropertyNameWithPath()) + " map changes :\n");
 
-        changes.forEach(cc -> builder.append("   ").append(cc.prettyPrint(valuePrinter)).append("\n"));
+        changes.forEach(cc -> builder.append("   " + cc.prettyPrint(valuePrinter)+"\n"));
 
         String result = builder.toString();
         return result.substring(0, result.length() - 1);
