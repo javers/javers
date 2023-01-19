@@ -78,9 +78,9 @@ public abstract class ContainerChange<T> extends PropertyChange<T> {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append(valuePrinter.formatWithQuotes(getPropertyNameWithPath())).append(" collection changes :\n");
+        builder.append(valuePrinter.formatWithQuotes(getPropertyNameWithPath()) + " collection changes :\n");
 
-        changes.forEach(cc -> builder.append("   ").append(cc.prettyPrint(valuePrinter)).append("\n"));
+        changes.forEach(cc -> builder.append("   " + cc.prettyPrint(valuePrinter)+"\n"));
 
         String result = builder.toString();
         return result.substring(0, result.length() - 1);
