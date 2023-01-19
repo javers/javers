@@ -83,7 +83,7 @@ public class Changes extends AbstractList<Change> implements Serializable {
 
         Map<CommitMetadata, List<Change>> changesByCommit = changes.stream().collect(
                 groupingBy(c -> c.getCommitMetadata().orElseThrow( () -> new IllegalStateException("No CommitMetadata in this Change")),
-                        () -> new LinkedHashMap<>(), toList()));
+                           () -> new LinkedHashMap<>(), toList()));
 
         List<ChangesByCommit> result = new ArrayList<>();
         changesByCommit.forEach((k,v) -> {
