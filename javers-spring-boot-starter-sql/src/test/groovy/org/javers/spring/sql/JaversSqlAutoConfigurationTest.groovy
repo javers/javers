@@ -42,7 +42,7 @@ class JaversSqlAutoConfigurationTest extends Specification {
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
        !javers.coreConfiguration.usePrimitiveDefaults
 
-        javersProperties.typeSafeValues
+        javersProperties.isTypeSafeValues()
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"
        !javersProperties.auditableAspectEnabled
        !javersProperties.springDataAuditableRepositoryAspectEnabled
