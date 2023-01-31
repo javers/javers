@@ -153,7 +153,7 @@ nexusPublishing {
             password = project.findProperty('nexusPassword') ?: 'secured'
         }
     }
-    //noinspection GroovyAssignabilityCheck
+    // noinspection GroovyAssignabilityCheck
     transitionCheckOptions {
         maxRetries.set(50)
         delayBetween.set(Duration.ofSeconds(5))
