@@ -16,12 +16,15 @@ class MongoRepositoryConfiguration {
     private final String headCollectionName;
     private final Integer cacheSize;
     private final MongoDialect mongoDialect;
+    private final boolean schemaManagementEnabled;
 
-    MongoRepositoryConfiguration(String snapshotCollectionName, String headCollectionName, Integer cacheSize, MongoDialect mongoDialect) {
+    MongoRepositoryConfiguration(String snapshotCollectionName, String headCollectionName, Integer cacheSize,
+                                 MongoDialect mongoDialect, boolean schemaManagementEnabled) {
         this.snapshotCollectionName = snapshotCollectionName;
         this.headCollectionName = headCollectionName;
         this.cacheSize = cacheSize;
         this.mongoDialect = mongoDialect;
+        this.schemaManagementEnabled = schemaManagementEnabled;
     }
 
     String getSnapshotCollectionName() {
@@ -38,5 +41,9 @@ class MongoRepositoryConfiguration {
 
     MongoDialect getMongoDialect() {
         return Optional.ofNullable(mongoDialect).orElse(DEFAULT_MONGO_DIALECT);
+    }
+
+    boolean isSchemaManagementEnabled() {
+        return schemaManagementEnabled;
     }
 }
