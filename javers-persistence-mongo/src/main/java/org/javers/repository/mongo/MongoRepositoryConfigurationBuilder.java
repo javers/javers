@@ -8,6 +8,7 @@ public class MongoRepositoryConfigurationBuilder {
     private String headCollectionName;
     private Integer cacheSize;
     private MongoDialect dialect;
+    private boolean schemaManagementEnabled = true;
 
     public static MongoRepositoryConfigurationBuilder mongoRepositoryConfiguration() {
         return new MongoRepositoryConfigurationBuilder();
@@ -39,7 +40,12 @@ public class MongoRepositoryConfigurationBuilder {
         return this;
     }
 
+    public MongoRepositoryConfigurationBuilder withSchemaManagementEnabled(boolean schemaManagementEnabled) {
+        this.schemaManagementEnabled = schemaManagementEnabled;
+        return this;
+    }
+
     public MongoRepositoryConfiguration build() {
-        return new MongoRepositoryConfiguration(snapshotCollectionName, headCollectionName, cacheSize, dialect);
+        return new MongoRepositoryConfiguration(snapshotCollectionName, headCollectionName, cacheSize, dialect, schemaManagementEnabled);
     }
 }
