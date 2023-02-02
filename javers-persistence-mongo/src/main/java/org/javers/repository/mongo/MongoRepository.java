@@ -46,6 +46,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
     private final LatestSnapshotCache cache;
     private MongoDialect mongoDialect;
+    private final boolean schemaManagementEnabled;
 
     public MongoRepository(MongoDatabase mongo) {
         this(mongo, mongoRepositoryConfiguration().build());
@@ -83,9 +84,11 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         Validate.argumentsAreNotNull(mongo);
         this.mongoDialect = mongoRepositoryConfiguration.getMongoDialect();
         this.mongoSchemaManager = new MongoSchemaManager(
-            mongo, mongoRepositoryConfiguration.getSnapshotCollectionName(), mongoRepositoryConfiguration.getHeadCollectionName());
+            mongo, mongoRepositoryConfiguration.getSnapshotCollectionName(),
+            mongoRepositoryConfiguration.getHeadCollectionName());
         int cacheSize = mongoRepositoryConfiguration.getCacheSize();
         this.cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
+        this.schemaManagementEnabled = mongoRepositoryConfiguration.isSchemaManagementEnabled();
     }
 
     @Override
@@ -168,7 +171,9 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
     @Override
     public void ensureSchema() {
-        mongoSchemaManager.ensureSchema(mongoDialect);
+        if(schemaManagementEnabled) {
+            mongoSchemaManager.ensureSchema(mongoDialect);
+        }
     }
 
     private Bson createIdQuery(GlobalId id) {
