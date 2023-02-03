@@ -15,10 +15,10 @@ public class DialectMapper {
         if (hibernateDialect instanceof H2Dialect){
             return DialectName.H2;
         }
-        if (hibernateDialect instanceof Oracle8iDialect){
+        if (hibernateDialect instanceof OracleDialect){
             return DialectName.ORACLE;
         }
-        if (hibernateDialect instanceof PostgreSQL81Dialect){
+        if (hibernateDialect instanceof PostgreSQLDialect){
             return DialectName.POSTGRES;
         }
         if (hibernateDialect instanceof MySQLDialect){
