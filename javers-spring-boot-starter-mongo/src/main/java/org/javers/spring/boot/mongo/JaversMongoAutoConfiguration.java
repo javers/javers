@@ -38,7 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.javers.repository.mongo.MongoDialect.DOCUMENT_DB;
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
+import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mongoRepositoryConfiguration;
 
 /**
  * @author pawelszymczyk
@@ -96,9 +98,22 @@ public class JaversMongoAutoConfiguration {
     private MongoRepository createMongoRepository(MongoDatabase mongoDatabase) {
         if (javersMongoProperties.isDocumentDbCompatibilityEnabled()) {
             logger.info("enabling Amazon DocumentDB compatibility");
-            return mongoRepositoryWithDocumentDBCompatibility(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
+
+            return new MongoRepository(
+                mongoDatabase,
+                mongoRepositoryConfiguration()
+                    .withDialect(DOCUMENT_DB)
+                    .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled())
+                    .withCacheSize(javersMongoProperties.getSnapshotsCacheSize())
+                    .build());
         }
-        return new MongoRepository(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
+
+        return new MongoRepository(
+            mongoDatabase,
+            mongoRepositoryConfiguration()
+                .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled())
+                .withCacheSize(javersMongoProperties.getSnapshotsCacheSize())
+                .build());
     }
 
     private MongoDatabase initJaversMongoDatabase() {
