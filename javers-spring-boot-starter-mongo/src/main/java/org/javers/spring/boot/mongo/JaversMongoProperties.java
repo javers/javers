@@ -11,12 +11,22 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class JaversMongoProperties extends JaversSpringProperties {
     private static final String DEFAULT_OBJECT_ACCESS_HOOK = DBRefUnproxyObjectAccessHook.class.getName();
 
+    private boolean schemaManagementEnabled = true;
+
     private boolean documentDbCompatibilityEnabled = false;
 
     // Set 0 to disable.
     private int snapshotsCacheSize = 5000;
 
     private Mongodb mongodb;
+
+    public boolean isSchemaManagementEnabled() {
+        return schemaManagementEnabled;
+    }
+
+    public void setSchemaManagementEnabled(boolean schemaManagementEnabled) {
+        this.schemaManagementEnabled = schemaManagementEnabled;
+    }
 
     public boolean isDocumentDbCompatibilityEnabled() {
         return documentDbCompatibilityEnabled;

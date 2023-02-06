@@ -44,6 +44,8 @@ class JaversMongoStarterDefaultsTest extends BaseSpecification{
         javersProperties.objectAccessHook == "org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook"
        !javersProperties.mongodb
         javersProperties.snapshotsCacheSize == 5000
+
+        javersProperties.schemaManagementEnabled
     }
 
     def "should connect to Mongo configured in spring.data.mongodb properties"(){
