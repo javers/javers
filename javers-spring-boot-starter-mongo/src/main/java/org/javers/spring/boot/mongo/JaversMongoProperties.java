@@ -13,6 +13,10 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     private boolean schemaManagementEnabled = true;
 
+    private String snapshotCollectionName;
+
+    private String headCollectionName;
+
     private boolean documentDbCompatibilityEnabled = false;
 
     // Set 0 to disable.
@@ -26,6 +30,22 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     public void setSchemaManagementEnabled(boolean schemaManagementEnabled) {
         this.schemaManagementEnabled = schemaManagementEnabled;
+    }
+
+    public String getSnapshotCollectionName() {
+        return snapshotCollectionName;
+    }
+
+    public void setSnapshotCollectionName(final String snapshotCollectionName) {
+        this.snapshotCollectionName = snapshotCollectionName;
+    }
+
+    public String getHeadCollectionName() {
+        return headCollectionName;
+    }
+
+    public void setHeadCollectionName(final String headCollectionName) {
+        this.headCollectionName = headCollectionName;
     }
 
     public boolean isDocumentDbCompatibilityEnabled() {
