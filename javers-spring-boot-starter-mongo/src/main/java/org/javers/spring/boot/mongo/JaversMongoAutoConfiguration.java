@@ -102,18 +102,24 @@ public class JaversMongoAutoConfiguration {
             return new MongoRepository(
                 mongoDatabase,
                 mongoRepositoryConfiguration()
+                    .withSnapshotCollectionName(javersMongoProperties.getSnapshotCollectionName())
+                    .withHeadCollectionName(javersMongoProperties.getHeadCollectionName())
+                    .withCacheSize(javersMongoProperties.getSnapshotsCacheSize())
                     .withDialect(DOCUMENT_DB)
                     .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled())
-                    .withCacheSize(javersMongoProperties.getSnapshotsCacheSize())
-                    .build());
+                    .build()
+            );
         }
 
         return new MongoRepository(
             mongoDatabase,
             mongoRepositoryConfiguration()
-                .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled())
+                .withSnapshotCollectionName(javersMongoProperties.getSnapshotCollectionName())
+                .withHeadCollectionName(javersMongoProperties.getHeadCollectionName())
                 .withCacheSize(javersMongoProperties.getSnapshotsCacheSize())
-                .build());
+                .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled())
+                .build()
+        );
     }
 
     private MongoDatabase initJaversMongoDatabase() {
