@@ -10,6 +10,9 @@ javers:
   documentDbCompatibilityEnabled: true
   objectAccessHook: org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook
   snapshotsCacheSize: 100
+  snapshotCollectionName: "jv_custom_snapshots"
+  headCollectionName: "jv_custom_head_id"
+  schemaManagementEnabled: false
   asyncCommitExecutorThreadCount: 1
   auditableAspectEnabled: false
   springDataAuditableRepositoryAspectEnabled: false

@@ -52,6 +52,9 @@ class JaversMongoStarterTest extends BaseSpecification {
 
         javersProperties.objectAccessHook == "org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook"
         javersProperties.snapshotsCacheSize == 100
+        !javersProperties.schemaManagementEnabled
+        javersProperties.snapshotCollectionName == "jv_custom_snapshots"
+        javersProperties.headCollectionName == "jv_custom_head_id"
     }
 
     def "should scan given packages for classes with @TypeName"() {
