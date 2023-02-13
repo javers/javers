@@ -13,6 +13,8 @@ public enum DialectName {
     POSTGRES,
     ORACLE,
     MYSQL,
+    DB2,
+    DB2400,
 
     /** Microsoft SQL Server*/
     MSSQL;
