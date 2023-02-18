@@ -11,13 +11,6 @@ import static PropertyScanAssert.assertThat
  */
 class FieldBasedScannerTest extends PropertyScannerTest {
 
-    @DiffIgnoreProperties(["field1", "field2"])
-    class EntityWithFieldIgnoredInList extends JaversEntity {
-        String field1;
-        String field2;
-        String field3;
-    }
-
     def setupSpec() {
         propertyScanner = new FieldBasedPropertyScanner(new AnnotationNamesProvider())
     }
@@ -28,6 +21,13 @@ class FieldBasedScannerTest extends PropertyScannerTest {
 
         then:
         assertThat(properties).hasntGotProperty("someTransientField")
+    }
+
+    @DiffIgnoreProperties(["field1", "field2"])
+    class EntityWithFieldIgnoredInList extends JaversEntity {
+        String field1
+        String field2
+        String field3
     }
 
     def "should ignore multiple fields by @DiffIgnoreFields"() {
