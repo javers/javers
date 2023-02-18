@@ -2,6 +2,7 @@ package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Sets;
 import org.javers.common.reflection.JaversMember;
+import org.javers.core.metamodel.annotation.DiffIgnoreProperties;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
@@ -24,7 +25,8 @@ abstract class PropertyScanner {
     public PropertyScan scan(Class<?> managedClass, boolean ignoreDeclaredProperties) {
         List<Property> properties = new ArrayList<>();
         for (JaversMember member : getMembers(managedClass)) {
-            boolean isIgnoredInType = isIgnoredInType(managedClass, member, ignoreDeclaredProperties);
+            boolean isIgnoredInType = isIgnoredInIgnoreDeclaredProperties(managedClass, member, ignoreDeclaredProperties) ||
+                    isIgnoredInDiffIgnoreProperties(managedClass, member);
             boolean hasTransientAnn = annotationNamesProvider.hasTransientPropertyAnn(member.getAnnotationTypes());
             boolean hasShallowReferenceAnn = annotationNamesProvider.hasShallowReferenceAnn(member.getAnnotationTypes());
             boolean hasIncludeAnn = annotationNamesProvider.hasDiffIncludeAnn(member.getAnnotationTypes());
@@ -41,25 +43,16 @@ abstract class PropertyScanner {
         return scan(managedClass, false);
     }
 
-    /**
-     * Checks if the provided member is marked as ignored on managed type level.
-     *
-     * @param managedClass             managed type to scan
-     * @param member                   target member
-     * @param ignoreDeclaredProperties should ignore all properties
-     */
-    private boolean isIgnoredInType(Class<?> managedClass, JaversMember member, boolean ignoreDeclaredProperties) {
-        return ignoreDeclaredProperties && member.getDeclaringClass().equals(managedClass) || isMemberInIgnoreList(member, managedClass);
+
+    private boolean isIgnoredInIgnoreDeclaredProperties(Class<?> managedClass, JaversMember member, boolean ignoreDeclaredProperties) {
+        return ignoreDeclaredProperties && member.getDeclaringClass().equals(managedClass);
     }
 
     /**
-     * Checks if provided member is marked to be ignored by the {@see DiffIncludeFields} annotation.
-     *
-     * @param member       target member
-     * @param managedClass managed type to scan
+     * Checks if a given member is marked to be ignored by the {@link DiffIgnoreProperties}
      */
-    private boolean isMemberInIgnoreList(JaversMember member, Class<?> managedClass) {
-        return annotationNamesProvider.hasIgnoreFieldsAnn(managedClass)
-                && annotationNamesProvider.getIgnoreFieldsAnnValue(Sets.asSet(managedClass.getAnnotations())).contains(member.getRawMember().getName());
+    private boolean isIgnoredInDiffIgnoreProperties(Class<?> managedClass, JaversMember member) {
+        return annotationNamesProvider.hasIgnorePropertiesAnn(managedClass)
+                && annotationNamesProvider.getIgnoreFieldsAnnValue(Sets.asSet(managedClass.getAnnotations())).contains(member.name());
     }
 }
