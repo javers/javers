@@ -1,18 +1,16 @@
 package org.javers.core.model
 
 import org.javers.core.metamodel.annotation.DiffIgnore
-import org.javers.core.metamodel.annotation.DiffIgnoreFields
 
-import java.time.LocalDateTime
 import javax.persistence.Id
 import javax.persistence.Transient
+import java.time.LocalDateTime
 
 /**
  * @author bartosz walacik
  */
-@DiffIgnoreFields(["propertyIgnoredInDiffIgnoreFields1", "propertyIgnoredInDiffIgnoreFields2"])
 class DummyUser extends AbstractDummyUser {
-    public enum Sex {FEMALE, MALE, OCCASIONALLY}
+    enum Sex {FEMALE, MALE, OCCASIONALLY}
 
     transient int someTransientField
 
@@ -21,9 +19,6 @@ class DummyUser extends AbstractDummyUser {
 
     @DiffIgnore
     int propertyWithDiffIgnoreAnn
-
-    int propertyIgnoredInDiffIgnoreFields1;
-    int propertyIgnoredInDiffIgnoreFields2;
 
     DummyIgnoredType propertyWithDiffIgnoredType
     IgnoredSubType propertyWithDiffIgnoredSubtype
