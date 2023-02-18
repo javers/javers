@@ -5,10 +5,7 @@ import org.javers.common.collections.Sets;
 import org.javers.common.reflection.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author bartosz walacik
@@ -54,23 +51,19 @@ class AnnotationNamesProvider {
     }
 
     /**
-     * Checks if provided class has {@code JaversAnnotationsNameSpace.DIFF_IGNORE_FIELDS_ANN} present.
-     *
-     * @param type class to scan
+     * Checks if a given class has DIFF_IGNORE_PROPERTIES_ANN
      */
-    boolean hasIgnoreFieldsAnn(Class<?> type) {
-        return type.isAnnotationPresent(JaversAnnotationsNameSpace.DIFF_IGNORE_FIELDS_ANN);
+    boolean hasIgnorePropertiesAnn(Class<?> type) {
+        return type.isAnnotationPresent(JaversAnnotationsNameSpace.DIFF_IGNORE_PROPERTIES_ANN);
     }
 
     /**
-     * Finds {@code JaversAnnotationsNameSpace.DIFF_IGNORE_FIELDS_ANN} and return a set of property names from configured in the annotation.
-     *
-     * @param annotations annotation set
+     * Finds DIFF_IGNORE_PROPERTIES_ANN and returns a set of property names from the annotation
      */
     Set<String> getIgnoreFieldsAnnValue(Set<Annotation> annotations) {
-        return Sets.asSet(findAnnotation(annotations, JaversAnnotationsNameSpace.DIFF_IGNORE_FIELDS_ANN, new HashSet<>())
-                .map(an -> (String[]) ReflectionUtil.getAnnotationValue(an, "value"))
-                .orElseGet(() -> new String[0]));
+        return findAnnotation(annotations, JaversAnnotationsNameSpace.DIFF_IGNORE_PROPERTIES_ANN, new HashSet<>())
+                .map(an -> Sets.asSet((String[]) ReflectionUtil.getAnnotationValue(an, "value")))
+                .orElseGet(() -> Collections.emptySet());
     }
 
     boolean hasDiffIncludeAnn(Set<Class<? extends Annotation>> annTypes) {
