@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.scanner
 
-import org.javers.core.metamodel.annotation.DiffIgnoreFields
+import org.javers.core.metamodel.annotation.DiffIgnoreProperties
 import org.javers.core.metamodel.clazz.JaversEntity
 import org.javers.core.model.DummyUser
 
@@ -11,7 +11,7 @@ import static PropertyScanAssert.assertThat
  */
 class FieldBasedScannerTest extends PropertyScannerTest {
 
-    @DiffIgnoreFields(["field1", "field2"])
+    @DiffIgnoreProperties(["field1", "field2"])
     class EntityWithFieldIgnoredInList extends JaversEntity {
         String field1;
         String field2;
