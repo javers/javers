@@ -39,10 +39,12 @@ public class MongoSchemaManager {
 
     private final MongoDatabase mongo;
     private final String snapshotCollectionName;
+    private final String headCollectionName;
 
-    MongoSchemaManager(MongoDatabase mongo, String snapshotCollectionName) {
+    MongoSchemaManager(MongoDatabase mongo, String snapshotCollectionName, String headCollectionName) {
         this.mongo = mongo;
         this.snapshotCollectionName = snapshotCollectionName;
+        this.headCollectionName = headCollectionName;
     }
 
     public void ensureSchema(MongoDialect dialect) {
@@ -94,6 +96,6 @@ public class MongoSchemaManager {
     }
 
     MongoCollection<Document> headCollection() {
-        return mongo.getCollection(MongoHeadId.COLLECTION_NAME);
+        return mongo.getCollection(headCollectionName);
     }
 }

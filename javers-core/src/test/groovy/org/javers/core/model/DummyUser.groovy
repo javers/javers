@@ -1,15 +1,16 @@
 package org.javers.core.model
 
 import org.javers.core.metamodel.annotation.DiffIgnore
-import java.time.LocalDateTime
+
 import javax.persistence.Id
 import javax.persistence.Transient
+import java.time.LocalDateTime
 
 /**
  * @author bartosz walacik
  */
 class DummyUser extends AbstractDummyUser {
-    public enum Sex {FEMALE, MALE, OCCASIONALLY}
+    enum Sex {FEMALE, MALE, OCCASIONALLY}
 
     transient int someTransientField
 

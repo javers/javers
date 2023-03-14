@@ -38,7 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.javers.repository.mongo.MongoDialect.DOCUMENT_DB;
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
+import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mongoRepositoryConfiguration;
 
 /**
  * @author pawelszymczyk
@@ -96,9 +98,28 @@ public class JaversMongoAutoConfiguration {
     private MongoRepository createMongoRepository(MongoDatabase mongoDatabase) {
         if (javersMongoProperties.isDocumentDbCompatibilityEnabled()) {
             logger.info("enabling Amazon DocumentDB compatibility");
-            return mongoRepositoryWithDocumentDBCompatibility(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
+
+            return new MongoRepository(
+                mongoDatabase,
+                mongoRepositoryConfiguration()
+                    .withSnapshotCollectionName(javersMongoProperties.getSnapshotCollectionName())
+                    .withHeadCollectionName(javersMongoProperties.getHeadCollectionName())
+                    .withCacheSize(javersMongoProperties.getSnapshotsCacheSize())
+                    .withDialect(DOCUMENT_DB)
+                    .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled())
+                    .build()
+            );
         }
-        return new MongoRepository(mongoDatabase, javersMongoProperties.getSnapshotsCacheSize());
+
+        return new MongoRepository(
+            mongoDatabase,
+            mongoRepositoryConfiguration()
+                .withSnapshotCollectionName(javersMongoProperties.getSnapshotCollectionName())
+                .withHeadCollectionName(javersMongoProperties.getHeadCollectionName())
+                .withCacheSize(javersMongoProperties.getSnapshotsCacheSize())
+                .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled())
+                .build()
+        );
     }
 
     private MongoDatabase initJaversMongoDatabase() {
