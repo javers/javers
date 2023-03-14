@@ -1,5 +1,7 @@
 package org.javers.repository.sql;
 
+import org.javers.repository.sql.codecs.CdoSnapshotStateCodec;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -13,6 +15,11 @@ public class H2RepositoryBuilder {
 
     public H2RepositoryBuilder() {
         sqlRepository = SqlRepositoryBuilder.sqlRepository();
+    }
+
+    public H2RepositoryBuilder withCdoSnapshotStateCodec(CdoSnapshotStateCodec cdoSnapshotStateCodec) {
+        sqlRepository.withCdoSnapshotStateCodec(cdoSnapshotStateCodec);
+        return this;
     }
 
     public JaversSqlRepository build() {
