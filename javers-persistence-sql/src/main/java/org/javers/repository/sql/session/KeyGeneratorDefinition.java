@@ -1,5 +1,7 @@
 package org.javers.repository.sql.session;
 
+import org.javers.repository.sql.KeyGenerator;
+
 interface KeyGeneratorDefinition {
 
     KeyGenerator createKeyGenerator();
@@ -13,7 +15,7 @@ interface KeyGeneratorDefinition {
 
         @Override
         default KeyGenerator createKeyGenerator() {
-            return new KeyGenerator.SequenceAllocation(this);
+            return new SequenceAllocation(this);
         }
     }
 
@@ -22,7 +24,7 @@ interface KeyGeneratorDefinition {
 
         @Override
         default KeyGenerator createKeyGenerator() {
-            return new KeyGenerator.AutoincrementGenerator(this);
+            return new AutoincrementGenerator(this);
         }
     }
 }

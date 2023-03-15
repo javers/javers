@@ -8,9 +8,6 @@ import org.polyjdbc.core.PolyJDBCBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import static org.javers.common.string.Strings.isNonEmpty;
 
 /**
@@ -21,6 +18,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     private DialectName dialectName;
     private ConnectionProvider connectionProvider;
+    private KeyGenerator keyGenerator;
 
     private String schemaName;
     private boolean globalIdCacheDisabled;
@@ -45,6 +43,15 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     public SqlRepositoryBuilder withConnectionProvider(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
+        return this;
+    }
+
+    /**
+     * Provides a KeyGenerator. If keyGenerator is null, the keyGenerator is taken from the Dialect
+     *
+     */
+    public SqlRepositoryBuilder withKeyGenerator(KeyGenerator keyGenerator) {
+        this.keyGenerator = keyGenerator;
         return this;
     }
 
@@ -119,7 +126,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
                 .usingManagedConnections(() -> connectionProvider.getConnection()).build();
 
-        SessionFactory sessionFactory = new SessionFactory(dialectName, connectionProvider);
+        SessionFactory sessionFactory = new SessionFactory(dialectName, connectionProvider, keyGenerator);
 
         addComponent(polyJDBC);
         addComponent(sessionFactory);

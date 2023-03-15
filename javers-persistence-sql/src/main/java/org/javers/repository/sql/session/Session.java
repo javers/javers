@@ -4,7 +4,7 @@ import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
-import org.javers.repository.sql.session.KeyGenerator.SequenceAllocation;
+import org.javers.repository.sql.KeyGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,12 +23,18 @@ public class Session implements AutoCloseable {
     private final ConnectionProvider connectionProvider;
     private final String sessionName;
     private final KeyGenerator keyGenerator;
+    private final KeyGenerator fallbackKeyGenerator;
 
-    Session(Dialect dialect, KeyGenerator keyGenerator, ConnectionProvider connectionProvider, String sessionName) {
+    Session(Dialect dialect,
+            KeyGenerator keyGenerator,
+            KeyGenerator fallbackKeyGenerator,
+            ConnectionProvider connectionProvider,
+            String sessionName) {
         this.dialect = dialect;
         this.connectionProvider = connectionProvider;
         this.sessionName = sessionName;
         this.keyGenerator = keyGenerator;
+        this.fallbackKeyGenerator = fallbackKeyGenerator;
     }
 
     public SelectBuilder select(String selectClauseSQL) {
@@ -42,8 +48,19 @@ public class Session implements AutoCloseable {
     long executeInsertAndGetSequence(String queryName, List<Parameter> parameters, String tableName, String primaryKeyFieldName, String sequenceName) {
         Validate.argumentsAreNotNull(queryName, parameters, tableName, primaryKeyFieldName, sequenceName);
 
-        if (dialect.supportsSequences()) {
+        if (keyGenerator != null) {
             long newId = keyGenerator.generateKey(sequenceName, this);
+
+            Insert insertQuery = new Insert(
+                    queryName,
+                    Lists.add(parameters, new Parameter.LongParameter(primaryKeyFieldName, newId)),
+                    tableName);
+
+            execute(insertQuery);
+            return newId;
+        }
+        if (dialect.supportsSequences()) {
+            long newId = fallbackKeyGenerator.generateKey(sequenceName, this);
 
             Insert insertQuery = new Insert(
                     queryName,
@@ -58,27 +75,33 @@ public class Session implements AutoCloseable {
 
             execute(insertQuery);
 
-            return keyGenerator.getKeyFromLastInsert(this);
+            return fallbackKeyGenerator.getKeyFromLastInsert(this);
         }
     }
 
     void executeInsert(String queryName, List<Parameter> parameters, String tableName, String primaryKeyFieldName, String sequenceName) {
         Validate.argumentsAreNotNull(queryName, parameters, tableName);
 
-        if (dialect.supportsSequences() && sequenceName != null) {
-            String nextFromSequenceExpression = ((SequenceAllocation) keyGenerator).nextFromSequenceAsSQLExpression(sequenceName);
+        Insert insertQuery;
 
-            Insert insertQuery = new Insert(
+        if (keyGenerator != null){
+            insertQuery = new Insert(
+                    queryName,
+                    Lists.add(parameters, new Parameter.LongParameter(primaryKeyFieldName, keyGenerator.generateKey(sequenceName, this))),
+                    tableName);
+        }
+        else if (dialect.supportsSequences() && sequenceName != null) {
+            String nextFromSequenceExpression = ((SequenceAllocation) fallbackKeyGenerator).nextFromSequenceAsSQLExpression(sequenceName);
+
+            insertQuery = new Insert(
                     queryName,
                     Lists.add(parameters, new Parameter.InlinedParameter(primaryKeyFieldName, nextFromSequenceExpression + " * 100")),
                     tableName);
-
-            execute(insertQuery);
         }
         else {
-            Insert insertQuery = new Insert(queryName, parameters, tableName);
-            execute(insertQuery);
+            insertQuery = new Insert(queryName, parameters, tableName);
         }
+        execute(insertQuery);
     }
 
     long executeQueryForLong(Select select) {
