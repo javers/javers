@@ -6,13 +6,10 @@ import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync
 import org.javers.spring.model.DummyObject
 import org.javers.spring.repository.DummyAuditedAsyncRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.ContextConfiguration
-import spock.lang.Specification
 
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
-@ContextConfiguration(classes = [TestApplicationConfig])
-class JaversAuditableAspectAsyncIntegrationTest extends Specification {
+class JaversAuditableAspectAsyncIntegrationTest extends BaseSpecification {
 
     @Autowired
     Javers javers

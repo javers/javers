@@ -3,11 +3,8 @@ package org.javers.spring.boot.mongo
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import spock.lang.Specification
 
-@SpringBootTest(classes = [TestApplication])
-class JaversMongoStarterIntegrationTest extends Specification{
+class JaversMongoStarterIntegrationTest extends BaseSpecification {
 
     class ValueObject {
         BigDecimal value

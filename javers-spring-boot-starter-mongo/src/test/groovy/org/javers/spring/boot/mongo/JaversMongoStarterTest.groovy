@@ -8,16 +8,13 @@ import org.javers.core.metamodel.type.EntityType
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import spock.lang.Specification
 
 /**
  * @author pawelszymczyk
  */
-@SpringBootTest(classes = [TestApplication])
 @ActiveProfiles("test")
-class JaversMongoStarterTest extends Specification{
+class JaversMongoStarterTest extends BaseSpecification {
 
     @Autowired
     Javers javers
@@ -55,6 +52,9 @@ class JaversMongoStarterTest extends Specification{
 
         javersProperties.objectAccessHook == "org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook"
         javersProperties.snapshotsCacheSize == 100
+        !javersProperties.schemaManagementEnabled
+        javersProperties.snapshotCollectionName == "jv_custom_snapshots"
+        javersProperties.headCollectionName == "jv_custom_head_id"
     }
 
     def "should scan given packages for classes with @TypeName"() {

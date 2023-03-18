@@ -6,7 +6,7 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.metamodel.annotation.Entity;
 import org.javers.core.metamodel.annotation.Id;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.repository.sql.H2RepositoryFactory;
+import org.javers.repository.sql.H2RepositoryBuilder;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -40,7 +40,7 @@ public class Case249GenericId {
     public void shouldCommitEntityWithSerializableId() {
         //given
         Javers javers = JaversBuilder.javers().
-                registerJaversRepository(H2RepositoryFactory.create()).build();
+                registerJaversRepository(new H2RepositoryBuilder().build()).build();
 
         //when
         Account acc = new Account("1","2");

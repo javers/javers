@@ -5,13 +5,12 @@ javadoc {
 dependencies {
     api project(':javers-spring')
     api project(':javers-persistence-mongo')
-    implementation "org.mongodb:mongodb-driver-legacy:$mongoDbDriverVersion"
+    implementation "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
 
     springImplementation "org.springframework.data:spring-data-mongodb:$springDataMongoVersion"
 
-    testCompile "org.springframework:spring-test:$springVersion"
-    testCompile "org.spockframework:spock-spring:$spockVersion"
-    testCompile project(path: ":javers-spring", configuration: "testArtifacts")
-    testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
-    testCompile "com.google.guava:guava:$guavaVersion"
+    testImplementation "org.springframework:spring-test:$springVersion"
+    testImplementation "org.spockframework:spock-spring:$spockVersion"
+    testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
+    testImplementation "com.google.guava:guava:$guavaVersion"
 }

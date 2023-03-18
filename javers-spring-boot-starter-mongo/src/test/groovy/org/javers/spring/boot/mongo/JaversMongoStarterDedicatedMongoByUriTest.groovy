@@ -1,15 +1,22 @@
 package org.javers.spring.boot.mongo
 
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 
-@SpringBootTest(classes = [TestApplication])
-@ActiveProfiles("dedicated-mongo-uri")
 class JaversMongoStarterDedicatedMongoByUriTest extends JaversMongoStarterDedicatedMongoTest {
 
-    def "should read dedicated mongo configuration from URI"(){
+    @Autowired
+    JaversMongoProperties javersProperties
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("javers.mongodb.uri", () -> "mongodb://localhost:$mongoPort/javers-dedicated")
+    }
+
+    def "should read dedicated mongo configuration from javers Spring config URI property"(){
         expect:
         javersProperties.mongodb
-        javersProperties.mongodb.uri == "mongodb://localhost:${PORT}/javers-dedicated"
+        javersProperties.mongodb.uri == "mongodb://localhost:$mongoPort/javers-dedicated"
     }
 }

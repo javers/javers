@@ -17,16 +17,16 @@ dependencies {
     javersLegacyImplementation "joda-time:joda-time:$jodaVersion"
     javersLegacyImplementation "com.google.guava:guava:$guavaVersion"
 
-    testCompile "joda-time:joda-time:$jodaVersion"
-    testCompile "com.google.guava:guava:$guavaVersion"
-    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
-    testCompile "com.google.guava:guava:$guavaVersion"
-    testCompile "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
-    testCompile ('org.mongodb.morphia:morphia:0.108') {
+    testImplementation "joda-time:joda-time:$jodaVersion"
+    testImplementation "com.google.guava:guava:$guavaVersion"
+    testImplementation 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+    testImplementation "com.google.guava:guava:$guavaVersion"
+    testImplementation "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
+    testImplementation ('org.mongodb.morphia:morphia:0.108') {
         exclude group: 'org.mongodb', module: 'mongo-java-driver'
     }
-    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
-    testCompile 'org.codehaus.gpars:gpars:1.2.1'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
+    testImplementation 'org.codehaus.gpars:gpars:1.2.1'
 }
 
 task testJar(type: Jar) {

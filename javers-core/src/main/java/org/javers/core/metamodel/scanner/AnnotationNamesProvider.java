@@ -47,7 +47,23 @@ class AnnotationNamesProvider {
 
     boolean hasTransientPropertyAnn(Set<Class<? extends Annotation>> annTypes){
         return annTypes.contains(JaversAnnotationsNameSpace.DIFF_IGNORE_ANN) ||
-               annTypes.stream().anyMatch(annType -> transientPropertyAliases.contains(annType.getSimpleName()));
+                annTypes.stream().anyMatch(annType -> transientPropertyAliases.contains(annType.getSimpleName()));
+    }
+
+    /**
+     * Checks if a given class has DIFF_IGNORE_PROPERTIES_ANN
+     */
+    boolean hasIgnorePropertiesAnn(Class<?> type) {
+        return type.isAnnotationPresent(JaversAnnotationsNameSpace.DIFF_IGNORE_PROPERTIES_ANN);
+    }
+
+    /**
+     * Finds DIFF_IGNORE_PROPERTIES_ANN and returns a set of property names from the annotation
+     */
+    Set<String> getIgnoreFieldsAnnValue(Set<Annotation> annotations) {
+        return findAnnotation(annotations, JaversAnnotationsNameSpace.DIFF_IGNORE_PROPERTIES_ANN, new HashSet<>())
+                .map(an -> Sets.asSet((String[]) ReflectionUtil.getAnnotationValue(an, "value")))
+                .orElseGet(() -> Collections.emptySet());
     }
 
     boolean hasDiffIncludeAnn(Set<Class<? extends Annotation>> annTypes) {

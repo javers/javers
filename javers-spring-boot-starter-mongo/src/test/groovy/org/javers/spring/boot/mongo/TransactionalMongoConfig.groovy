@@ -5,8 +5,6 @@ import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.WriteConcern
 import com.mongodb.client.MongoClient
-import org.jetbrains.annotations.NotNull
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -19,9 +17,6 @@ import java.util.concurrent.TimeUnit
 @Configuration
 @Profile("TransactionalMongo")
 class TransactionalMongoConfig {
-
-    @Autowired
-    private JaversMongoProperties javersMongoProperties
 
     @Bean(destroyMethod = "stop")
     MongoDbReplicaSet mongoDbReplicaSet() {

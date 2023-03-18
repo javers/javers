@@ -7,14 +7,11 @@ import org.javers.core.MappingStyle
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.repository.jql.QueryBuilder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import spock.lang.Specification
 
 /**
  * @author pawelszymczyk
  */
-@SpringBootTest(classes = [TestApplication])
-class JaversMongoStarterDefaultsTest extends Specification{
+class JaversMongoStarterDefaultsTest extends BaseSpecification{
     static String DB_NAME = 'spring-mongo-default'
 
     @Autowired Javers javers
@@ -47,6 +44,9 @@ class JaversMongoStarterDefaultsTest extends Specification{
         javersProperties.objectAccessHook == "org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook"
        !javersProperties.mongodb
         javersProperties.snapshotsCacheSize == 5000
+        javersProperties.schemaManagementEnabled
+        javersProperties.snapshotCollectionName == null
+        javersProperties.headCollectionName == null
     }
 
     def "should connect to Mongo configured in spring.data.mongodb properties"(){

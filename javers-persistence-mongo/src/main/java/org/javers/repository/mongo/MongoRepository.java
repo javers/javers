@@ -1,8 +1,8 @@
 package org.javers.repository.mongo;
 
+import com.mongodb.client.*;
 import com.google.gson.JsonObject;
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -30,7 +30,6 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
 import static org.javers.repository.mongo.DocumentConverter.fromDocument;
 import static org.javers.repository.mongo.DocumentConverter.toDocument;
 import static org.javers.repository.mongo.MongoDialect.DOCUMENT_DB;
-import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mongoRepositoryConfiguration;
 import static org.javers.repository.mongo.MongoSchemaManager.*;
 
@@ -47,6 +46,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
     private final LatestSnapshotCache cache;
     private MongoDialect mongoDialect;
+    private final boolean schemaManagementEnabled;
 
     public MongoRepository(MongoDatabase mongo) {
         this(mongo, mongoRepositoryConfiguration().build());
@@ -83,9 +83,12 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     public MongoRepository(MongoDatabase mongo, MongoRepositoryConfiguration mongoRepositoryConfiguration) {
         Validate.argumentsAreNotNull(mongo);
         this.mongoDialect = mongoRepositoryConfiguration.getMongoDialect();
-        this.mongoSchemaManager = new MongoSchemaManager(mongo, mongoRepositoryConfiguration.getSnapshotCollectionName());
+        this.mongoSchemaManager = new MongoSchemaManager(
+            mongo, mongoRepositoryConfiguration.getSnapshotCollectionName(),
+            mongoRepositoryConfiguration.getHeadCollectionName());
         int cacheSize = mongoRepositoryConfiguration.getCacheSize();
         this.cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
+        this.schemaManagementEnabled = mongoRepositoryConfiguration.isSchemaManagementEnabled();
     }
 
     @Override
@@ -168,7 +171,9 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
     @Override
     public void ensureSchema() {
-        mongoSchemaManager.ensureSchema(mongoDialect);
+        if(schemaManagementEnabled) {
+            mongoSchemaManager.ensureSchema(mongoDialect);
+        }
     }
 
     private Bson createIdQuery(GlobalId id) {

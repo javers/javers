@@ -10,6 +10,7 @@ import org.javers.core.diff.changetype.container.ValueAdded
 import org.javers.core.examples.model.Person
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
+import org.javers.core.metamodel.annotation.DiffIgnoreProperties
 import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
@@ -412,6 +413,42 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         diff.changes.size() == 0
         javers.getTypeMapping(DummyIgnoredType) instanceof IgnoredType
         javers.getTypeMapping(IgnoredSubType) instanceof IgnoredType
+    }
+
+    @DiffIgnoreProperties(["field1", "field2", "getField1", "getField2"])
+    class ClassWithDiffIgnoreProperties {
+        @Id int name
+
+        int field1
+        int field2
+
+        int getField1() {
+            return field1
+        }
+        int getField2() {
+            return field2
+        }
+        int getName() {
+            return name
+        }
+    }
+
+    @Unroll
+    def "should ignore properties listed in @DiffIgnoreProperties in mappingStyle #mappingStyle"(){
+        given:
+        def javers = javers().withMappingStyle(mappingStyle).build()
+
+        def left =  new ClassWithDiffIgnoreProperties("name":1, field1: 1, field2: 1)
+        def right = new ClassWithDiffIgnoreProperties("name":1, field1: 2, field2: 2)
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 0
+
+        where:
+        mappingStyle << [ MappingStyle.FIELD, MappingStyle.BEAN]
     }
 
     class Foo {

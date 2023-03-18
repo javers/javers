@@ -3,16 +3,21 @@ dependencies {
     api project(':javers-spring-mongo')
     api project(':javers-persistence-mongo')
 
-    implementation "org.mongodb:mongodb-driver-legacy:$mongoDbDriverVersion"
+    implementation "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
     springImplementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     springImplementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-    testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
-    testCompile "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
-    testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
-    testCompile "org.spockframework:spock-spring:$spockVersion"
-    testCompile project(path: ":javers-persistence-mongo", configuration: "testArtifacts")
-    testCompile project(path: ":javers-spring", configuration: "testArtifacts")
-    testCompile "com.github.silaev:mongodb-replica-set:0.4.3"
+    testImplementation project(path: ":javers-spring", configuration: "testArtifacts")
+    testImplementation project(path: ":javers-persistence-mongo", configuration: "testArtifacts")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
+    testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
+    testImplementation "org.spockframework:spock-spring:$spockVersion"
+
+    testImplementation "com.github.silaev:mongodb-replica-set:0.4.3"
+    testImplementation "org.testcontainers:spock:$testcontainers"
+    testImplementation "org.testcontainers:mongodb:$testcontainers"
+
+
 }

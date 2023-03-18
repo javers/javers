@@ -28,6 +28,11 @@ class PropertyAssert {
         this
     }
 
+    PropertyAssert isNotTransient() {
+        assert !actual.hasTransientAnn
+        this
+    }
+
     PropertyAssert isIncluded() {
         assert actual.hasIncludedAnn
         this

@@ -22,6 +22,7 @@ class ClassAnnotationsScanner {
     private final AnnotationNamesProvider annotationNamesProvider;
     private List<Class<? extends Annotation>> JAVERS_TYPE_ANNOTATIONS = Lists.immutableListOf(
             DiffIgnore.class,
+            DiffIgnoreProperties.class,
             Entity.class,
             ShallowReference.class,
             ValueObject.class,
