@@ -279,6 +279,7 @@ class TypeMapperTest extends Specification {
     @Unroll
     def "should ignore all props of subclass when superclass #classType has Included properties definition"(){
         given:
+        def mapper = JaversTestBuilder.javersTestAssembly().typeMapper
         mapper.registerClientsClass(definition)
 
         when:

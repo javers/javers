@@ -35,11 +35,11 @@ public class TypeMapper implements TypeMapperLazy {
 
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 
-    public TypeMapper(ClassScanner classScanner, CoreConfiguration javersCoreConfiguration, DynamicMappingStrategy dynamicMappingStrategy) {
+    public TypeMapper(ClassScanner classScanner, @Deprecated CoreConfiguration javersCoreConfiguration, DynamicMappingStrategy dynamicMappingStrategy) {
         //Pico doesn't support cycles, so manual construction
         TypeFactory typeFactory = new TypeFactory(classScanner, this, dynamicMappingStrategy);
         this.typeFactory = typeFactory;
-        this.engine = new TypeMapperEngine(this, javersCoreConfiguration);
+        this.engine = new TypeMapperEngine(this);
     }
 
     /**
@@ -50,6 +50,17 @@ public class TypeMapper implements TypeMapperLazy {
     protected TypeMapper(TypeFactory typeFactory, TypeMapperEngine engine) {
         this.typeFactory = typeFactory;
         this.engine = engine;
+    }
+
+    /**
+     * Registers core types in the underlying TypeMapperEngine.
+     * Meant to be called by the JaversBuilder after ClientsClassDefinition(s) have been registered
+     * which may have registered custom value comparators too.
+     * In case a ClientsClassDefinition is already present, we assume that the client knew what he was doing
+     * because his ClientsClassDefinition will take precedence over whatever would have been registered as a core type.
+     */
+    public void registerCoreTypes(CoreConfiguration javersCoreConfiguration) {
+        this.engine.registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
     }
 
     /**
