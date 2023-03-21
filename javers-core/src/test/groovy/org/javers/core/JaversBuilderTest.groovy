@@ -7,6 +7,7 @@ import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.examples.typeNames.NewValueObjectWithTypeAlias
 import org.javers.core.graph.ObjectAccessHook
+import org.javers.core.metamodel.clazz.ValueObjectDefinition
 import org.javers.core.metamodel.scanner.BeanBasedPropertyScanner
 import org.javers.core.metamodel.scanner.FieldBasedPropertyScanner
 import org.javers.core.metamodel.type.EntityType
@@ -58,6 +59,18 @@ class JaversBuilderTest extends Specification {
 
         then:
         javers.getTypeMapping(DummyNetworkAddress) instanceof ValueObjectType
+    }
+
+    def "should throw when ClientsClassDefinition is registered twice"() {
+        given:
+        def javersBuilder = javers().registerType(new ValueObjectDefinition(DummyNetworkAddress))
+
+        when:
+        javersBuilder.registerType(new ValueObjectDefinition(DummyNetworkAddress))
+
+        then:
+        def e = thrown(RuntimeException)
+        e.message == "Must not overwrite existing client definition for base java class: class org.javers.core.model.DummyNetworkAddress"
     }
 
     def "should create Javers"() {

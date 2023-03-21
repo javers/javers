@@ -164,6 +164,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
         // boot add-ons modules
         Set<JaversType> additionalTypes = bootAddOns();
 
+        mapRegisteredClasses();
+
         // boot JSON beans & domain aware typeAdapters
         bootJsonConverter();
 
@@ -175,7 +177,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
         }
         typeMapper().addPluginTypes(additionalTypes);
 
-        mapRegisteredClasses();
+        // register core / well known types last in case client definitions or other modules
+        // would like to register them with different comparators, converters etc.
+        typeMapper().registerCoreTypes(coreConfiguration);
 
         bootRepository();
 
@@ -261,7 +265,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerType(ClientsClassDefinition clientsClassDefinition) {
         argumentIsNotNull(clientsClassDefinition);
-        clientsClassDefinitions.put(clientsClassDefinition.getBaseJavaClass(), clientsClassDefinition);
+        clientsClassDefinitions.compute(clientsClassDefinition.getBaseJavaClass(), (baseJavaClass, oldClientsClassDefinition) -> {
+            if (oldClientsClassDefinition != null) {
+
+                throw new RuntimeException("Must not overwrite existing client definition for base java class: " + baseJavaClass.toString());
+            }
+
+            return clientsClassDefinition;
+        });
         return this;
     }
 
@@ -548,7 +559,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerValueTypeAdapter(JsonTypeAdapter typeAdapter) {
         for (Class c : (List<Class>)typeAdapter.getValueTypes()){
-            registerValue(c);
+            if (!clientsClassDefinitions.containsKey(c)) {
+                registerValue(c);
+            }
         }
 
         jsonConverterBuilder().registerJsonTypeAdapter(typeAdapter);
@@ -574,7 +587,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @see TypeAdapter
      */
     public JaversBuilder registerValueGsonTypeAdapter(Class valueType, TypeAdapter nativeAdapter) {
-        registerValue(valueType);
+        if (!clientsClassDefinitions.containsKey(valueType)) {
+            registerValue(valueType);
+        }
         jsonConverterBuilder().registerNativeTypeAdapter(valueType, nativeAdapter);
         return this;
     }
