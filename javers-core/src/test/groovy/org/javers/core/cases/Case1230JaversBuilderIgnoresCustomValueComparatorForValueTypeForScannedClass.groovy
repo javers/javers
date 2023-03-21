@@ -11,7 +11,7 @@ import static org.javers.core.JaversBuilder.javers
 /**
  * @author catautobox
  */
-class JaversBuilderIgnoresCustomValueComparatorForValueTypeForScannedClass extends Specification {
+class Case1230JaversBuilderIgnoresCustomValueComparatorForValueTypeForScannedClass extends Specification {
 
     def "should use registered custom value comparator for value type property of scanned class"() {
         given:
