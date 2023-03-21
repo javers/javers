@@ -27,9 +27,9 @@ class TypeMapperEngine {
     private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
     private final TypeMapperLazy typeMapperlazy;
 
-    TypeMapperEngine(TypeMapperLazy typeMapperlazy, CoreConfiguration javersCoreConfiguration) {
+
+    TypeMapperEngine(TypeMapperLazy typeMapperlazy) {
         this.typeMapperlazy = typeMapperlazy;
-        this.registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
     }
 
     private void putIfAbsent(Type javaType, final JaversType jType) {
@@ -41,6 +41,7 @@ class TypeMapperEngine {
         addFullMapping(javaType, jType);
     }
 
+    @Deprecated
     private void putWithOverwrite(Type javaType, final JaversType jType) {
         Validate.argumentsAreNotNull(javaType, jType);
         addFullMapping(javaType, jType);
@@ -83,7 +84,7 @@ class TypeMapperEngine {
     }
 
     void registerExplicitType(JaversType javersType) {
-        putWithOverwrite(javersType.getBaseJavaType(), javersType);
+        putIfAbsent(javersType.getBaseJavaType(), javersType);
     }
 
     private void registerCoreType(JaversType jType) {
@@ -116,7 +117,10 @@ class TypeMapperEngine {
     private void addFullMapping(Type javaType, JaversType newType){
         Validate.argumentsAreNotNull(javaType, newType);
 
-        mappedTypes.put(javaType.toString(), newType);
+        if (mappedTypes.put(javaType.toString(), newType) != null) {
+
+            throw new RuntimeException("Must not overwrite existing mapping");
+        }
 
         if (newType instanceof ManagedType){
             ManagedType managedType = (ManagedType)newType;
