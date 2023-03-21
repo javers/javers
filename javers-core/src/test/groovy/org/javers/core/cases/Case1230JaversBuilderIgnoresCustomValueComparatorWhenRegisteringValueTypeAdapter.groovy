@@ -13,7 +13,7 @@ import static org.javers.core.JaversBuilder.javers
 /**
  * @author catautobox
  */
-class JaversBuilderIgnoresCustomValueComparatorWhenRegisteringValueTypeAdapter extends Specification {
+class Case1230JaversBuilderIgnoresCustomValueComparatorWhenRegisteringValueTypeAdapter extends Specification {
 
     def "should use registered custom comparator for value type after registering a value type adapter"() {
         given:
