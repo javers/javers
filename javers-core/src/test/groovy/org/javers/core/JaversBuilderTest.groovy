@@ -1,5 +1,7 @@
 package org.javers.core
 
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.diff.DiffFactory
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.appenders.SimpleListChangeAppender
@@ -69,8 +71,8 @@ class JaversBuilderTest extends Specification {
         javersBuilder.registerType(new ValueObjectDefinition(DummyNetworkAddress))
 
         then:
-        def e = thrown(RuntimeException)
-        e.message == "Must not overwrite existing client definition for base java class: class org.javers.core.model.DummyNetworkAddress"
+        def e = thrown(JaversException)
+        e.code == JaversExceptionCode.ATTEMPT_TO_OVERWRITE_EXISTING_CLIENT_CLASS_DEFINITION
     }
 
     def "should create Javers"() {
