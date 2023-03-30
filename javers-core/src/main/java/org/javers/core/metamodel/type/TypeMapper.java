@@ -35,7 +35,7 @@ public class TypeMapper implements TypeMapperLazy {
 
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 
-    public TypeMapper(ClassScanner classScanner, @Deprecated CoreConfiguration javersCoreConfiguration, DynamicMappingStrategy dynamicMappingStrategy) {
+    public TypeMapper(ClassScanner classScanner, DynamicMappingStrategy dynamicMappingStrategy) {
         //Pico doesn't support cycles, so manual construction
         TypeFactory typeFactory = new TypeFactory(classScanner, this, dynamicMappingStrategy);
         this.typeFactory = typeFactory;

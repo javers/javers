@@ -117,9 +117,9 @@ class TypeMapperEngine {
     private void addFullMapping(Type javaType, JaversType newType){
         Validate.argumentsAreNotNull(javaType, newType);
 
-        if (mappedTypes.put(javaType.toString(), newType) != null) {
-
-            throw new RuntimeException("Must not overwrite existing mapping");
+        JaversType existingType = mappedTypes.put(javaType.toString(), newType);
+        if (existingType != null) {
+            throw new JaversException(JaversExceptionCode.ATTEMPT_TO_OVERWRITE_EXISTING_JAVERSTYPE_MAPPING, javaType.toString(), existingType, newType);
         }
 
         if (newType instanceof ManagedType){
