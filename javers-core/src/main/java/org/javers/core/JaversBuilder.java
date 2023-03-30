@@ -5,6 +5,8 @@ import com.google.gson.TypeAdapter;
 
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.JaversCoreProperties.PrettyPrintDateFormats;
 import org.javers.core.commit.Commit;
@@ -267,10 +269,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
         argumentIsNotNull(clientsClassDefinition);
         clientsClassDefinitions.compute(clientsClassDefinition.getBaseJavaClass(), (baseJavaClass, oldClientsClassDefinition) -> {
             if (oldClientsClassDefinition != null) {
-
-                throw new RuntimeException("Must not overwrite existing client definition for base java class: " + baseJavaClass.toString());
+                throw new JaversException(JaversExceptionCode.ATTEMPT_TO_OVERWRITE_EXISTING_CLIENT_CLASS_DEFINITION, baseJavaClass.getName());
             }
-
             return clientsClassDefinition;
         });
         return this;

@@ -6,6 +6,12 @@ package org.javers.common.exception;
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public enum JaversExceptionCode {
+    ATTEMPT_TO_OVERWRITE_EXISTING_CLIENT_CLASS_DEFINITION(
+            "Attempt to overwrite existing clientsClassDefinition for java type %s"),
+
+    ATTEMPT_TO_OVERWRITE_EXISTING_JAVERSTYPE_MAPPING(
+            "Attempt to overwrite existing javersType mapping for class %s, existingType: %s, newType: %s"),
+
     WRONG_USAGE_OF_JAVERS_AUDITABLE_DELETE("" +
             "The argument '%s' you have passed to a method '%s' annotated with @JaversAuditableDelete " +
             "is not an Entity, nor a Value Object. " +
