@@ -2,19 +2,13 @@ package org.javers.core.cases;
 
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.type.EntityType;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.TokenType;
+import org.javers.core.metamodel.annotation.Id;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.shadow.Shadow;
 import org.junit.jupiter.api.Test;
-
-import javax.persistence.Id;
-import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
+
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
