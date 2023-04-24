@@ -1,13 +1,13 @@
 package org.javers.repository.mongo.cases
 
 import com.mongodb.client.MongoDatabase
+import jakarta.persistence.Id
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.repository.mongo.MongoRepository
 import org.javers.repository.mongo.BaseMongoTest
 import spock.lang.Shared
 
-import javax.persistence.Id
 
 class LargeNumberDeserializationCase extends BaseMongoTest {
   public static final long ID_ONE_BILLION = 1000000000L

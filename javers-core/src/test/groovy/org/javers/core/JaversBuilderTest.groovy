@@ -19,7 +19,7 @@ import org.javers.core.model.DummyNetworkAddress
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 import static org.fest.assertions.api.Assertions.assertThat
 import static org.javers.core.JaversBuilder.javers

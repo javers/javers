@@ -1,6 +1,6 @@
 package org.javers.hibernate.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "person")

@@ -12,7 +12,7 @@ class ContainerChangeAssert {
 
     ContainerChange actual
 
-    static assertThat = { ContainerChange actual ->
+    static ContainerChangeAssert assertThat(ContainerChange actual) {
         new ContainerChangeAssert(actual: actual)
     }
 

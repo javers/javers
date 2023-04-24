@@ -6,7 +6,7 @@ import groovy.transform.EqualsAndHashCode
 
 import java.time.LocalDate
 
-import javax.persistence.Id
+import jakarta.persistence.Id
 
 /**
  * @author bartosz walacik

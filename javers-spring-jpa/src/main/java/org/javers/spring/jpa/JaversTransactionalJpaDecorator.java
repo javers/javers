@@ -1,5 +1,6 @@
 package org.javers.spring.jpa;
 
+import jakarta.transaction.Transactional;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.Commit;
@@ -12,7 +13,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.*;
 
-import javax.transaction.Transactional;
 import java.util.Map;
 
 /**

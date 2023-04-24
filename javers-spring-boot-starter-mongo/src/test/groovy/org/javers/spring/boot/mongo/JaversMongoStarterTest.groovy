@@ -40,7 +40,7 @@ class JaversMongoStarterTest extends BaseSpecification {
         javers.coreConfiguration.commitIdGenerator == CommitIdGenerator.RANDOM
        !javers.coreConfiguration.usePrimitiveDefaults
 
-        javersProperties.typeSafeValues
+        javersProperties.isTypeSafeValues()
         javersProperties.packagesToScan == "org.javers.spring.boot"
         javersProperties.documentDbCompatibilityEnabled == true
        !javersProperties.auditableAspectEnabled

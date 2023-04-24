@@ -38,7 +38,7 @@ class JaversMongoStarterDefaultsTest extends BaseSpecification{
 
         javersProperties.auditableAspectEnabled
         javersProperties.springDataAuditableRepositoryAspectEnabled
-       !javersProperties.typeSafeValues
+       !javersProperties.isTypeSafeValues()
         javersProperties.packagesToScan == ""
        !javersProperties.documentDbCompatibilityEnabled
         javersProperties.objectAccessHook == "org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook"

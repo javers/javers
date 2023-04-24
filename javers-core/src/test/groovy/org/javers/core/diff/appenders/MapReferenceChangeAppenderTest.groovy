@@ -7,7 +7,7 @@ import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
-import static org.javers.core.diff.appenders.MapChangeAssert.getAssertThat
+import static org.javers.core.diff.appenders.MapChangeAssert.assertThat
 import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 

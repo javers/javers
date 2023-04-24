@@ -1,3 +1,9 @@
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
 dependencies {
     api project(':javers-core')
     implementation "org.polyjdbc:polyjdbc:$polyjdbcVersion"
@@ -5,8 +11,7 @@ dependencies {
 
     testImplementation project(path: ":javers-core", configuration: "testArtifacts")
 
-    //required for @javax.persistence.Id ann in SnapshotEntity.class
-    testImplementation 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+    testImplementation 'jakarta.persistence:jakarta.persistence-api:3.0.0'
     testImplementation 'org.picocontainer:picocontainer:2.15'
     testImplementation 'commons-dbcp:commons-dbcp:1.4'
     testImplementation 'com.h2database:h2:1.4.187'
@@ -14,7 +19,6 @@ dependencies {
     testImplementation 'org.mariadb.jdbc:mariadb-java-client:2.2.3'
     testImplementation 'mysql:mysql-connector-java:8.0.14'
     testImplementation 'org.codehaus.gpars:gpars:1.2.1'
-    testImplementation "joda-time:joda-time:$jodaVersion"
     testImplementation "org.testcontainers:spock:$testcontainers"
     testImplementation "org.testcontainers:mssqlserver:$testcontainers"
     testImplementation "org.testcontainers:postgresql:$testcontainers"

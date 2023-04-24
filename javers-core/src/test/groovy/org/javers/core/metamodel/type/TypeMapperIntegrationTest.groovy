@@ -11,8 +11,8 @@ import org.javers.core.model.*
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.persistence.EmbeddedId
-import javax.persistence.Id
+import jakarta.persistence.EmbeddedId
+import jakarta.persistence.Id
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
