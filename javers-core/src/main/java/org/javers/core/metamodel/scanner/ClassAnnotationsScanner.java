@@ -22,7 +22,6 @@ class ClassAnnotationsScanner {
     private final AnnotationNamesProvider annotationNamesProvider;
     private List<Class<? extends Annotation>> JAVERS_TYPE_ANNOTATIONS = Lists.immutableListOf(
             DiffIgnore.class,
-            DiffIgnoreProperties.class,
             Entity.class,
             ShallowReference.class,
             ValueObject.class,
@@ -42,9 +41,6 @@ class ClassAnnotationsScanner {
                 .collect(Collectors.toSet());
 
         Optional<String> typeName = annotationNamesProvider.findTypeNameAnnValue(annotations);
-
-        Optional<Class<? extends Annotation>> javersTypeAnnotation =
-                JAVERS_TYPE_ANNOTATIONS.stream().filter(annTypes::contains).findFirst();
 
         boolean hasIgnoreDeclaredProperties = annTypes.contains(IGNORE_DECLARED_PROPERTIES_ANN);
 
