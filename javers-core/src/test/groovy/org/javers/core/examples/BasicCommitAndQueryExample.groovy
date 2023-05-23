@@ -10,6 +10,9 @@ import org.javers.repository.jql.JqlQuery
 import org.javers.repository.jql.QueryBuilder
 import org.javers.shadow.Shadow
 import spock.lang.Specification
+import org.locationtech.jts.geom.CoordinateXY
+import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.Geometry;
 
 class BasicCommitAndQueryExample extends Specification {
 
@@ -18,8 +21,11 @@ class BasicCommitAndQueryExample extends Specification {
         // prepare JaVers instance. By default, JaVers uses InMemoryRepository,
         // it's useful for testing
         Javers javers = JaversBuilder.javers().build()
+        Geometry coordinates = new GeometryFactory().createPoint(
+            new CoordinateXY(8.684346.doubleValue(), 50.183965.doubleValue())
+        )
 
-        Person robert = new Person("bob", "Robert Martin")
+        Person robert = new Person("bob", "Robert Martin", coordinates)
         javers.commit("user", robert)           // persist initial commit
 
         robert.setName("Robert C.")             // do some changes

@@ -13,6 +13,9 @@ dependencies {
     implementation 'org.picocontainer:picocontainer:2.15'
     implementation "io.github.classgraph:classgraph:$classgraphVersion"
 
+    implementation "org.locationtech.jts:jts-core:1.19.0"
+    implementation("org.locationtech.jts.io:jts-io-common:1.19.0")
+
     //should be on application's classpath when using custom comparators
     optionalImplementation "com.google.guava:guava:$guavaVersion"
 

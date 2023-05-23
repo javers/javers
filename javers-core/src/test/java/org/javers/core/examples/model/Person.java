@@ -3,6 +3,7 @@ package org.javers.core.examples.model;
 import jakarta.persistence.Id;
 import java.util.List;
 import java.util.Map;
+import org.locationtech.jts.geom.Geometry;
 
 public class Person {
     @Id
@@ -11,6 +12,7 @@ public class Person {
     private List<Address> addresses;
     private Map<String, Address> addressMap;
     private Position position;
+    private Geometry coordinates;
 
     Person() {
     }
@@ -18,6 +20,12 @@ public class Person {
     public Person(String login, String name) {
         this.login = login;
         this.name = name;
+    }
+
+    public Person(String login, String name, Geometry coordinates) {
+        this.login = login;
+        this.name = name;
+        this.coordinates = coordinates;
     }
 
     public String getLogin() {
