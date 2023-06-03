@@ -718,4 +718,30 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       changes[1].propertyRemoved
       changes[2].propertyRemoved
     }
+
+    class TestChild {
+        String value
+    }
+
+    class TestParent {
+        Map<String, TestChild> childMap = new HashMap<>();
+    }
+
+    def "Map entry with null value should be ignored while comparing"() {
+        given:
+        def javers = javers().build()
+        def testParent1 = new TestParent()
+        def testParent2 = new TestParent()
+        testParent1.childMap.put("k", null)
+        testParent2.childMap.put("k", new TestChild(value: "v"))
+
+        when:
+        def diff = javers.compare(testParent1, testParent2)
+        def changes = diff.getChangesByType(PropertyChange)
+
+        then:
+        changes.size() == 2
+        changes[0].propertyValueChanged
+        changes[1].propertyValueChanged
+    }
 }
