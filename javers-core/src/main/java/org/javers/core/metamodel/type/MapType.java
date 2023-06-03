@@ -3,10 +3,13 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Maps;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
+
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -68,12 +71,15 @@ public class MapType extends KeyValueType {
             //value
             mapEnumerationContext.switchToValue(mappedKey);
 
+            Object entryValue = entry.getValue();
             Object mappedValue = null;
-            if (keyValueType.getValueJaversType() instanceof ContainerType) {
-                ContainerType containerType = (ContainerType) keyValueType.getValueJaversType();
-                mappedValue = containerType.map(entry.getValue(), mapFunction, mapEnumerationContext);
-            } else {
-                mappedValue = mapFunction.apply(entry.getValue(), mapEnumerationContext);
+            if (entryValue != null) {
+                if (keyValueType.getValueJaversType() instanceof ContainerType) {
+                    ContainerType containerType = (ContainerType) keyValueType.getValueJaversType();
+                    mappedValue = containerType.map(entryValue, mapFunction, mapEnumerationContext);
+                } else {
+                    mappedValue = mapFunction.apply(entryValue, mapEnumerationContext);
+                }
             }
 
             entryConsumer.accept(mappedKey, mappedValue);
