@@ -3,16 +3,16 @@ package org.javers.repository.sql.repositories;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.InstanceId;
-import org.javers.core.metamodel.object.UnboundedValueObjectId;
-import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.object.*;
 import org.javers.repository.sql.SqlRepositoryConfiguration;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.session.InsertBuilder;
 import org.javers.repository.sql.session.SelectBuilder;
 import org.javers.repository.sql.session.Session;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
@@ -21,7 +21,7 @@ public class GlobalIdRepository extends SchemaNameAware {
     private JsonConverter jsonConverter;
     private final boolean disableCache;
 
-    private Cache<GlobalId, Long> globalIdPkCache = CacheBuilder.newBuilder()
+    private Cache<GlobalId, List<Long>> globalIdPkCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .build();
 
@@ -30,9 +30,11 @@ public class GlobalIdRepository extends SchemaNameAware {
         this.disableCache = configuration.isGlobalIdCacheDisabled();
     }
 
-    public long getOrInsertId(GlobalId globalId, Session session) {
-        Optional<Long> pk = findGlobalIdPk(globalId, session);
-        return pk.isPresent() ? pk.get() : insert(globalId, session);
+    public long getOrInsertId(GlobalId globalId, Optional<Boolean> isInitial, Session session) {
+        if (isInitial.isPresent() && isInitial.get() == true) {
+            return insert(globalId, session);
+        }
+        return findGlobalIdPk(globalId, session).stream().findFirst().orElseGet(() -> insert(globalId, session));
     }
 
     public void evictCache() {
@@ -46,34 +48,34 @@ public class GlobalIdRepository extends SchemaNameAware {
     /**
      * cached
      */
-    public Optional<Long> findGlobalIdPk(GlobalId globalId, Session session) {
+    public List<Long> findGlobalIdPk(GlobalId globalId, Session session) {
         if (disableCache){
             return findGlobalIdPkInDB(globalId, session);
         }
 
-        Long foundPk = globalIdPkCache.getIfPresent(globalId);
+        List<Long> foundPks = globalIdPkCache.getIfPresent(globalId);
 
-        if (foundPk != null){
-            return Optional.of(foundPk);
+        if (foundPks != null){
+            return foundPks;
         }
 
-        Optional<Long> fresh = findGlobalIdPkInDB(globalId, session);
-        if (fresh.isPresent()){
-            globalIdPkCache.put(globalId, fresh.get());
+        List<Long> fresh = findGlobalIdPkInDB(globalId, session);
+        if (!fresh.isEmpty()){
+            globalIdPkCache.put(globalId, fresh);
         }
 
         return fresh;
     }
 
-    private Optional<Long> findGlobalIdPkInDB(GlobalId globalId, Session session) {
+    private List<Long> findGlobalIdPkInDB(GlobalId globalId, Session session) {
         SelectBuilder select =  session.select(GLOBAL_ID_PK)
                 .from(getGlobalIdTableNameWithSchema());
 
         if (globalId instanceof ValueObjectId) {
             final ValueObjectId valueObjectId  = (ValueObjectId) globalId;
-            Optional<Long> ownerFk = findGlobalIdPk(valueObjectId.getOwnerId(), session);
+            Optional<Long> ownerFk = findGlobalIdPk(valueObjectId.getOwnerId(), session).stream().findFirst();
             if (!ownerFk.isPresent()){
-                return Optional.empty();
+                return Collections.emptyList();
             }
             select.and(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment())
                   .and(GLOBAL_ID_OWNER_ID_FK, ownerFk.get())
@@ -89,7 +91,7 @@ public class GlobalIdRepository extends SchemaNameAware {
                   .queryName("find PK of UnboundedValueObjectId");
         }
 
-        return select.queryForOptionalLong();
+        return select.queryForListOfLong();
     }
 
     private long insert(GlobalId globalId, Session session) {
@@ -98,7 +100,7 @@ public class GlobalIdRepository extends SchemaNameAware {
         if (globalId instanceof ValueObjectId) {
             insert = session.insert("ValueObjectId");
             ValueObjectId valueObjectId  = (ValueObjectId) globalId;
-            long ownerFk = getOrInsertId(valueObjectId.getOwnerId(), session);
+            long ownerFk = getOrInsertId(valueObjectId.getOwnerId(), Optional.empty(), session);
             insert.value(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment())
                   .value(GLOBAL_ID_OWNER_ID_FK, ownerFk);
         }

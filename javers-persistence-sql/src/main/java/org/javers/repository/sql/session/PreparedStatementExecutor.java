@@ -54,6 +54,10 @@ class PreparedStatementExecutor {
         return executeQueryForOptionalValue(select, resultSet -> resultSet.getLong(1));
     }
 
+    List<Long> executeQueryForListOfLong(Select select) {
+        return executeQueryForListOfLong(select, resultSet -> resultSet.getLong(1));
+    }
+
     <T> List<T> executeQuery(Select select, ObjectMapper<T> objectMapper) {
         return runSql(() -> {
             select.injectValuesTo(statement);
@@ -87,6 +91,18 @@ class PreparedStatementExecutor {
             else {
                 return Optional.empty();
             }
+        });
+    }
+
+    private <T> List<T> executeQueryForListOfLong(Select select, ObjectMapper<T> objectMapper) {
+        return runSql(() -> {
+            select.injectValuesTo(statement);
+            ResultSet rset = statement.executeQuery();
+            List<T> result = new ArrayList<>();
+            while(rset.next()) {
+                result.add(objectMapper.get(rset));
+            }
+            return result;
         });
     }
 

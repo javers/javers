@@ -15,6 +15,10 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 public class Lists {
 
+    public static Long max(List<Long> list) {
+        return list.stream().max(Long::compareTo).orElse(null);
+    }
+
     public static List wrapNull(Object list) {
         if (list == null || list == MissingProperty.INSTANCE || !(list instanceof List)) {
             return Collections.emptyList();

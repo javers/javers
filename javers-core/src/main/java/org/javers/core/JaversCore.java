@@ -90,7 +90,7 @@ class JaversCore implements Javers {
         persist(commit);
         long stop = System.currentTimeMillis();
 
-        logger.info(commit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(stopCreate-start), (stop-stopCreate));
+        logger.info(commit.toString()+", done in "+ (stop-start)+ " ms (diff:{} ms, persist:{} ms)",(stopCreate-start), (stop-stopCreate));
         return commit;
     }
 
