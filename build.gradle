@@ -131,7 +131,7 @@ subprojects {
         useJUnitPlatform()
 
         testLogging {
-            showStandardStreams = false
+            showStandardStreams = true
             exceptionFormat = 'full'
         }
     }

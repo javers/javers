@@ -1235,7 +1235,7 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     //CASE FOR ISSUE 958
-    def "should query by commitIds with minor numbers (parallel)"() {
+    def "should query in parallel by commitIds with minor numbers"() {
         given: "there are commits with ids 1.0 and 1.01"
         def commitFactory = javers.commitFactory
 
