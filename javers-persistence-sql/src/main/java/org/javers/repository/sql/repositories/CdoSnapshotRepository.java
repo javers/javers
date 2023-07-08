@@ -25,7 +25,8 @@ public class CdoSnapshotRepository extends SchemaNameAware {
     }
 
     public void save(long commitIdPk, List<CdoSnapshot> cdoSnapshots, Session session) {
-        // Entities
+        // Entities are saved first, their globalIdPks are saved in the cache
+        // and may be loaded fast while saving their child Value Objects
         cdoSnapshots.stream().filter(it -> it.isInstance()).forEach(cdoSnapshot -> {
             long globalIdPk = globalIdRepository.getOrInsertId(cdoSnapshot.getGlobalId(), Optional.of(cdoSnapshot.isInitial()), session);
             insertSnapshot(cdoSnapshot, globalIdPk, commitIdPk, session);
