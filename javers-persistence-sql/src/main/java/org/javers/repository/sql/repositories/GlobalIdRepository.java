@@ -45,6 +45,10 @@ public class GlobalIdRepository extends SchemaNameAware {
         return (int)globalIdPkCache.size();
     }
 
+    private void putGlobalIdPkInCache(GlobalId globalId, List<Long> pks) {
+        globalIdPkCache.put(globalId, pks);
+    }
+
     /**
      * cached
      */
@@ -61,7 +65,7 @@ public class GlobalIdRepository extends SchemaNameAware {
 
         List<Long> fresh = findGlobalIdPkInDB(globalId, session);
         if (!fresh.isEmpty()){
-            globalIdPkCache.put(globalId, fresh);
+            putGlobalIdPkInCache(globalId, fresh);
         }
 
         return fresh;
@@ -121,9 +125,12 @@ public class GlobalIdRepository extends SchemaNameAware {
                     .value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
         }
 
-        return insert.into(getGlobalIdTableNameWithSchema())
+        long newPk = insert.into(getGlobalIdTableNameWithSchema())
               .sequence(GLOBAL_ID_PK, getGlobalIdPkSeqName().nameWithSchema())
               .executeAndGetSequence();
+
+        putGlobalIdPkInCache(globalId, List.of(newPk));
+        return newPk;
     }
 
     public void setJsonConverter(JsonConverter JSONConverter) {
