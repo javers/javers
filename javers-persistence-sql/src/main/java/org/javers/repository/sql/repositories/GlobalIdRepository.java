@@ -94,7 +94,13 @@ public class GlobalIdRepository extends SchemaNameAware {
         return select.queryForListOfLong();
     }
 
+    private void evictCacheFor(GlobalId globalId) {
+        globalIdPkCache.invalidate(globalId);
+    }
+
     private long insert(GlobalId globalId, Session session) {
+        evictCacheFor(globalId);
+
         InsertBuilder insert = null;
 
         if (globalId instanceof ValueObjectId) {
