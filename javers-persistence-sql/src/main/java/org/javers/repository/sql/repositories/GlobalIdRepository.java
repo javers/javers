@@ -125,12 +125,9 @@ public class GlobalIdRepository extends SchemaNameAware {
                     .value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
         }
 
-        long newPk = insert.into(getGlobalIdTableNameWithSchema())
-              .sequence(GLOBAL_ID_PK, getGlobalIdPkSeqName().nameWithSchema())
-              .executeAndGetSequence();
-
-        putGlobalIdPkInCache(globalId, List.of(newPk));
-        return newPk;
+        return insert.into(getGlobalIdTableNameWithSchema())
+                .sequence(GLOBAL_ID_PK, getGlobalIdPkSeqName().nameWithSchema())
+                .executeAndGetSequence();
     }
 
     public void setJsonConverter(JsonConverter JSONConverter) {
