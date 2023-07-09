@@ -99,6 +99,10 @@ public class SelectBuilder extends QueryBuilder<SelectBuilder> {
         return session.executeQueryForOptionalLong(build());
     }
 
+    public List<Long> queryForListOfLong() {
+        return session.executeQueryForListOfLong(build());
+    }
+
     public <T> List<T> executeQuery(ObjectMapper<T> objectMapper) {
         return session.executeQuery(build(), objectMapper);
     }

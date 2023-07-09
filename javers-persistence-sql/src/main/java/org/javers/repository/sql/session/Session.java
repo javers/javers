@@ -96,6 +96,11 @@ public class Session implements AutoCloseable {
         return executor.executeQueryForOptionalLong(select);
     }
 
+    List<Long> executeQueryForListOfLong(Select select) {
+        PreparedStatementExecutor executor = getOrCreatePreparedStatement(select);
+        return executor.executeQueryForListOfLong(select);
+    }
+
     <T> List<T> executeQuery(Select select, ObjectMapper<T> objectMapper) {
         PreparedStatementExecutor executor = getOrCreatePreparedStatement(select);
         return executor.executeQuery(select, objectMapper);

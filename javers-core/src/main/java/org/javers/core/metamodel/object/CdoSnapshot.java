@@ -140,6 +140,10 @@ public final class CdoSnapshot extends Cdo {
         return type == INITIAL;
     }
 
+    public boolean isInstance() {
+        return globalId instanceof InstanceId;
+    }
+
     public boolean isTerminal() {
         return type == TERMINAL;
     }

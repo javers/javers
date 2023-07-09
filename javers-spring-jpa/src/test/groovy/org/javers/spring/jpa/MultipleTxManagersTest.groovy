@@ -26,7 +26,7 @@ class MultipleTxManagersTest extends Specification {
 
     def "should not fail when there are more than one transaction manager in the application context"(){
         given:
-        def person = new Person(id:"kaz")
+        def person = new Person(id: "kaz")
 
         when:
         repository.save(person)
