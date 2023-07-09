@@ -16,7 +16,7 @@ buildscript {
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.10.1'
     id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
-    id 'com.adarshr.test-logger' version '2.0.0'
+    id 'com.adarshr.test-logger' version '3.2.0'
 }
 
 scmVersion {
@@ -58,14 +58,6 @@ subprojects {
 
     javadoc {
         options.noTimestamp()
-    }
-
-    test {
-        useJUnitPlatform()
-
-        testLogging {
-            exceptionFormat = 'full'
-        }
     }
 
     task example(dependsOn: 'cleanTest') {
@@ -136,8 +128,12 @@ subprojects {
     //-- eof maven-publish.publish spell --
 
     test {
-        testLogging.exceptionFormat = 'full'
-        testLogging.showStackTraces = true
+        useJUnitPlatform()
+
+        testLogging {
+            showStandardStreams = false
+            exceptionFormat = 'full'
+        }
     }
 }
 

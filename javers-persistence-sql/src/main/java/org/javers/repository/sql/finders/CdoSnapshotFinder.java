@@ -1,6 +1,5 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Lists;
 import org.javers.common.collections.Sets;
 import org.javers.repository.sql.codecs.CdoSnapshotStateCodec;
 import org.javers.core.json.CdoSnapshotSerialized;
@@ -21,6 +20,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
+import static org.javers.common.collections.Lists.*;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBAL_ID_FK;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_PK;
 
@@ -41,12 +41,12 @@ public class CdoSnapshotFinder {
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId, Session session, boolean loadCommitProps) {
-        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId, session);
-        if (!globalIdPk.isPresent()){
+        List<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId, session);
+        if (globalIdPk.isEmpty()){
             return Optional.empty();
         }
 
-        return selectMaxSnapshotPrimaryKey(globalIdPk.get(), session).map(maxSnapshotId -> {
+        return selectMaxSnapshotPrimaryKey(max(globalIdPk), session).map(maxSnapshotId -> {
             QueryParams oneItemLimit = QueryParamsBuilder
                     .withLimit(1)
                     .withCommitProps(loadCommitProps)
@@ -61,11 +61,11 @@ public class CdoSnapshotFinder {
 
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers, Session session) {
 
-        List<SnapshotDbIdentifier> snapshotIdentifiersWithPk = snapshotIdentifiers.stream()
-                .map(si -> globalIdRepository.findGlobalIdPk(si.getGlobalId(), session)
-                                             .map(id -> new SnapshotDbIdentifier(si, id)))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        List<SnapshotDbIdentifier> snapshotIdentifiersWithPk = snapshotIdentifiers
+                .stream()
+                .flatMap(si -> globalIdRepository.findGlobalIdPk(si.getGlobalId(), session)
+                    .stream()
+                    .map(id -> new SnapshotDbIdentifier(si, id)))
                 .collect(toList());
 
         QueryParams queryParams = QueryParamsBuilder.withLimit(Integer.MAX_VALUE).build();
@@ -82,10 +82,11 @@ public class CdoSnapshotFinder {
     }
 
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams, Session session) {
-        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId, session);
+        List<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId, session);
 
-        return globalIdPk.map(idPk -> fetchCdoSnapshots(q -> q.addGlobalIdFilter(idPk), queryParams, session))
-                         .orElse(Collections.emptyList());
+        return globalIdPk.stream()
+                .flatMap(idPk -> fetchCdoSnapshots(q -> q.addGlobalIdFilter(idPk), queryParams, session).stream())
+                .collect(toList());
     }
 
     private List<CdoSnapshot> fetchCdoSnapshots(Consumer<SnapshotQuery> additionalFilter,
@@ -100,7 +101,7 @@ public class CdoSnapshotFinder {
             cdoSnapshotsEnricher.enrichWithCommitProperties(serializedSnapshots, commitPropertyDTOs);
         }
 
-        return Lists.transform(serializedSnapshots,
+        return transform(serializedSnapshots,
                 serializedSnapshot -> jsonConverter.fromSerializedSnapshot(serializedSnapshot));
     }
 
