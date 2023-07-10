@@ -15,16 +15,17 @@ class Case1287ValueObjectWithIgnoredProperties extends Specification {
 	class MyValueObject {
 
 		@Id
-		private UUID id;
+		private UUID id
 
-		private String property;
+		private String property
 	}
 
-	def "should recognize class as a value object type"() {
+	def "should recognize class as a value object type when @DiffIgnoreProperties is used"() {
 		given:
 		Javers javers = JaversBuilder.javers().build()
 
 		expect:
 		javers.getTypeMapping( MyValueObject ) instanceof ValueObjectType
+		javers.getTypeMapping( MyValueObject ).properties.collect {it.name} == ['property']
 	}
 }
