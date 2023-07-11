@@ -24,18 +24,18 @@ public abstract class ClientsClassDefinition {
     private final PropertiesFilter propertiesFilter;
 
     ClientsClassDefinition(Class<?> baseJavaClass) {
-        this(baseJavaClass, emptyList(), Optional.empty(), emptyList());
+        this(baseJavaClass, emptyList(), Optional.empty(), emptyList(), emptyList());
     }
 
     ClientsClassDefinition(Class<?> baseJavaClass, List<String> ignoredProperties) {
-        this(baseJavaClass, ignoredProperties, Optional.empty(), emptyList());
+        this(baseJavaClass, ignoredProperties, Optional.empty(), emptyList(), emptyList());
     }
 
     ClientsClassDefinition(ClientsClassDefinitionBuilder builder) {
-        this(builder.getClazz(), builder.getIgnoredProperties(), builder.getTypeName(), builder.getIncludedProperties());
+        this(builder.getClazz(), builder.getIgnoredProperties(), builder.getTypeName(), builder.getIncludedProperties(), builder.getShallowProperties());
     }
 
-    private ClientsClassDefinition(Class<?> baseJavaClass, List<String> ignoredProperties, Optional<String> typeName, List<String> includedProperties) {
+    private ClientsClassDefinition(Class<?> baseJavaClass, List<String> ignoredProperties, Optional<String> typeName, List<String> includedProperties, List<String> shallowProperties) {
         argumentsAreNotNull(baseJavaClass, typeName, ignoredProperties, includedProperties);
 
         argumentCheck(!(includedProperties.size() > 0 && ignoredProperties.size() > 0),
@@ -44,7 +44,7 @@ public abstract class ClientsClassDefinition {
 
         this.baseJavaClass = baseJavaClass;
         this.typeName = typeName;
-        this.propertiesFilter = new PropertiesFilter(includedProperties, ignoredProperties);
+        this.propertiesFilter = new PropertiesFilter(includedProperties, ignoredProperties, shallowProperties);
     }
 
     public Class<?> getBaseJavaClass() {

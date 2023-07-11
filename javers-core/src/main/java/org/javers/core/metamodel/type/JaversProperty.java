@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.reflection.JaversMember;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.Objects;
@@ -21,6 +22,12 @@ public class JaversProperty extends Property {
     public JaversProperty(Supplier<JaversType> propertyType, Property property) {
         super(property.getMember(),  property.hasTransientAnn(), property.hasShallowReferenceAnn(), property.getName(), property.isHasIncludedAnn());
         this.propertyType = propertyType;
+    }
+
+    private JaversProperty(Supplier<JaversType> propertyType, JaversMember member, boolean hasTransientAnn,
+                           boolean hasShallowReferenceAnn, String name, boolean hasIncludedAnn) {
+      super(member, hasTransientAnn, hasShallowReferenceAnn, name, hasIncludedAnn);
+      this.propertyType = propertyType;
     }
 
     public <T extends JaversType> T getType() {
@@ -61,6 +68,11 @@ public class JaversProperty extends Property {
     public boolean isShallowReference(){
         return (hasShallowReferenceAnn()
             || getType() instanceof ShallowReferenceType);
+    }
+
+    public JaversProperty copyShallow() {
+      boolean shallowReference = true;
+      return new JaversProperty(propertyType, getMember(), hasTransientAnn(), shallowReference, getName(), isHasIncludedAnn());
     }
 
     @Override
