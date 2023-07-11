@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -75,6 +76,9 @@ public class JaversMongoAutoConfiguration {
     @Autowired
     private Optional<MongoTransactionManager> mongoTransactionManager;
 
+    @Value("${spring.data.mongodb.database:#{null}}")
+    Optional<String> mongoDbName;
+
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
     public Javers javers() {
@@ -124,10 +128,14 @@ public class JaversMongoAutoConfiguration {
 
     private MongoDatabase initJaversMongoDatabase() {
         if (!javersMongoProperties.isDedicatedMongodbConfigurationEnabled()) {
-            MongoDatabase mongoDatabase = getDefaultMongoDatabase();
-            logger.info("connecting Javers to primary Mongo database '{}' configured in spring.data.mongodb properties",
-                        mongoDatabase.getName());
-            return mongoDatabase;
+            return mongoDbName.map(name -> {
+                logger.info("connecting Javers to Mongo database '{}' configured in the spring.data.mongodb.database property", name);
+                return MongoDatabaseUtils.getDatabase(name, dbFactory);
+            }).orElseGet(() -> {
+                MongoDatabase mongoDatabase = MongoDatabaseUtils.getDatabase(dbFactory);
+                logger.info("connecting Javers to Spring's default Mongo database: '{}'", mongoDatabase.getName());
+                return mongoDatabase;
+            });
         } else {
             MongoDatabase mongoDatabase = JaversDedicatedMongoFactory
                     .createMongoDatabase(javersMongoProperties, mongoClientSettings);
@@ -135,10 +143,6 @@ public class JaversMongoAutoConfiguration {
                     mongoDatabase.getName());
             return mongoDatabase;
         }
-    }
-
-    private MongoDatabase getDefaultMongoDatabase() {
-        return MongoDatabaseUtils.getDatabase(dbFactory);
     }
 
     @Bean(name = "SpringSecurityAuthorProvider")
