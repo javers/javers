@@ -20,6 +20,7 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
     private Class<?> clazz;
     private List<String> ignoredProperties = Collections.emptyList();
     private List<String> includedProperties = Collections.emptyList();
+    private List<String> shallowProperties = Collections.emptyList();
     private Optional<String> typeName = Optional.empty();
 
     ClientsClassDefinitionBuilder(Class<?> clazz) {
@@ -76,6 +77,12 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
         return (T) this;
     }
 
+    public T withShallowProperties(List<String> shallowProperties) {
+        Validate.argumentIsNotNull(shallowProperties);
+        this.shallowProperties = shallowProperties;
+        return (T) this;
+    }
+
     public T withTypeName(Optional<String> typeName) {
         Validate.argumentIsNotNull(typeName);
         this.typeName = typeName;
@@ -102,7 +109,11 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
         return includedProperties;
     }
 
-    Optional<String> getTypeName() {
+    List<String> getShallowProperties() {
+        return shallowProperties;
+    }
+
+  Optional<String> getTypeName() {
         return typeName;
     }
 

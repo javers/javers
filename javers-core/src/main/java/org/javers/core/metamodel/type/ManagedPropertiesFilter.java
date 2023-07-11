@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.type;
 
+import java.util.HashSet;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.clazz.PropertiesFilter;
@@ -16,6 +17,7 @@ class ManagedPropertiesFilter {
     private static final Logger logger = LoggerFactory.getLogger(ManagedPropertiesFilter.class);
     private final Set<JaversProperty> includedProperties;
     private final Set<JaversProperty> ignoredProperties;
+    private final Set<String> shallowProperties;
 
     static ManagedPropertiesFilter empty() {
         return new ManagedPropertiesFilter();
@@ -32,11 +34,14 @@ class ManagedPropertiesFilter {
             this.ignoredProperties = filter(allSourceProperties, propertiesFilter.getIgnoredProperties(), baseJavaClass);
             this.ignoredProperties.addAll(allSourceProperties.stream().filter(p -> p.hasTransientAnn()).collect(Collectors.toSet()));
         }
+
+        this.shallowProperties = new HashSet<>(propertiesFilter.getShallowProperties());
     }
 
     private ManagedPropertiesFilter() {
         this.includedProperties = Collections.emptySet();
         this.ignoredProperties = Collections.emptySet();
+        this.shallowProperties = Collections.emptySet();
     }
 
     List<JaversProperty> filterProperties(List<JaversProperty> allProperties){
@@ -49,6 +54,12 @@ class ManagedPropertiesFilter {
         }
 
         return allProperties;
+    }
+
+    List<JaversProperty> shallowProperties(List<JaversProperty> allProperties) {
+        return allProperties.stream()
+            .map(it -> shallowProperties.contains(it.getName()) && !it.isShallowReference() ? it.copyShallow() : it)
+            .collect(Collectors.toList());
     }
 
     boolean hasIgnoredProperties() {

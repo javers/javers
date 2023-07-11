@@ -8,11 +8,13 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class PropertiesFilter {
     private final List<String> includedProperties;
     private final List<String> ignoredProperties;
+    private final List<String> shallowProperties;
 
-    public PropertiesFilter(List<String> includedProperties, List<String> ignoredProperties) {
-        argumentsAreNotNull(ignoredProperties, includedProperties);
+    public PropertiesFilter(List<String> includedProperties, List<String> ignoredProperties, List<String> shallowProperties) {
+        argumentsAreNotNull(ignoredProperties, includedProperties, shallowProperties);
         this.includedProperties = immutableCopyOf(includedProperties);
         this.ignoredProperties = immutableCopyOf(ignoredProperties);
+        this.shallowProperties = shallowProperties;
     }
 
     public List<String> getIgnoredProperties() {
@@ -21,5 +23,9 @@ public class PropertiesFilter {
 
     public List<String> getIncludedProperties() {
         return includedProperties;
+    }
+
+    public List<String> getShallowProperties() {
+        return shallowProperties;
     }
 }

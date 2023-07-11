@@ -41,6 +41,8 @@ class ManagedClassFactory {
 
         filtered = filterIgnoredType(filtered, baseJavaClass);
 
+        filtered = propertiesFilter.shallowProperties(filtered);
+
         return new ManagedClass(baseJavaClass, filtered,
                 positiveFilter(allProperties, p -> p.looksLikeId()), propertiesFilter);
     }
