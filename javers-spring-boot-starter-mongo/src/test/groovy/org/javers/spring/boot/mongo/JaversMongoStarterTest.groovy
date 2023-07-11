@@ -25,12 +25,12 @@ class JaversMongoStarterTest extends BaseSpecification {
     @Autowired
     AuthorProvider provider
 
-    def "shoudUseDbNameFromMongoStarter"(){
+    def "shoud UseDbNameFromMongoStarter"(){
         expect:
         javers.repository.delegate.mongoSchemaManager.mongo.name == "spring-mongo"
     }
 
-    def "shouldReadConfigurationFromYml"() {
+    def "should ReadConfigurationFromYml"() {
         expect:
         javers.coreConfiguration.listCompareAlgorithm == ListCompareAlgorithm.LEVENSHTEIN_DISTANCE
         javers.coreConfiguration.mappingStyle == MappingStyle.BEAN
