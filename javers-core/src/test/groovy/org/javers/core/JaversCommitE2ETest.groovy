@@ -3,6 +3,7 @@ package org.javers.core
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert
+import org.javers.core.metamodel.clazz.EntityDefinitionBuilder
 import org.javers.core.model.*
 import org.javers.repository.jql.InstanceIdDTO
 import spock.lang.Specification
@@ -44,6 +45,25 @@ class JaversCommitE2ETest extends Specification {
         given:
         def javers = javers().build()
         def entity =  new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(1, "old shallow"))
+
+        when:
+        def commit = javers.commit("", entity)
+
+        then:
+        println commit.snapshots[0]
+
+        commit.snapshots.size() == 1
+    }
+
+    def "should not commit snapshot of a reference when a property is shallow via EntityDefinition"() {
+        given:
+        def javers = javers().registerEntity(
+                EntityDefinitionBuilder.entityDefinition(PhoneWithShallowCategory)
+                        .withIdPropertyName("id")
+                        .withShallowProperties(["deepCategory"])
+                        .build())
+                .build()
+        def entity =  new PhoneWithShallowCategory(id:1, deepCategory:new CategoryC(1, "old shallow"))
 
         when:
         def commit = javers.commit("", entity)
