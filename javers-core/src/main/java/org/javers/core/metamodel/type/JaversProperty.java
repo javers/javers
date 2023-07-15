@@ -3,7 +3,6 @@ package org.javers.core.metamodel.type;
 import org.javers.common.reflection.JaversMember;
 import org.javers.core.metamodel.property.Property;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import static org.javers.common.string.ToStringBuilder.typeName;
@@ -19,15 +18,22 @@ public class JaversProperty extends Property {
      */
     private final Supplier<JaversType> propertyType;
 
+    private final boolean isListedAsShallowReference;
+
     public JaversProperty(Supplier<JaversType> propertyType, Property property) {
-        super(property.getMember(),  property.hasTransientAnn(), property.hasShallowReferenceAnn(), property.getName(), property.isHasIncludedAnn());
-        this.propertyType = propertyType;
+        this(propertyType, property.getMember(), property.hasTransientAnn(), property.hasShallowReferenceAnn(), property.getName(), property.isHasIncludedAnn(), false);
     }
 
-    private JaversProperty(Supplier<JaversType> propertyType, JaversMember member, boolean hasTransientAnn,
-                           boolean hasShallowReferenceAnn, String name, boolean hasIncludedAnn) {
+    private JaversProperty(Supplier<JaversType> propertyType,
+                           JaversMember member,
+                           boolean hasTransientAnn,
+                           boolean hasShallowReferenceAnn,
+                           String name,
+                           boolean hasIncludedAnn,
+                           boolean isListedAsShallowReference) {
       super(member, hasTransientAnn, hasShallowReferenceAnn, name, hasIncludedAnn);
       this.propertyType = propertyType;
+      this.isListedAsShallowReference = isListedAsShallowReference;
     }
 
     public <T extends JaversType> T getType() {
@@ -67,20 +73,22 @@ public class JaversProperty extends Property {
 
     public boolean isShallowReference(){
         return (hasShallowReferenceAnn()
-            || getType() instanceof ShallowReferenceType);
+                || getType() instanceof ShallowReferenceType)
+                || isListedAsShallowReference;
     }
 
-    public JaversProperty copyShallow() {
-      boolean shallowReference = true;
-      return new JaversProperty(propertyType, getMember(), hasTransientAnn(), shallowReference, getName(), isHasIncludedAnn());
+    public JaversProperty copyAsShallowReference() {
+      boolean isListedAsShallowReference = true;
+      return new JaversProperty(propertyType, getMember(), hasTransientAnn(), hasShallowReferenceAnn(), getName(), isHasIncludedAnn(), isListedAsShallowReference);
     }
 
     @Override
     public String toString() {
         return getMember().memberType() + " " +
-                getType().getClass().getSimpleName() + ":" +
-                typeName(getMember().getGenericResolvedType()) + " " +
-                getName() + (getMember().memberType().equals("Getter") ? "()" : "")+
-                ", declared in " + getDeclaringClass().getSimpleName();
+                getName() + (getMember().memberType().equals("Getter") ? "()" : "") + " " +
+                typeName(getMember().getGenericResolvedType()) + ", " +
+                "javersType: " + getType().getClass().getSimpleName() + ", " +
+                (isShallowReference() ? "@ShallowReference, " : "")+
+                "declared in: " + getDeclaringClass().getSimpleName();
     }
 }

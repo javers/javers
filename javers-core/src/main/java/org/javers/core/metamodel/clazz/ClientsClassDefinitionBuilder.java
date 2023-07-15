@@ -8,6 +8,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
+import org.javers.core.metamodel.annotation.ShallowReference;
 
 import java.util.Collections;
 import java.util.List;
@@ -77,6 +78,9 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
         return (T) this;
     }
 
+    /**
+     * Equiv to the property-level {@link ShallowReference} annotations.
+     */
     public T withShallowProperties(List<String> shallowProperties) {
         Validate.argumentIsNotNull(shallowProperties);
         this.shallowProperties = shallowProperties;
