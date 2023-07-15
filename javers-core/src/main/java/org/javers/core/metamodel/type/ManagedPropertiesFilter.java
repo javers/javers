@@ -45,20 +45,23 @@ class ManagedPropertiesFilter {
     }
 
     List<JaversProperty> filterProperties(List<JaversProperty> allProperties){
+        List<JaversProperty> baseListOfProperties;
         if (hasIncludedProperties()) {
-            return new ArrayList<>(includedProperties);
+            baseListOfProperties = new ArrayList<>(includedProperties);
+        } else if (hasIgnoredProperties()) {
+            baseListOfProperties = allProperties.stream().filter(it -> !ignoredProperties.contains(it)).collect(Collectors.toList());
         }
-
-        if (hasIgnoredProperties()) {
-            return allProperties.stream().filter(it -> !ignoredProperties.contains(it)).collect(Collectors.toList());
+        else {
+            baseListOfProperties = allProperties;
         }
-
-        return allProperties;
+        return applyShallowPropertiesConfiguration(baseListOfProperties);
     }
 
-    List<JaversProperty> shallowProperties(List<JaversProperty> allProperties) {
+    private List<JaversProperty> applyShallowPropertiesConfiguration(List<JaversProperty> allProperties) {
         return allProperties.stream()
-            .map(it -> shallowProperties.contains(it.getName()) && !it.isShallowReference() ? it.copyShallow() : it)
+            .map(it -> shallowProperties.contains(it.getName()) && !it.isShallowReference()
+                    ? it.copyAsShallowReference()
+                    : it)
             .collect(Collectors.toList());
     }
 
