@@ -250,6 +250,10 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     }
 
     private void persistHeadId(Commit commit, Optional<ClientSession> clientSession) {
+        if (coreConfiguration.getCommitIdGenerator() != CommitIdGenerator.SYNCHRONIZED_SEQUENCE) {
+            return;
+        }
+
         MongoCollection<Document> headIdCollection = headCollection();
 
         Document oldHead = headIdCollection.find().first();

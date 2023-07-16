@@ -1177,23 +1177,21 @@ class JaversRepositoryE2ETest extends Specification {
         println 'persisted commits ids: ' + snapshots.collect{it -> it.commitId}
     }
 
-    def "should not persist commits with zero snapshots" () {
+    def "should not persist snapshots when nothing is changed" () {
         given:
         def anEntity = new SnapshotEntity(id: 1, intProperty: 100)
 
         when:
         def commit = javers.commit("author", anEntity)
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
-        snapshots.size() == 1
-        repository.getHeadId() == commit.getId()
+        javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build()).size() == 1
 
         when: "should not be persisted"
         javers.commit("author", anEntity)
 
         then:
-        repository.getHeadId() == commit.getId()
+        javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build()).size() == 1
     }
 
     def "should use name from @PropertyName in commits and queries"(){
