@@ -7,6 +7,8 @@ import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.changetype.*
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.ValueAdded
+import org.javers.core.diff.changetype.map.EntryAdded
+import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.examples.model.Person
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
@@ -727,21 +729,28 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         Map<String, TestChild> childMap = new HashMap<>();
     }
 
-    def "Map entry with null value should be ignored while comparing"() {
+    def "Map entry with null value should be treated as no entry while comparing"() {
         given:
-        def javers = javers().build()
-        def testParent1 = new TestParent()
-        def testParent2 = new TestParent()
-        testParent1.childMap.put("k", null)
-        testParent2.childMap.put("k", new TestChild(value: "v"))
+        def javers = javers().withInitialChanges(false).build()
+        def testParent1 = new TestParent(childMap: ["k": null])
+        def testParent2 = new TestParent(childMap: ["k": new TestChild(value: "v")])
 
         when:
         def diff = javers.compare(testParent1, testParent2)
         def changes = diff.getChangesByType(PropertyChange)
 
         then:
-        changes.size() == 2
-        changes[0].propertyValueChanged
-        changes[1].propertyValueChanged
+        changes.size() == 1
+        changes[0] instanceof MapChange
+        changes[0].entryChanges[0] instanceof EntryAdded
+
+        when:
+        testParent1 = new TestParent(childMap: ["k": null])
+        testParent2 = new TestParent(childMap: [:])
+        diff = javers.compare(testParent1, testParent2)
+        changes = diff.getChangesByType(PropertyChange)
+
+        then:
+        changes.size() == 0
     }
 }

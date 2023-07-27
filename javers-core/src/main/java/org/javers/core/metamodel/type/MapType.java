@@ -72,14 +72,15 @@ public class MapType extends KeyValueType {
             mapEnumerationContext.switchToValue(mappedKey);
 
             Object entryValue = entry.getValue();
+            if (entryValue == null) {
+              continue;
+            }
             Object mappedValue = null;
-            if (entryValue != null) {
-                if (keyValueType.getValueJaversType() instanceof ContainerType) {
-                    ContainerType containerType = (ContainerType) keyValueType.getValueJaversType();
-                    mappedValue = containerType.map(entryValue, mapFunction, mapEnumerationContext);
-                } else {
-                    mappedValue = mapFunction.apply(entryValue, mapEnumerationContext);
-                }
+            if (keyValueType.getValueJaversType() instanceof ContainerType) {
+                ContainerType containerType = (ContainerType) keyValueType.getValueJaversType();
+                mappedValue = containerType.map(entryValue, mapFunction, mapEnumerationContext);
+            } else {
+                mappedValue = mapFunction.apply(entryValue, mapEnumerationContext);
             }
 
             entryConsumer.accept(mappedKey, mappedValue);
