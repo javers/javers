@@ -1,6 +1,7 @@
 package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
+import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.metamodel.object.InstanceId
 import spock.lang.Specification
@@ -34,25 +35,19 @@ class Case638Lybeck extends Specification {
         }
     }
 
-    def "should handle null as Map value when Map key is an Entity"() {
+    def "should treat entry with null value as no entry when Map key is an Entity"() {
       given:
       def object1 = new DataObject(id:1, map: [:])
-
       def object2 = new DataObject(id:1, map: [(new KeyObject(2, 3)) : null])
 
-      def javers = JaversBuilder.javers().build()
+      def javers = JaversBuilder.javers().withInitialChanges(false).build()
 
       when:
       def diff = javers.compare(object1, object2)
       println("object diff = " + diff)
 
-
-      def change = diff.getChangesByType(MapChange)[0]
-      def key = change.entryChanges[0].key
-      def val = change.entryChanges[0].value
-
       then:
-      key instanceof InstanceId
-      val == null
+      diff.changes.size() == 1
+      diff.changes[0] instanceof NewObject
     }
 }
