@@ -15,9 +15,13 @@ import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.annotation.DiffIgnoreProperties
 import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.annotation.Id
+import org.javers.core.metamodel.annotation.ShallowReference
 import org.javers.core.metamodel.annotation.TypeName
+import org.javers.core.metamodel.clazz.EntityDefinitionBuilder
 import org.javers.core.metamodel.property.Property
 import org.javers.core.metamodel.type.IgnoredType
+import org.javers.core.metamodel.type.ManagedType
+import org.javers.core.metamodel.type.SetType
 import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.*
 import spock.lang.Unroll
@@ -574,6 +578,11 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         Set<SetValueObject> valueObjects
     }
 
+    class ValueObjectHolderAnnotated {
+        @Id int id
+        @ShallowReference Set<SetValueObject> valueObjects
+    }
+
     def "should follow and deeply compare entities referenced from ValueObjects inside Set"(){
       given:
       def javers = javers().build()
@@ -594,6 +603,69 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       changes[0].affectedGlobalId.value() == SnapshotEntity.getName()+"/1"
       changes[0].left == 5
       changes[0].right == 6
+    }
+
+    def "should map Set field to SetType when entity is not registered"(){
+        given:
+        def javers = javers().build()
+
+        when:
+        ManagedType mapping = javers.getTypeMapping(ValueObjectHolder.class)
+
+        then:
+        mapping.getProperty('valueObjects').getType() instanceof SetType
+    }
+
+    def "should map Set field to SetType when entity is registered"(){
+        given:
+        def javers = javers()
+                .registerEntity(EntityDefinitionBuilder
+                        .entityDefinition(ValueObjectHolder.class)
+                        .withIdPropertyName('id')
+                        .withIncludedProperties(['id', 'valueObjects'])
+                        .build())
+                .build()
+
+        when:
+        ManagedType mapping = javers.getTypeMapping(ValueObjectHolder.class)
+
+        then:
+        mapping.getProperty('valueObjects').getType() instanceof SetType
+    }
+
+    def "should map Set field to SetType when entity is registered and has @ShallowReference"(){
+        given:
+        def javers = javers()
+                .registerEntity(EntityDefinitionBuilder
+                        .entityDefinition(ValueObjectHolderAnnotated.class)
+                        .withIdPropertyName('id')
+                        .withIncludedProperties(['id', 'valueObjects'])
+                        .build())
+                .build()
+
+        when:
+        ManagedType mapping = javers.getTypeMapping(ValueObjectHolderAnnotated.class)
+
+        then:
+        mapping.getProperty('valueObjects').getType() instanceof SetType
+    }
+
+    def "should map Set field to SetType when entity is registered with shallow properties"(){
+        given:
+        def javers = javers()
+                .registerEntity(EntityDefinitionBuilder
+                        .entityDefinition(ValueObjectHolder.class)
+                        .withIdPropertyName('id')
+                        .withIncludedProperties(['id', 'valueObjects'])
+                        .withShallowProperties(['valueObjects'])
+                        .build())
+                .build()
+
+        when:
+        ManagedType mapping = javers.getTypeMapping(ValueObjectHolder.class)
+
+        then:
+        mapping.getProperty('valueObjects').getType() instanceof SetType
     }
 
     @TypeName("ClassWithValue")
