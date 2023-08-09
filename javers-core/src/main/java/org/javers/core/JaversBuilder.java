@@ -162,22 +162,20 @@ public class JaversBuilder extends AbstractContainerBuilder {
         // boot add-ons modules
         Set<JaversType> additionalTypes = bootAddOns();
 
-        mapRegisteredClasses();
-
         // boot JSON beans & domain aware typeAdapters
         bootJsonConverter();
 
         bootDateTimeProvider();
 
-        // clases to scan & additionalTypes
-        for (Class c : classesToScan){
-            typeMapper().getJaversType(c);
-        }
+        // classes to scan & additionalTypes
+        classesToScan.forEach(c -> typeMapper().getJaversType(c));
         typeMapper().addPluginTypes(additionalTypes);
 
         // register core / well known types last in case client definitions or other modules
         // would like to register them with different comparators, converters etc.
-        typeMapper().registerCoreTypes(coreConfiguration);
+        typeMapper().registerCoreTypes(coreConfiguration, clientsClassDefinitions.values());
+
+        mapRegisteredClasses();
 
         bootRepository();
 
@@ -895,9 +893,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private void mapRegisteredClasses() {
         TypeMapper typeMapper = typeMapper();
-        for (ClientsClassDefinition def : clientsClassDefinitions.values()) {
-            typeMapper.registerClientsClass(def);
-        }
+        clientsClassDefinitions.values().forEach(def -> typeMapper.registerClientsClass(def));
     }
 
     private TypeMapper typeMapper() {

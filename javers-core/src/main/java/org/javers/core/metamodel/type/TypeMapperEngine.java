@@ -6,15 +6,16 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
-import org.javers.core.CoreConfiguration;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
+import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.java8support.Java8TypeAdapters;
 
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -47,40 +48,46 @@ class TypeMapperEngine {
         addFullMapping(javaType, jType);
     }
 
-    void registerCoreTypes(ListCompareAlgorithm listCompareAlgorithm){
-        //primitives & boxes
-        for (Class primitiveOrBox : Primitives.getPrimitiveAndBoxTypes()) {
-            registerCoreType(new PrimitiveType(primitiveOrBox));
-        }
+    void registerCoreTypes(ListCompareAlgorithm listCompareAlgorithm,
+                           Collection<ClientsClassDefinition> classesToSkip){
+        List<JaversType> coreTypes = new ArrayList<>();
+        Set<Class<?>> classesToSkipAsSet = classesToSkip.stream().map(it -> it.getBaseJavaClass())
+                .collect(Collectors.toSet());
 
-        registerCoreType(new PrimitiveType(Enum.class));
+        //primitives & boxes
+        Primitives.getPrimitiveAndBoxTypes()
+                .forEach(primitiveOrBox -> coreTypes.add(new PrimitiveType(primitiveOrBox)));
+
+        coreTypes.add(new PrimitiveType(Enum.class));
 
         //array
-        registerCoreType(new ArrayType(Object[].class, typeMapperlazy));
+        coreTypes.add(new ArrayType(Object[].class, typeMapperlazy));
 
         //well known Value types
-        for (Class valueType : WellKnownValueTypes.getOldGoodValueTypes()) {
-            registerCoreType(new ValueType(valueType));
-        }
+        WellKnownValueTypes.getOldGoodValueTypes()
+                .forEach(valueType-> coreTypes.add(new ValueType(valueType)));
 
         //java util and sql types
-        registerCoreTypes((List) UtilTypeCoreAdapters.valueTypes());
+        coreTypes.addAll(UtilTypeCoreAdapters.valueTypes());
 
         //java time types
-        registerCoreTypes((List) Java8TypeAdapters.valueTypes());
+        coreTypes.addAll(Java8TypeAdapters.valueTypes());
 
         //Collections
-        registerCoreType(new CollectionType(Collection.class, typeMapperlazy));
-        registerCoreType(new SetType(Set.class, typeMapperlazy));
+        coreTypes.add(new CollectionType(Collection.class, typeMapperlazy));
+        coreTypes.add(new SetType(Set.class, typeMapperlazy));
         if (listCompareAlgorithm == ListCompareAlgorithm.AS_SET) {
-            registerCoreType(new ListAsSetType(List.class, typeMapperlazy));
+            coreTypes.add(new ListAsSetType(List.class, typeMapperlazy));
         } else {
-            registerCoreType(new ListType(List.class, typeMapperlazy));
+            coreTypes.add(new ListType(List.class, typeMapperlazy));
         }
-        registerCoreType(new OptionalType(typeMapperlazy));
+        coreTypes.add(new OptionalType(typeMapperlazy));
 
         //& Maps
-        registerCoreType(new MapType(Map.class, typeMapperlazy));
+        coreTypes.add(new MapType(Map.class, typeMapperlazy));
+
+        coreTypes.stream().filter(it -> !classesToSkipAsSet.contains(it.getBaseJavaType()))
+            .forEach(it -> registerCoreType(it));
     }
 
     void registerExplicitType(JaversType javersType) {
@@ -89,10 +96,6 @@ class TypeMapperEngine {
 
     private void registerCoreType(JaversType jType) {
         putIfAbsent(jType.getBaseJavaType(), jType);
-    }
-
-    private void registerCoreTypes(Collection<JaversType> jTypes) {
-        jTypes.forEach(t -> registerCoreType(t));
     }
 
     JaversType computeIfAbsent(Type javaType, Function<Type, JaversType> computeFunction) {

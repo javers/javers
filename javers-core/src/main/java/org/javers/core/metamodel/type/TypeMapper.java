@@ -59,8 +59,8 @@ public class TypeMapper implements TypeMapperLazy {
      * In case a ClientsClassDefinition is already present, we assume that the client knew what he was doing
      * because his ClientsClassDefinition will take precedence over whatever would have been registered as a core type.
      */
-    public void registerCoreTypes(CoreConfiguration javersCoreConfiguration) {
-        this.engine.registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
+    public void registerCoreTypes(CoreConfiguration javersCoreConfiguration, Collection<ClientsClassDefinition> classesToSkip) {
+        this.engine.registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm(), classesToSkip);
     }
 
     /**

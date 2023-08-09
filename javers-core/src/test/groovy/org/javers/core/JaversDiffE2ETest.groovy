@@ -637,7 +637,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         given:
         def javers = javers()
                 .registerEntity(EntityDefinitionBuilder
-                        .entityDefinition(ValueObjectHolderAnnotated.class)
+                        .entityDefinition(ValueObjectHolderAnnotated)
                         .withIdPropertyName('id')
                         .withIncludedProperties(['id', 'valueObjects'])
                         .build())
