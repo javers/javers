@@ -24,7 +24,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -58,9 +57,6 @@ public class JaversMongoAutoConfiguration {
 
     @Autowired
     private ApplicationContext applicationContext;
-
-    @Autowired
-    private MongoProperties mongoProperties; //from spring-boot-starter-data-mongodb
 
     @Autowired
     @Qualifier("javersMongoClientSettings")
