@@ -668,6 +668,70 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         mapping.getProperty('valueObjects').getType() instanceof SetType
     }
 
+    class EntityHolder {
+        @Id int id
+        ValueObjectHolder valueObjectHolder
+    }
+
+    def "should use entity definition for entity that is not a shallow reference"(){
+        given:
+        def javers = javers()
+                .registerEntity(EntityDefinitionBuilder
+                        .entityDefinition(EntityHolder.class)
+                        .withIdPropertyName('id')
+                        .withIncludedProperties(['id', 'valueObjectHolder'])
+                        .withTypeName(EntityHolder.simpleName)
+                        .build())
+                .registerEntity(EntityDefinitionBuilder
+                        .entityDefinition(ValueObjectHolder.class)
+                        .withIdPropertyName('id')
+                        .withIncludedProperties(['id', 'valueObjects'])
+                        .withShallowProperties(['valueObjects'])
+                        .withTypeName(ValueObjectHolder.simpleName)
+                        .build())
+                .build()
+
+        when:
+        ManagedType ehMapping = javers.getTypeMapping(EntityHolder.class)
+        ManagedType vohMapping = javers.getTypeMapping(ValueObjectHolder.class)
+
+        then:
+        ehMapping.name == EntityHolder.simpleName
+        ehMapping.properties.findAll { it.shallowReference }.isEmpty()
+        vohMapping.name == ValueObjectHolder.simpleName
+        vohMapping.properties.find { it.shallowReference }?.name == 'valueObjects'
+    }
+
+    def "should use entity definition for entity that is a shallow reference"(){
+        given:
+        def javers = javers()
+                .registerEntity(EntityDefinitionBuilder
+                        .entityDefinition(EntityHolder.class)
+                        .withIdPropertyName('id')
+                        .withIncludedProperties(['id', 'valueObjectHolder'])
+                        .withShallowProperties(['valueObjectHolder'])
+                        .withTypeName(EntityHolder.simpleName)
+                        .build())
+                .registerEntity(EntityDefinitionBuilder
+                        .entityDefinition(ValueObjectHolder.class)
+                        .withIdPropertyName('id')
+                        .withIncludedProperties(['id', 'valueObjects'])
+                        .withShallowProperties(['valueObjects'])
+                        .withTypeName(ValueObjectHolder.simpleName)
+                        .build())
+                .build()
+
+        when:
+        ManagedType ehMapping = javers.getTypeMapping(EntityHolder.class)
+        ManagedType vohMapping = javers.getTypeMapping(ValueObjectHolder.class)
+
+        then:
+        ehMapping.name == EntityHolder.simpleName
+        ehMapping.properties.find { it.shallowReference }?.name == 'valueObjectHolder'
+        vohMapping.name == ValueObjectHolder.simpleName
+        vohMapping.properties.find { it.shallowReference }?.name == 'valueObjects'
+    }
+
     @TypeName("ClassWithValue")
     static class Class1WithValue {
         @Id int id
