@@ -60,6 +60,10 @@ subprojects {
         options.noTimestamp()
     }
 
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs << '-parameters'
+    }
+
     task example(dependsOn: 'cleanTest') {
         doLast {
             tasks.test.testLogging {
