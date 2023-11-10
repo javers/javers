@@ -37,7 +37,7 @@ public class ArrayType extends ContainerType {
     public Object map(Object sourceArray, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(sourceArray, mapFunction, owner);
 
-        Object targetArray = newArray(sourceArray, null, false);
+        Object targetArray = newArray(sourceArray, false);
 
         int len = Array.getLength(sourceArray);
         EnumerationAwareOwnerContext enumerationContext = new IndexableEnumerationOwnerContext(owner);
@@ -55,9 +55,18 @@ public class ArrayType extends ContainerType {
 
     @Override
     public Object map(Object sourceArray, Function mapFunction, boolean filterNulls) {
+        return this.map(sourceArray, mapFunction, filterNulls, false);
+    }
+
+    @Override
+    public Object mapPreservingSourceItemType(Object sourceArray, Function mapFunction) {
+        return this.map(sourceArray, mapFunction, false, true);
+    }
+
+    private Object map(Object sourceArray, Function mapFunction, boolean filterNulls, boolean keepSourceItemTypes) {
         Validate.argumentsAreNotNull(sourceArray, mapFunction);
 
-        Object targetArray = newArray(sourceArray, mapFunction, true);
+        Object targetArray = newArray(sourceArray, keepSourceItemTypes);
 
         int len = Array.getLength(sourceArray);
         int t = 0;
@@ -80,7 +89,7 @@ public class ArrayType extends ContainerType {
         return Arrays.asList((Object[])source).stream();
     }
 
-    private Object newArray(Object sourceArray, Function mapFunction, boolean doSample) {
+    private Object newArray(Object sourceArray, boolean preserveItemType) {
         int len = Array.getLength(sourceArray);
         if (len == 0) {
             return sourceArray;
@@ -90,11 +99,8 @@ public class ArrayType extends ContainerType {
             return Array.newInstance(getItemClass(), len);
         }
 
-        if (doSample) {
-            Object sample = mapFunction.apply(Array.get(sourceArray, 0));
-            if (getItemClass().isAssignableFrom(sample.getClass())) {
-                return Array.newInstance(getItemClass(), len);
-            }
+        if (preserveItemType) {
+            return Array.newInstance(getItemClass(), len);
         }
 
         return Array.newInstance(Object.class, len);

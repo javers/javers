@@ -54,6 +54,13 @@ public abstract class EnumerableType extends ClassType {
         return map(sourceEnumerable, mapFunction, false);
     }
 
+    /**
+     * For building Shadows. Item type of new enumerable matters only for arrays
+     */
+    public Object mapPreservingSourceItemType(Object sourceEnumerable, Function mapFunction) {
+        return this.map(sourceEnumerable, mapFunction);
+    }
+
     public abstract Object map(Object sourceEnumerable, Function mapFunction, boolean filterNulls);
 
     public abstract boolean isEmpty(Object container);
