@@ -110,10 +110,6 @@ public class TypeMapper implements TypeMapperLazy {
         return engine.computeIfAbsent(javaType, j -> typeFactory.infer(j, findPrototype(j)));
     }
 
-    public boolean isShallowReferenceType(Type javaType) {
-        return getJaversType(javaType) instanceof ShallowReferenceType;
-    }
-
     public ClassType getJaversClassType(Type javaType) {
         argumentIsNotNull(javaType);
         JaversType jType = getJaversType(javaType);
@@ -214,8 +210,8 @@ public class TypeMapper implements TypeMapperLazy {
     public void registerClientsClass(ClientsClassDefinition def) {
         JaversType newType = typeFactory.create(def);
 
-        logger.debug("javersType of '{}' " + "mapped explicitly to {}",
-                def.getBaseJavaClass().getSimpleName(), newType.getClass().getSimpleName());
+        logger.debug("registering explicit type: {} -> {}",
+                def.getBaseJavaClass().getName(), newType.getClass().getSimpleName());
 
         engine.registerExplicitType(newType);
     }

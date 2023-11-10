@@ -59,7 +59,7 @@ class ManagedPropertiesFilter {
 
     private List<JaversProperty> applyShallowPropertiesConfiguration(List<JaversProperty> allProperties) {
         return allProperties.stream()
-            .map(it -> shallowProperties.contains(it.getName()) && !it.isShallowReference()
+            .map(it -> shallowProperties.contains(it.getName())
                     ? it.copyAsShallowReference()
                     : it)
             .collect(Collectors.toList());
