@@ -84,7 +84,6 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  */
 public class JaversBuilder extends AbstractContainerBuilder {
     public static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
-
     private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new LinkedHashMap<>();
 
     private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
@@ -171,10 +170,12 @@ public class JaversBuilder extends AbstractContainerBuilder {
         classesToScan.forEach(c -> typeMapper().getJaversType(c));
         typeMapper().addPluginTypes(additionalTypes);
 
-        // register core / well known types last in case client definitions or other modules
-        // would like to register them with different comparators, converters etc.
+        // register core / well known types last
         typeMapper().registerCoreTypes(coreConfiguration, clientsClassDefinitions.values());
 
+        // client definitions (explicit types) should have the highest priority
+        // if a client would like to register overwrite core types with
+        // different comparators, converters etc.
         mapRegisteredClasses();
 
         bootRepository();

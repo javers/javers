@@ -96,9 +96,8 @@ class TypeFactory {
 
         if (prototype.isPresent()) {
             JaversType jType = spawnFromPrototype(javaRichType, prototype.get());
-            logger.debug("javersType for '{}' spawned as {} from prototype {}",
-                    javaRichType.getTypeName(),
-                    jType.getClass().getSimpleName(), prototype.get());
+            logger.debug("registering prototype-based type: {} -> {}, inferred from prototype {}",
+                    javaType.getTypeName(), jType.getClass().getSimpleName(), prototype.get());
             return jType;
         }
 
@@ -106,8 +105,8 @@ class TypeFactory {
 
         return dynamicType
                 .orElseGet(() -> inferFromAnnotations(javaRichType).map(jType -> {
-                        logger.debug("javersType for '{}' inferred from annotations as {}",
-                        javaRichType.getTypeName(), jType.getClass().getSimpleName());
+                        logger.debug("registering dynamicType: {} -> {}, inferred from annotations",
+                                javaType.getTypeName(), jType.getClass().getSimpleName());
                         return jType;
                 })
                 .orElseGet(() -> inferFromHints(javaRichType)
@@ -152,7 +151,9 @@ class TypeFactory {
     }
 
     private JaversType createDefaultType(JavaRichType t) {
-        logger.debug("javersType for '{}' defaulted to ValueObjectType", t.getTypeName());
+        logger.debug("registering default type: {} -> {}",
+                t.getTypeName(), ValueObjectType.class.getSimpleName());
+
         return create(valueObjectDefinition(t.javaClass)
                 .withTypeName(t.getScan().typeName())
                 .defaultType()

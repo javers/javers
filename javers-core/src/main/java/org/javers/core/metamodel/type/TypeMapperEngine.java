@@ -10,6 +10,7 @@ import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.java8support.Java8TypeAdapters;
+import org.slf4j.Logger;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -23,6 +24,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * thread-safe, mutable state of JaversTypes mapping
  */
 class TypeMapperEngine {
+    static final Logger logger = TypeMapper.logger;
 
     private final Map<String, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
@@ -39,12 +41,6 @@ class TypeMapperEngine {
             return;
         }
 
-        addFullMapping(javaType, jType);
-    }
-
-    @Deprecated
-    private void putWithOverwrite(Type javaType, final JaversType jType) {
-        Validate.argumentsAreNotNull(javaType, jType);
         addFullMapping(javaType, jType);
     }
 
@@ -95,6 +91,7 @@ class TypeMapperEngine {
     }
 
     private void registerCoreType(JaversType jType) {
+        logger.debug("registering coreType: {} -> {} ", jType.getBaseJavaType().getTypeName(), jType.getClass().getSimpleName());
         putIfAbsent(jType.getBaseJavaType(), jType);
     }
 

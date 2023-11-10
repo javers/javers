@@ -78,8 +78,14 @@ public class JaversProperty extends Property {
     }
 
     public JaversProperty copyAsShallowReference() {
-      boolean isListedAsShallowReference = true;
-      return new JaversProperty(propertyType, getMember(), hasTransientAnn(), hasShallowReferenceAnn(), getName(), isHasIncludedAnn(), isListedAsShallowReference);
+      return new JaversProperty(
+              propertyType,
+              getMember(),
+              hasTransientAnn(),
+              hasShallowReferenceAnn(),
+              getName(),
+              isHasIncludedAnn(),
+              true);
     }
 
     @Override
