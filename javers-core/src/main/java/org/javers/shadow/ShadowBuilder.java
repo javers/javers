@@ -83,7 +83,7 @@ class ShadowBuilder {
         void wire() {
             EnumerableType propertyType = property.getType();
 
-            Object targetContainer = propertyType.map(targetWithShadows, (valueOrShadow) -> {
+            Object targetContainer = propertyType.mapPreservingSourceItemType(targetWithShadows, (valueOrShadow) -> {
                 if (valueOrShadow instanceof ShadowBuilder) {
                     //injecting reference to shadow
                     return ((ShadowBuilder) valueOrShadow).shadow;
