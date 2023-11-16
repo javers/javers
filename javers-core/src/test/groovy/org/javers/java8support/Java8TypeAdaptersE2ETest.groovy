@@ -12,9 +12,12 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.MonthDay
 import java.time.OffsetDateTime
+import java.time.OffsetTime
 import java.time.Period
 import java.time.Year
+import java.time.YearMonth
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
@@ -36,7 +39,7 @@ class Java8TypeAdaptersE2ETest extends Specification {
         javers.getTypeMapping(j8type) instanceof ValueType
 
         where:
-        j8type << [LocalDate, LocalDateTime, LocalTime, Year, ZonedDateTime, ZoneOffset, OffsetDateTime, Instant, Period, Duration]
+        j8type << [LocalDate, LocalDateTime, LocalTime, Year, ZonedDateTime, ZoneOffset, OffsetDateTime, Instant, Period, Duration, YearMonth, MonthDay, OffsetTime]
     }
 
     @Unroll

@@ -22,7 +22,10 @@ public class Java8TypeAdapters {
             new OffsetDateTimeTypeAdapter(),
             new InstantTypeAdapter(),
             new PeriodTypeAdapter(),
-            new DurationTypeAdapter());
+            new DurationTypeAdapter(),
+            new YearMonthTypeAdapter(),
+            new MonthDayTypeAdapter(),
+            new OffsetTimeTypeAdapter());
     }
 
     public static List<ValueType> valueTypes() {
@@ -36,7 +39,10 @@ public class Java8TypeAdapters {
                 buildValueType(OffsetDateTime.class, v -> v.toLocalDateTime().toString() + "," + v.getOffset()),
                 buildValueType(Instant.class, v -> v.getEpochSecond() + "," + v.getNano()),
                 buildValueType(Period.class, v -> v.getYears() + "," + v.getMonths() + "," + v.getDays()),
-                buildValueType(Duration.class, v -> v.getSeconds() + "," + v.getNano())
+                buildValueType(Duration.class, v -> v.getSeconds() + "," + v.getNano()),
+                buildValueType(YearMonth.class, v -> v.toString()),
+                buildValueType(MonthDay.class, v -> v.toString()),
+                buildValueType(OffsetTime.class, v -> v.toLocalTime().toString() + "," + v.getOffset())
         );
     }
 

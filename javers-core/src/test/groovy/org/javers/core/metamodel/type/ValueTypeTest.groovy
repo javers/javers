@@ -10,9 +10,12 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.MonthDay
 import java.time.OffsetDateTime
+import java.time.OffsetTime
 import java.time.Period
 import java.time.Year
+import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -51,6 +54,9 @@ class ValueTypeTest extends Specification {
         calculateToString(Period.between(LocalDate.of(2014, 1, 1), LocalDate.of(2015, 3, 7))) == "1,2,6"
         calculateToString(Duration.ofSeconds(6005)) == "6005,0"
         calculateToString(Duration.ofHours(3)) == "10800,0"
+        calculateToString(YearMonth.of(2019,02)) == "2019-02"
+        calculateToString(MonthDay.of(02,01)) == "--02-01"
+        calculateToString(OffsetTime.of(LocalTime.of(1,2,3), ZoneOffset.of("+05:00"))) == "01:02:03,+05:00"
     }
 
     String calculateToString(def val) {

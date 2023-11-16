@@ -11,9 +11,12 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.MonthDay
 import java.time.OffsetDateTime
+import java.time.OffsetTime
 import java.time.Period
 import java.time.Year
+import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -45,7 +48,10 @@ class JsonConverterJava8TypesTest extends Specification {
                          ZoneOffset,
                          OffsetDateTime,
                          Period,
-                         Duration
+                         Duration,
+                         YearMonth,
+                         MonthDay,
+                         OffsetTime
         ]
         givenValue   << [localDateTime,
                          LocalDate.of(2001,01,31),
@@ -57,7 +63,10 @@ class JsonConverterJava8TypesTest extends Specification {
                          ZoneOffset.of("+05:00"),
                          OffsetDateTime.of(localDateTime, ZoneOffset.of("+05:00")),
                          Period.between(LocalDate.of(2014, 1, 1), LocalDate.of(2015, 3, 7)),
-                         Duration.ofSeconds(6005)
+                         Duration.ofSeconds(6005),
+                         YearMonth.of(2001,01),
+                         MonthDay.of(01,31),
+                         OffsetTime.of(LocalTime.of(12,15,31),ZoneOffset.of("+05:00"))
         ]
         expectedJson << ['"2001-01-31T15:14:13.085"',
                          '"2001-01-31"',
@@ -69,7 +78,10 @@ class JsonConverterJava8TypesTest extends Specification {
                          '"+05:00"',
                          '"2001-01-31T15:14:13.085+05:00"',
                          '"P1Y2M6D"',
-                         '"PT1H40M5S"'
+                         '"PT1H40M5S"',
+                         '"2001-01"',
+                         '"--01-31"',
+                         '"12:15:31+05:00"'
         ]
     }
 
