@@ -7,6 +7,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.nio.file.Path
+
 /**
  * @author bartosz.walacik
  */
@@ -17,23 +19,25 @@ class JsonConverterUtilTypesTest extends Specification{
     @Unroll
     def "should convert #expectedType (#givenValue) to and from JSON"(){
         expect:
+        javers.getTypeMapping(expectedType) instanceof ValueType
         javers.jsonConverter.toJson( givenValue ) == expectedJson
         javers.jsonConverter.fromJson( expectedJson, expectedType ) == givenValue
-        javers.getTypeMapping(expectedType) instanceof ValueType
 
         where:
-        expectedType << [UUID, Currency, URI, URL, File]
+        expectedType << [UUID, Currency, URI, URL, File, Path]
         givenValue   << [new UUID(123456,654321),
                          Currency.getInstance("PLN"),
                          new URI("http://example.com"),
                          new URL("http://example.com"),
-                         new File("/tmp/file.txt")
+                         new File("/tmp/file.txt"),
+                         Path.of("file")
         ]
         expectedJson << ['"00000000-0001-e240-0000-00000009fbf1"',
                          '"PLN"',
                          '"http://example.com"',
                          '"http://example.com"',
-                         JsonOutput.toJson(new File('/tmp/file.txt').toString())
+                         JsonOutput.toJson(new File('/tmp/file.txt').toString()),
+                         '"file"'
         ]
     }
 }

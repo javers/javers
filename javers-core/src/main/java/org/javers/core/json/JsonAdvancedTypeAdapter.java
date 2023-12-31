@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
  *
  * @author bartosz.walacik
  */
-public interface JsonAdvancedTypeAdapter<T> {
+public interface JsonAdvancedTypeAdapter<T> extends AbstractJsonTypeAdapter {
 
     T fromJson(JsonElement json, Type typeOfT, JsonDeserializationContext context);
 

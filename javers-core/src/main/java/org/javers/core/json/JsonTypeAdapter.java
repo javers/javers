@@ -38,7 +38,7 @@ import java.util.List;
  * @see JsonAdvancedTypeAdapter
  * @author bartosz walacik
  */
-public interface JsonTypeAdapter<T> {
+public interface JsonTypeAdapter<T> extends AbstractJsonTypeAdapter {
 
     /**
      * @param json not null and not JsonNull
