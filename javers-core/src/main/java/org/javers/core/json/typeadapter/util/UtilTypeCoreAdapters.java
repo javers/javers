@@ -1,12 +1,18 @@
 package org.javers.core.json.typeadapter.util;
 
 import org.javers.common.collections.Lists;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.core.json.AbstractJsonTypeAdapter;
 import org.javers.core.json.BasicStringTypeAdapter;
+import org.javers.core.json.JsonAdvancedTypeAdapter;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.type.ValueType;
+import org.javers.java8support.OptionalTypeAdapter;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,21 +78,33 @@ public class UtilTypeCoreAdapters {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public static List<BasicStringTypeAdapter> adapters() {
-        return (List) Lists.immutableListOf(
+    public static List<AbstractJsonTypeAdapter> adapters() {
+        return Lists.immutableListOf(
+                new PathTypeAdapter(),
                 new JavaUtilDateTypeAdapter(),
                 new JavaSqlDateTypeAdapter(),
                 new JavaSqlTimestampTypeAdapter(),
                 new JavaSqlTimeTypeAdapter(),
                 new FileTypeAdapter(),
                 new UUIDTypeAdapter()
-        );
+                );
     }
 
     public static List<ValueType> valueTypes() {
         return adapters()
                 .stream()
-                .map(c -> new ValueType(c.getValueType()))
+                .flatMap(it -> getValueTypes(it).stream())
+                .map(c -> new ValueType(c))
                 .collect(Collectors.toList());
+    }
+
+    private static List<Class<?>> getValueTypes(AbstractJsonTypeAdapter adapter) {
+        if (adapter instanceof JsonAdvancedTypeAdapter) {
+            return List.of( ((JsonAdvancedTypeAdapter) adapter).getTypeSuperclass());
+        }
+        if (adapter instanceof JsonTypeAdapter) {
+            return ((JsonTypeAdapter) adapter).getValueTypes();
+        }
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
     }
 }

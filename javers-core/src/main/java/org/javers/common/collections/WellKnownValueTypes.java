@@ -1,5 +1,7 @@
 package org.javers.common.collections;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.zone.ZoneRules;
 import java.util.TimeZone;
@@ -21,7 +23,7 @@ public class WellKnownValueTypes {
             BigDecimal.class,
             BigInteger.class,
             ThreadLocal.class,
-            UUID.class,
+            //UUID.class,
             Currency.class,
             URI.class,
             URL.class,

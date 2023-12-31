@@ -27,7 +27,7 @@ public class JsonConverterBuilder {
         this.gsonBuilder.setExclusionStrategies(new SkipFieldExclusionStrategy());
         this.gsonBuilder.setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE);
         registerBuiltInAdapters(Java8TypeAdapters.adapters());
-        registerBuiltInAdapters((List)UtilTypeCoreAdapters.adapters());
+        registerBuiltInAdapters(UtilTypeCoreAdapters.adapters());
         registerJsonAdvancedTypeAdapter(new OptionalTypeAdapter());
     }
 
@@ -143,6 +143,14 @@ public class JsonConverterBuilder {
         return this;
     }
 
+    private void registerJsonTypeAdapterForType(Class targetType, final JsonTypeAdapter adapter) {
+        JsonSerializer jsonSerializer = (value, type, jsonSerializationContext) -> adapter.toJson(value, jsonSerializationContext);
+        JsonDeserializer jsonDeserializer = (jsonElement, type, jsonDeserializationContext) -> adapter.fromJson(jsonElement, jsonDeserializationContext);
+
+        registerNativeGsonSerializer(targetType, jsonSerializer);
+        registerNativeGsonDeserializer(targetType, jsonDeserializer);
+    }
+
     public JsonConverter build() {
         registerBuiltInAdapter(new AtomicTypeAdapter(typeSafeValues));
 
@@ -158,20 +166,19 @@ public class JsonConverterBuilder {
         return new JsonConverter(gsonBuilder.create());
     }
 
-    private void registerJsonTypeAdapterForType(Class targetType, final JsonTypeAdapter adapter) {
-        JsonSerializer jsonSerializer = (value, type, jsonSerializationContext) -> adapter.toJson(value, jsonSerializationContext);
-        JsonDeserializer jsonDeserializer = (jsonElement, type, jsonDeserializationContext) -> adapter.fromJson(jsonElement, jsonDeserializationContext);
-
-        registerNativeGsonSerializer(targetType, jsonSerializer);
-        registerNativeGsonDeserializer(targetType, jsonDeserializer);
-    }
-
-    private void registerBuiltInAdapters(final List<JsonTypeAdapter> adapters) {
-        adapters.forEach(this::registerBuiltInAdapter);
+    private <T extends AbstractJsonTypeAdapter> void registerBuiltInAdapters(final List<T> adapters) {
+        adapters.forEach(a -> {
+            if (a instanceof JsonAdvancedTypeAdapter) {
+                registerJsonAdvancedTypeAdapter((JsonAdvancedTypeAdapter) a);
+            }
+            if (a instanceof JsonTypeAdapter) {
+                registerBuiltInAdapter((JsonTypeAdapter) a);
+            }
+        });
     }
 
     private void registerBuiltInAdapter(final JsonTypeAdapter adapter) {
-        adapter.getValueTypes().forEach( c -> registerJsonTypeAdapterForType((Class) c, adapter));
+        adapter.getValueTypes().forEach(c -> registerJsonTypeAdapterForType((Class) c, adapter));
     }
 
     private static class SkipFieldExclusionStrategy implements ExclusionStrategy {

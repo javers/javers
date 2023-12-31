@@ -9,7 +9,7 @@ import spock.lang.Specification
 /**
  * @author bartosz.walacik
  */
-public class OpBoxCaseClassExtractionError extends Specification {
+class OpBoxCaseClassExtractionError extends Specification {
     interface ParamType {
         String getName()
     }
