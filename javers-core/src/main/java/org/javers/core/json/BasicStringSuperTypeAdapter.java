@@ -9,27 +9,8 @@ import java.lang.reflect.Type;
 
 public abstract class BasicStringSuperTypeAdapter<T> implements JsonAdvancedTypeAdapter<T> {
 
-    /**
-     * Example serialization for LocalDateTime:
-     * <pre>
-     * public String serialize(LocalDateTime sourceValue) {
-     *     return ISO_DATE_TIME_FORMATTER.print(sourceValue);
-     * }
-     * </pre>
-     * @param sourceValue not null
-     */
     public abstract String serialize(T sourceValue);
 
-    /**
-     * Example deserialization for LocalDateTime:
-     * <pre>
-     * public LocalDateTime deserialize(String serializedValue) {
-     *     return ISO_DATE_TIME_FORMATTER.parseLocalDateTime(serializedValue);
-     * }
-     * </pre>
-     *
-     * @param serializedValue not null
-     */
     public abstract T deserialize(String serializedValue);
 
     @Override

@@ -23,7 +23,6 @@ public class WellKnownValueTypes {
             BigDecimal.class,
             BigInteger.class,
             ThreadLocal.class,
-            //UUID.class,
             Currency.class,
             URI.class,
             URL.class,
