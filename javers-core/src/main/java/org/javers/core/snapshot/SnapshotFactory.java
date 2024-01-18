@@ -3,6 +3,7 @@ package org.javers.core.snapshot;
 import org.javers.common.collections.Defaults;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.core.CoreConfiguration;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.HashWrapper;
 import org.javers.core.graph.Cdo;
@@ -23,20 +24,26 @@ import static org.javers.core.metamodel.object.SnapshotType.*;
  */
 public class SnapshotFactory {
     private final TypeMapper typeMapper;
+    private final CoreConfiguration javersCoreConfiguration;
 
-    SnapshotFactory(TypeMapper typeMapper) {
+    SnapshotFactory(TypeMapper typeMapper, CoreConfiguration javersCoreConfiguration) {
+        this.javersCoreConfiguration = javersCoreConfiguration;
         this.typeMapper = typeMapper;
     }
 
     public CdoSnapshot createTerminal(GlobalId globalId, CdoSnapshot previous, CommitMetadata commitMetadata) {
         ManagedType managedType = typeMapper.getJaversManagedType(globalId);
-        return cdoSnapshot()
+        CdoSnapshotBuilder snapshotBuilder = cdoSnapshot()
                 .withGlobalId(globalId)
                 .withManagedType(managedType)
                 .withCommitMetadata(commitMetadata)
                 .withType(TERMINAL)
-                .withVersion(previous != null ? (previous.getVersion() + 1) : 1)
-                .build();
+                .withVersion(previous != null ? (previous.getVersion() + 1) : 1);
+
+        if (previous != null && previous.getState() != null && javersCoreConfiguration.isTerminalSnapshot()) {
+            snapshotBuilder = snapshotBuilder.withState(previous.getState());
+        }
+        return snapshotBuilder.build();
     }
 
     CdoSnapshot createInitial(LiveNode liveNode, CommitMetadata commitMetadata) {

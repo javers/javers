@@ -22,6 +22,7 @@ public class CoreConfiguration {
     private final boolean initialChanges;
 
     private final boolean terminalChanges;
+    private final boolean terminalSnapshot;
 
     private final boolean usePrimitiveDefaults;
 
@@ -29,7 +30,7 @@ public class CoreConfiguration {
 
     private final Supplier<CommitId> customCommitIdGenerator;
 
-    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean initialChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean terminalChanges, boolean prettyPrint,
+    CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean initialChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean terminalChanges, boolean terminalSnapshot, boolean prettyPrint,
             boolean usePrimitiveDefaults) {
         this.prettyValuePrinter = prettyValuePrinter;
         this.mappingStyle = mappingStyle;
@@ -38,6 +39,7 @@ public class CoreConfiguration {
         this.commitIdGenerator = commitIdGenerator;
         this.customCommitIdGenerator = customCommitIdGenerator;
         this.terminalChanges = terminalChanges;
+        this.terminalSnapshot = terminalSnapshot;
         this.prettyPrint = prettyPrint;
         this.usePrimitiveDefaults = usePrimitiveDefaults;
     }
@@ -65,6 +67,8 @@ public class CoreConfiguration {
     public boolean isTerminalChanges() {
         return terminalChanges;
     }
+
+    public boolean isTerminalSnapshot() { return terminalSnapshot; }
 
     public CommitIdGenerator getCommitIdGenerator() {
         return commitIdGenerator;
