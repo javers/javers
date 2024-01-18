@@ -3,6 +3,7 @@ package org.javers.shadow;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.JaversRepository;
 
 /**
@@ -21,11 +22,13 @@ import org.javers.repository.api.JaversRepository;
  */
 public class Shadow<T> {
     private final CommitMetadata commitMetadata;
+    private final CdoSnapshot cdoSnapshot;
     private final T it;
 
-    Shadow(CommitMetadata commitMetadata, T shadow) {
+    Shadow(CommitMetadata commitMetadata, CdoSnapshot cdoSnapshot, T shadow) {
         Validate.argumentsAreNotNull(commitMetadata, shadow);
         this.commitMetadata = commitMetadata;
+        this.cdoSnapshot = cdoSnapshot;
         this.it = shadow;
     }
 
