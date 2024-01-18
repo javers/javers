@@ -24,7 +24,7 @@ public class ShadowFactory {
 
     public Shadow createShadow(CdoSnapshot cdoSnapshot, CommitMetadata rootContext, BiFunction<CommitMetadata, GlobalId, CdoSnapshot> referenceResolver) {
         ShadowGraphBuilder builder = new ShadowGraphBuilder(jsonConverter, referenceResolver, typeMapper, rootContext);
-        return new Shadow(rootContext, builder.buildDeepShadow(cdoSnapshot));
+        return new Shadow(rootContext, cdoSnapshot, builder.buildDeepShadow(cdoSnapshot));
     }
 
     Object createShadow(CdoSnapshot cdoSnapshot) {
