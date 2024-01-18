@@ -785,6 +785,30 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+    /**
+     * The <b>Terminal Snapshot</b> switch, disabled by default since Javers 7.3.9.
+     * <br/><br/>
+     *
+     * When the switch is enabled, Terminal Snapshot will not have empty state.
+     * It is useful to get deleted records with actual state instead of empty state.
+     * It will not change the behaviour of Terminal changes calculation.
+     * In Javers Spring Boot starter you can enable Terminal Snapshot in `application.yml`:
+     *
+     * <pre>
+     * javers:
+     *   terminalSnapshot: true
+     * </pre>
+     *
+     * @since 7.3.9
+     * @see ObjectRemoved
+     * @see JaversBuilder#withUsePrimitiveDefaults(boolean)
+     * @see JaversBuilder#withInitialChanges(boolean) (boolean)
+     */
+    public JaversBuilder withTerminalSnapshot(boolean terminalSnapshot){
+        configurationBuilder().withTerminalSnapshot(terminalSnapshot);
+        return this;
+    }
+
     public JaversBuilder withObjectAccessHook(ObjectAccessHook objectAccessHook) {
         removeComponent(ObjectAccessHook.class);
         bindComponent(ObjectAccessHook.class, objectAccessHook);
@@ -883,6 +907,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
         }
         if (javersProperties.isTerminalChanges() != null) {
             withTerminalChanges(javersProperties.isTerminalChanges());
+        }
+        if (javersProperties.isTerminalSnapshot() != null) {
+            withTerminalSnapshot(javersProperties.isTerminalSnapshot());
         }
         if (javersProperties.isUsePrimitiveDefaults() != null) {
             withUsePrimitiveDefaults(javersProperties.isUsePrimitiveDefaults());
