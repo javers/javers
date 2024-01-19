@@ -40,6 +40,8 @@ public class Shadow<T> {
         return commitMetadata.getId();
     }
 
+    public CdoSnapshot getCdoSnapshot() { return cdoSnapshot; }
+
     /**
      * Shadow object per se
      */
