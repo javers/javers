@@ -11,7 +11,7 @@ import org.javers.repository.api.JaversRepository;
  * from a snapshot loaded from {@link JaversRepository}.
  * <br/><br/>
  *
- * Shadows use the same types as domain objects.
+ * Shadows objects are of the same type domain objects.
  * For example, a Shadow of a Person object is an instance of Person.class.
  * <br/><br/>
  *
@@ -21,23 +21,21 @@ import org.javers.repository.api.JaversRepository;
  * @author bartosz.walacik
  */
 public class Shadow<T> {
-    private final CommitMetadata commitMetadata;
     private final CdoSnapshot cdoSnapshot;
     private final T it;
 
-    Shadow(CommitMetadata commitMetadata, CdoSnapshot cdoSnapshot, T shadow) {
-        Validate.argumentsAreNotNull(commitMetadata, shadow);
-        this.commitMetadata = commitMetadata;
+    Shadow(CdoSnapshot cdoSnapshot, T shadow) {
+        Validate.argumentsAreNotNull(cdoSnapshot, shadow);
         this.cdoSnapshot = cdoSnapshot;
         this.it = shadow;
     }
 
     public CommitMetadata getCommitMetadata() {
-        return commitMetadata;
+        return cdoSnapshot.getCommitMetadata();
     }
 
     public CommitId getCommitId() {
-        return commitMetadata.getId();
+        return getCommitMetadata().getId();
     }
 
     public CdoSnapshot getCdoSnapshot() { return cdoSnapshot; }
@@ -53,7 +51,7 @@ public class Shadow<T> {
     public String toString() {
         return "Shadow{" +
                 "it=" + it +
-                ", commitMetadata=" + commitMetadata +
+                ", commitMetadata=" + getCommitMetadata() +
                 '}';
     }
 }
