@@ -22,23 +22,33 @@ import org.javers.repository.api.JaversRepository;
  */
 public class Shadow<T> {
     private final CdoSnapshot cdoSnapshot;
+    private final CommitMetadata rootCommitMetadata;
     private final T it;
 
-    Shadow(CdoSnapshot cdoSnapshot, T shadow) {
-        Validate.argumentsAreNotNull(cdoSnapshot, shadow);
+    Shadow(CommitMetadata rootCommitMetadata, CdoSnapshot cdoSnapshot, T shadow) {
+        Validate.argumentsAreNotNull(rootCommitMetadata, cdoSnapshot, shadow);
         this.cdoSnapshot = cdoSnapshot;
+        this.rootCommitMetadata = rootCommitMetadata;
         this.it = shadow;
     }
 
+    /**
+     * Root commit metadata
+     */
     public CommitMetadata getCommitMetadata() {
-        return cdoSnapshot.getCommitMetadata();
+        return rootCommitMetadata;
     }
 
+    /**
+     * Root commit Id
+     */
     public CommitId getCommitId() {
-        return getCommitMetadata().getId();
+        return rootCommitMetadata.getId();
     }
 
-    public CdoSnapshot getCdoSnapshot() { return cdoSnapshot; }
+    public CdoSnapshot getCdoSnapshot() {
+        return cdoSnapshot;
+    }
 
     /**
      * Shadow object per se
