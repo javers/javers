@@ -15,7 +15,7 @@ class ObjectHasherTest extends Specification {
 
     def setupSpec(){
         javers = JaversTestBuilder.javersTestAssembly()
-        objectHasher = new ObjectHasher(javers.snapshotFactory, javers.jsonConverter)
+        objectHasher = new SnapshotObjectHasher(javers.snapshotFactory, javers.jsonConverter)
     }
 
     def "should calculate hash of ValueObject "(){

@@ -10,16 +10,21 @@ import java.util.Collection;
  * @author bartosz.walacik
  */
 public class GraphFactoryModule extends InstantiatingModule {
-    public GraphFactoryModule(MutablePicoContainer container) {
+	
+    private Class<? extends ObjectHasher> objectHasherImplementation;
+
+    public GraphFactoryModule(MutablePicoContainer container, Class<? extends ObjectHasher> objectHasherImplementation) {
         super(container);
+        this.objectHasherImplementation = objectHasherImplementation;
     }
+
     @Override
     protected Collection<Class> getImplementations() {
         return (Collection) Lists.asList(
                LiveCdoFactory.class,
                CollectionsCdoFactory.class,
                LiveGraphFactory.class,
-               ObjectHasher.class,
+               objectHasherImplementation,
                ObjectGraphBuilder.class,
                ObjectAccessHookDoNothingImpl.class);
     }

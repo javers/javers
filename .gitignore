@@ -1,6 +1,9 @@
 # IDE
 .idea
 *.iml
+.classpath
+.settings
+.project
 
 # Maven
 target
@@ -13,6 +16,7 @@ build
 out
 classes
 lib
+bin
 
 # mac os x
 .DS_Store
