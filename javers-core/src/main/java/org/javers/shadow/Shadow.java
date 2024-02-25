@@ -12,7 +12,7 @@ import org.javers.repository.api.JaversRepository;
  * <br/><br/>
  *
  * Shadows objects are of the same type domain objects.
- * For example, a Shadow of a Person object is an instance of Person.class.
+ * For example, a Shadow of a Person object is an instance of the Person class.
  * <br/><br/>
  *
  * Shadows class is a thin wrapper for a Shadow object and {@link CommitMetadata}
