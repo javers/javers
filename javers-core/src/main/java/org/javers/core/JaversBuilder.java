@@ -21,7 +21,10 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.custom.*;
 import org.javers.core.graph.GraphFactoryModule;
+import org.javers.core.graph.HashCodeObjectHasher;
 import org.javers.core.graph.ObjectAccessHook;
+import org.javers.core.graph.ObjectHasher;
+import org.javers.core.graph.SnapshotObjectHasher;
 import org.javers.core.graph.TailoredJaversMemberFactoryModule;
 import org.javers.core.json.JsonAdvancedTypeAdapter;
 import org.javers.core.json.JsonConverter;
@@ -96,6 +99,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     private JaversRepository repository;
     private DateProvider dateProvider;
     private long bootStart = System.currentTimeMillis();
+    private Class<? extends ObjectHasher> objectHasherImplementation = SnapshotObjectHasher.class;
 
     private IgnoredClassesStrategy ignoredClassesStrategy;
 
@@ -147,7 +151,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new DiffFactoryModule());
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new SnapshotModule(getContainer()));
-        addModule(new GraphFactoryModule(getContainer()));
+        addModule(new GraphFactoryModule(getContainer(), objectHasherImplementation));
         addModule(new DiffAppendersModule(coreConfiguration, getContainer()));
         addModule(new TailoredJaversMemberFactoryModule(coreConfiguration, getContainer()));
         addModule(new ScannerModule(coreConfiguration, getContainer()));
@@ -181,6 +185,18 @@ public class JaversBuilder extends AbstractContainerBuilder {
         bootRepository();
 
         return getContainerComponent(JaversCore.class);
+    }
+    
+    /**
+     * Registeer an custom {@link ObjectHasher} implementation.
+     * The default implementation compare object by json serialization based on snapshot state {@link SnapshotObjectHasher}.
+     * 
+     * Optional implementation uses {@link #hashCode()} method form the object {@link HashCodeObjectHasher}. This is beneficial for unorderted collections to detect changes on that collection for value objects
+     * 
+     */
+    public JaversBuilder registerObjectHasher(Class<? extends ObjectHasher> objectHasherType) {
+    	objectHasherImplementation = objectHasherType;
+    	return this;
     }
 
     /**
