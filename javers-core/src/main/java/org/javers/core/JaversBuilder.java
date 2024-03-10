@@ -188,11 +188,20 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
     
     /**
-     * Registeer an custom {@link ObjectHasher} implementation.
-     * The default implementation compare object by json serialization based on snapshot state {@link SnapshotObjectHasher}.
-     * 
-     * Optional implementation uses {@link #hashCode()} method form the object {@link HashCodeObjectHasher}. This is beneficial for unorderted collections to detect changes on that collection for value objects
-     * 
+     * Register a custom {@link ObjectHasher} implementation, which
+     * is used to identify Value Objects inside Sets.
+     *
+     * The default implementation compares objects
+     * by value using JSON serialization state, see {@link SnapshotObjectHasher}.
+     * <br/><br/>
+     *
+     * Alternative implementation &mdash; {@link HashCodeObjectHasher}
+     * uses standard Java {@link #hashCode()} to identify Value Objects inside Sets.
+     * This approach can be beneficial if you for some reason don't want to map
+     * a given Value Object type as Entity but still you want this type to be identifiable inside Sets.
+     *
+     * @see ValueObjectType
+     * @see Case1301ObjectHasherSpec
      */
     public JaversBuilder registerObjectHasher(Class<? extends ObjectHasher> objectHasherType) {
     	objectHasherImplementation = objectHasherType;
