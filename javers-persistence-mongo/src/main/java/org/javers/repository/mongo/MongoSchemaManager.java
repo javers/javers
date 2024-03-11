@@ -28,6 +28,7 @@ public class MongoSchemaManager {
     static final String GLOBAL_ID_KEY = "globalId_key";
     static final String GLOBAL_ID_ENTITY = "globalId.entity";
     static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
+    static final String GLOBAL_ID_OWNER_ID_CDO_ID = "globalId.ownerId.cdoId";
     static final String GLOBAL_ID_FRAGMENT = "globalId.fragment";
     static final String GLOBAL_ID_VALUE_OBJECT = "globalId.valueObject";
     static final String SNAPSHOT_VERSION = "version";
