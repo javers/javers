@@ -16,6 +16,7 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
@@ -181,7 +182,17 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     }
 
     private Bson createIdQueryWithAggregate(GlobalId id) {
-        return Filters.or(createIdQuery(id), prefixQuery(GLOBAL_ID_KEY, id.value() + "#"));
+        if (id instanceof InstanceId) {
+            return Filters.or(
+                createIdQuery(id),
+                new BasicDBObject(GLOBAL_ID_OWNER_ID_CDO_ID, ((InstanceId)id).getCdoId())
+            );
+        }
+
+        return Filters.or(
+            createIdQuery(id),
+            prefixQuery(GLOBAL_ID_KEY, id.value() + "#")
+        );
     }
 
     private Bson createVersionQuery(Long version) {
