@@ -56,6 +56,7 @@ public class MongoSchemaManager {
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
+        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_CDO_ID, ASC));
 
         if (dialect == MONGO_DB) {
             snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC),
