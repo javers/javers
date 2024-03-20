@@ -254,6 +254,7 @@ public class JaversSchemaManager extends SchemaNameAware {
                 } while(tableSchemaName != null
                         && !tableSchemaName.equalsIgnoreCase("public")
                         && !tableSchemaName.equals("")
+                        && (!(this.dialect instanceof PostgresDialect))
                         && (!(this.dialect instanceof MsSqlDialect) || !tableSchemaName.equalsIgnoreCase("dbo"))
                         && (!(this.dialect instanceof OracleDialect) || !tableSchemaName.equalsIgnoreCase("system"))
                 );
