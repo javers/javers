@@ -239,10 +239,17 @@ public class ReflectionUtil {
                 parents.add(current);
             }
 
-            for (Class i : current.getInterfaces()) {
-                if (!interfaces.contains(i)) {
-                    interfaces.add(i);
+            Class<?>[] currentInterfaces = current.getInterfaces();
+            while (currentInterfaces.length != 0) {
+                for (final Class<?> i : currentInterfaces) {
+                    if (!interfaces.contains(i)) {
+                        interfaces.add(i);
+                    }
                 }
+
+                currentInterfaces = Arrays.stream(currentInterfaces)
+                        .flatMap(currentInterface -> Arrays.stream(currentInterface.getInterfaces()))
+                        .toArray(Class<?>[]::new);
             }
 
             current = current.getSuperclass();
