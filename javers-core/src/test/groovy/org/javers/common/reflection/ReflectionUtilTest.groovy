@@ -66,7 +66,7 @@ class ReflectionUtilTest extends Specification {
 
     def "should calculate hierarchy distance as follows (parents first, interfaces last)"() {
         expect:
-        ReflectionUtil.calculateHierarchyDistance(HashMap) == [AbstractMap, Map, Cloneable, Serializable]
+        ReflectionUtil.calculateHierarchyDistance(TreeMap) == [AbstractMap, NavigableMap, Cloneable, Serializable, SortedMap, Map]
     }
 
     def "should get all methods from a given class without inheritance duplicates"(){
