@@ -1,3 +1,7 @@
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.4.0'
+}
+
 rootProject.name = 'javers'
 
 include 'javers-core', 'javers-persistence-sql', 'javers-persistence-mongo', 'javers-spring', 'javers-spring-jpa', 'javers-spring-mongo', 'javers-spring-boot-starter-mongo', 'javers-spring-boot-starter-sql'
