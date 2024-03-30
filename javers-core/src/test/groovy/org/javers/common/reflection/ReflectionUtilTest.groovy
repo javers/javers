@@ -64,7 +64,7 @@ class ReflectionUtilTest extends Specification {
         instance instanceof ReflectionTestClass
     }
 
-    def "should calculate hierarchy distance as follows (parents first, interfaces last)"() {
+    def "should calculate hierarchy distance as follow (parents first, interfaces last)"() {
         expect:
         ReflectionUtil.calculateHierarchyDistance(TreeMap) == [AbstractMap, NavigableMap, Cloneable, Serializable, SortedMap, Map]
     }

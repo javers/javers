@@ -13,6 +13,9 @@ import org.slf4j.Logger;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -228,6 +231,14 @@ public class ReflectionUtil {
         return false;
     }
 
+    public static List<Class<?>> getAllInterfaces(Class<?> clazz) {
+        var directInterfaces = clazz.getInterfaces();
+        return Stream.concat(
+                 Arrays.stream(directInterfaces),
+                 Arrays.stream(directInterfaces).flatMap(i -> getAllInterfaces(i).stream())
+                ).collect(Collectors.toList());
+    }
+
     public static List<Type> calculateHierarchyDistance(Class<?> clazz) {
         List<Type> interfaces = new ArrayList<>();
 
@@ -239,18 +250,7 @@ public class ReflectionUtil {
                 parents.add(current);
             }
 
-            Class<?>[] currentInterfaces = current.getInterfaces();
-            while (currentInterfaces.length != 0) {
-                for (final Class<?> i : currentInterfaces) {
-                    if (!interfaces.contains(i)) {
-                        interfaces.add(i);
-                    }
-                }
-
-                currentInterfaces = Arrays.stream(currentInterfaces)
-                        .flatMap(currentInterface -> Arrays.stream(currentInterface.getInterfaces()))
-                        .toArray(Class<?>[]::new);
-            }
+            getAllInterfaces(current).stream().filter(it -> !interfaces.contains(it)).forEach(it -> interfaces.add(it));
 
             current = current.getSuperclass();
         }

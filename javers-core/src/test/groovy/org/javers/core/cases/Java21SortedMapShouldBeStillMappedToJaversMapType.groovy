@@ -21,6 +21,8 @@ class Java21SortedMapShouldBeStillMappedToJaversMapType extends Specification{
         final def jType = javers.getTypeMapping(SortedMap)
 
         then:
+        println("java.version: " + System.getProperty("java.version"))
+        println("java.vendor: " + System.getProperty("java.vendor"))
         jType instanceof MapType
     }
 }
