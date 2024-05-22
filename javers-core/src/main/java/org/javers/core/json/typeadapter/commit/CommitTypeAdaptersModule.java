@@ -16,11 +16,10 @@ public class CommitTypeAdaptersModule extends InstantiatingModule {
 
     @Override
     protected Collection<Class> getImplementations() {
-        return (Collection)Lists.asList(
+        return Lists.asList(
                 CdoSnapshotTypeAdapter.class,
                 GlobalIdTypeAdapter.class,
                 CommitIdTypeAdapter.class,
-                JsonElementFakeAdapter.class,
                 CdoSnapshotStateTypeAdapter.class,
                 CommitMetadataTypeAdapter.class
         );
