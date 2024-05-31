@@ -1,9 +1,6 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
-import org.javers.core.metamodel.annotation.ShallowReference;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
@@ -12,12 +9,10 @@ import org.javers.core.metamodel.type.*;
  * @author bartosz walacik
  */
 class EdgeBuilder {
-    private final TypeMapper typeMapper;
     private final NodeReuser nodeReuser;
     private final LiveCdoFactory cdoFactory;
 
-    EdgeBuilder(TypeMapper typeMapper, NodeReuser nodeReuser, LiveCdoFactory cdoFactory) {
-        this.typeMapper = typeMapper;
+    EdgeBuilder(NodeReuser nodeReuser, LiveCdoFactory cdoFactory) {
         this.nodeReuser = nodeReuser;
         this.cdoFactory = cdoFactory;
     }
@@ -94,8 +89,20 @@ class EdgeBuilder {
             return nodeReuser.getForReuse(cdo);
         }
         else {
+            if (nodeReuser.isTraversed(cdo)) {
+                return buildNodeDouble(nodeReuser.getForDouble(cdo), cdo);
+            }
             return buildNodeStub(cdo);
         }
+    }
+
+    /**
+     * A node's double is created when we stumble upon an already traversed instance of VO
+     */
+    private LiveNode buildNodeDouble(LiveNode originalNode, LiveCdo cdoDouble) {
+        LiveNode newDouble = LiveNode.liveNodeDouble(originalNode, cdoDouble);
+        nodeReuser.saveNodeDouble(newDouble);
+        return newDouble;
     }
 
     LiveNode buildNodeStub(LiveCdo cdo){

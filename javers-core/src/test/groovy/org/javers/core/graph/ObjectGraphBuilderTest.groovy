@@ -285,7 +285,89 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .isMultiEdge("Em1", "Em2", "Em3")
     }
 
-    def "should manage graph cycles"(){
+    class ComplexProperty {
+        String value
+    }
+
+    class ListItem {
+        String name
+        ComplexProperty complexProperty
+    }
+    class TopLevelClass {
+        ComplexProperty complexProperty
+        List<ListItem> items
+    }
+
+    def "should map the same VO instance to different nodes, when put in different locations" () {
+        given:
+        def complexProperty = new ComplexProperty(value: "value1")
+        def o = new TopLevelClass(
+                complexProperty: complexProperty,
+                items: [
+                        new ListItem(name: "name1", complexProperty: complexProperty)
+                ])
+
+        def graphBuilder = newBuilder()
+
+        when:
+        def graph = graphBuilder.buildGraph(o)
+
+        then:
+        graph.nodes().size() == 4
+
+        def nodeA = graph.root()
+        def nodeB = nodeA.edges['complexProperty'].referencedNode
+        def nodeC = nodeA.edges['items'].references[0]
+        def nodeBA = nodeC.edges['complexProperty'].referencedNode
+
+        nodeA.globalId.value().endsWith("TopLevelClass/")
+        nodeB.globalId.value().endsWith("TopLevelClass/#complexProperty")
+        nodeC.globalId.value().endsWith("TopLevelClass/#items/0")
+        nodeBA.globalId.value().endsWith("TopLevelClass/#items/0/complexProperty")
+    }
+
+    class LoopedObject {
+        LoopedObject ref
+    }
+
+    def "should manage cycles in graph of Value Objects"(){
+        //  a
+        //  \ \
+        //   b \
+        //    \ \
+        //      c
+        given:
+        def graphBuilder = newBuilder()
+
+        def a = new LoopedObject()
+        def b = new LoopedObject()
+        def c = new LoopedObject()
+        a.ref = b
+        b.ref = c
+        c.ref = a
+
+        when:
+        def graph = graphBuilder.buildGraph(a)
+
+        then:
+        graph.nodes().size() == 4
+
+        def nodeA = graph.root()
+        def nodeB = nodeA.edges['ref'].referencedNode
+        def nodeC = nodeB.edges['ref'].referencedNode
+        def nodeCA = nodeC.edges['ref'].referencedNode
+
+        nodeA.globalId.value().endsWith("LoopedObject/")
+        nodeB.globalId.value().endsWith("LoopedObject/#ref")
+        nodeC.globalId.value().endsWith("LoopedObject/#ref/ref")
+        nodeCA.globalId.value().endsWith("LoopedObject/#ref/ref/ref")
+        nodeCA.edges['ref'].referencedNode == nodeB //assert shallow node
+
+        and: "should get descendants"
+        graph.root().descendants(10).size() == 3
+    }
+
+    def "should manage cycles in graph of Entities"(){
         //superKaz
         //  \ \   \
         //   kaz   \
@@ -300,11 +382,14 @@ abstract class ObjectGraphBuilderTest extends Specification {
         superKaz.employeesList = [ kaz, microKaz ]
 
         when:
-        def node = graphBuilder.buildGraph(superKaz).root()
+        def graph = graphBuilder.buildGraph(superKaz)
+        def root = graph.root()
 
         then:
+        graph.nodes().size() == 3
+
         //small cycle
-        assertThat(node).hasCdoId("superKaz")
+        assertThat(root).hasCdoId("superKaz")
                 .hasEdge("employeesList")
                 .isMultiEdge("kaz", "microKaz")
                 .andTargetNode("kaz")
@@ -312,7 +397,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .isSingleEdgeTo("superKaz")
 
         //large cycle
-        assertThat(node).hasCdoId("superKaz")
+        assertThat(root).hasCdoId("superKaz")
                 .hasMultiEdge("employeesList")
                 .andTargetNode("microKaz")
                 .hasEdge("supervisor")
@@ -322,7 +407,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .isSingleEdgeTo("superKaz")
 
         and: "should get descendants"
-        node.descendants(10).size() == 2
+        root.descendants(10).size() == 2
     }
 
     def "should build graph with primitive types Set"() {
@@ -496,17 +581,22 @@ abstract class ObjectGraphBuilderTest extends Specification {
         root.addChild(child1).addChild(child2)
 
         when:
-        def node = graphBuilder.buildGraph(root).root()
+        def graph = graphBuilder.buildGraph(root)
+        def rootN = graph.root()
 
         then:
-        assertThat(node).hasGlobalId(unboundedValueObjectId(CategoryVo))
-        assertThat(node).hasMultiEdge("children").refersToGlobalIds([
+        graph.nodes().size() == 5
+
+        assertThat(rootN).hasGlobalId(unboundedValueObjectId(CategoryVo))
+        assertThat(rootN).hasMultiEdge("children").refersToGlobalIds([
                 withUnboundedValueObjectOwner(CategoryVo, "children/0"),
                 withUnboundedValueObjectOwner(CategoryVo, "children/1")
         ])
-        assertThat(node).hasMultiEdge("children")
+        assertThat(rootN).hasMultiEdge("children")
                         .andFirstTargetNode()
-                        .hasSingleEdge("parent").andTargetNode().hasGlobalId(unboundedValueObjectId(CategoryVo))
+                        .hasSingleEdge("parent")
+                        .andTargetNode()
+                        .hasGlobalId(withUnboundedValueObjectOwner(CategoryVo, "children/0/parent"))
     }
 
     def "should support large graphs (more than 10000 edges)"() {
