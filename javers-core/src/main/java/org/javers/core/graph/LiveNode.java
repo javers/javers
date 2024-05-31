@@ -9,6 +9,7 @@ import org.javers.core.metamodel.type.JaversProperty;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -18,6 +19,12 @@ public class LiveNode extends ObjectNode<LiveCdo>{
 
     public LiveNode(LiveCdo cdo) {
         super(cdo);
+    }
+
+    static LiveNode liveNodeDouble(LiveNode originalNode, LiveCdo cdoDouble) {
+        LiveNode doubleNode =new LiveNode(cdoDouble);
+        doubleNode.edges.putAll(originalNode.edges);
+        return doubleNode;
     }
 
     Edge getEdge(Property property) {
@@ -98,8 +105,9 @@ public class LiveNode extends ObjectNode<LiveCdo>{
         this.edges.put(edge.getProperty().getName(), edge);
     }
 
+    // used in tests
     Set<LiveCdo> descendants(int maxDepth) {
-        return new NodeTraverser(this, maxDepth, null).descendantsSet();
+        return new NodeTraverser(this, maxDepth, null).descendantsList().stream().collect(Collectors.toUnmodifiableSet());
     }
 
     List<LiveCdo> descendantVOs(int maxDepth) {
@@ -108,6 +116,7 @@ public class LiveNode extends ObjectNode<LiveCdo>{
     }
 
     private static class NodeTraverser {
+        private final Set<LiveNode> descendantsSet = new HashSet<>();
         private final List<LiveCdo> descendantsList = new ArrayList<>();
         private final int maxDepth;
         private final ObjectNode root;
@@ -121,11 +130,12 @@ public class LiveNode extends ObjectNode<LiveCdo>{
         }
 
         void follow(Edge edge, int depth) {
-            edge.getReferences().forEach(n -> {
-                if(!n.equals(root) && filter.test(n)) {
-                    descendantsList.add(n.getCdo());
+            edge.getReferences().forEach(reference -> {
+                if(!descendantsSet.contains(reference) && !reference.equals(root) && filter.test(reference)) {
+                    descendantsSet.add(reference);  // for search
+                    descendantsList.add(reference.getCdo()); // for consistent ordering
                     if (depth < maxDepth) {
-                        followEdges(n, depth + 1);
+                        followEdges(reference, depth + 1);
                     }
                 }
             });
@@ -133,10 +143,6 @@ public class LiveNode extends ObjectNode<LiveCdo>{
 
         List<LiveCdo> descendantsList() {
             return Lists.immutableListOf(descendantsList);
-        }
-
-        Set<LiveCdo> descendantsSet() {
-            return Collections.unmodifiableSet(new HashSet<>(descendantsList));
         }
 
         void followEdges(LiveNode node, int depth) {

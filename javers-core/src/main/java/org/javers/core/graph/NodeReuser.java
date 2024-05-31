@@ -1,5 +1,6 @@
 package org.javers.core.graph;
 
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 
@@ -9,7 +10,8 @@ import java.util.*;
  * @author bartosz walacik
  */
 class NodeReuser {
-    private final Map<Object, LiveNode> reverseCdoIdMap = new HashMap<>();
+    private final Map<GlobalId, LiveNode> reverseCdoIdMap = new HashMap<>();
+    private final Map<SystemIdentityWrapper, LiveNode> traversedObjects = new HashMap<>();
     private final List<LiveNode> nodes = new ArrayList<>();
     private final Queue<LiveNode> stubs = new LinkedList<>();
     private int reusedNodes;
@@ -23,10 +25,20 @@ class NodeReuser {
         return reverseCdoIdMap.containsKey(reverseCdoIdMapKey(cdo));
     }
 
+    boolean isTraversed(Cdo cdo) {
+        return traversedObjects.containsKey(traversedObjectsMapKey(cdo));
+    }
+
     LiveNode getForReuse(Cdo cdo) {
         reusedNodes++;
         return reverseCdoIdMap.get(reverseCdoIdMapKey(cdo));
     }
+
+    LiveNode getForDouble(Cdo cdo) {
+        reusedNodes++;
+        return traversedObjects.get(traversedObjectsMapKey(cdo));
+    }
+
 
     List<LiveNode> nodes() {
         return Collections.unmodifiableList(nodes);
@@ -40,6 +52,12 @@ class NodeReuser {
             valueObjects++;
         }
         reverseCdoIdMap.put(reverseCdoIdMapKey(reference.getCdo()), reference);
+        traversedObjects.put(traversedObjectsMapKey(reference.getCdo()), reference);
+
+        nodes.add(reference);
+    }
+
+    void saveNodeDouble(LiveNode reference) {
         nodes.add(reference);
     }
 
@@ -71,22 +89,19 @@ class NodeReuser {
         return valueObjects;
     }
 
-    /**
-     * InstanceId for Entities,
-     * System.identityHashCode for ValueObjects
-     */
-    private Object reverseCdoIdMapKey(Cdo cdo) {
-        if (cdo.getGlobalId() instanceof InstanceId) {
-            return cdo.getGlobalId();
-        }
-        return new SystemIdentityWrapper(cdo.getWrappedCdo().get());
+    private GlobalId reverseCdoIdMapKey(Cdo cdo) {
+        return cdo.getGlobalId();
+    }
+
+    private SystemIdentityWrapper traversedObjectsMapKey(Cdo cdo) {
+        return new SystemIdentityWrapper(cdo);
     }
 
     private static class SystemIdentityWrapper {
-        private final Object cdo;
+        private final Object wrappedObject;
 
-        SystemIdentityWrapper(Object cdo) {
-            this.cdo = cdo;
+        SystemIdentityWrapper(Cdo cdo) {
+            this.wrappedObject = cdo.getWrappedCdo().get();
         }
 
         @Override
@@ -95,20 +110,12 @@ class NodeReuser {
                 return false;
             }
 
-            return this.cdo == ((SystemIdentityWrapper)o).cdo;
+            return this.wrappedObject == ((SystemIdentityWrapper)o).wrappedObject;
         }
 
         @Override
         public int hashCode() {
-            return System.identityHashCode(cdo);
-        }
-
-        @Override
-        public String toString() {
-            return "SystemIdentityWrapper{" +
-                    "hash:"+hashCode()+", "+
-                    "cdo:" + cdo +
-                    '}';
+            return System.identityHashCode(wrappedObject);
         }
     }
 }

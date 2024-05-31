@@ -1,9 +1,6 @@
 package org.javers.core.graph;
 
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.ValueObjectIdWithHash;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
@@ -36,7 +33,7 @@ class ObjectGraphBuilder {
         Validate.argumentsAreNotNull(typeMapper, cdoFactory);
         this.typeMapper = typeMapper;
         this.cdoFactory = cdoFactory;
-        this.edgeBuilder = new EdgeBuilder(typeMapper, nodeReuser, cdoFactory);
+        this.edgeBuilder = new EdgeBuilder(nodeReuser, cdoFactory);
     }
 
     /**
