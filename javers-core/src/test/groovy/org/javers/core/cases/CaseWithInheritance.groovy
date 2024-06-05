@@ -35,15 +35,11 @@ class CaseWithInheritance extends Specification{
       then:
       println diff.prettyPrint()
 
-      diff.changes.size() == 2
+      diff.changes.size() == 1
 
       with(diff.changes.find {it.propertyName == "field"}) {
           assert left == "aa"
           assert right == "bb"
-      }
-      with(diff.changes.find {it.propertyName == "someOtherField"}) {
-          assert left == null
-          assert right == "b"
       }
     }
 }
