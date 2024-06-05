@@ -7,8 +7,14 @@ import spock.lang.Specification
 class CaseSharedObjectUnsetWhenUsedInCollection extends Specification {
 
     @EqualsAndHashCode
+    class DeepComplexProperty {
+        String value
+    }
+
+    @EqualsAndHashCode
     class ComplexProperty {
         String value
+        DeepComplexProperty deepProperty
     }
 
     @EqualsAndHashCode
@@ -28,12 +34,12 @@ class CaseSharedObjectUnsetWhenUsedInCollection extends Specification {
         def javers = JaversBuilder.javers().build()
 
         def l1 = new TopLevelClass(
-                complexProperty: new ComplexProperty(value: "value1"),
+                complexProperty: new ComplexProperty(value: "value1", deepProperty: new DeepComplexProperty(value: "value2")),
                 items: [
-                        new ListItem(name: "name1", complexProperty: new ComplexProperty(value: "value1"))
+                        new ListItem(name: "name1", complexProperty: new ComplexProperty(value: "value1", deepProperty: new DeepComplexProperty(value: "value2")))
                 ])
 
-        def complexProperty = new ComplexProperty(value: "value1")
+        def complexProperty = new ComplexProperty(value: "value1", deepProperty: new DeepComplexProperty(value: "value2"))
         def l2 = new TopLevelClass(
                 complexProperty: complexProperty,
                 items: [
