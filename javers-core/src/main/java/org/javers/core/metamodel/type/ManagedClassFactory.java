@@ -32,7 +32,8 @@ class ManagedClassFactory {
 
     ManagedClass createFromPrototype(Class<?> baseJavaClass, ClassScan scan, ManagedPropertiesFilter prototypePropertiesFilter) {
         List<JaversProperty> allProperties = convert(scan.getProperties());
-        return create(baseJavaClass, allProperties, prototypePropertiesFilter);
+        ManagedPropertiesFilter managedPropertiesFilter = new ManagedPropertiesFilter(baseJavaClass, allProperties, prototypePropertiesFilter);
+        return create(baseJavaClass, allProperties, managedPropertiesFilter);
     }
 
     private ManagedClass create(Class<?> baseJavaClass, List<JaversProperty> allProperties, ManagedPropertiesFilter propertiesFilter){

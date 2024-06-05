@@ -4,6 +4,7 @@ import java.util.HashSet;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.clazz.PropertiesFilter;
+import org.javers.core.metamodel.property.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,10 @@ class ManagedPropertiesFilter {
         }
 
         this.shallowProperties = new HashSet<>(propertiesFilter.getShallowProperties());
+    }
+
+    ManagedPropertiesFilter(Class<?> baseJavaClass, List<JaversProperty> allSourceProperties, ManagedPropertiesFilter prototypeFilter) {
+        this(baseJavaClass, allSourceProperties, prototypeFilter.toPropertiesFilter());
     }
 
     private ManagedPropertiesFilter() {
@@ -80,5 +85,12 @@ class ManagedPropertiesFilter {
                     .findFirst()
                     .orElseThrow(() -> new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND, p, baseJavaClass.getName())))
             .collect(Collectors.toSet());
+    }
+
+    private PropertiesFilter toPropertiesFilter() {
+        List<String> included = includedProperties.stream().map(Property::getName).collect(Collectors.toList());
+        List<String> ignored = ignoredProperties.stream().map(Property::getName).collect(Collectors.toList());
+        ArrayList<String> shallow = new ArrayList<>(shallowProperties);
+        return new PropertiesFilter(included, ignored, shallow);
     }
 }
