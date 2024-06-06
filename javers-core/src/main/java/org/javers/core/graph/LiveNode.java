@@ -2,6 +2,8 @@ package org.javers.core.graph;
 
 import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EnumerableType;
@@ -17,14 +19,15 @@ public class LiveNode extends ObjectNode<LiveCdo>{
 
     private final Map<String, Edge> edges = new HashMap<>();
 
-    public LiveNode(LiveCdo cdo) {
+    private final Optional<LiveNode> parent;
+
+    public LiveNode(LiveCdo cdo, Optional<LiveNode> parent) {
         super(cdo);
+        this.parent = parent;
     }
 
-    static LiveNode liveNodeDouble(LiveNode originalNode, LiveCdo cdoDouble) {
-        LiveNode doubleNode =new LiveNode(cdoDouble);
-        doubleNode.edges.putAll(originalNode.edges);
-        return doubleNode;
+    LiveNode(LiveCdo cdo) {
+        this(cdo, Optional.empty());
     }
 
     Edge getEdge(Property property) {
@@ -38,6 +41,18 @@ public class LiveNode extends ObjectNode<LiveCdo>{
     @Override
     public boolean isEdge() {
         return false;
+    }
+
+    Optional<LiveNode> findOnPathFromRoot(Predicate<LiveNode> nodeFilter) {
+        if (nodeFilter.test(this)) {
+            return Optional.of(this);
+        }
+        return parent.flatMap(p -> {
+            if (nodeFilter.test(p)) {
+                return Optional.of(p);
+            }
+            return p.findOnPathFromRoot(nodeFilter);
+        });
     }
 
     @Override
@@ -148,6 +163,14 @@ public class LiveNode extends ObjectNode<LiveCdo>{
         void followEdges(LiveNode node, int depth) {
             node.edges.values().forEach(e -> follow((Edge)e, depth));
         }
+    }
+
+    boolean isEntityNode() {
+        return getGlobalId() instanceof InstanceId;
+    }
+
+    boolean isValueObjectNode() {
+        return getGlobalId() instanceof ValueObjectId || getGlobalId() instanceof UnboundedValueObjectId;
     }
 
     @Override

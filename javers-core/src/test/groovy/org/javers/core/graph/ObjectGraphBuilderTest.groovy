@@ -330,27 +330,28 @@ abstract class ObjectGraphBuilderTest extends Specification {
         LoopedObject ref
     }
 
-    def "should manage cycles in graph of Value Objects"(){
-        //  a
-        //  \ \
-        //   b \
-        //    \ \
-        //      c
+    //  a
+    //  \ \
+    //   b \
+    //    \ \
+    //      c
+    def "should manage full cycle in graph of Value Objects"() {
         given:
         def graphBuilder = newBuilder()
 
         def a = new LoopedObject()
         def b = new LoopedObject()
         def c = new LoopedObject()
-        a.ref = b
-        b.ref = c
-        c.ref = a
+
+        a.ref = b // a.ref = b
+        b.ref = c // a.ref.ref = c
+        c.ref = a // a.ref.ref.ref = a
 
         when:
         def graph = graphBuilder.buildGraph(a)
 
         then:
-        graph.nodes().size() == 4
+        graph.nodes().size() == 3
 
         def nodeA = graph.root()
         def nodeB = nodeA.edges['ref'].referencedNode
@@ -360,11 +361,49 @@ abstract class ObjectGraphBuilderTest extends Specification {
         nodeA.globalId.value().endsWith("LoopedObject/")
         nodeB.globalId.value().endsWith("LoopedObject/#ref")
         nodeC.globalId.value().endsWith("LoopedObject/#ref/ref")
-        nodeCA.globalId.value().endsWith("LoopedObject/#ref/ref/ref")
-        nodeCA.edges['ref'].referencedNode == nodeB //assert shallow node
+        nodeCA.globalId.value().endsWith("LoopedObject/")
+        nodeCA == nodeA
 
         and: "should get descendants"
-        graph.root().descendants(10).size() == 3
+        graph.root().descendants(10).size() == 2
+    }
+
+    //  a
+    //   \
+    //    b
+    //    \ \
+    //      c
+    def "should manage a cycle in graph of Value Objects"() {
+        given:
+        def graphBuilder = newBuilder()
+
+        def a = new LoopedObject()
+        def b = new LoopedObject()
+        def c = new LoopedObject()
+
+        a.ref = b // a.ref = b
+        b.ref = c // a.ref.ref = c
+        c.ref = b // a.ref.ref.ref = b
+
+        when:
+        def graph = graphBuilder.buildGraph(a)
+
+        then:
+        graph.nodes().size() == 3
+
+        def nodeA = graph.root()
+        def nodeB = nodeA.edges['ref'].referencedNode
+        def nodeC = nodeB.edges['ref'].referencedNode
+        def nodeCB = nodeC.edges['ref'].referencedNode
+
+        nodeA.globalId.value().endsWith("LoopedObject/")
+        nodeB.globalId.value().endsWith("LoopedObject/#ref")
+        nodeC.globalId.value().endsWith("LoopedObject/#ref/ref")
+        nodeCB.globalId.value().endsWith("LoopedObject/#ref")
+        nodeCB == nodeB
+
+        and: "should get descendants"
+        graph.root().descendants(10).size() == 2
     }
 
     def "should manage cycles in graph of Entities"(){
@@ -585,18 +624,22 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def rootN = graph.root()
 
         then:
-        graph.nodes().size() == 5
+        graph.nodes().size() == 3
 
-        assertThat(rootN).hasGlobalId(unboundedValueObjectId(CategoryVo))
-        assertThat(rootN).hasMultiEdge("children").refersToGlobalIds([
-                withUnboundedValueObjectOwner(CategoryVo, "children/0"),
-                withUnboundedValueObjectOwner(CategoryVo, "children/1")
-        ])
-        assertThat(rootN).hasMultiEdge("children")
-                        .andFirstTargetNode()
-                        .hasSingleEdge("parent")
-                        .andTargetNode()
-                        .hasGlobalId(withUnboundedValueObjectOwner(CategoryVo, "children/0/parent"))
+        def nodeC1 = rootN.edges['children'].references[0]
+        def nodeC2 = rootN.edges['children'].references[1]
+        def nodeC1A = nodeC1.edges['parent'].referencedNode
+        def nodeC2A = nodeC2.edges['parent'].referencedNode
+
+        then:
+        rootN.globalId.value().endsWith("CategoryVo/")
+        nodeC1.globalId.value().endsWith("CategoryVo/#children/0")
+        nodeC2.globalId.value().endsWith("CategoryVo/#children/1")
+        nodeC1A == rootN
+        nodeC2A == rootN
+
+        and:
+        rootN.descendants(10).size() == 2
     }
 
     def "should support large graphs (more than 10000 edges)"() {

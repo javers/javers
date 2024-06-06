@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -54,7 +55,8 @@ class ObjectGraphBuilder {
     LiveGraph buildGraphFromCdo(LiveCdo cdo) {
         argumentIsNotNull(cdo);
 
-        LiveNode root = edgeBuilder.buildNodeStub(cdo);
+        LiveNode root = edgeBuilder.buildNodeStub(cdo, Optional.empty());
+        // System.out.println("- root node: " + cdo.getGlobalId());
 
         //we can't use recursion here, it could cause StackOverflow for large graphs
         while(nodeReuser.hasMoreStubs()){

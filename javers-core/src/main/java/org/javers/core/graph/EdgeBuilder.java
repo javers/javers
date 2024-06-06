@@ -5,6 +5,8 @@ import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
 
+import java.util.Optional;
+
 /**
  * @author bartosz walacik
  */
@@ -20,13 +22,13 @@ class EdgeBuilder {
     /**
      * @return node stub, could be redundant so check reuse context
      */
-    AbstractSingleEdge buildSingleEdge(ObjectNode node, JaversProperty singleRef) {
+    AbstractSingleEdge buildSingleEdge(LiveNode node, JaversProperty singleRef) {
         Object rawReference = node.getPropertyValue(singleRef);
         OwnerContext ownerContext = createOwnerContext(node, singleRef);
 
         if (!singleRef.isShallowReference()){
             LiveCdo cdo = cdoFactory.create(rawReference, ownerContext);
-            LiveNode targetNode = buildNodeStubOrReuse(cdo);
+            LiveNode targetNode = buildNodeStubOrReuse(cdo, node);
             return new SingleEdge(singleRef, targetNode);
         }
         return new ShallowSingleEdge(singleRef, cdoFactory.createId(rawReference, ownerContext));
@@ -36,7 +38,7 @@ class EdgeBuilder {
         return new PropertyOwnerContext(parentNode.getGlobalId(), property.getName());
     }
 
-    AbstractMultiEdge createMultiEdge(JaversProperty containerProperty, EnumerableType enumerableType, ObjectNode node) {
+    AbstractMultiEdge createMultiEdge(JaversProperty containerProperty, EnumerableType enumerableType, LiveNode node) {
         OwnerContext owner = createOwnerContext(node, containerProperty);
 
         Object container = node.getPropertyValue(containerProperty);
@@ -56,7 +58,7 @@ class EdgeBuilder {
 
             if (!isShallow) {
                 LiveCdo cdo = cdoFactory.create(input, context);
-                return buildNodeStubOrReuse(cdo);
+                return buildNodeStubOrReuse(cdo, node);
             } else {
                 return cdoFactory.createId(input, context);
             }
@@ -84,29 +86,25 @@ class EdgeBuilder {
         return false;
     }
 
-    private LiveNode buildNodeStubOrReuse(LiveCdo cdo){
-        if (nodeReuser.isReusable(cdo)){
-            return nodeReuser.getForReuse(cdo);
+    private LiveNode buildNodeStubOrReuse(LiveCdo cdo, LiveNode parent){
+        if (nodeReuser.isGraphLevelReusable(cdo)){
+            LiveNode reused = nodeReuser.getForReuse(cdo);
+            // System.out.println("--- reused node (globally): " + reused.getGlobalId() +" <- "+ cdo.getGlobalId());
+            return reused;
         }
-        else {
-            if (nodeReuser.isTraversed(cdo)) {
-                return buildNodeDouble(nodeReuser.getForDouble(cdo), cdo);
-            }
-            return buildNodeStub(cdo);
+        Optional<LiveNode> locallyReused = nodeReuser.locallyReusableValueObjectNode(cdo, parent);
+        if (locallyReused.isPresent()) {
+            LiveNode reused = locallyReused.get();
+            // System.out.println("--- reused node (locally): " + reused.getGlobalId() +" <- "+ cdo.getGlobalId());
+            return reused;
         }
+
+        // System.out.println("-- regular node:" + cdo.getGlobalId());
+        return buildNodeStub(cdo, Optional.of(parent));
     }
 
-    /**
-     * A node's double is created when we stumble upon an already traversed instance of VO
-     */
-    private LiveNode buildNodeDouble(LiveNode originalNode, LiveCdo cdoDouble) {
-        LiveNode newDouble = LiveNode.liveNodeDouble(originalNode, cdoDouble);
-        nodeReuser.saveNodeDouble(newDouble);
-        return newDouble;
-    }
-
-    LiveNode buildNodeStub(LiveCdo cdo){
-        LiveNode newStub = new LiveNode(cdo);
+    LiveNode buildNodeStub(LiveCdo cdo, Optional<LiveNode> parent){
+        LiveNode newStub = new LiveNode(cdo, parent);
         nodeReuser.enqueueStub(newStub);
         return newStub;
     }
