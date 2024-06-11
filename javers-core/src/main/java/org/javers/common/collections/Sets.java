@@ -141,4 +141,18 @@ public class Sets {
             return left;
         }, Collections::unmodifiableSet);
     }
+
+    public static <T> Set<T> join(Set<T> a, Set<T> b) {
+        if (a == null || a.size() == 0) {
+            return b;
+        }
+
+        if (b == null || b.size() == 0) {
+            return a;
+        }
+
+        Set<T> result = new HashSet<>(a);
+        result.addAll(b);
+        return result;
+    }
 }
