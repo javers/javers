@@ -4,6 +4,7 @@ import org.javers.common.collections.Lists;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.PropertiesFilter;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScan;
 
@@ -32,8 +33,11 @@ class ManagedClassFactory {
 
     ManagedClass createFromPrototype(Class<?> baseJavaClass, ClassScan scan, ManagedPropertiesFilter prototypePropertiesFilter) {
         List<JaversProperty> allProperties = convert(scan.getProperties());
-        ManagedPropertiesFilter managedPropertiesFilter = new ManagedPropertiesFilter(baseJavaClass, allProperties, prototypePropertiesFilter);
-        return create(baseJavaClass, allProperties, managedPropertiesFilter);
+
+        ManagedPropertiesFilter managedPropertiesFilter = new ManagedPropertiesFilter(baseJavaClass, allProperties, PropertiesFilter.empty());
+        ManagedPropertiesFilter managedPropertiesFilterWithPrototypeFilter = managedPropertiesFilter.add(prototypePropertiesFilter);
+
+        return create(baseJavaClass, allProperties, managedPropertiesFilterWithPrototypeFilter);
     }
 
     private ManagedClass create(Class<?> baseJavaClass, List<JaversProperty> allProperties, ManagedPropertiesFilter propertiesFilter){

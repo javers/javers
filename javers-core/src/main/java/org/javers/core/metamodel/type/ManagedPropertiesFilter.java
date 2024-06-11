@@ -1,10 +1,11 @@
 package org.javers.core.metamodel.type;
 
 import java.util.HashSet;
+
+import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.clazz.PropertiesFilter;
-import org.javers.core.metamodel.property.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,14 +40,24 @@ class ManagedPropertiesFilter {
         this.shallowProperties = new HashSet<>(propertiesFilter.getShallowProperties());
     }
 
-    ManagedPropertiesFilter(Class<?> baseJavaClass, List<JaversProperty> allSourceProperties, ManagedPropertiesFilter prototypeFilter) {
-        this(baseJavaClass, allSourceProperties, prototypeFilter.toPropertiesFilter());
+    ManagedPropertiesFilter(Set<JaversProperty> includedProperties, Set<JaversProperty> ignoredProperties, Set<String> shallowProperties) {
+        this.includedProperties = includedProperties;
+        this.ignoredProperties = ignoredProperties;
+        this.shallowProperties = shallowProperties;
     }
 
     private ManagedPropertiesFilter() {
         this.includedProperties = Collections.emptySet();
         this.ignoredProperties = Collections.emptySet();
         this.shallowProperties = Collections.emptySet();
+    }
+
+    ManagedPropertiesFilter add(ManagedPropertiesFilter that) {
+        return new ManagedPropertiesFilter(
+                Sets.join(this.includedProperties, that.includedProperties),
+                Sets.join(this.ignoredProperties, that.ignoredProperties),
+                Sets.join(this.shallowProperties, that.shallowProperties)
+        );
     }
 
     List<JaversProperty> filterProperties(List<JaversProperty> allProperties){
@@ -85,12 +96,5 @@ class ManagedPropertiesFilter {
                     .findFirst()
                     .orElseThrow(() -> new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND, p, baseJavaClass.getName())))
             .collect(Collectors.toSet());
-    }
-
-    private PropertiesFilter toPropertiesFilter() {
-        List<String> included = includedProperties.stream().map(Property::getName).collect(Collectors.toList());
-        List<String> ignored = ignoredProperties.stream().map(Property::getName).collect(Collectors.toList());
-        ArrayList<String> shallow = new ArrayList<>(shallowProperties);
-        return new PropertiesFilter(included, ignored, shallow);
     }
 }

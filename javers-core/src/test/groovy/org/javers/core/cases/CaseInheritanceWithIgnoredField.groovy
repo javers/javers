@@ -15,6 +15,7 @@ class CaseInheritanceWithIgnoredField extends Specification {
     class A {
         @Id
         String id
+        @DiffIgnore
         String field
     }
     @TypeName("B")
@@ -44,7 +45,9 @@ class CaseInheritanceWithIgnoredField extends Specification {
         println cType.prettyPrint()
 
         assert bType.findProperty("someOtherField").isEmpty()
+        assert bType.findProperty("field").isEmpty()
         assert cType.findProperty("someOtherField").isEmpty()
+        assert cType.findProperty("field").isEmpty()
     }
 
 }
