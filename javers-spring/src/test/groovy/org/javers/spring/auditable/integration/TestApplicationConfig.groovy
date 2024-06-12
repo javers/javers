@@ -4,6 +4,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.repository.mongo.MongoRepository
+import org.javers.spring.auditable.AdvancedCommitPropertiesProvider
+import org.javers.spring.auditable.AuditingExecutionContext
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.CommitPropertiesProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -43,13 +45,13 @@ class TestApplicationConfig {
 
     @Bean
     JaversAuditableAspect javersAuditableAspect() {
-        new JaversAuditableAspect(javers(), authorProvider(), commitPropertiesProvider())
+        new JaversAuditableAspect(javers(), authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider())
     }
 
     @Bean
     JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
         new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(),
-                commitPropertiesProvider())
+                commitPropertiesProvider(), advancedCommitPropertiesProvider())
     }
 
     /**
@@ -57,7 +59,7 @@ class TestApplicationConfig {
      */
     @Bean
     JaversAuditableAspectAsync javersAuditableAspectAsync() {
-        new JaversAuditableAspectAsync(javers(), authorProvider(), commitPropertiesProvider(), javersAsyncAuditExecutor())
+        new JaversAuditableAspectAsync(javers(), authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider(), javersAsyncAuditExecutor())
     }
 
     /**
@@ -85,4 +87,36 @@ class TestApplicationConfig {
             }
         }
     }
+
+    @Bean
+    AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider() {
+        return new AdvancedCommitPropertiesProvider() {
+
+            @Override
+            public Map<String, String> provideForCommittedObject(AuditingExecutionContext ctx, Object domainObject) {
+                return Map.of(
+                    "TargetMethodName", ctx.getTargetMethodName(),
+                    "TargetClassName", ctx.getTargetClassName()
+                );
+            }
+
+            @Override
+            public Map<String, String> provideForDeletedObject(AuditingExecutionContext ctx, Object domainObject) {
+                return Map.of(
+                    "TargetMethodName", ctx.getTargetMethodName(),
+                    "TargetClassName", ctx.getTargetClassName()
+                );
+            }
+
+            @Override
+            public Map<String, String> provideForDeleteById(AuditingExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
+                return Map.of(
+                    "TargetMethodName", ctx.getTargetMethodName(),
+                    "getTargetClassName", ctx.getTargetClassName()
+                );
+            }
+
+        };
+    }
+
 }

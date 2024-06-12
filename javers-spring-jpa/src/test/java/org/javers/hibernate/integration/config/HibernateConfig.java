@@ -1,9 +1,12 @@
 package org.javers.hibernate.integration.config;
 
+import jakarta.persistence.EntityManagerFactory;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.JaversSqlRepository;
+import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
+import org.javers.spring.auditable.AuditingExecutionContext;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
@@ -18,9 +21,8 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import jakarta.persistence.EntityManagerFactory;
+
 import javax.sql.DataSource;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -71,12 +73,12 @@ public class HibernateConfig {
 
     @Bean
     public JaversAuditableAspect javersAuditableAspect(Javers javers) {
-        return new JaversAuditableAspect(javers, authorProvider(), commitPropertiesProvider());
+        return new JaversAuditableAspect(javers, authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider());
     }
 
     @Bean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers) {
-        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider());
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider());
     }
 
     /**
@@ -106,6 +108,37 @@ public class HibernateConfig {
             public Map<String, String> provide() {
                 return Maps.of("key", "ok_2");
             }
+        };
+    }
+
+    @Bean
+    public AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider() {
+        return new AdvancedCommitPropertiesProvider() {
+
+            @Override
+            public Map<String, String> provideForCommittedObject(AuditingExecutionContext ctx, Object domainObject) {
+                return Map.of(
+                    "TargetMethodName", ctx.getTargetMethodName(),
+                    "TargetClassName", ctx.getTargetClassName()
+                );
+            }
+
+            @Override
+            public Map<String, String> provideForDeletedObject(AuditingExecutionContext ctx, Object domainObject) {
+                return Map.of(
+                    "TargetMethodName", ctx.getTargetMethodName(),
+                    "TargetClassName", ctx.getTargetClassName()
+                );
+            }
+
+            @Override
+            public Map<String, String> provideForDeleteById(AuditingExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
+                return Map.of(
+                    "TargetMethodName", ctx.getTargetMethodName(),
+                    "getTargetClassName", ctx.getTargetClassName()
+                );
+            }
+
         };
     }
 

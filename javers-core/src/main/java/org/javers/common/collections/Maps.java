@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * @author bartosz walacik
@@ -65,4 +66,10 @@ public class Maps {
 
         return Collections.unmodifiableMap(m);
     }
+
+    @SafeVarargs
+    public static <K,V> Map<K,V> merge(Map<K, V>... a) {
+        return Stream.of(a).reduce(new HashMap<>(), Maps::merge);
+    }
+
 }
