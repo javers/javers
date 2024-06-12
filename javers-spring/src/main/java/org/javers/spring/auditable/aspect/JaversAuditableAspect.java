@@ -5,13 +5,11 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.javers.core.Javers;
 import org.javers.spring.annotation.JaversAuditable;
+import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.springframework.core.annotation.Order;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Commits all arguments passed to methods annotated with {@link JaversAuditable}
@@ -30,12 +28,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class JaversAuditableAspect {
     private final JaversCommitAdvice javersCommitAdvice;
 
-    public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
-        this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider) );
+    public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
+        this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider));
     }
 
     public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider) {
-        this(javers, authorProvider, new EmptyPropertiesProvider());
+        this(javers, authorProvider, new EmptyPropertiesProvider(), AdvancedCommitPropertiesProvider.empty());
     }
 
     JaversAuditableAspect(JaversCommitAdvice javersCommitAdvice) {

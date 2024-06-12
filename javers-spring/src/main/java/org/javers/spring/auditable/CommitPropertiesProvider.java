@@ -15,9 +15,13 @@ import java.util.Map;
  * <br/><br/>
  *
  * Implementation has to be thread-safe.
+ * <br/>
+ * This interface is deprecated, use {@link AdvancedCommitPropertiesProvider} instead.
+ * @see AdvancedCommitPropertiesProvider
  *
  * @author bartosz.walacik
  */
+@Deprecated
 public interface CommitPropertiesProvider {
 
     /**
