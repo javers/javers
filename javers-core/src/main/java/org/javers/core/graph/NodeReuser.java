@@ -1,5 +1,6 @@
 package org.javers.core.graph;
 
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 
@@ -9,7 +10,7 @@ import java.util.*;
  * @author bartosz walacik
  */
 class NodeReuser {
-    private final Map<Object, LiveNode> reverseCdoIdMap = new HashMap<>();
+    private final Map<GlobalId, LiveNode> reverseCdoIdMapForGlobalReuse = new HashMap<>();
     private final List<LiveNode> nodes = new ArrayList<>();
     private final Queue<LiveNode> stubs = new LinkedList<>();
     private int reusedNodes;
@@ -19,13 +20,18 @@ class NodeReuser {
     NodeReuser() {
     }
 
-    boolean isReusable(Cdo cdo) {
-        return reverseCdoIdMap.containsKey(reverseCdoIdMapKey(cdo));
+    boolean isGraphLevelReusable(Cdo cdo) {
+        return reverseCdoIdMapForGlobalReuse.containsKey(reverseCdoIdMapKey(cdo));
+    }
+
+    Optional<LiveNode> locallyReusableValueObjectNode(Cdo cdo, LiveNode parent) {
+        return parent.findOnPathFromRoot(p -> p.isValueObjectNode()
+                && p.getCdo().getWrappedCdo().equals(cdo.getWrappedCdo()));
     }
 
     LiveNode getForReuse(Cdo cdo) {
         reusedNodes++;
-        return reverseCdoIdMap.get(reverseCdoIdMapKey(cdo));
+        return reverseCdoIdMapForGlobalReuse.get(reverseCdoIdMapKey(cdo));
     }
 
     List<LiveNode> nodes() {
@@ -39,7 +45,11 @@ class NodeReuser {
         if (reference.getGlobalId() instanceof ValueObjectId) {
             valueObjects++;
         }
-        reverseCdoIdMap.put(reverseCdoIdMapKey(reference.getCdo()), reference);
+
+        if (reference.isEntityNode()) {
+            reverseCdoIdMapForGlobalReuse.put(reverseCdoIdMapKey(reference.getCdo()), reference);
+        }
+
         nodes.add(reference);
     }
 
@@ -56,7 +66,7 @@ class NodeReuser {
     }
 
     int nodesCount() {
-        return reverseCdoIdMap.size();
+        return nodes.size();
     }
 
     int reusedNodesCount() {
@@ -71,44 +81,31 @@ class NodeReuser {
         return valueObjects;
     }
 
-    /**
-     * InstanceId for Entities,
-     * System.identityHashCode for ValueObjects
-     */
-    private Object reverseCdoIdMapKey(Cdo cdo) {
-        if (cdo.getGlobalId() instanceof InstanceId) {
-            return cdo.getGlobalId();
-        }
-        return new SystemIdentityWrapper(cdo.getWrappedCdo().get());
+    private GlobalId reverseCdoIdMapKey(Cdo cdo) {
+        return cdo.getGlobalId();
     }
 
-    private static class SystemIdentityWrapper {
-        private final Object cdo;
+    @Deprecated
+    private static class SystemIdentityPlusOwnerIdWrapper {
+        private final Object wrappedObject;
+        private final GlobalId masterObjectId;
 
-        SystemIdentityWrapper(Object cdo) {
-            this.cdo = cdo;
+        SystemIdentityPlusOwnerIdWrapper(Cdo cdo) {
+            this.wrappedObject = cdo.getWrappedCdo().get();
+            this.masterObjectId = cdo.getGlobalId().masterObjectId();
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o == null || o.getClass() != SystemIdentityWrapper.class) {
-                return false;
-            }
-
-            return this.cdo == ((SystemIdentityWrapper)o).cdo;
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SystemIdentityPlusOwnerIdWrapper that = (SystemIdentityPlusOwnerIdWrapper) o;
+            return Objects.equals(wrappedObject, that.wrappedObject) && Objects.equals(masterObjectId, that.masterObjectId);
         }
 
         @Override
         public int hashCode() {
-            return System.identityHashCode(cdo);
-        }
-
-        @Override
-        public String toString() {
-            return "SystemIdentityWrapper{" +
-                    "hash:"+hashCode()+", "+
-                    "cdo:" + cdo +
-                    '}';
+            return System.identityHashCode(wrappedObject) + masterObjectId.hashCode();
         }
     }
 }
