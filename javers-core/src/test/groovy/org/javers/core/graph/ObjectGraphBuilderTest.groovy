@@ -326,6 +326,54 @@ abstract class ObjectGraphBuilderTest extends Specification {
         nodeBA.globalId.value().endsWith("TopLevelClass/#items/0/complexProperty")
     }
 
+    def "should find nodes OnPathFromRoot" () {
+        given:
+        def graphBuilder = newBuilder()
+        def dna = new DummyNetworkAddress()
+        def da = new DummyAddress(networkAddress: dna)
+        def u = new DummyUserDetails(id: 1, dummyAddress: da)
+
+        LiveNode root = graphBuilder.buildGraph(u).root()
+        LiveNode nodeDA = root.edges['dummyAddress'].referencedNode
+        LiveNode nodeDNA = nodeDA.edges['networkAddress'].referencedNode
+
+        when:
+        def same = nodeDNA.findOnPathFromRoot(
+                {true},
+                {!it.isValueObjectNode()}
+        ).get()
+
+        then:
+        same == nodeDNA
+
+        when:
+        def parent = nodeDNA.findOnPathFromRoot(
+                it -> it == nodeDA,
+                it -> !it.isValueObjectNode()
+        ).get()
+
+        then:
+        parent == nodeDA
+
+        when:
+        def grandPaVO = nodeDNA.findOnPathFromRoot(
+                it -> it == root,
+                it -> !it.isValueObjectNode()
+        )
+
+        then:
+        grandPaVO.empty
+
+        when:
+        def grandPaAny = nodeDNA.findOnPathFromRoot(
+                it -> it == root,
+                it -> false
+        ).get()
+
+        then:
+        grandPaAny == root
+    }
+
     class LoopedObject {
         LoopedObject ref
     }

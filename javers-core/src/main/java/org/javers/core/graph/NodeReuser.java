@@ -25,8 +25,10 @@ class NodeReuser {
     }
 
     Optional<LiveNode> locallyReusableValueObjectNode(Cdo cdo, LiveNode parent) {
-        return parent.findOnPathFromRoot(p -> p.isValueObjectNode()
-                && p.getCdo().getWrappedCdo().equals(cdo.getWrappedCdo()));
+        return parent.findOnPathFromRoot(
+                p -> p.getCdo().getWrappedCdo().equals(cdo.getWrappedCdo()),
+                p -> !p.isValueObjectNode()
+        );
     }
 
     LiveNode getForReuse(Cdo cdo) {

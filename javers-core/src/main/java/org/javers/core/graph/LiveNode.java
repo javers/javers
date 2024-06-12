@@ -43,16 +43,15 @@ public class LiveNode extends ObjectNode<LiveCdo>{
         return false;
     }
 
-    Optional<LiveNode> findOnPathFromRoot(Predicate<LiveNode> nodeFilter) {
-        if (nodeFilter.test(this)) {
-            return Optional.of(this);
-        }
-        return parent.flatMap(p -> {
-            if (nodeFilter.test(p)) {
-                return Optional.of(p);
+    Optional<LiveNode> findOnPathFromRoot(Predicate<LiveNode> hitCondition, Predicate<LiveNode> stopCondition) {
+        LiveNode currentNode = this;
+        while (currentNode != null && !stopCondition.test(currentNode)) {
+            if (hitCondition.test(currentNode)) {
+                return Optional.of(currentNode);
             }
-            return p.findOnPathFromRoot(nodeFilter);
-        });
+            currentNode = currentNode.parent.orElse(null);
+        }
+        return Optional.empty();
     }
 
     @Override
