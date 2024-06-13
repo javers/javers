@@ -11,7 +11,6 @@ import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
 import org.javers.spring.auditable.AuditedMethodExecutionContext;
 import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
@@ -72,7 +71,7 @@ public class JaversSpringJpaApplicationConfigExample {
      */
     @Bean
     public JaversAuditableAspect javersAuditableAspect(Javers javers) {
-        return new JaversAuditableAspect(javers, authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider());
+        return new JaversAuditableAspect(javers, authorProvider(), advancedCommitPropertiesProvider());
     }
 
     /**
@@ -84,7 +83,7 @@ public class JaversSpringJpaApplicationConfigExample {
      */
     @Bean
     public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers) {
-        return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider());
+        return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider(), advancedCommitPropertiesProvider());
     }
 
     /**
@@ -100,49 +99,19 @@ public class JaversSpringJpaApplicationConfigExample {
 
     /**
      * Optional for auto-audit aspect. <br/>
-     * @see CommitPropertiesProvider
+     * @see AdvancedCommitPropertiesProvider
      */
-    @Bean
-    public CommitPropertiesProvider commitPropertiesProvider() {
-        return new CommitPropertiesProvider() {
-            @Override
-            public Map<String, String> provideForCommittedObject(Object domainObject) {
-                if (domainObject instanceof DummyObject) {
-                    return Maps.of("dummyObject.name", ((DummyObject)domainObject).getName());
-                }
-                return Collections.emptyMap();
-            }
-        };
-    }
-
     @Bean
     public AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider() {
         return new AdvancedCommitPropertiesProvider() {
 
             @Override
             public Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
-                return Map.of(
-                    "TargetMethodName", ctx.getTargetMethodName(),
-                    "TargetClassName", ctx.getTargetClassName()
-                );
+                if (domainObject instanceof DummyObject) {
+                    return Maps.of("dummyObject.name", ((DummyObject)domainObject).getName());
+                }
+                return Collections.emptyMap();
             }
-
-            @Override
-            public Map<String, String> provideForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
-                return Map.of(
-                    "TargetMethodName", ctx.getTargetMethodName(),
-                    "TargetClassName", ctx.getTargetClassName()
-                );
-            }
-
-            @Override
-            public Map<String, String> provideForDeleteById(AuditedMethodExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
-                return Map.of(
-                    "TargetMethodName", ctx.getTargetMethodName(),
-                    "getTargetClassName", ctx.getTargetClassName()
-                );
-            }
-
         };
     }
 

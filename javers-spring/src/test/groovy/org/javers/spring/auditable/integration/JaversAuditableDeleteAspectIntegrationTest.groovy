@@ -63,7 +63,7 @@ class JaversAuditableDeleteAspectIntegrationTest extends BaseSpecification {
         def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
         snapshots.size() == 2
         snapshots[0].terminal
-        snapshots[0].commitMetadata.properties["key"] == "ok"
+        snapshots[0].commitMetadata.properties["key"] == "ok_deleted"
         snapshots[1].initial
     }
 

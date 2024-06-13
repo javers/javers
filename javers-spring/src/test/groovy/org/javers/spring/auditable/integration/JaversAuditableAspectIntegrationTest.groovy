@@ -63,6 +63,36 @@ class JaversAuditableAspectIntegrationTest extends BaseSpecification {
         snapshot.commitMetadata.properties["key"] == "ok"
     }
 
+    def "should commit with properties provided by AdvancedCommitPropertiesProvider"(){
+        given:
+        def o = new DummyObject()
+
+        when:
+        repository.save(o)
+
+        then:
+        def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())[0]
+        snapshot.commitMetadata.properties["TargetMethodName"] == "save"
+        snapshot.commitMetadata.properties["TargetClassName"].endsWith("DummyAuditedRepository")
+        snapshot.commitMetadata.properties["TargetMethodArgs.size"] == "1"
+
+        when:
+        repository.delete(o)
+        snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())[0]
+
+        then:
+        snapshot.commitMetadata.properties["TargetMethodName"] == "delete"
+        snapshot.commitMetadata.properties["TargetClassName"].endsWith("DummyAuditedRepository")
+
+        when:
+        repository.deleteById(o.id)
+        snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())[0]
+
+        then:
+        snapshot.commitMetadata.properties["TargetMethodName"] == "deleteById"
+        snapshot.commitMetadata.properties["TargetClassName"].endsWith("DummyAuditedRepository")
+    }
+
     def "should commit iterable argument when method is annotated with @JaversAuditable"() {
         given:
         def objects = [new DummyObject(), new DummyObject()]

@@ -9,11 +9,7 @@ import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.annotation.JaversAuditableAsync;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
-import org.javers.spring.auditable.AuditedMethodExecutionContext;
-import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.javers.spring.auditable.SpringSecurityAuthorProvider;
+import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
@@ -85,7 +81,7 @@ public class JaversSpringMongoApplicationConfigExample {
      */
     @Bean
     public JaversAuditableAspect javersAuditableAspect() {
-        return new JaversAuditableAspect(javers(), authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider());
+        return new JaversAuditableAspect(javers(), authorProvider(), advancedCommitPropertiesProvider());
     }
 
     /**
@@ -96,8 +92,7 @@ public class JaversSpringMongoApplicationConfigExample {
      */
     @Bean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
-        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(),
-                commitPropertiesProvider(), advancedCommitPropertiesProvider());
+        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(), advancedCommitPropertiesProvider());
     }
 
     /**
@@ -111,7 +106,7 @@ public class JaversSpringMongoApplicationConfigExample {
      */
     @Bean
     public JaversAuditableAspectAsync javersAuditableAspectAsync() {
-        return new JaversAuditableAspectAsync(javers(), authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider(), javersAsyncAuditExecutor());
+        return new JaversAuditableAspectAsync(javers(), authorProvider(), new EmptyPropertiesProvider(), advancedCommitPropertiesProvider(), javersAsyncAuditExecutor());
     }
 
     /**
@@ -137,20 +132,11 @@ public class JaversSpringMongoApplicationConfigExample {
         return new SpringSecurityAuthorProvider();
     }
 
+
     /**
      * Optional for auto-audit aspect. <br/>
      * @see CommitPropertiesProvider
      */
-    @Bean
-    public CommitPropertiesProvider commitPropertiesProvider() {
-        return new CommitPropertiesProvider() {
-            @Override
-            public Map<String, String> provideForCommittedObject(Object domainObject) {
-                    return Maps.of("key", "ok");
-            }
-        };
-    }
-
     @Bean
     public AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider() {
         return new AdvancedCommitPropertiesProvider() {
@@ -158,27 +144,9 @@ public class JaversSpringMongoApplicationConfigExample {
             @Override
             public Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
                 return Map.of(
-                    "TargetMethodName", ctx.getTargetMethodName(),
-                    "TargetClassName", ctx.getTargetClassName()
+                    "key", "ok"
                 );
             }
-
-            @Override
-            public Map<String, String> provideForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
-                return Map.of(
-                    "TargetMethodName", ctx.getTargetMethodName(),
-                    "TargetClassName", ctx.getTargetClassName()
-                );
-            }
-
-            @Override
-            public Map<String, String> provideForDeleteById(AuditedMethodExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
-                return Map.of(
-                    "TargetMethodName", ctx.getTargetMethodName(),
-                    "getTargetClassName", ctx.getTargetClassName()
-                );
-            }
-
         };
     }
 

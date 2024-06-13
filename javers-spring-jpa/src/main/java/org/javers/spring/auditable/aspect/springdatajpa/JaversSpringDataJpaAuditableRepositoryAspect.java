@@ -7,6 +7,7 @@ import org.javers.core.Javers;
 import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.javers.spring.auditable.aspect.springdata.AbstractSpringAuditableRepositoryAspect;
 import org.springframework.core.annotation.Order;
 
@@ -18,13 +19,22 @@ import org.springframework.core.annotation.Order;
 @Aspect
 @Order(0)
 public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpringAuditableRepositoryAspect {
+    public JaversSpringDataJpaAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
+        super(javers, authorProvider, new EmptyPropertiesProvider(), advancedCommitPropertiesProvider);
+    }
+
+    /**
+     * For backward compatibility after introducing AdvancedCommitPropertiesProvider
+     */
+    @Deprecated
     public JaversSpringDataJpaAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
         super(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider);
     }
 
     /**
-     * for backward compatibility after introducing AdvancedCommitPropertiesProvider
+     * For backward compatibility after introducing AdvancedCommitPropertiesProvider
      */
+    @Deprecated
     public JaversSpringDataJpaAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this(javers, authorProvider, commitPropertiesProvider, AdvancedCommitPropertiesProvider.empty());
     }

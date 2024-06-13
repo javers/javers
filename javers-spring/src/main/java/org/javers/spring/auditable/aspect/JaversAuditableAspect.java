@@ -28,13 +28,22 @@ import org.springframework.core.annotation.Order;
 public class JaversAuditableAspect {
     private final JaversCommitAdvice javersCommitAdvice;
 
+    public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider,  AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
+        this(new JaversCommitAdvice(javers, authorProvider, new EmptyPropertiesProvider(), advancedCommitPropertiesProvider));
+    }
+
+    /**
+     * For backward compatibility after introducing AdvancedCommitPropertiesProvider
+     */
+    @Deprecated
     public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
         this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider));
     }
 
     /**
-     * for backward compatibility after introducing AdvancedCommitPropertiesProvider
+     * For backward compatibility after introducing AdvancedCommitPropertiesProvider
      */
+    @Deprecated
     public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this(javers, authorProvider, commitPropertiesProvider, AdvancedCommitPropertiesProvider.empty());
     }
