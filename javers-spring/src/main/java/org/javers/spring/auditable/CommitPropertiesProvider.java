@@ -11,13 +11,16 @@ import java.util.Map;
 /**
  * Provides commit properties
  * for {@link Javers#commit(String, Object, Map)}
- * called by Javers auto-audit aspect &mdash; {@link JaversSpringDataAuditable}.
+ * called by the auto-audit aspect &mdash; {@link JaversSpringDataAuditable}.
  * <br/><br/>
  *
  * Implementation has to be thread-safe.
+ * <br/><br/>
+ *
+ * This interface is deprecated since Javers 7.5, yet there are no plans to phase it out.
  * <br/>
- * This interface is deprecated, use {@link AdvancedCommitPropertiesProvider} instead.
- * @see AdvancedCommitPropertiesProvider
+ * For new code, use the upgraded version &mdash; {@link AdvancedCommitPropertiesProvider}, which
+ * provides a method call context.
  *
  * @author bartosz.walacik
  */
@@ -25,12 +28,12 @@ import java.util.Map;
 public interface CommitPropertiesProvider {
 
     /**
-     * Provides object-specific Javers commit properties when a  given object is committed (saved or updated)
+     * Provides object-specific Javers commit properties when a given object is committed (saved or updated)
      * to {@link JaversRepository}.
      *
      * <br/><br/>
-     * This method is called by {@link JaversSpringDataAuditable} aspect
-     * to get properties for commit created when
+     * This method is called by the {@link JaversSpringDataAuditable} aspect
+     * to get properties for Javers commit created when
      * {@link CrudRepository#save(Object)} and
      * {@link CrudRepository#saveAll(Iterable)} methods are called.
      *
@@ -44,11 +47,11 @@ public interface CommitPropertiesProvider {
     }
 
     /**
-     * Provides object-specific commit properties when a given object is deleted from {@link JaversRepository}.
+     * Provides object-specific Javers commit properties when a given object is deleted from {@link JaversRepository}.
      *
      * <br/><br/>
      * This method is called by {@link JaversSpringDataAuditable} aspect
-     * to get properties for commit created when
+     * to get properties for Javers commit created when
      * {@link CrudRepository#delete(Object)} and
      * {@link CrudRepository#deleteAll(Iterable)} methods are called.
      *
@@ -67,8 +70,8 @@ public interface CommitPropertiesProvider {
      *
      * <br/><br/>
      * This method is called by {@link JaversSpringDataAuditable} aspect
-     * to get properties for commit created when
-     * {@link CrudRepository#deleteById(Object)} methods are called.
+     * to get properties for Javers commit created when
+     * {@link CrudRepository#deleteById(Object)} is called.
      *
      * <br/><br/>
      * Default implementation returns empty Map

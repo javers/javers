@@ -13,7 +13,7 @@ import org.javers.core.metamodel.type.PrimitiveOrValueType;
 import org.javers.spring.annotation.JaversAuditableDelete;
 import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
 import org.javers.spring.auditable.AspectUtil;
-import org.javers.spring.auditable.AuditingExecutionContext;
+import org.javers.spring.auditable.AuditedMethodExecutionContext;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
@@ -56,14 +56,14 @@ public class JaversCommitAdvice {
 	}
 
 	void commitSaveMethodArguments(JoinPoint pjp) {
-        AuditingExecutionContext ctx = AuditingExecutionContext.from(pjp);
+        AuditedMethodExecutionContext ctx = AuditedMethodExecutionContext.from(pjp);
         for (Object arg : AspectUtil.collectArguments(pjp)) {
             commitObject(ctx, arg);
         }
     }
 
     void commitDeleteMethodArguments(JoinPoint jp) {
-        AuditingExecutionContext ctx = AuditingExecutionContext.from(jp);
+        AuditedMethodExecutionContext ctx = AuditedMethodExecutionContext.from(jp);
 
         for (Object arg : AspectUtil.collectArguments(jp)) {
             JaversType javersType = javers.getTypeMapping(arg.getClass());
@@ -76,7 +76,7 @@ public class JaversCommitAdvice {
     }
 
     void commitDeleteMethodResult(JoinPoint jp, Object entities) {
-        AuditingExecutionContext ctx = AuditingExecutionContext.from(jp);
+        AuditedMethodExecutionContext ctx = AuditedMethodExecutionContext.from(jp);
         for (Object arg : AspectUtil.collectReturnedObjects(entities)) {
             JaversType javersType = javers.getTypeMapping(arg.getClass());
             if (javersType instanceof ManagedType) {
@@ -98,12 +98,12 @@ public class JaversCommitAdvice {
         return entity;
     }
 
-    public void commitObject(AuditingExecutionContext ctx, Object domainObject) {
+    public void commitObject(AuditedMethodExecutionContext ctx, Object domainObject) {
         String author = authorProvider.provide();
         javers.commit(author, domainObject, propsForCommit(ctx, domainObject));
     }
 
-    public void commitShallowDelete(AuditingExecutionContext ctx, Object domainObject) {
+    public void commitShallowDelete(AuditedMethodExecutionContext ctx, Object domainObject) {
         String author = authorProvider.provide();
 
         javers.commitShallowDelete(author, domainObject, Maps.merge(
@@ -114,7 +114,7 @@ public class JaversCommitAdvice {
         );
     }
 
-    public void commitShallowDeleteById(AuditingExecutionContext ctx, Object domainObjectId, Class<?> domainType) {
+    public void commitShallowDeleteById(AuditedMethodExecutionContext ctx, Object domainObjectId, Class<?> domainType) {
         String author = authorProvider.provide();
 
         javers.commitShallowDeleteById(author, instanceId(domainObjectId, domainType), Maps.merge(
@@ -125,7 +125,7 @@ public class JaversCommitAdvice {
     }
 
     Optional<CompletableFuture<Commit>> commitSaveMethodArgumentsAsync(JoinPoint pjp) {
-        var ctx = AuditingExecutionContext.from(pjp);
+        var ctx = AuditedMethodExecutionContext.from(pjp);
 
         List<CompletableFuture<Commit>> futures = AspectUtil.collectArguments(pjp)
                 .stream()
@@ -135,12 +135,12 @@ public class JaversCommitAdvice {
         return futures.size() == 0 ? Optional.empty() : Optional.of(futures.get(futures.size() - 1));
     }
 
-    CompletableFuture<Commit> commitObjectAsync(AuditingExecutionContext ctx, Object domainObject) {
+    CompletableFuture<Commit> commitObjectAsync(AuditedMethodExecutionContext ctx, Object domainObject) {
         String author = this.authorProvider.provide();
         return this.javers.commitAsync(author, domainObject, propsForCommit(ctx, domainObject), executor);
     }
 
-    private Map<String, String> propsForCommit(AuditingExecutionContext ctx, Object domainObject) {
+    private Map<String, String> propsForCommit(AuditedMethodExecutionContext ctx, Object domainObject) {
         return Maps.merge(
             advancedCommitPropertiesProvider.provideForCommittedObject(ctx, domainObject),
             commitPropertiesProvider.provideForCommittedObject(domainObject),

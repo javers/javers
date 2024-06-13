@@ -5,7 +5,7 @@ import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.repository.mongo.MongoRepository
 import org.javers.spring.auditable.AdvancedCommitPropertiesProvider
-import org.javers.spring.auditable.AuditingExecutionContext
+import org.javers.spring.auditable.AuditedMethodExecutionContext
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.CommitPropertiesProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -93,7 +93,7 @@ class TestApplicationConfig {
         return new AdvancedCommitPropertiesProvider() {
 
             @Override
-            public Map<String, String> provideForCommittedObject(AuditingExecutionContext ctx, Object domainObject) {
+            public Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
                 return Map.of(
                     "TargetMethodName", ctx.getTargetMethodName(),
                     "TargetClassName", ctx.getTargetClassName()
@@ -101,7 +101,7 @@ class TestApplicationConfig {
             }
 
             @Override
-            public Map<String, String> provideForDeletedObject(AuditingExecutionContext ctx, Object domainObject) {
+            public Map<String, String> provideForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
                 return Map.of(
                     "TargetMethodName", ctx.getTargetMethodName(),
                     "TargetClassName", ctx.getTargetClassName()
@@ -109,7 +109,7 @@ class TestApplicationConfig {
             }
 
             @Override
-            public Map<String, String> provideForDeleteById(AuditingExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
+            public Map<String, String> provideForDeleteById(AuditedMethodExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
                 return Map.of(
                     "TargetMethodName", ctx.getTargetMethodName(),
                     "getTargetClassName", ctx.getTargetClassName()

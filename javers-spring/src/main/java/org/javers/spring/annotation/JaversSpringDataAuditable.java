@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Enables Javers auto-audit aspect when put on Spring Data {@link CrudRepository}
+ * Enables Javers auto-audit aspect when put on a Spring Data {@link CrudRepository} instance.
  *
  * @see JaversSpringDataAuditableRepositoryAspect
  * @author Florian Gessner

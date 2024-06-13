@@ -10,7 +10,7 @@ import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.annotation.JaversAuditableAsync;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
-import org.javers.spring.auditable.AuditingExecutionContext;
+import org.javers.spring.auditable.AuditedMethodExecutionContext;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
@@ -156,7 +156,7 @@ public class JaversSpringMongoApplicationConfigExample {
         return new AdvancedCommitPropertiesProvider() {
 
             @Override
-            public Map<String, String> provideForCommittedObject(AuditingExecutionContext ctx, Object domainObject) {
+            public Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
                 return Map.of(
                     "TargetMethodName", ctx.getTargetMethodName(),
                     "TargetClassName", ctx.getTargetClassName()
@@ -164,7 +164,7 @@ public class JaversSpringMongoApplicationConfigExample {
             }
 
             @Override
-            public Map<String, String> provideForDeletedObject(AuditingExecutionContext ctx, Object domainObject) {
+            public Map<String, String> provideForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
                 return Map.of(
                     "TargetMethodName", ctx.getTargetMethodName(),
                     "TargetClassName", ctx.getTargetClassName()
@@ -172,7 +172,7 @@ public class JaversSpringMongoApplicationConfigExample {
             }
 
             @Override
-            public Map<String, String> provideForDeleteById(AuditingExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
+            public Map<String, String> provideForDeleteById(AuditedMethodExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
                 return Map.of(
                     "TargetMethodName", ctx.getTargetMethodName(),
                     "getTargetClassName", ctx.getTargetClassName()
