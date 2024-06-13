@@ -32,6 +32,13 @@ public class JaversAuditableAspect {
         this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider));
     }
 
+    /**
+     * for backward compatibility after introducing AdvancedCommitPropertiesProvider
+     */
+    public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        this(javers, authorProvider, commitPropertiesProvider, AdvancedCommitPropertiesProvider.empty());
+    }
+
     public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider) {
         this(javers, authorProvider, new EmptyPropertiesProvider(), AdvancedCommitPropertiesProvider.empty());
     }

@@ -12,8 +12,8 @@ import org.springframework.core.annotation.Order;
 import java.util.Map;
 
 /**
- * Calls {@link Javers#commit(String, Object, Map)} on objects returned from save() methods in Spring Data CrudRepository
- * when a repository is annotated with (class-level) @JaversSpringDataAuditable.
+ * Calls {@link Javers#commit(String, Object, Map)} on objects returned from save() methods in
+ * Spring Data CrudRepository when a repository is annotated with (class-level) @JaversSpringDataAuditable.
  * <br/><br/>
  *
  * Calls {@link Javers#commitShallowDelete(String, Object, Map)} on arguments passed to delete() methods.
@@ -23,6 +23,13 @@ import java.util.Map;
 public class JaversSpringDataAuditableRepositoryAspect extends AbstractSpringAuditableRepositoryAspect {
     public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
         super(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider);
+    }
+
+    /**
+     * for backward compatibility after introducing AdvancedCommitPropertiesProvider
+     */
+    public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        this(javers, authorProvider, commitPropertiesProvider, AdvancedCommitPropertiesProvider.empty());
     }
 
     @AfterReturning("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")
