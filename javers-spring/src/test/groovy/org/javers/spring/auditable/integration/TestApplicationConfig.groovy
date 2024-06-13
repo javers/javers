@@ -83,7 +83,11 @@ class TestApplicationConfig {
         return new CommitPropertiesProvider() {
             @Override
             Map<String, String> provideForCommittedObject(Object domainObject) {
-                return ["key":"ok"]
+                ["key":"ok"]
+            }
+
+            Map<String, String> provideForDeletedObject(Object domainObject) {
+                ["key":"ok_deleted"]
             }
         }
     }
@@ -93,27 +97,28 @@ class TestApplicationConfig {
         return new AdvancedCommitPropertiesProvider() {
 
             @Override
-            public Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
-                return Map.of(
-                    "TargetMethodName", ctx.getTargetMethodName(),
-                    "TargetClassName", ctx.getTargetClassName()
-                );
+            Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
+                [
+                    "TargetMethodName" : ctx.getTargetMethodName(),
+                    "TargetClassName" : ctx.getTargetClassName(),
+                    "TargetMethodArgs.size" : ctx.getTargetMethodArgs().length + ''
+                ]
             }
 
             @Override
-            public Map<String, String> provideForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
-                return Map.of(
-                    "TargetMethodName", ctx.getTargetMethodName(),
-                    "TargetClassName", ctx.getTargetClassName()
-                );
+            Map<String, String> provideForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
+                [
+                    "TargetMethodName" : ctx.getTargetMethodName(),
+                    "TargetClassName" : ctx.getTargetClassName(),
+                ]
             }
 
             @Override
             public Map<String, String> provideForDeleteById(AuditedMethodExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
-                return Map.of(
-                    "TargetMethodName", ctx.getTargetMethodName(),
-                    "getTargetClassName", ctx.getTargetClassName()
-                );
+                [
+                    "TargetMethodName" : ctx.getTargetMethodName(),
+                    "TargetClassName" : ctx.getTargetClassName(),
+                ]
             }
 
         };
