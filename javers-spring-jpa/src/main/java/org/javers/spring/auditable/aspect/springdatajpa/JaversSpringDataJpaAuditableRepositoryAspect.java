@@ -22,6 +22,13 @@ public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpring
         super(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider);
     }
 
+    /**
+     * for backward compatibility after introducing AdvancedCommitPropertiesProvider
+     */
+    public JaversSpringDataJpaAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        this(javers, authorProvider, commitPropertiesProvider, AdvancedCommitPropertiesProvider.empty());
+    }
+
     @AfterReturning("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")
     public void onDeleteExecuted(JoinPoint pjp) {
         onDelete(pjp);
