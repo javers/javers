@@ -9,19 +9,22 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
+ * <b>
+ * This interface is deprecated since Javers 7.5.
+ * </b>
+ * <br/>
+ * Use the new version &mdash; {@link AdvancedCommitPropertiesProvider},
+ * which works similarly to the old one, but gives access to an audited method call context.
+ * <br/><br/>
+ *
  * Provides commit properties
  * for {@link Javers#commit(String, Object, Map)}
  * called by the auto-audit aspect &mdash; {@link JaversSpringDataAuditable}.
  * <br/><br/>
  *
  * Implementation has to be thread-safe.
- * <br/><br/>
  *
- * This interface is deprecated since Javers 7.5, yet there are no plans to phase it out.
- * <br/>
- * For new code, use the upgraded version &mdash; {@link AdvancedCommitPropertiesProvider}, which
- * provides a method call context.
- *
+ * @Deprecated to be replaced by {@link AdvancedCommitPropertiesProvider}
  * @author bartosz.walacik
  */
 @Deprecated

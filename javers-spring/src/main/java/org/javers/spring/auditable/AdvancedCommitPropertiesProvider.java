@@ -9,10 +9,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * A new version of {@link CommitPropertiesProvider}.
- * <br/><br/>
- *
- * Use it to provide commit properties
+ * Use this interface to provide commit properties
  * for {@link Javers#commit(String, Object, Map)}
  * called by the auto-audit aspect &mdash; {@link JaversSpringDataAuditable}.
  * Implementation has to be thread-safe.
@@ -34,6 +31,8 @@ import java.util.Map;
  *     }
  * }
  * </pre>
+ *
+ * This is a new version of deprecated {@link CommitPropertiesProvider}.
  *
  * @author Xiangcheng Kuo
  * @see CommitPropertiesProvider

@@ -122,6 +122,7 @@ public class JaversSqlAutoConfiguration {
 
     @Bean(name = "EmptyPropertiesProvider")
     @ConditionalOnMissingBean
+    @Deprecated
     public CommitPropertiesProvider commitPropertiesProvider() {
         return new EmptyPropertiesProvider();
     }
