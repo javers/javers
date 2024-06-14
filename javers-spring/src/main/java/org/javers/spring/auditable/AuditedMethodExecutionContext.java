@@ -106,13 +106,11 @@ public interface AuditedMethodExecutionContext {
 		@Override
 		public Method getTargetMethod() {
 			Signature signature = jp.getSignature();
-			Method targetMethod;
 			if (signature instanceof MethodSignature ms) {
-				targetMethod = ms.getMethod();
+				return ms.getMethod();
 			} else {
 				throw new IllegalArgumentException("Unsupported signature type: " + signature.getClass().getName());
 			}
-			return targetMethod;
 		}
 
 		/**

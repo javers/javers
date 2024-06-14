@@ -157,6 +157,7 @@ public class JaversMongoAutoConfiguration {
 
     @Bean(name = "EmptyPropertiesProvider")
     @ConditionalOnMissingBean
+    @Deprecated
     public CommitPropertiesProvider commitPropertiesProvider() {
         return new EmptyPropertiesProvider();
     }

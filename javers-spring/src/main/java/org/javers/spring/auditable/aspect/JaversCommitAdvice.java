@@ -40,11 +40,7 @@ public class JaversCommitAdvice {
     private final Executor executor;
 
     public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
-        this.javers = javers;
-        this.authorProvider = authorProvider;
-        this.commitPropertiesProvider = commitPropertiesProvider;
-        this.advancedCommitPropertiesProvider = advancedCommitPropertiesProvider;
-        this.executor = null;
+        this(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider, null);
     }
 
     public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider, Executor executor) {
@@ -106,22 +102,14 @@ public class JaversCommitAdvice {
     public void commitShallowDelete(AuditedMethodExecutionContext ctx, Object domainObject) {
         String author = authorProvider.provide();
 
-        javers.commitShallowDelete(author, domainObject, Maps.merge(
-                advancedCommitPropertiesProvider.provideForDeletedObject(ctx, domainObject),
-                commitPropertiesProvider.provideForDeletedObject(domainObject),
-                commitPropertiesProvider.provide()
-            )
-        );
+        javers.commitShallowDelete(author, domainObject, propsForDeletedObject(ctx, domainObject));
     }
 
     public void commitShallowDeleteById(AuditedMethodExecutionContext ctx, Object domainObjectId, Class<?> domainType) {
         String author = authorProvider.provide();
 
-        javers.commitShallowDeleteById(author, instanceId(domainObjectId, domainType), Maps.merge(
-            advancedCommitPropertiesProvider.provideForDeleteById(ctx, domainType, domainObjectId),
-            commitPropertiesProvider.provideForDeleteById(domainType, domainObjectId),
-            commitPropertiesProvider.provide()
-        ));
+        javers.commitShallowDeleteById(author, instanceId(domainObjectId, domainType),
+                propsForDeletedById(ctx, domainType, domainObjectId));
     }
 
     Optional<CompletableFuture<Commit>> commitSaveMethodArgumentsAsync(JoinPoint pjp) {
@@ -145,6 +133,22 @@ public class JaversCommitAdvice {
             advancedCommitPropertiesProvider.provideForCommittedObject(ctx, domainObject),
             commitPropertiesProvider.provideForCommittedObject(domainObject),
             commitPropertiesProvider.provide()
+        );
+    }
+
+    private Map<String, String> propsForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
+        return Maps.merge(
+                advancedCommitPropertiesProvider.provideForDeletedObject(ctx, domainObject),
+                commitPropertiesProvider.provideForDeletedObject(domainObject),
+                commitPropertiesProvider.provide()
+        );
+    }
+
+    private Map<String, String> propsForDeletedById(AuditedMethodExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
+        return Maps.merge(
+                advancedCommitPropertiesProvider.provideForDeleteById(ctx, domainObjectClass, domainObjectId),
+                commitPropertiesProvider.provideForDeleteById(domainObjectClass, domainObjectId),
+                commitPropertiesProvider.provide()
         );
     }
 }
