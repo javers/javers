@@ -9,14 +9,15 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Use this interface to provide commit properties
- * for {@link Javers#commit(String, Object, Map)}
- * called by the auto-audit aspect &mdash; {@link JaversSpringDataAuditable}.
- * Implementation has to be thread-safe.
+ * This is an extended version of {@link CommitPropertiesProvider}.
+ * <br/>
+ * Both interfaces exist because of backward compatibility reasons.
  * <br/><br/>
  *
- * By implementing this interface, you can leverage information from {@link AuditedMethodExecutionContext}
- * to generate commit properties that might be aware of a current operation being performed.
+ * Choose this extended version of the interface to generate commit properties that might
+ * depend on a current method being executed. See {@link AuditedMethodExecutionContext}.
+ * <br/><br/>
+ * It's not recommended to implement both interfaces in your class, if so, Javers merges the results.
  * <br/><br/>
  *
  * <b>Usage</b>
@@ -32,71 +33,61 @@ import java.util.Map;
  * }
  * </pre>
  *
- * This is a new version of deprecated {@link CommitPropertiesProvider}.
- *
  * @author Xiangcheng Kuo
  * @see CommitPropertiesProvider
  * @see AuditedMethodExecutionContext
  * @since 7.5
  */
-public interface AdvancedCommitPropertiesProvider {
+public interface AdvancedCommitPropertiesProvider extends CommitPropertiesProvider {
 
 	/**
-	 * Provides Javers commit properties when a given object is committed (saved or updated)
-	 * to {@link JaversRepository}.
+	 * Extended version of {@link #provideForCommittedObject(Object)},
+	 * which gives access to an audited method execution context.
 	 * <br/><br/>
 	 *
-	 * This method is called by the {@link JaversSpringDataAuditable} aspect
-	 * to get properties for Javers commit created when
-	 * {@link CrudRepository#save(Object)} and
-	 * {@link CrudRepository#saveAll(Iterable)} methods are called.
+	 * These two method variants exist because of backward compatibility reasons.
+	 * Pick one you want to override. If you override both of them (which is not recommended) &mdash;
+	 * Javers merges the results.<br/>
+	 * Both method variants returns empty Map by default.
 	 *
-	 * @param ctx          an audited method call context
-	 * @param domainObject an object being saved
 	 * @return a map of commit properties
+	 * @see #provideForCommittedObject(Object)
 	 */
-	default Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
+	default Map<String, String> provideForCommittedObject(Object savedDomainObject, AuditedMethodExecutionContext ctx) {
 		return Collections.emptyMap();
 	}
 
 	/**
-	 * Provides Javers commit properties when a given object is deleted from {@link JaversRepository}.
+	 * Extended version of {@link #provideForDeletedObject(Object)},
+	 * which gives access to an audited method execution context.
 	 * <br/><br/>
 	 *
-	 * This method is called by {@link JaversSpringDataAuditable} aspect
-	 * to get properties for Javers commit created when
-	 * {@link CrudRepository#delete(Object)} and
-	 * {@link CrudRepository#deleteAll(Iterable)} methods are called.
+	 * These two method variants exist because of backward compatibility reasons.
+	 * Pick one you want to override. If you override both of them (which is not recommended) &mdash;
+	 * Javers merges the results.<br/>
+	 * Default impl delegates to {@link #provideForCommittedObject(Object, AuditedMethodExecutionContext)}.
 	 *
-	 * <br/><br/>
-	 * Default implementation delegates to {@link #provideForCommittedObject(AuditedMethodExecutionContext, Object)}
-	 *
-	 * @param ctx          an audited method call context
-	 * @param domainObject an object being deleted
 	 * @return a map of commit properties
+	 * @see #provideForDeletedObject(Object)
 	 */
-	default Map<String, String> provideForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
-		return Collections.emptyMap();
+	default Map<String, String> provideForDeletedObject(Object deletedDomainObject, AuditedMethodExecutionContext ctx) {
+		return provideForDeletedObject(deletedDomainObject, ctx);
 	}
 
 	/**
-	 * Provides Javers commit properties when a given object is deleted from {@link JaversRepository}
-	 * by its Id.
+	 * Extended version of {@link #provideForDeleteById(Class, Object)},
+	 * which gives access to an audited method execution context.
 	 * <br/><br/>
 	 *
-	 * This method is called by {@link JaversSpringDataAuditable} aspect
-	 * to get properties for Javers commit created when
-	 * {@link CrudRepository#deleteById(Object)} is called.
+	 * These two method variants exist because of backward compatibility reasons.
+	 * Pick one you want to override. If you override both of them (which is not recommended) &mdash;
+	 * Javers merges the results.<br/>
+	 * Both method variants returns empty Map by default.
 	 *
-	 * <br/><br/>
-	 * Default implementation returns empty Map
-	 *
-	 * @param ctx               an audited method call context
-	 * @param domainObjectClass a class of the object being deleted
-	 * @param domainObjectId    an ID of the object being deleted
 	 * @return a map of commit properties
+	 * @see #provideForDeleteById(Class, Object)
 	 */
-	default Map<String, String> provideForDeleteById(AuditedMethodExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
+	default Map<String, String> provideForDeleteById(Class<?> deletedDomainObjectClass, Object deletedDomainObjectId, AuditedMethodExecutionContext ctx) {
 		return Collections.emptyMap();
 	}
 

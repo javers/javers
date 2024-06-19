@@ -2,7 +2,6 @@ package org.javers.spring.auditable.aspect;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.javers.common.collections.Maps;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
@@ -36,25 +35,22 @@ public class JaversCommitAdvice {
     private final AuthorProvider authorProvider;
     private final CommitPropertiesProvider commitPropertiesProvider;
 
-    private final AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider;
     private final Executor executor;
 
-    public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
-        this(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider, null);
+    public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        this(javers, authorProvider, commitPropertiesProvider, null);
     }
 
-    public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider, Executor executor) {
+    public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, Executor executor) {
 		this.javers = javers;
 		this.authorProvider = authorProvider;
 		this.commitPropertiesProvider = commitPropertiesProvider;
-        this.advancedCommitPropertiesProvider = advancedCommitPropertiesProvider;
     	this.executor = executor;
 	}
 
-	void commitSaveMethodArguments(JoinPoint pjp) {
-        AuditedMethodExecutionContext ctx = AuditedMethodExecutionContext.from(pjp);
-        for (Object arg : AspectUtil.collectArguments(pjp)) {
-            commitObject(ctx, arg);
+	void commitSaveMethodArguments(JoinPoint jp) {
+        for (Object arg : AspectUtil.collectArguments(jp)) {
+            commitObject(jp, arg);
         }
     }
 
@@ -64,9 +60,9 @@ public class JaversCommitAdvice {
         for (Object arg : AspectUtil.collectArguments(jp)) {
             JaversType javersType = javers.getTypeMapping(arg.getClass());
             if (javersType instanceof ManagedType) {
-                commitShallowDelete(ctx, arg);
+                commitShallowDelete(jp, arg);
             } else if (javersType instanceof PrimitiveOrValueType) {
-                commitShallowDeleteById(ctx, arg, getDomainTypeToDelete(jp, arg));
+                commitShallowDeleteById(jp, arg, getDomainTypeToDelete(jp, arg));
             }
         }
     }
@@ -76,7 +72,7 @@ public class JaversCommitAdvice {
         for (Object arg : AspectUtil.collectReturnedObjects(entities)) {
             JaversType javersType = javers.getTypeMapping(arg.getClass());
             if (javersType instanceof ManagedType) {
-                commitShallowDelete(ctx, arg);
+                commitShallowDelete(jp, arg);
             } else {
                 Method method = ((MethodSignature) jp.getSignature()).getMethod();
                 throw new JaversException(JaversExceptionCode.WRONG_USAGE_OF_JAVERS_AUDITABLE_CONDITIONAL_DELETE, method);
@@ -94,61 +90,61 @@ public class JaversCommitAdvice {
         return entity;
     }
 
-    public void commitObject(AuditedMethodExecutionContext ctx, Object domainObject) {
+    public void commitObject(JoinPoint jp, Object domainObject) {
         String author = authorProvider.provide();
-        javers.commit(author, domainObject, propsForCommit(ctx, domainObject));
+        javers.commit(author, domainObject, propsForCommit(jp, domainObject));
     }
 
-    public void commitShallowDelete(AuditedMethodExecutionContext ctx, Object domainObject) {
+    public void commitShallowDelete(JoinPoint jp, Object domainObject) {
         String author = authorProvider.provide();
 
-        javers.commitShallowDelete(author, domainObject, propsForDeletedObject(ctx, domainObject));
+        javers.commitShallowDelete(author, domainObject, propsForDeletedObject(jp, domainObject));
     }
 
-    public void commitShallowDeleteById(AuditedMethodExecutionContext ctx, Object domainObjectId, Class<?> domainType) {
+    public void commitShallowDeleteById(JoinPoint jp, Object domainObjectId, Class<?> domainType) {
         String author = authorProvider.provide();
 
         javers.commitShallowDeleteById(author, instanceId(domainObjectId, domainType),
-                propsForDeletedById(ctx, domainType, domainObjectId));
+                propsForDeletedById(jp, domainType, domainObjectId));
     }
 
     Optional<CompletableFuture<Commit>> commitSaveMethodArgumentsAsync(JoinPoint pjp) {
-        var ctx = AuditedMethodExecutionContext.from(pjp);
-
         List<CompletableFuture<Commit>> futures = AspectUtil.collectArguments(pjp)
                 .stream()
-                .map(arg -> commitObjectAsync(ctx, arg))
+                .map(arg -> commitObjectAsync(pjp, arg))
                 .collect(Collectors.toList());
 
         return futures.size() == 0 ? Optional.empty() : Optional.of(futures.get(futures.size() - 1));
     }
 
-    CompletableFuture<Commit> commitObjectAsync(AuditedMethodExecutionContext ctx, Object domainObject) {
+    CompletableFuture<Commit> commitObjectAsync(JoinPoint jp, Object domainObject) {
         String author = this.authorProvider.provide();
-        return this.javers.commitAsync(author, domainObject, propsForCommit(ctx, domainObject), executor);
+        return this.javers.commitAsync(author, domainObject, propsForCommit(jp, domainObject), executor);
     }
 
-    private Map<String, String> propsForCommit(AuditedMethodExecutionContext ctx, Object domainObject) {
-        return Maps.merge(
-            advancedCommitPropertiesProvider.provideForCommittedObject(ctx, domainObject),
-            commitPropertiesProvider.provideForCommittedObject(domainObject),
-            commitPropertiesProvider.provide()
-        );
+    private Map<String, String> propsForCommit(JoinPoint jp, Object domainObject) {
+        return getAdvancedCommitPropertiesProvider()
+                .map(adv -> adv.provideForCommittedObject(domainObject, AuditedMethodExecutionContext.from(jp)))
+                .orElse(commitPropertiesProvider.provideForCommittedObject(domainObject));
     }
 
-    private Map<String, String> propsForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
-        return Maps.merge(
-                advancedCommitPropertiesProvider.provideForDeletedObject(ctx, domainObject),
-                commitPropertiesProvider.provideForDeletedObject(domainObject),
-                commitPropertiesProvider.provide()
-        );
+    private Optional<AdvancedCommitPropertiesProvider> getAdvancedCommitPropertiesProvider() {
+        if (this.commitPropertiesProvider instanceof AdvancedCommitPropertiesProvider) {
+            return Optional.of((AdvancedCommitPropertiesProvider) this.commitPropertiesProvider);
+        }
+        return Optional.empty();
     }
 
-    private Map<String, String> propsForDeletedById(AuditedMethodExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
-        return Maps.merge(
-                advancedCommitPropertiesProvider.provideForDeleteById(ctx, domainObjectClass, domainObjectId),
-                commitPropertiesProvider.provideForDeleteById(domainObjectClass, domainObjectId),
-                commitPropertiesProvider.provide()
-        );
+    private Map<String, String> propsForDeletedObject(JoinPoint jp, Object domainObject) {
+        return getAdvancedCommitPropertiesProvider()
+                .map(adv -> adv.provideForDeletedObject(domainObject, AuditedMethodExecutionContext.from(jp)))
+                .orElse(commitPropertiesProvider.provideForDeletedObject(domainObject));
+    }
+
+    private Map<String, String> propsForDeletedById(JoinPoint jp, Class<?> domainObjectClass, Object domainObjectId) {
+
+        return getAdvancedCommitPropertiesProvider()
+                .map(adv -> adv.provideForDeleteById(domainObjectClass, domainObjectId, AuditedMethodExecutionContext.from(jp)))
+                .orElse(commitPropertiesProvider.provideForDeleteById(domainObjectClass, domainObjectId));
     }
 }

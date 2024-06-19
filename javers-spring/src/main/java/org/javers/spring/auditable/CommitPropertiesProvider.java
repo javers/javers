@@ -9,88 +9,91 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * <b>
- * This interface is deprecated since Javers 7.5.
- * </b>
- * <br/>
- * Use the new version &mdash; {@link AdvancedCommitPropertiesProvider},
- * which works similarly to the old one, but gives access to an audited method call context.
- * <br/><br/>
- *
- * Provides commit properties
- * for {@link Javers#commit(String, Object, Map)}
- * called by the auto-audit aspect &mdash; {@link JaversSpringDataAuditable}.
+ * This interface gives possibility to provide commit properties for
+ * {@link Javers#commit(String, Object, Map)} and
+ * {@link Javers#commitShallowDelete(String, Object, Map)} when called
+ * by the {@link JaversSpringDataAuditable} auto-audit aspect.
  * <br/><br/>
  *
  * Implementation has to be thread-safe.
+ * <br/><br/>
  *
- * @Deprecated to be replaced by {@link AdvancedCommitPropertiesProvider}
+ * <b>Usage</b>
+ * <br/>
+ * Create a bean in your Spring context, for example:
+ * <pre>
+ * {@code
+ *     @Bean
+ *     @ConditionalOnMissingBean
+ *     public CommitPropertiesProvider commitPropertiesProvider() {
+ *         return new MyCommitPropertiesProvider();
+ *     }
+ * }
+ * </pre>
+ *
+ * See the extended version of this interface &mdash; {@link AdvancedCommitPropertiesProvider},
+ * which works similarly, but additionally gives you access to an audited method execution context.
+ * <br/><br/>
+ *
  * @author bartosz.walacik
  */
-@Deprecated
 public interface CommitPropertiesProvider {
 
     /**
      * Provides object-specific Javers commit properties when a given object is committed (saved or updated)
      * to {@link JaversRepository}.
-     *
      * <br/><br/>
+     *
      * This method is called by the {@link JaversSpringDataAuditable} aspect
      * to get properties for Javers commit created when
      * {@link CrudRepository#save(Object)} and
      * {@link CrudRepository#saveAll(Iterable)} methods are called.
      *
      * <br/><br/>
-     * Default implementation returns empty Map
+     * Default implementation returns empty Map.
      *
-     * @param domainObject saved object
+     * @return a map of commit properties
+     * @see AdvancedCommitPropertiesProvider#provideForCommittedObject(Object, AuditedMethodExecutionContext)
      */
-    default Map<String, String> provideForCommittedObject(Object domainObject) {
+    default Map<String, String> provideForCommittedObject(Object savedDomainObject) {
         return Collections.emptyMap();
     }
 
     /**
      * Provides object-specific Javers commit properties when a given object is deleted from {@link JaversRepository}.
-     *
      * <br/><br/>
+     *
      * This method is called by {@link JaversSpringDataAuditable} aspect
      * to get properties for Javers commit created when
      * {@link CrudRepository#delete(Object)} and
      * {@link CrudRepository#deleteAll(Iterable)} methods are called.
      *
      * <br/><br/>
-     * Default implementation delegates to {@link #provideForCommittedObject(Object)}
+     * Default implementation delegates to {@link #provideForCommittedObject(Object)}.
      *
-     * @param domainObject affected object
+     * @return a map of commit properties
+     * @see AdvancedCommitPropertiesProvider#provideForDeletedObject(Object, AuditedMethodExecutionContext)
      */
-    default Map<String, String> provideForDeletedObject(Object domainObject) {
-        return provideForCommittedObject(domainObject);
+    default Map<String, String> provideForDeletedObject(Object deletedDomainObject) {
+        return provideForCommittedObject(deletedDomainObject);
     }
 
     /**
      * Provides object-specific commit properties when a given object is deleted from {@link JaversRepository}
      * by its Id.
-     *
      * <br/><br/>
+     *
      * This method is called by {@link JaversSpringDataAuditable} aspect
      * to get properties for Javers commit created when
      * {@link CrudRepository#deleteById(Object)} is called.
      *
      * <br/><br/>
-     * Default implementation returns empty Map
-     */
-    default Map<String, String> provideForDeleteById(Class<?> domainObjectClass, Object domainObjectId) {
-        return Collections.emptyMap();
-    }
-
-    /**
-     * This method is deprecated
-     * and replaced with {@link #provideForCommittedObject(Object)}
+     * Default implementation returns empty Map.
      *
-     * @Deprecated
+     * @return a map of commit properties
+     * @see AdvancedCommitPropertiesProvider#provideForDeleteById(Class, Object, AuditedMethodExecutionContext)
      */
-    @Deprecated
-    default Map<String, String> provide() {
+    default Map<String, String> provideForDeleteById(Class<?> deletedDomainObjectClass, Object deletedDomainObjectId) {
         return Collections.emptyMap();
     }
 }

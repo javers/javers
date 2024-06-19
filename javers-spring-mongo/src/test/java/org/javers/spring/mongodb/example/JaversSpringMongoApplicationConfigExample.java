@@ -9,7 +9,10 @@ import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.annotation.JaversAuditableAsync;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.javers.spring.auditable.*;
+import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
+import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
@@ -81,7 +84,7 @@ public class JaversSpringMongoApplicationConfigExample {
      */
     @Bean
     public JaversAuditableAspect javersAuditableAspect() {
-        return new JaversAuditableAspect(javers(), authorProvider(), advancedCommitPropertiesProvider());
+        return new JaversAuditableAspect(javers(), authorProvider(), commitPropertiesProvider());
     }
 
     /**
@@ -92,7 +95,8 @@ public class JaversSpringMongoApplicationConfigExample {
      */
     @Bean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
-        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(), advancedCommitPropertiesProvider());
+        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(),
+                commitPropertiesProvider());
     }
 
     /**
@@ -106,7 +110,7 @@ public class JaversSpringMongoApplicationConfigExample {
      */
     @Bean
     public JaversAuditableAspectAsync javersAuditableAspectAsync() {
-        return new JaversAuditableAspectAsync(javers(), authorProvider(), new EmptyPropertiesProvider(), advancedCommitPropertiesProvider(), javersAsyncAuditExecutor());
+        return new JaversAuditableAspectAsync(javers(), authorProvider(), commitPropertiesProvider(), javersAsyncAuditExecutor());
     }
 
     /**
@@ -132,22 +136,17 @@ public class JaversSpringMongoApplicationConfigExample {
         return new SpringSecurityAuthorProvider();
     }
 
-
     /**
-     * Optional for auto-audit aspect. <br/>
-     * @see CommitPropertiesProvider
+     * Optional for auto-audit aspect.
+     * See also {@link AdvancedCommitPropertiesProvider}
      */
     @Bean
-    public AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider() {
-        return new AdvancedCommitPropertiesProvider() {
-
+    public CommitPropertiesProvider commitPropertiesProvider() {
+        return new CommitPropertiesProvider() {
             @Override
-            public Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
-                return Map.of(
-                    "key", "ok"
-                );
+            public Map<String, String> provideForCommittedObject(Object domainObject) {
+                    return Maps.of("key", "ok");
             }
         };
     }
-
 }

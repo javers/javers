@@ -5,11 +5,11 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.javers.core.Javers;
 import org.javers.spring.annotation.JaversAuditable;
-import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.springframework.core.annotation.Order;
+
 
 /**
  * Commits all arguments passed to methods annotated with {@link JaversAuditable}
@@ -28,28 +28,12 @@ import org.springframework.core.annotation.Order;
 public class JaversAuditableAspect {
     private final JaversCommitAdvice javersCommitAdvice;
 
-    public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider,  AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
-        this(new JaversCommitAdvice(javers, authorProvider, new EmptyPropertiesProvider(), advancedCommitPropertiesProvider));
-    }
-
-    /**
-     * For backward compatibility after introducing AdvancedCommitPropertiesProvider
-     */
-    @Deprecated
-    public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
-        this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider));
-    }
-
-    /**
-     * For backward compatibility after introducing AdvancedCommitPropertiesProvider
-     */
-    @Deprecated
     public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
-        this(javers, authorProvider, commitPropertiesProvider, AdvancedCommitPropertiesProvider.empty());
+        this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider) );
     }
 
     public JaversAuditableAspect(Javers javers, AuthorProvider authorProvider) {
-        this(javers, authorProvider, new EmptyPropertiesProvider(), AdvancedCommitPropertiesProvider.empty());
+        this(javers, authorProvider, new EmptyPropertiesProvider());
     }
 
     JaversAuditableAspect(JaversCommitAdvice javersCommitAdvice) {

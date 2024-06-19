@@ -1,6 +1,5 @@
 package org.javers.spring.example;
 
-import jakarta.persistence.EntityManagerFactory;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
@@ -9,8 +8,8 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
-import org.javers.spring.auditable.AuditedMethodExecutionContext;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
@@ -30,6 +29,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class JaversSpringJpaApplicationConfigExample {
      */
     @Bean
     public JaversAuditableAspect javersAuditableAspect(Javers javers) {
-        return new JaversAuditableAspect(javers, authorProvider(), advancedCommitPropertiesProvider());
+        return new JaversAuditableAspect(javers, authorProvider(), commitPropertiesProvider());
     }
 
     /**
@@ -83,7 +83,7 @@ public class JaversSpringJpaApplicationConfigExample {
      */
     @Bean
     public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers) {
-        return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider(), advancedCommitPropertiesProvider());
+        return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider());
     }
 
     /**
@@ -98,15 +98,14 @@ public class JaversSpringJpaApplicationConfigExample {
     }
 
     /**
-     * Optional for auto-audit aspect. <br/>
-     * @see AdvancedCommitPropertiesProvider
+     * Optional for auto-audit aspect.
+     * See also {@link AdvancedCommitPropertiesProvider}
      */
     @Bean
-    public AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider() {
-        return new AdvancedCommitPropertiesProvider() {
-
+    public CommitPropertiesProvider commitPropertiesProvider() {
+        return new CommitPropertiesProvider() {
             @Override
-            public Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
+            public Map<String, String> provideForCommittedObject(Object domainObject) {
                 if (domainObject instanceof DummyObject) {
                     return Maps.of("dummyObject.name", ((DummyObject)domainObject).getName());
                 }

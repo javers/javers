@@ -7,7 +7,6 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.JaversBuilderPlugin;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
-import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.EmptyPropertiesProvider;
@@ -157,15 +156,8 @@ public class JaversMongoAutoConfiguration {
 
     @Bean(name = "EmptyPropertiesProvider")
     @ConditionalOnMissingBean
-    @Deprecated
     public CommitPropertiesProvider commitPropertiesProvider() {
         return new EmptyPropertiesProvider();
-    }
-
-    @Bean(name = "EmptyAdvancedCommitPropertiesProvider")
-    @ConditionalOnMissingBean
-    public AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider() {
-        return AdvancedCommitPropertiesProvider.empty();
     }
 
     @Bean
@@ -173,10 +165,8 @@ public class JaversMongoAutoConfiguration {
     public JaversAuditableAspect javersAuditableAspect(
             Javers javers,
             AuthorProvider authorProvider,
-            CommitPropertiesProvider commitPropertiesProvider,
-            AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider
-    ) {
-        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider);
+            CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
     }
 
     @Bean
@@ -184,9 +174,7 @@ public class JaversMongoAutoConfiguration {
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(
             Javers javers,
             AuthorProvider authorProvider,
-            CommitPropertiesProvider commitPropertiesProvider,
-            AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider
-    ) {
-        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider);
+            CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
     }
 }

@@ -4,17 +4,15 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.javers.core.Javers;
-import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
-import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.springframework.core.annotation.Order;
 import java.util.Map;
 
 /**
- * Calls {@link Javers#commit(String, Object, Map)} on objects returned from save() methods in
- * Spring Data CrudRepository when a repository is annotated with (class-level) @JaversSpringDataAuditable.
+ * Calls {@link Javers#commit(String, Object, Map)} on objects returned from save() methods in Spring Data CrudRepository
+ * when a repository is annotated with (class-level) @JaversSpringDataAuditable.
  * <br/><br/>
  *
  * Calls {@link Javers#commitShallowDelete(String, Object, Map)} on arguments passed to delete() methods.
@@ -22,25 +20,8 @@ import java.util.Map;
 @Aspect
 @Order(0)
 public class JaversSpringDataAuditableRepositoryAspect extends AbstractSpringAuditableRepositoryAspect {
-
-    public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
-        super(javers, authorProvider, new EmptyPropertiesProvider(), advancedCommitPropertiesProvider);
-    }
-
-    /**
-     * For backward compatibility after introducing AdvancedCommitPropertiesProvider
-     */
-    @Deprecated
-    public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
-        super(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider);
-    }
-
-    /**
-     * For backward compatibility after introducing AdvancedCommitPropertiesProvider
-     */
-    @Deprecated
     public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
-        this(javers, authorProvider, commitPropertiesProvider, AdvancedCommitPropertiesProvider.empty());
+        super(javers, authorProvider, commitPropertiesProvider);
     }
 
     @AfterReturning("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")
