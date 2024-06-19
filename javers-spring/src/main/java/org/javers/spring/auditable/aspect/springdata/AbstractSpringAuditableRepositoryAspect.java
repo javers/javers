@@ -4,9 +4,7 @@ import org.aspectj.lang.JoinPoint;
 import org.javers.core.Javers;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
 import org.javers.spring.auditable.AspectUtil;
-import org.javers.spring.auditable.AuditedMethodExecutionContext;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.aspect.JaversCommitAdvice;
@@ -20,23 +18,21 @@ public class AbstractSpringAuditableRepositoryAspect {
     private final JaversCommitAdvice javersCommitAdvice;
     private final Javers javers;
 
-    protected AbstractSpringAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider) {
+    protected AbstractSpringAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this.javers = javers;
-        this.javersCommitAdvice = new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider);
+        this.javersCommitAdvice = new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider);
     }
 
     protected void onSave(JoinPoint pjp, Object returnedObject) {
-        AuditedMethodExecutionContext ctx = AuditedMethodExecutionContext.from(pjp);
         getRepositoryInterface(pjp).ifPresent(i ->
-                AspectUtil.collectReturnedObjects(returnedObject).forEach(it -> javersCommitAdvice.commitObject(ctx, it)));
+                AspectUtil.collectReturnedObjects(returnedObject).forEach(it -> javersCommitAdvice.commitObject(pjp, it)));
     }
 
     protected void onDelete(JoinPoint pjp) {
-        AuditedMethodExecutionContext ctx = AuditedMethodExecutionContext.from(pjp);
         getRepositoryInterface(pjp).ifPresent( i -> {
             RepositoryMetadata metadata = DefaultRepositoryMetadata.getMetadata(i);
             for (Object deletedObject : AspectUtil.collectArguments(pjp)) {
-                handleDelete(ctx, metadata, deletedObject);
+                handleDelete(pjp, metadata, deletedObject);
             }
         });
     }
@@ -51,18 +47,18 @@ public class AbstractSpringAuditableRepositoryAspect {
     }
 
 
-    void handleDelete(AuditedMethodExecutionContext ctx, RepositoryMetadata repositoryMetadata, Object domainObjectOrId) {
+    void handleDelete(JoinPoint pjp, RepositoryMetadata repositoryMetadata, Object domainObjectOrId) {
             if (isIdClass(repositoryMetadata, domainObjectOrId)) {
                 Class<?> domainType = repositoryMetadata.getDomainType();
                 if (javers.findSnapshots(QueryBuilder.byInstanceId(domainObjectOrId, domainType).limit(1).build()).size() == 0) {
                     return;
                 }
-                javersCommitAdvice.commitShallowDeleteById(ctx, domainObjectOrId, domainType);
+                javersCommitAdvice.commitShallowDeleteById(pjp, domainObjectOrId, domainType);
             } else if (isDomainClass(repositoryMetadata, domainObjectOrId)) {
                 if (javers.findSnapshots(QueryBuilder.byInstance(domainObjectOrId).limit(1).build()).size() == 0) {
                     return;
                 }
-                javersCommitAdvice.commitShallowDelete(ctx, domainObjectOrId);
+                javersCommitAdvice.commitShallowDelete(pjp, domainObjectOrId);
             } else {
                 throw new IllegalArgumentException("Domain object or object id expected");
             }

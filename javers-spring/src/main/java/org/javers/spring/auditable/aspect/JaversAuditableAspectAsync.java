@@ -6,7 +6,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.javers.core.Javers;
 import org.javers.core.commit.Commit;
 import org.javers.spring.annotation.JaversAuditableAsync;
-import org.javers.spring.auditable.AdvancedCommitPropertiesProvider;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.springframework.core.annotation.Order;
@@ -32,8 +31,8 @@ public class JaversAuditableAspectAsync {
     private final JaversCommitAdvice javersCommitAdvice;
     private Optional<CompletableFuture<Commit>> lastAsyncCommit = Optional.empty();
 
-    public JaversAuditableAspectAsync(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider, Executor executor) {
-        this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider, advancedCommitPropertiesProvider, executor));
+    public JaversAuditableAspectAsync(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider,Executor executor) {
+        this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider, executor));
     }
 
     JaversAuditableAspectAsync(JaversCommitAdvice javersCommitAdvice) {
