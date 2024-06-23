@@ -2,6 +2,7 @@ package org.javers.spring.auditable.aspect;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.javers.common.collections.Maps;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
@@ -122,12 +123,6 @@ public class JaversCommitAdvice {
         return this.javers.commitAsync(author, domainObject, propsForCommit(jp, domainObject), executor);
     }
 
-    private Map<String, String> propsForCommit(JoinPoint jp, Object domainObject) {
-        return getAdvancedCommitPropertiesProvider()
-                .map(adv -> adv.provideForCommittedObject(domainObject, AuditedMethodExecutionContext.from(jp)))
-                .orElse(commitPropertiesProvider.provideForCommittedObject(domainObject));
-    }
-
     private Optional<AdvancedCommitPropertiesProvider> getAdvancedCommitPropertiesProvider() {
         if (this.commitPropertiesProvider instanceof AdvancedCommitPropertiesProvider) {
             return Optional.of((AdvancedCommitPropertiesProvider) this.commitPropertiesProvider);
@@ -135,16 +130,29 @@ public class JaversCommitAdvice {
         return Optional.empty();
     }
 
-    private Map<String, String> propsForDeletedObject(JoinPoint jp, Object domainObject) {
+    private Map<String, String> propsForCommit(JoinPoint jp, Object domainObject) {
+        var basicProps = Maps.merge(
+                this.commitPropertiesProvider.provideForCommittedObject(domainObject),
+                this.commitPropertiesProvider.provide());
+
         return getAdvancedCommitPropertiesProvider()
-                .map(adv -> adv.provideForDeletedObject(domainObject, AuditedMethodExecutionContext.from(jp)))
-                .orElse(commitPropertiesProvider.provideForDeletedObject(domainObject));
+                .map(adv -> Maps.merge(adv.provideForCommittedObject(domainObject, AuditedMethodExecutionContext.from(jp)), basicProps))
+                .orElse(basicProps);
+    }
+
+    private Map<String, String> propsForDeletedObject(JoinPoint jp, Object domainObject) {
+        var basicProps = this.commitPropertiesProvider.provideForDeletedObject(domainObject);
+
+        return getAdvancedCommitPropertiesProvider()
+                .map(adv -> Maps.merge(adv.provideForDeletedObject(domainObject, AuditedMethodExecutionContext.from(jp)), basicProps))
+                .orElse(basicProps);
     }
 
     private Map<String, String> propsForDeletedById(JoinPoint jp, Class<?> domainObjectClass, Object domainObjectId) {
+        var basicProps = this.commitPropertiesProvider.provideForDeleteById(domainObjectClass, domainObjectId);
 
         return getAdvancedCommitPropertiesProvider()
-                .map(adv -> adv.provideForDeleteById(domainObjectClass, domainObjectId, AuditedMethodExecutionContext.from(jp)))
-                .orElse(commitPropertiesProvider.provideForDeleteById(domainObjectClass, domainObjectId));
+                .map(adv -> Maps.merge(adv.provideForDeleteById(domainObjectClass, domainObjectId, AuditedMethodExecutionContext.from(jp)), basicProps))
+                .orElse(basicProps);
     }
 }

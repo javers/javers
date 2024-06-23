@@ -96,4 +96,15 @@ public interface CommitPropertiesProvider {
     default Map<String, String> provideForDeleteById(Class<?> deletedDomainObjectClass, Object deletedDomainObjectId) {
         return Collections.emptyMap();
     }
+
+    /**
+     * This method is deprecated
+     * and replaced with {@link #provideForCommittedObject(Object)}
+     *
+     * @Deprecated
+     */
+    @Deprecated
+    default Map<String, String> provide() {
+        return Collections.emptyMap();
+    }
 }
