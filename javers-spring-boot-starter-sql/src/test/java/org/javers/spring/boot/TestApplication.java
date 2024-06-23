@@ -1,6 +1,6 @@
 package org.javers.spring.boot;
 
-import org.apache.groovy.util.Maps;
+import org.javers.common.collections.Maps;
 import org.javers.core.JaversBuilderPlugin;
 import org.javers.core.diff.custom.CustomBigDecimalComparator;
 import org.javers.core.json.BasicStringTypeAdapter;

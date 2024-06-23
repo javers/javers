@@ -7,7 +7,6 @@ import org.javers.repository.mongo.MongoRepository
 import org.javers.spring.auditable.AdvancedCommitPropertiesProvider
 import org.javers.spring.auditable.AuditedMethodExecutionContext
 import org.javers.spring.auditable.AuthorProvider
-import org.javers.spring.auditable.CommitPropertiesProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
 import org.javers.spring.auditable.aspect.JaversAuditableAspect
 import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync
@@ -45,13 +44,12 @@ class TestApplicationConfig {
 
     @Bean
     JaversAuditableAspect javersAuditableAspect() {
-        new JaversAuditableAspect(javers(), authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider())
+        new JaversAuditableAspect(javers(), authorProvider(), advancedCommitPropertiesProvider())
     }
 
     @Bean
     JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
-        new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(),
-                commitPropertiesProvider(), advancedCommitPropertiesProvider())
+        new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(), advancedCommitPropertiesProvider())
     }
 
     /**
@@ -59,7 +57,7 @@ class TestApplicationConfig {
      */
     @Bean
     JaversAuditableAspectAsync javersAuditableAspectAsync() {
-        new JaversAuditableAspectAsync(javers(), authorProvider(), commitPropertiesProvider(), advancedCommitPropertiesProvider(), javersAsyncAuditExecutor())
+        new JaversAuditableAspectAsync(javers(), authorProvider(), advancedCommitPropertiesProvider(), javersAsyncAuditExecutor())
     }
 
     /**
@@ -79,25 +77,20 @@ class TestApplicationConfig {
     }
 
     @Bean
-    CommitPropertiesProvider commitPropertiesProvider() {
-        return new CommitPropertiesProvider() {
-            @Override
-            Map<String, String> provideForCommittedObject(Object domainObject) {
-                ["key":"ok"]
-            }
-
-            Map<String, String> provideForDeletedObject(Object domainObject) {
-                ["key":"ok_deleted"]
-            }
-        }
-    }
-
-    @Bean
     AdvancedCommitPropertiesProvider advancedCommitPropertiesProvider() {
         return new AdvancedCommitPropertiesProvider() {
 
             @Override
-            Map<String, String> provideForCommittedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
+            Map<String, String> provideForCommittedObject(Object domainObject) {
+                ["key":"ok"]
+            }
+            @Override
+            Map<String, String> provideForDeletedObject(Object domainObject) {
+                ["key":"ok_deleted"]
+            }
+
+            @Override
+            Map<String, String> provideForCommittedObject(Object domainObject, AuditedMethodExecutionContext ctx) {
                 [
                     "TargetMethodName" : ctx.getTargetMethodName(),
                     "TargetClassName" : ctx.getTargetClassName(),
@@ -106,7 +99,7 @@ class TestApplicationConfig {
             }
 
             @Override
-            Map<String, String> provideForDeletedObject(AuditedMethodExecutionContext ctx, Object domainObject) {
+            Map<String, String> provideForDeletedObject(Object domainObject, AuditedMethodExecutionContext ctx) {
                 [
                     "TargetMethodName" : ctx.getTargetMethodName(),
                     "TargetClassName" : ctx.getTargetClassName(),
@@ -114,7 +107,7 @@ class TestApplicationConfig {
             }
 
             @Override
-            public Map<String, String> provideForDeleteById(AuditedMethodExecutionContext ctx, Class<?> domainObjectClass, Object domainObjectId) {
+            public Map<String, String> provideForDeleteById(Class<?> domainObjectClass, Object domainObjectId, AuditedMethodExecutionContext ctx) {
                 [
                     "TargetMethodName" : ctx.getTargetMethodName(),
                     "TargetClassName" : ctx.getTargetClassName(),
