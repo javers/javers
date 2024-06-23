@@ -284,12 +284,16 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private MongoCursor<Document> getMongoSnapshotsCursor(Bson query, Optional<QueryParams> queryParams) {
         FindIterable<Document> findIterable = snapshotsCollection()
             .find(applyQueryParams(query, queryParams));
+        HashMap<String, Integer> sortFilters = new HashMap<>();
+        sortFilters.put(OBJECT_ID, DESC);
 
         if (coreConfiguration.getCommitIdGenerator() == CommitIdGenerator.SYNCHRONIZED_SEQUENCE) {
-            findIterable.sort(new Document(COMMIT_ID, DESC));
+            sortFilters.put(COMMIT_ID, DESC);
+            findIterable.sort(new Document(sortFilters));
         }
         else {
-            findIterable.sort(new Document(COMMIT_DATE_INSTANT, DESC));
+            sortFilters.put(COMMIT_DATE_INSTANT, DESC);
+            findIterable.sort(new Document(sortFilters));
         }
 
         return applyQueryParams(findIterable, queryParams).iterator();
