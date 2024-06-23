@@ -141,7 +141,9 @@ public class JaversCommitAdvice {
     }
 
     private Map<String, String> propsForDeletedObject(JoinPoint jp, Object domainObject) {
-        var basicProps = this.commitPropertiesProvider.provideForDeletedObject(domainObject);
+        var basicProps = Maps.merge(
+                this.commitPropertiesProvider.provideForDeletedObject(domainObject),
+                this.commitPropertiesProvider.provide());
 
         return getAdvancedCommitPropertiesProvider()
                 .map(adv -> Maps.merge(adv.provideForDeletedObject(domainObject, AuditedMethodExecutionContext.from(jp)), basicProps))
@@ -149,7 +151,9 @@ public class JaversCommitAdvice {
     }
 
     private Map<String, String> propsForDeletedById(JoinPoint jp, Class<?> domainObjectClass, Object domainObjectId) {
-        var basicProps = this.commitPropertiesProvider.provideForDeleteById(domainObjectClass, domainObjectId);
+        var basicProps = Maps.merge(
+                this.commitPropertiesProvider.provideForDeleteById(domainObjectClass, domainObjectId),
+                this.commitPropertiesProvider.provide());
 
         return getAdvancedCommitPropertiesProvider()
                 .map(adv -> Maps.merge(adv.provideForDeleteById(domainObjectClass, domainObjectId, AuditedMethodExecutionContext.from(jp)), basicProps))
