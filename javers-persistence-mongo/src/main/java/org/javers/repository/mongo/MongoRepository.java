@@ -1,5 +1,7 @@
 package org.javers.repository.mongo;
 
+import static com.mongodb.client.model.Sorts.orderBy;
+import static com.mongodb.client.model.Sorts.descending;
 import com.mongodb.client.*;
 import com.google.gson.JsonObject;
 import com.mongodb.BasicDBObject;
@@ -284,16 +286,12 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private MongoCursor<Document> getMongoSnapshotsCursor(Bson query, Optional<QueryParams> queryParams) {
         FindIterable<Document> findIterable = snapshotsCollection()
             .find(applyQueryParams(query, queryParams));
-        HashMap<String, Integer> sortFilters = new HashMap<>();
-        sortFilters.put(OBJECT_ID, DESC);
 
         if (coreConfiguration.getCommitIdGenerator() == CommitIdGenerator.SYNCHRONIZED_SEQUENCE) {
-            sortFilters.put(COMMIT_ID, DESC);
-            findIterable.sort(new Document(sortFilters));
+            findIterable.sort(orderBy(descending(COMMIT_ID, OBJECT_ID)));
         }
         else {
-            sortFilters.put(COMMIT_DATE_INSTANT, DESC);
-            findIterable.sort(new Document(sortFilters));
+            findIterable.sort(orderBy(descending(COMMIT_DATE_INSTANT, OBJECT_ID)));
         }
 
         return applyQueryParams(findIterable, queryParams).iterator();
