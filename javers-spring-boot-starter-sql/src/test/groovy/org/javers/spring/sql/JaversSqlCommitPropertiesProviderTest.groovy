@@ -82,8 +82,9 @@ class JaversSqlCommitPropertiesProviderTest extends Specification {
         snapshots.size() == 1
         snapshots[0].globalId.typeName == EmployeeEntity.name
         with(snapshots[0].commitMetadata) {
-            assert it.properties.size() == 1
+            assert it.properties.size() == 2
             assert it.properties["deleted employeeId"] == employeeEntity.id.toString()
+            assert it.properties["commit"] == "seems fine"
         }
     }
 
