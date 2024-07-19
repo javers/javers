@@ -23,6 +23,8 @@ public class QueryParamsBuilder {
     private CommitId toCommitId;
     private Set<CommitId> commitIds = new HashSet<>();
     private Long version;
+    private Long fromVersion;
+    private Long toVersion;
     private String author;
     private String authorLikeIgnoreCase;
     private boolean aggregate;
@@ -43,6 +45,8 @@ public class QueryParamsBuilder {
         that.toCommitId().ifPresent((it -> copy.toCommitId(it)));
         copy.commitIds = that.commitIds();
         that.version().ifPresent((it -> copy.version(it)));
+        that.fromVersion().ifPresent((it -> copy.fromVersion(it)));
+        that.toVersion().ifPresent((it -> copy.toVersion(it)));
         that.author().ifPresent((it -> copy.author(it)));
         that.authorLikeIgnoreCase().ifPresent(it -> copy.authorLikeIgnoreCase(it));
         copy.withChildValueObjects(that.isAggregate());
@@ -206,6 +210,22 @@ public class QueryParamsBuilder {
     }
 
     /**
+     * @see QueryBuilder#fromVersion(long)
+     */
+    public QueryParamsBuilder fromVersion(Long fromVersion) {
+        this.fromVersion = fromVersion;
+        return this;
+    }
+
+    /**
+     * @see QueryBuilder#toVersion(long)
+     */
+    public QueryParamsBuilder toVersion(Long toVersion) {
+        this.toVersion = toVersion;
+        return this;
+    }
+
+    /**
      * @see QueryBuilder#withSnapshotType(SnapshotType)
      */
     public QueryParamsBuilder withSnapshotType(SnapshotType snapshotType) {
@@ -242,6 +262,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, author, authorLikeIgnoreCase, commitProperties, commitPropertiesLike, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
+        return new QueryParams(limit, skip, from, fromInstant, to, toInstant, commitIds, version, fromVersion, toVersion,  author, authorLikeIgnoreCase, commitProperties, commitPropertiesLike, aggregate, changedProperties, toCommitId, snapshotType, loadCommitProps, snapshotQueryLimit);
     }
 }

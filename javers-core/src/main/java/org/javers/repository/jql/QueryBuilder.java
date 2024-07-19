@@ -508,10 +508,35 @@ public class QueryBuilder {
 
     /**
      * Only snapshots with a given version.
+     *
+     * @see #fromVersion(long)
+     * @see #toVersion(long)
      */
     public QueryBuilder withVersion(long version) {
         Validate.argumentCheck(version > 0, "Version is not a positive number.");
         queryParamsBuilder.version(version);
+        return this;
+    }
+
+    /**
+     * All snapshots from or equals to a given version.
+     * @see #withVersion(long)
+     * @see #toVersion(long)
+     */
+    public QueryBuilder fromVersion(long fromVersion) {
+        Validate.argumentCheck(fromVersion > 0, "Version is not a positive number.");
+        queryParamsBuilder.fromVersion(fromVersion);
+        return this;
+    }
+
+    /**
+     * All snapshots up to (exclusive) a given version.
+     * @see #withVersion(long)
+     * @see #fromVersion(long)
+     */
+    public QueryBuilder toVersion(long toVersion) {
+        Validate.argumentCheck(toVersion > 0, "Version is not a positive number.");
+        queryParamsBuilder.toVersion(toVersion);
         return this;
     }
 

@@ -104,6 +104,10 @@ class SnapshotQuery {
 
         queryParams.version().ifPresent(ver -> selectBuilder.and(SNAPSHOT_VERSION, ver));
 
+        queryParams.fromVersion().ifPresent(fromVer -> selectBuilder.and(SNAPSHOT_VERSION, ">=", longParam(fromVer)));
+
+        queryParams.toVersion().ifPresent(toVersion -> selectBuilder.and(SNAPSHOT_VERSION, "<", longParam(toVersion)));
+
         queryParams.author().ifPresent(author -> selectBuilder.and(COMMIT_AUTHOR, author));
 
         queryParams.authorLikeIgnoreCase().ifPresent(author -> selectBuilder.andLike("LOWER(" + COMMIT_AUTHOR + ")", "%"+author.toLowerCase(Locale.ROOT)+"%"));

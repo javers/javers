@@ -28,6 +28,8 @@ public class QueryParams {
     private final CommitId toCommitId;
     private final Set<CommitId> commitIds;
     private final Long version;
+    private final Long fromVersion;
+    private final Long toVersion;
     private final String author;
     private final String authorLikeIgnoreCase;
     private final Map<String, Collection<String>> commitProperties;
@@ -38,7 +40,7 @@ public class QueryParams {
     private final boolean loadCommitProps;
     private final Integer snapshotQueryLimit;
 
-    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, String author, String authorLikeIgnoreCase, Map<String, Collection<String>> commitProperties, Map<String,String> commitPropertiesLike, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps, Integer snapshotQueryLimit) {
+    QueryParams(int limit, int skip, LocalDateTime from, Instant fromInstant, LocalDateTime to, Instant toInstant, Set<CommitId> commitIds, Long version, Long fromVersion, Long toVersion, String author, String authorLikeIgnoreCase, Map<String, Collection<String>> commitProperties, Map<String,String> commitPropertiesLike, boolean aggregate, Set<String> changedProperties, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps, Integer snapshotQueryLimit) {
         this.snapshotQueryLimit = snapshotQueryLimit;
         this.limit = limit;
         this.skip = skip;
@@ -48,6 +50,8 @@ public class QueryParams {
         this.toInstant = toInstant;
         this.commitIds = Collections.unmodifiableSet(commitIds);
         this.version = version;
+        this.fromVersion = fromVersion;
+        this.toVersion = toVersion;
         this.author = author;
         this.authorLikeIgnoreCase = authorLikeIgnoreCase;
         this.commitProperties = Collections.unmodifiableMap(commitProperties);
@@ -161,6 +165,20 @@ public class QueryParams {
      */
     public Optional<Long> version() {
         return Optional.ofNullable(version);
+    }
+
+    /**
+     * @see QueryBuilder#fromVersion(long)
+     */
+    public Optional<Long> fromVersion() {
+        return Optional.ofNullable(fromVersion);
+    }
+
+    /**
+     * @see QueryBuilder#toVersion(long)
+     */
+    public Optional<Long> toVersion() {
+        return Optional.ofNullable(toVersion);
     }
 
     /**

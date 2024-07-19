@@ -323,6 +323,12 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             if (params.version().isPresent()) {
                 query = Filters.and(query, createVersionQuery(params.version().get()));
             }
+            if (params.fromVersion().isPresent()) {
+                query = Filters.and(query, Filters.gte(SNAPSHOT_VERSION, params.fromVersion().get()));
+            }
+            if (params.toVersion().isPresent()) {
+                query = Filters.and(query, Filters.lt(SNAPSHOT_VERSION, params.toVersion().get()));
+            }
             if (params.author().isPresent()) {
                 query = Filters.and(query, new BasicDBObject(COMMIT_AUTHOR, params.author().get()));
             }
