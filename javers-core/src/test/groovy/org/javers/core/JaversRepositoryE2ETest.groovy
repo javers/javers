@@ -883,6 +883,53 @@ class JaversRepositoryE2ETest extends Specification {
         ]
     }
 
+    @Unroll
+    def "should query for every Entity snapshot from version"() {
+        given:
+        (1..10).each { javers.commit("author", new SnapshotEntity(id: 1, intProperty: it)) }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.size() == 6
+        snapshots[0].getPropertyValue('intProperty') == 10
+        snapshots[1].getPropertyValue('intProperty') == 9
+        snapshots[2].getPropertyValue('intProperty') == 8
+        snapshots[3].getPropertyValue('intProperty') == 7
+        snapshots[4].getPropertyValue('intProperty') == 6
+        snapshots[5].getPropertyValue('intProperty') == 5
+
+        where:
+        query << [
+                byClass(SnapshotEntity).fromVersion(5).build(),
+                byInstanceId(1, SnapshotEntity).fromVersion(5).build()
+        ]
+    }
+
+    @Unroll
+    def "should query for every Entity snapshot up to version"() {
+        given:
+        (1..10).each { javers.commit("author", new SnapshotEntity(id: 1, intProperty: it)) }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.size() == 5
+        snapshots[0].getPropertyValue('intProperty') == 5
+        snapshots[1].getPropertyValue('intProperty') == 4
+        snapshots[2].getPropertyValue('intProperty') == 3
+        snapshots[3].getPropertyValue('intProperty') == 2
+        snapshots[4].getPropertyValue('intProperty') == 1
+
+        where:
+        query << [
+                byClass(SnapshotEntity).toVersion(5).build(),
+                byInstanceId(1, SnapshotEntity).toVersion(5).build()
+        ]
+    }
+
     def "should retrieve snapshots with specified identifiers"() {
         given:
         (1..10).each {
