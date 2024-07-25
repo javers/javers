@@ -133,7 +133,7 @@ public class InMemoryRepository implements JaversRepository {
             snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getVersion() >= queryParams.fromVersion().get());
         }
         if (queryParams.toVersion().isPresent()) {
-            snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getVersion() < queryParams.toVersion().get());
+            snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getVersion() <= queryParams.toVersion().get());
         }
         if (queryParams.author().isPresent()) {
             snapshots = filterSnapshotsByAuthor(snapshots, queryParams.author().get());
