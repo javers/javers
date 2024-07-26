@@ -519,7 +519,8 @@ public class QueryBuilder {
     }
 
     /**
-     * All snapshots from or equals to a given version.
+     * Only snapshots with a version greater than or equal to (>=) a given version.
+     *
      * @see #withVersion(long)
      * @see #toVersion(long)
      */
@@ -530,7 +531,8 @@ public class QueryBuilder {
     }
 
     /**
-     * All snapshots up to (exclusive) a given version.
+     * Only snapshots with a version less than or equal to (<=) a given version.
+     *
      * @see #withVersion(long)
      * @see #fromVersion(long)
      */

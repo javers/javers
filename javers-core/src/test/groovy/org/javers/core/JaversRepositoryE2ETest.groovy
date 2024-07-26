@@ -884,7 +884,7 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     @Unroll
-    def "should query for every Entity snapshot from version"() {
+    def "should query (#what) for every Entity snapshot from version"() {
         given:
         (1..10).each { javers.commit("author", new SnapshotEntity(id: 1, intProperty: it)) }
 
@@ -905,10 +905,11 @@ class JaversRepositoryE2ETest extends Specification {
                 byClass(SnapshotEntity).fromVersion(5).build(),
                 byInstanceId(1, SnapshotEntity).fromVersion(5).build()
         ]
+        what << ["byClass","byInstanceId"]
     }
 
     @Unroll
-    def "should query for every Entity snapshot up to version"() {
+    def "should query (#what) for every Entity snapshot up to version"() {
         given:
         (1..10).each { javers.commit("author", new SnapshotEntity(id: 1, intProperty: it)) }
 
@@ -928,6 +929,7 @@ class JaversRepositoryE2ETest extends Specification {
                 byClass(SnapshotEntity).toVersion(5).build(),
                 byInstanceId(1, SnapshotEntity).toVersion(5).build()
         ]
+        what << ["byClass","byInstanceId"]
     }
 
     def "should retrieve snapshots with specified identifiers"() {
