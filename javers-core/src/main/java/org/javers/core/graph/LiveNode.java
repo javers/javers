@@ -5,6 +5,7 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.property.MissingProperty;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
@@ -101,7 +102,7 @@ public class LiveNode extends ObjectNode<LiveCdo>{
         }
 
         Object propertyValue = getCdo().getPropertyValue(property);
-        if (propertyValue == null) {
+        if (propertyValue == null || propertyValue instanceof MissingProperty) {
             return null;
         }
 
