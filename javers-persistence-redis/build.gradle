@@ -8,7 +8,8 @@ dependencies {
     api project(':javers-core')
     implementation "redis.clients:jedis:$jedisVersion"
     implementation "org.apache.commons:commons-lang3:3.15.0"
-    
+
     testImplementation "org.testcontainers:testcontainers:$testcontainers"
     testImplementation "org.testcontainers:junit-jupiter:$testcontainers"
+    testImplementation "org.awaitility:awaitility:4.2.1"
 }
