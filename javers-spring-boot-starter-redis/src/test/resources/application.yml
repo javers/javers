@@ -8,7 +8,6 @@ javers:
     database: 0
     password: secret
     timeout: 2000
-    use-ssl: false
 spring:
   data:
     redis:
