@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.task.TaskExecutor;
 
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -31,68 +30,64 @@ import redis.clients.jedis.JedisPoolConfig;
 @Configuration
 @ConditionalOnProperty("javers.redis.enabled")
 @EnableAspectJAutoProxy
-@EnableConfigurationProperties({ JaversRedisProperties.class })
-@Import({ RegisterJsonTypeAdaptersPlugin.class })
+@EnableConfigurationProperties({JaversRedisProperties.class})
+@Import({RegisterJsonTypeAdaptersPlugin.class})
 public class JaversRedisAutoConfiguration {
 
-	@Bean(destroyMethod = "destroy")
-	JedisPool jedisPool(final JaversRedisProperties javersRedisProperties) {
-		final var redisProps = javersRedisProperties.getRedis();
-		final var jedisPoolConfig = new JedisPoolConfig();
-		return new JedisPool(jedisPoolConfig, redisProps.getHost(), redisProps.getPort(), redisProps.getTimeout(), redisProps.getPassword(),
-				redisProps.getDatabase(), redisProps.isUseSsl());
-	}
+    @Bean(destroyMethod = "destroy")
+    JedisPool jedisPool(final JaversRedisProperties javersRedisProperties) {
+        final var redisProps = javersRedisProperties.getRedis();
+        final var jedisPoolConfig = new JedisPoolConfig();
+        return new JedisPool(jedisPoolConfig, redisProps.getHost(), redisProps.getPort(), redisProps.getTimeout(), redisProps.getPassword(),
+                redisProps.getDatabase(), redisProps.isUseSsl());
+    }
 
-	@Bean(destroyMethod = "shutdown")
-	JaversRedisRepository javersRedisRepository(final JaversRedisProperties javersRedisProperties, final JedisPool jedisPool, final TaskExecutor taskExecutor) {
-		final var javersRedisRepository = new JaversRedisRepository(jedisPool, javersRedisProperties.getRedis().getAuditDuration());
-		if (javersRedisProperties.getRedis().isCleanExpiredSnapshotsOnStart()) {
-			taskExecutor.execute(javersRedisRepository::cleanExpiredSnapshots);
-		}
-		return javersRedisRepository;
-	}
+    @Bean(destroyMethod = "shutdown")
+    JaversRedisRepository javersRedisRepository(final JedisPool jedisPool, final JaversRedisProperties javersRedisProperties) {
+        return new JaversRedisRepository(jedisPool, javersRedisProperties.getRedis().getAuditDuration());
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	Javers javers(final JaversRedisProperties javersRedisProperties, final JaversRedisRepository javersRedisRepository,
-			final List<JaversBuilderPlugin> plugins) {
-		final var javersBuilder = JaversBuilder.javers().registerJaversRepository(javersRedisRepository).withProperties(javersRedisProperties)
-				.withObjectAccessHook(javersRedisProperties.createObjectAccessHookInstance());
-		plugins.forEach(plugin -> plugin.beforeAssemble(javersBuilder));
-		return javersBuilder.build();
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    Javers javers(final JaversRedisProperties javersRedisProperties, final JaversRedisRepository javersRedisRepository,
+            final List<JaversBuilderPlugin> plugins) {
+        final var javersBuilder = JaversBuilder.javers().registerJaversRepository(javersRedisRepository).withProperties(javersRedisProperties)
+                .withObjectAccessHook(javersRedisProperties.createObjectAccessHookInstance());
+        plugins.forEach(plugin -> plugin.beforeAssemble(javersBuilder));
+        return javersBuilder.build();
+    }
 
-	@Bean(name = "springSecurityAuthorProvider")
-	@ConditionalOnMissingBean
-	@ConditionalOnClass(name = { "org.springframework.security.core.context.SecurityContextHolder" })
-	AuthorProvider springSecurityAuthorProvider() {
-		return new SpringSecurityAuthorProvider();
-	}
+    @Bean(name = "springSecurityAuthorProvider")
+    @ConditionalOnMissingBean
+    @ConditionalOnClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
+    AuthorProvider springSecurityAuthorProvider() {
+        return new SpringSecurityAuthorProvider();
+    }
 
-	@Bean(name = "mockAuthorProvider")
-	@ConditionalOnMissingBean
-	@ConditionalOnMissingClass({ "org.springframework.security.core.context.SecurityContextHolder" })
-	AuthorProvider unknownAuthorProvider() {
-		return new MockAuthorProvider();
-	}
+    @Bean(name = "mockAuthorProvider")
+    @ConditionalOnMissingBean
+    @ConditionalOnMissingClass({"org.springframework.security.core.context.SecurityContextHolder"})
+    AuthorProvider unknownAuthorProvider() {
+        return new MockAuthorProvider();
+    }
 
-	@Bean(name = "emptyPropertiesProvider")
-	@ConditionalOnMissingBean
-	CommitPropertiesProvider emptyPropertiesProvider() {
-		return new EmptyPropertiesProvider();
-	}
+    @Bean(name = "emptyPropertiesProvider")
+    @ConditionalOnMissingBean
+    CommitPropertiesProvider emptyPropertiesProvider() {
+        return new EmptyPropertiesProvider();
+    }
 
-	@Bean
-	@ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
-	JaversAuditableAspect javersAuditableAspect(final Javers javers, final AuthorProvider authorProvider,
-			final CommitPropertiesProvider commitPropertiesProvider) {
-		return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
-	}
+    @Bean
+    @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
+    JaversAuditableAspect javersAuditableAspect(final Javers javers, final AuthorProvider authorProvider,
+            final CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
+    }
 
-	@Bean
-	@ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
-	JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(final Javers javers, final AuthorProvider authorProvider,
-			final CommitPropertiesProvider commitPropertiesProvider) {
-		return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
-	}
+    @Bean
+    @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
+    JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(final Javers javers, final AuthorProvider authorProvider,
+            final CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
+    }
 }
