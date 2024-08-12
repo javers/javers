@@ -14,6 +14,7 @@ import org.javers.spring.auditable.MockAuthorProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -35,16 +36,17 @@ import redis.clients.jedis.JedisPoolConfig;
 public class JaversRedisAutoConfiguration {
 
     @Bean(destroyMethod = "destroy")
-    JedisPool jedisPool(final JaversRedisProperties javersRedisProperties) {
+    JedisPool javersJedisPool(final JaversRedisProperties javersRedisProperties) {
         final var redisProps = javersRedisProperties.getRedis();
         final var jedisPoolConfig = new JedisPoolConfig();
+        jedisPoolConfig.setJmxEnabled(false);
         return new JedisPool(jedisPoolConfig, redisProps.getHost(), redisProps.getPort(), redisProps.getTimeout(), redisProps.getPassword(),
                 redisProps.getDatabase(), redisProps.isUseSsl());
     }
 
     @Bean(destroyMethod = "shutdown")
-    JaversRedisRepository javersRedisRepository(final JedisPool jedisPool, final JaversRedisProperties javersRedisProperties) {
-        return new JaversRedisRepository(jedisPool, javersRedisProperties.getRedis().getAuditDuration());
+    JaversRedisRepository javersRedisRepository(@Qualifier("javersJedisPool") final JedisPool javersJedisPool, final JaversRedisProperties javersRedisProperties) {
+        return new JaversRedisRepository(javersJedisPool, javersRedisProperties.getRedis().getAuditDuration());
     }
 
     @Bean
