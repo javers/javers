@@ -1,13 +1,8 @@
 javers:
-  auditableAspectEnabled: true
-  springDataAuditableRepositoryAspectEnabled: true
   redis:
-    enabled: true
-    host: localhost
-    port: 6379
-    database: 0
-    password: secret
-    timeout: 2000
+    jedis:
+      password: secret
+
 spring:
   data:
     redis:
