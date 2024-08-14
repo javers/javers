@@ -38,7 +38,7 @@ import redis.clients.jedis.JedisPool;
 
 @Testcontainers
 @TestMethodOrder(OrderAnnotation.class)
-class JaversRedisRepositoryTest {
+class JaversRedisRepositoryStandaloneTest {
 
     @Container
     @SuppressWarnings("resource")
