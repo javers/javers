@@ -1,5 +1,8 @@
 package org.javers.spring.boot.redis;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.javers.core.Javers;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.spring.boot.redis.domain.LabAssistant;
@@ -17,9 +20,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author ivansimeonov
@@ -50,11 +50,11 @@ class JaversRedisRepositoryAspectDisabledTest {
   LabAssistantRepository labAssistantRepository;
 
   @DynamicPropertySource
-  static void configureProperties(DynamicPropertyRegistry registry) {
+  static void configureProperties(final DynamicPropertyRegistry registry) {
     registry.add("spring.data.redis.host", redis::getHost);
     registry.add("spring.data.redis.port", redis::getFirstMappedPort);
-    registry.add("javers.redis.host", redis::getHost);
-    registry.add("javers.redis.port", redis::getFirstMappedPort);
+    registry.add("javers.redis.jedis.host", redis::getHost);
+    registry.add("javers.redis.jedis.port", redis::getFirstMappedPort);
   }
 
   @Test
@@ -66,8 +66,8 @@ class JaversRedisRepositoryAspectDisabledTest {
     labAssistantRepository.save(labRat1);
 
     // then
-    var query = QueryBuilder.byClass(LabAssistant.class).build();
-    var snapshots = javers.findSnapshots(query);
+    final var query = QueryBuilder.byClass(LabAssistant.class).build();
+    final var snapshots = javers.findSnapshots(query);
 
     assertNotNull(snapshots);
     assertEquals(0, snapshots.size());
