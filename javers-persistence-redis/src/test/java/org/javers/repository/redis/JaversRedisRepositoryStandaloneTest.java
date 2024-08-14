@@ -42,7 +42,8 @@ class JaversRedisRepositoryStandaloneTest {
 
     @Container
     @SuppressWarnings("resource")
-    static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7-alpine")).withExposedPorts(6379)
+    static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+            .withExposedPorts(6379)
             .withCommand("redis-server", "/etc/redis/redis.conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("redis.conf"), "/etc/redis/redis.conf");
 
