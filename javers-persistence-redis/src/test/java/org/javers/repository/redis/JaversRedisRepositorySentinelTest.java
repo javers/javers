@@ -21,13 +21,11 @@ import org.javers.repository.redis.domain.Firmware;
 import org.javers.repository.redis.domain.LabAssistant;
 import org.javers.repository.redis.domain.Sensor;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -37,37 +35,45 @@ import redis.clients.jedis.JedisSentinelPool;
 
 @Testcontainers
 @TestMethodOrder(OrderAnnotation.class)
-@Disabled
 class JaversRedisRepositorySentinelTest {
-    
-    static Network network = Network.newNetwork();
 
     @Container
     @SuppressWarnings("resource")
     static GenericContainer<?> redisMaster = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-    .withExposedPorts(6379)
+            .withExposedPorts(6379)
             .withCommand("redis-server", "/etc/redis/redis.conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("redis.conf"), "/etc/redis/redis.conf")
-            .withNetwork(network)
-            .withNetworkAliases("redis")
             .withCreateContainerCmdModifier(cmd -> cmd.withName("redis-master"));
 
     @Container
     @SuppressWarnings("resource")
     static GenericContainer<?> redisSentinel = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-    .withExposedPorts(26379)
-            .withCommand("redis-sentinel", "/etc/redis/sentinel.conf")
-            .withNetwork(network)
-            .withNetworkAliases("redis")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("sentinel.conf"), "/etc/redis/sentinel.conf")
-            .withCreateContainerCmdModifier(cmd -> cmd.withName("redis-sentinel"))
+            .withExposedPorts(26379)
+            .withCreateContainerCmdModifier(cmd -> {
+                final var entrypoint = String.format("""
+                        /bin/sh -s <<EOF
+                        /bin/sh -c "mkdir -p /etc/redis; cat <<EOF > /etc/redis/sentinel.conf
+                        sentinel resolve-hostnames yes
+                        sentinel monitor mymaster %s %s 1
+                        sentinel down-after-milliseconds mymaster 5000
+                        sentinel failover-timeout mymaster 10000
+                        sentinel parallel-syncs mymaster 1
+                        EOF"
+                        /bin/sh -c "redis-sentinel /etc/redis/sentinel.conf"
+                        EOF
+                        """, redisMaster.getHost(), redisMaster.getFirstMappedPort());
+                cmd.withName("redis-sentinel")
+                        .withEntrypoint("/bin/sh", "-c", entrypoint);
+            })
             .dependsOn(redisMaster);
 
     static Javers javers;
 
     @BeforeAll
     static void setup() {
-        Set<String> sentinels = Set.of(redisSentinel.getHost() + ":" + redisSentinel.getFirstMappedPort());
+
+        final Set<String> sentinels = Set.of(redisSentinel.getHost() + ":" + redisSentinel.getFirstMappedPort());
+
         final var jedisSentinelPool = new JedisSentinelPool("mymaster", sentinels);
         final var javersRedisRepository = new JaversRedisRepository(jedisSentinelPool, Duration.of(1000, ChronoUnit.SECONDS));
         try {
@@ -116,8 +122,8 @@ class JaversRedisRepositorySentinelTest {
         javers.commit("author", device);
 
         // then
-        var labRat1Snapshot = javers.getLatestSnapshot("John", LabAssistant.class).orElse(null);
-        var labRat2Snapshot = javers.getLatestSnapshot("Smith", LabAssistant.class).orElse(null);
+        final var labRat1Snapshot = javers.getLatestSnapshot("John", LabAssistant.class).orElse(null);
+        final var labRat2Snapshot = javers.getLatestSnapshot("Smith", LabAssistant.class).orElse(null);
 
         assertNotNull(labRat1Snapshot);
         assertNotNull(labRat2Snapshot);
@@ -146,7 +152,7 @@ class JaversRedisRepositorySentinelTest {
         // given
         // when
         // then
-        var latestSnapshot = javers.getLatestSnapshot("thermometer", Device.class).get();
+        final var latestSnapshot = javers.getLatestSnapshot("thermometer", Device.class).get();
         assertEquals("thermometer", latestSnapshot.getPropertyValue("name"));
     }
 
@@ -464,7 +470,7 @@ class JaversRedisRepositorySentinelTest {
     @Order(24)
     void testQueryToCommitId() {
         // given
-        var commitId = javers.findSnapshots(QueryBuilder.byClass(LabAssistant.class).build()).get(0).getCommitId();
+        final var commitId = javers.findSnapshots(QueryBuilder.byClass(LabAssistant.class).build()).get(0).getCommitId();
         final var query = QueryBuilder.byClass(Device.class).toCommitId(commitId).build();
 
         // when
@@ -712,37 +718,5 @@ class JaversRedisRepositorySentinelTest {
         assertNotNull(snapshots);
         assertEquals(4, snapshots.size());
     }
-
-    // @Test
-    // @Order(35)
-    // void testCleanExpiredSnapshots() {
-    // // given
-    // final var jedisPool2 = new JedisPool(redis.getHost(),
-    // redis.getFirstMappedPort());
-    // final var javersRedisRepository2 = new JaversRedisRepository(jedisPool2,
-    // Duration.of(1, SECONDS));
-    //
-    // try (final var jedis2 = jedisPool2.getResource()) {
-    // try {
-    // // given
-    // final var javers2 =
-    // JaversBuilder.javers().registerJaversRepository(javersRedisRepository2).build();
-    // final var labRat = new LabAssistant("Peter", "1");
-    // javers2.commit("author", labRat);
-    //
-    // // when
-    // javersRedisRepository2.cleanExpiredSnapshotsKeysSets();
-    //
-    // // then
-    // await().with().pollDelay(Duration.ofMillis(500)).atMost(Duration.ofSeconds(2))
-    // .until(() -> javers.getLatestSnapshot("Peter",
-    // LabAssistant.class).isEmpty());
-    // assertTrue(javers.getLatestSnapshot("Peter", LabAssistant.class).isEmpty());
-    // } catch (final Exception e) {
-    // e.printStackTrace();
-    // }
-    // }
-    //
-    // }
 
 }
