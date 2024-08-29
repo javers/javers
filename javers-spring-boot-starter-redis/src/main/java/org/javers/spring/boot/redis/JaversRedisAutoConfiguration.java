@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -92,16 +93,21 @@ public class JaversRedisAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    Javers javers(final JaversSpringProperties javersSpringProperties, final JaversRedisRepository javersRedisRepository,
+    Javers javers(
+            final ApplicationContext ctx,
+            final JaversSpringProperties javersSpringProperties, final JaversRedisRepository javersRedisRepository,
             final List<JaversBuilderPlugin> plugins) {
         final var objectAccessHook = javersSpringProperties.createObjectAccessHookInstance();
         final var javersBuilder = JaversBuilder.javers()
                 .registerJaversRepository(javersRedisRepository)
                 .withProperties(javersSpringProperties)
                 .withObjectAccessHook(objectAccessHook);
-
         plugins.forEach(plugin -> plugin.beforeAssemble(javersBuilder));
-        return javersBuilder.build();
+        final var javers = javersBuilder.build();
+        if (ctx.containsBean("platformTransactionManager")) {
+            return new JaversTransactionalRedisDecorator(javers);
+        }
+        return javers;
     }
 
     @Bean(name = "springSecurityAuthorProvider")
