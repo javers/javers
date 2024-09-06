@@ -58,7 +58,7 @@ This project exists thanks to all the people who contribute their work:
 ## Sponsorship
 
 Support the JaVers project by becoming a financial contributor and helping us sustain its development.
-See [Sponsorship](Sponsorship).
+See [Sponsorship](https://javers.org/sponsorship).
 
 If your organization is interested in supporting Javers, we can feature your logo here and on the
 [javers.org](http://javers.org) website.
