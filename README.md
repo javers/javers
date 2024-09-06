@@ -55,33 +55,19 @@ Before you start, please read our
 This project exists thanks to all the people who contribute their work:
 <a href="https://github.com/javers/javers/graphs/contributors"><img src="https://opencollective.com/javers/contributors.svg?width=890&button=false" /></a>
 
-## Financial Contributing
+## Sponsorship
 
-Become a financial contributor and help us sustain the 
-JaVers project.
-[[Contribute](https://opencollective.com/javers/contribute)]
+Support the JaVers project by becoming a financial contributor and helping us sustain its development.
+See [Sponsorship](Sponsorship).
 
-#### Individual contributors
+If your organization is interested in supporting Javers, we can feature your logo here and on the
+[javers.org](http://javers.org) website.
 
-<a href="https://opencollective.com/javers">
-<img src="https://opencollective.com/javers/individuals.svg?width=890">
+### Featured Sponsors
+
+<a class="no-focus-style" href="https://github.com/AkrosAG">
+<img src="https://javers.org/img/akros_logo.png" width="160px" alt="Akros Logo"/>
 </a>
-
-#### Organizations
-
-Support Javers as an organization.
-Your logo will show up here with a link to your website.
-
-<a href="https://opencollective.com/javers/organization/0/website"><img src="https://opencollective.com/javers/organization/0/avatar.svg"></a>
-<a href="https://opencollective.com/javers/organization/1/website"><img src="https://opencollective.com/javers/organization/1/avatar.svg"></a>
-<a href="https://opencollective.com/javers/organization/2/website"><img src="https://opencollective.com/javers/organization/2/avatar.svg"></a>
-<a href="https://opencollective.com/javers/organization/3/website"><img src="https://opencollective.com/javers/organization/3/avatar.svg"></a>
-<a href="https://opencollective.com/javers/organization/4/website"><img src="https://opencollective.com/javers/organization/4/avatar.svg"></a>
-<a href="https://opencollective.com/javers/organization/5/website"><img src="https://opencollective.com/javers/organization/5/avatar.svg"></a>
-<a href="https://opencollective.com/javers/organization/6/website"><img src="https://opencollective.com/javers/organization/6/avatar.svg"></a>
-<a href="https://opencollective.com/javers/organization/7/website"><img src="https://opencollective.com/javers/organization/7/avatar.svg"></a>
-<a href="https://opencollective.com/javers/organization/8/website"><img src="https://opencollective.com/javers/organization/8/avatar.svg"></a>
-<a href="https://opencollective.com/javers/organization/9/website"><img src="https://opencollective.com/javers/organization/9/avatar.svg"></a>
 
 ## License
 JaVers is licensed under Apache License Version 2.0, see the LICENSE file.
