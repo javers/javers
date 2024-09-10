@@ -235,30 +235,31 @@ public class JaversSchemaManager extends SchemaNameAware {
             DatabaseMetaData metadata = connection.getMetaData();
             String catalog = connection.getCatalog();
 
-            ResultSet resultSet = metadata.getTables(
+            try (ResultSet resultSet = metadata.getTables(
                     catalog,
                     convertCase(schemaName, metadata),
                     convertCase(name, metadata),
-                    new String[]{"TABLE"});
+                    new String[]{"TABLE"})) {
 
-            if (schemaName != null) {
-                return resultSet.next();
-            } else {
-                String tableSchemaName;
-                do {
-                    if (!resultSet.next()) {
-                        return false;
-                    }
+                if (schemaName != null) {
+                    return resultSet.next();
+                } else {
+                    String tableSchemaName;
+                    do {
+                        if (!resultSet.next()) {
+                            return false;
+                        }
 
-                    tableSchemaName = resultSet.getString("TABLE_SCHEM");
-                } while(tableSchemaName != null
-                        && !tableSchemaName.equalsIgnoreCase("public")
-                        && !tableSchemaName.equals("")
-                        && (!(this.dialect instanceof MsSqlDialect) || !tableSchemaName.equalsIgnoreCase("dbo"))
-                        && (!(this.dialect instanceof OracleDialect) || !tableSchemaName.equalsIgnoreCase("system"))
-                );
+                        tableSchemaName = resultSet.getString("TABLE_SCHEM");
+                    } while (tableSchemaName != null
+                            && !tableSchemaName.equalsIgnoreCase("public")
+                            && !tableSchemaName.equals("")
+                            && (!(this.dialect instanceof MsSqlDialect) || !tableSchemaName.equalsIgnoreCase("dbo"))
+                            && (!(this.dialect instanceof OracleDialect) || !tableSchemaName.equalsIgnoreCase("system"))
+                    );
 
-                return true;
+                    return true;
+                }
             }
         } catch (SQLException var4) {
             throw new SchemaInspectionException("RELATION_LOOKUP_ERROR", "Failed to obtain tables metadata when checking table " + name, var4);
