@@ -62,10 +62,11 @@ class PreparedStatementExecutor {
         return runSql(() -> {
             select.injectValuesTo(statement);
 
-            ResultSet rset = statement.executeQuery();
             List<T> result = new ArrayList<>();
-            while(rset.next()) {
-                result.add(objectMapper.get(rset));
+            try (ResultSet rset = statement.executeQuery()) {
+                while (rset.next()) {
+                    result.add(objectMapper.get(rset));
+                }
             }
 
             return Collections.unmodifiableList(result);
@@ -75,21 +76,22 @@ class PreparedStatementExecutor {
     private <T> T executeQueryForValue(Select select, ObjectMapper<T> objectMapper) {
         return runSql(() -> {
             select.injectValuesTo(statement);
-            ResultSet rset = statement.executeQuery();
-            rset.next();
-            return objectMapper.get(rset);
+            try (ResultSet rset = statement.executeQuery()) {
+                rset.next();
+                return objectMapper.get(rset);
+            }
         });
     }
 
     private <T> Optional<T> executeQueryForOptionalValue(Select select, ObjectMapper<T> objectMapper) {
         return runSql(() -> {
             select.injectValuesTo(statement);
-            ResultSet rset = statement.executeQuery();
-            if (rset.next()) {
-                return Optional.ofNullable(objectMapper.get(rset));
-            }
-            else {
-                return Optional.empty();
+            try (ResultSet rset = statement.executeQuery()) {
+                if (rset.next()) {
+                    return Optional.ofNullable(objectMapper.get(rset));
+                } else {
+                    return Optional.empty();
+                }
             }
         });
     }
@@ -97,10 +99,11 @@ class PreparedStatementExecutor {
     private <T> List<T> executeQueryForListOfLong(Select select, ObjectMapper<T> objectMapper) {
         return runSql(() -> {
             select.injectValuesTo(statement);
-            ResultSet rset = statement.executeQuery();
             List<T> result = new ArrayList<>();
-            while(rset.next()) {
-                result.add(objectMapper.get(rset));
+            try (ResultSet rset = statement.executeQuery()) {
+                while (rset.next()) {
+                    result.add(objectMapper.get(rset));
+                }
             }
             return result;
         });
