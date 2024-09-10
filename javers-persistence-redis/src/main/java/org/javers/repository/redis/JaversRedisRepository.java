@@ -150,14 +150,16 @@ public class JaversRedisRepository implements JaversRepository {
   public List<CdoSnapshot> getSnapshots(final QueryParams queryParams) {
     Validate.argumentIsNotNull(queryParams);
     try (final var jedis = jedisPool.getResource()) {
-      final var start = queryParams.skip();
-      final var stop = queryParams.skip() + queryParams.limit() - 1;
-      final var keys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS, start, stop);
+      final var keys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS, 0, -1);
       final var allCdoSnapshots = keys.stream()
+          .filter(k -> !k.contains("#"))
           .map(this::instanceId)
           .map(instanceId -> getStateHistory(instanceId, queryParams))
           .flatMap(List::stream)
-          .sorted(inReverseChronologicalOrder()).toList();
+          .skip(queryParams.skip())
+          .limit(queryParams.limit())
+          //.sorted(inReverseChronologicalOrder())
+          .toList();
       return applyQueryParams(allCdoSnapshots, queryParams);
     }
   }
@@ -214,7 +216,7 @@ public class JaversRedisRepository implements JaversRepository {
     final var value = jsonConverter.toJson(snapshot);
     final var entityNameKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(snapshot.getGlobalId().getTypeName());
     try (final var jedis = jedisPool.getResource()) {
-      final var commitInstantMs = (double) snapshot.getCommitMetadata().getCommitDateInstant().toEpochMilli();
+      final var commitInstantMs = (double) -snapshot.getCommitMetadata().getCommitDateInstant().toEpochMilli();
       jedis.zadd(JV_SNAPSHOTS_ENTITY_KEYS, commitInstantMs, key);
       if (snapshot.getGlobalId() instanceof InstanceId) {
         jedis.zadd(entityNameKey, commitInstantMs, key);
@@ -248,7 +250,9 @@ public class JaversRedisRepository implements JaversRepository {
       final var size = jedis.llen(key);
       final var limit = queryParams.snapshotQueryLimit().orElse((int) size);
       final var cdoSnapshotJsonList = jedis.lrange(key, 0, limit);
-      final var cdoSnapshots = cdoSnapshotJsonList.stream().map(cdoSnapshotJson -> jsonConverter.fromJson(cdoSnapshotJson, CdoSnapshot.class)).toList();
+      final var cdoSnapshots = cdoSnapshotJsonList.stream()
+          .map(cdoSnapshotJson -> jsonConverter.fromJson(cdoSnapshotJson, CdoSnapshot.class))
+          .toList();
       return applyQueryParams(cdoSnapshots, queryParams);
     }
   }
