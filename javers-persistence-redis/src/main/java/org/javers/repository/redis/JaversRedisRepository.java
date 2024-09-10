@@ -145,7 +145,12 @@ public class JaversRedisRepository implements JaversRepository {
     Validate.argumentIsNotNull(queryParams);
     try (final var jedis = jedisPool.getResource()) {
       final var keys = jedis.smembers(JV_SNAPSHOTS_ENTITY_KEYS);
-      final var allCdoSnapshots = keys.stream().map(this::instanceId).map(instanceId -> getStateHistory(instanceId, queryParams)).flatMap(List::stream)
+      final var allCdoSnapshots = keys.stream()
+          .skip(queryParams.skip())
+          .limit(queryParams.limit())
+          .map(this::instanceId)
+          .map(instanceId -> getStateHistory(instanceId, queryParams))
+          .flatMap(List::stream)
           .sorted(inReverseChronologicalOrder()).toList();
       return applyQueryParams(allCdoSnapshots, queryParams);
     }
@@ -187,7 +192,7 @@ public class JaversRedisRepository implements JaversRepository {
       // NOOP
     }
   }
-  
+
   private void initializeSubscriber() {
     executor.execute(() -> {
       try (final var jedis = jedisPool.getResource()) {
@@ -209,7 +214,7 @@ public class JaversRedisRepository implements JaversRepository {
         final var entityTypeName = snapshot.getGlobalId().getTypeName();
         jedis.sadd(JV_SNAPSHOTS_ENTITY_KEYS_SET, JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(entityTypeName));
       }
-      if (snapshot.getGlobalId() instanceof ValueObjectId valueObjectId) {
+      if (snapshot.getGlobalId() instanceof final ValueObjectId valueObjectId) {
         final var ownerId = valueObjectId.getOwnerId();
         final var ownerEntityNameKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerId.getTypeName());
         jedis.sadd(ownerEntityNameKey, key);
