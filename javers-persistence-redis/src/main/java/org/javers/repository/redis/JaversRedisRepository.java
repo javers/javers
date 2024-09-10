@@ -105,7 +105,7 @@ public class JaversRedisRepository implements JaversRepository {
     try (final var jedis = jedisPool.getResource()) {
       if (queryParams.isAggregate()) {
         final var entityKey = key(globalId);
-        final var keys = jedis.smembers(JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(globalId.getTypeName())).stream()
+        final var keys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(globalId.getTypeName()), 0, -1).stream()
             .filter(v -> v.startsWith(entityKey)).toList();
         return keys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream).sorted(inReverseChronologicalOrder()).toList();
       } else {
@@ -120,10 +120,14 @@ public class JaversRedisRepository implements JaversRepository {
     Validate.argumentsAreNotNull(givenClasses, queryParams);
     try (final var jedis = jedisPool.getResource()) {
       final var result = givenClasses.stream()
-          .map(givenClass -> jedis.smembers(JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(givenClass.getName()))).flatMap(Set::stream)
+          .map(givenClass -> jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(givenClass.getName()), 0, -1))
+          .flatMap(List::stream)
           .filter(key -> !key.contains("#")) // skip keys of value objects
-          .map(this::instanceId).map(instanceId -> getStateHistory(instanceId, queryParams)).flatMap(List::stream)
-          .sorted(inReverseChronologicalOrder()).toList();
+          .map(this::instanceId)
+          .map(instanceId -> getStateHistory(instanceId, queryParams))
+          .flatMap(List::stream)
+          .sorted(inReverseChronologicalOrder())
+          .toList();
       return applyQueryParams(result, queryParams);
     }
   }
@@ -132,7 +136,7 @@ public class JaversRedisRepository implements JaversRepository {
   public List<CdoSnapshot> getValueObjectStateHistory(final EntityType ownerEntity, final String path, final QueryParams queryParams) {
     Validate.argumentsAreNotNull(ownerEntity, path, queryParams);
     try (final var jedis = jedisPool.getResource()) {
-      final var entityKeys = jedis.smembers(JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerEntity.getName()));
+      final var entityKeys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerEntity.getName()), 0, -1);
       final var valueObjectKeys = entityKeys.stream().filter(k -> k.contains("#".concat(path))).toList();
       final var result = valueObjectKeys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream)
           .sorted(inReverseChronologicalOrder()).toList();
@@ -144,10 +148,8 @@ public class JaversRedisRepository implements JaversRepository {
   public List<CdoSnapshot> getSnapshots(final QueryParams queryParams) {
     Validate.argumentIsNotNull(queryParams);
     try (final var jedis = jedisPool.getResource()) {
-      final var keys = jedis.smembers(JV_SNAPSHOTS_ENTITY_KEYS);
+      final var keys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS, queryParams.skip(), queryParams.skip() + queryParams.limit());
       final var allCdoSnapshots = keys.stream()
-          .skip(queryParams.skip())
-          .limit(queryParams.limit())
           .map(this::instanceId)
           .map(instanceId -> getStateHistory(instanceId, queryParams))
           .flatMap(List::stream)
@@ -208,16 +210,16 @@ public class JaversRedisRepository implements JaversRepository {
     final var value = jsonConverter.toJson(snapshot);
     final var entityNameKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(snapshot.getGlobalId().getTypeName());
     try (final var jedis = jedisPool.getResource()) {
-      jedis.sadd(JV_SNAPSHOTS_ENTITY_KEYS, key);
+      jedis.zadd(JV_SNAPSHOTS_ENTITY_KEYS, Double.valueOf(snapshot.getCommitId().value()), key);
       if (snapshot.getGlobalId() instanceof InstanceId) {
-        jedis.sadd(entityNameKey, key);
+        jedis.zadd(entityNameKey, Double.valueOf(snapshot.getCommitId().value()), key);
         final var entityTypeName = snapshot.getGlobalId().getTypeName();
-        jedis.sadd(JV_SNAPSHOTS_ENTITY_KEYS_SET, JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(entityTypeName));
+        jedis.zadd(JV_SNAPSHOTS_ENTITY_KEYS_SET, Double.valueOf(snapshot.getCommitId().value()), JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(entityTypeName));
       }
       if (snapshot.getGlobalId() instanceof final ValueObjectId valueObjectId) {
         final var ownerId = valueObjectId.getOwnerId();
         final var ownerEntityNameKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerId.getTypeName());
-        jedis.sadd(ownerEntityNameKey, key);
+        jedis.zadd(ownerEntityNameKey, Double.valueOf(snapshot.getCommitId().value()), key);
       }
       jedis.lpush(key, value);
       jedis.expire(key, duration);
