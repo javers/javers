@@ -43,345 +43,343 @@ import redis.clients.jedis.util.Pool;
 
 public class JaversRedisRepository implements JaversRepository {
 
-  private static final Logger log = LoggerFactory.getLogger(JaversRedisRepository.class);
-  public static final String JV_SNAPSHOTS = "jv_snapshots:";
-  public static final String JV_SNAPSHOTS_ENTITY_KEYS = "jv_snapshots_keys";
-  public static final String JV_SNAPSHOTS_ENTITY_KEYS_SET = "jv_snapshots_keys_set";
-  private static final byte[] JV_HEAD_ID = "jv_head_id".getBytes();
+    private static final Logger log = LoggerFactory.getLogger(JaversRedisRepository.class);
+    public static final String JV_SNAPSHOTS = "jv_snapshots:";
+    public static final String JV_SNAPSHOTS_ENTITY_KEYS = "jv_snapshots_keys";
+    public static final String JV_SNAPSHOTS_ENTITY_KEYS_SET = "jv_snapshots_keys_set";
+    private static final byte[] JV_HEAD_ID = "jv_head_id".getBytes();
 
-  private JsonConverter jsonConverter;
-  private final Pool<Jedis> jedisPool;
-  private final long duration;
-  private final ExecutorService executor;
+    private JsonConverter jsonConverter;
+    private final Pool<Jedis> jedisPool;
+    private final long duration;
+    private final ExecutorService executor;
 
-  public JaversRedisRepository(final JedisPool jedisPool, final Duration duration) {
-    this.jedisPool = jedisPool;
-    this.duration = duration.toSeconds();
-    this.executor = Executors.newSingleThreadExecutor();
-    initializeSubscriber();
+    public JaversRedisRepository(final JedisPool jedisPool, final Duration duration) {
+        this.jedisPool = jedisPool;
+        this.duration = duration.toSeconds();
+        this.executor = Executors.newSingleThreadExecutor();
+        initializeSubscriber();
 
-  }
-
-  public JaversRedisRepository(final JedisSentinelPool jedisSentinelPool, final Duration duration) {
-    this.jedisPool = jedisSentinelPool;
-    this.duration = duration.toSeconds();
-    this.executor = Executors.newSingleThreadExecutor();
-    initializeSubscriber();
-  }
-
-  public void shutdown() {
-    executor.shutdown();
-  }
-
-  @Override
-  public CommitId getHeadId() {
-    try (final var jedis = jedisPool.getResource()) {
-      final var headIdByteArray = jedis.get(JV_HEAD_ID);
-      return (CommitId) Optional.ofNullable(headIdByteArray)
-          .map(a -> deserialize(a))
-          .orElse(new CommitId(0, 0));
     }
-  }
 
-  @Override
-  public void persist(final Commit commit) {
-    Validate.conditionFulfilled(Objects.nonNull(jsonConverter), "jsonConverter is null");
-    Validate.argumentsAreNotNull(commit);
-    commit.getSnapshots().forEach(this::persist);
-    try (final var jedis = jedisPool.getResource()) {
-      jedis.set(JV_HEAD_ID, serialize(commit.getId()));
+    public JaversRedisRepository(final JedisSentinelPool jedisSentinelPool, final Duration duration) {
+        this.jedisPool = jedisSentinelPool;
+        this.duration = duration.toSeconds();
+        this.executor = Executors.newSingleThreadExecutor();
+        initializeSubscriber();
     }
-  }
 
-  @Override
-  public Optional<CdoSnapshot> getLatest(final GlobalId globalId) {
-    final var key = key(globalId);
-    try (final var jedis = jedisPool.getResource()) {
-      final var cdoSnapshotJson = jedis.lrange(key, 0l, 1l);
-      return cdoSnapshotJson.stream().findFirst().map(v -> jsonConverter.fromJson(v, CdoSnapshot.class));
+    public void shutdown() {
+        executor.shutdown();
     }
-  }
 
-  @Override
-  public List<CdoSnapshot> getStateHistory(final GlobalId globalId, final QueryParams queryParams) {
-    try (final var jedis = jedisPool.getResource()) {
-      if (queryParams.isAggregate()) {
-        final var entityKey = key(globalId);
-        final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(globalId.getTypeName());
-        final var keys = jedis.zrange(setKey, 0, -1).stream()
-            .filter(v -> v.startsWith(entityKey)).toList();
-        return keys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream).sorted(inReverseChronologicalOrder()).toList();
-      } else {
+    @Override
+    public CommitId getHeadId() {
+        try (final var jedis = jedisPool.getResource()) {
+            final var headIdByteArray = jedis.get(JV_HEAD_ID);
+            return (CommitId) Optional.ofNullable(headIdByteArray)
+                    .map(a -> deserialize(a))
+                    .orElse(new CommitId(0, 0));
+        }
+    }
+
+    @Override
+    public void persist(final Commit commit) {
+        Validate.conditionFulfilled(Objects.nonNull(jsonConverter), "jsonConverter is null");
+        Validate.argumentsAreNotNull(commit);
+        commit.getSnapshots().forEach(this::persist);
+        try (final var jedis = jedisPool.getResource()) {
+            jedis.set(JV_HEAD_ID, serialize(commit.getId()));
+        }
+    }
+
+    @Override
+    public Optional<CdoSnapshot> getLatest(final GlobalId globalId) {
         final var key = key(globalId);
-        return getStateHistory(key, queryParams);
-      }
+        try (final var jedis = jedisPool.getResource()) {
+            final var cdoSnapshotJson = jedis.lrange(key, 0l, 1l);
+            return cdoSnapshotJson.stream().findFirst().map(v -> jsonConverter.fromJson(v, CdoSnapshot.class));
+        }
     }
-  }
 
-  @Override
-  public List<CdoSnapshot> getStateHistory(final Set<ManagedType> givenClasses, final QueryParams queryParams) {
-    Validate.argumentsAreNotNull(givenClasses, queryParams);
-    try (final var jedis = jedisPool.getResource()) {
-      final var result = givenClasses.stream()
-          .map(givenClass -> {
-            final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(givenClass.getName());
-            return jedis.zrange(setKey, 0, -1);
-          })
-          .flatMap(List::stream)
-          .filter(key -> !key.contains("#")) // skip keys of value objects
-          .map(this::instanceId)
-          .map(instanceId -> getStateHistory(instanceId, queryParams))
-          .flatMap(List::stream)
-          .sorted(inReverseChronologicalOrder())
-          .toList();
-      return applyQueryParams(result, queryParams);
+    @Override
+    public List<CdoSnapshot> getStateHistory(final GlobalId globalId, final QueryParams queryParams) {
+        try (final var jedis = jedisPool.getResource()) {
+            if (queryParams.isAggregate()) {
+                final var entityKey = key(globalId);
+                final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(globalId.getTypeName());
+                final var keys = jedis.zrange(setKey, 0, -1).stream()
+                        .filter(v -> v.startsWith(entityKey)).toList();
+                return keys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream).sorted(inReverseChronologicalOrder()).toList();
+            } else {
+                final var key = key(globalId);
+                return getStateHistory(key, queryParams);
+            }
+        }
     }
-  }
 
-  @Override
-  public List<CdoSnapshot> getValueObjectStateHistory(final EntityType ownerEntity, final String path, final QueryParams queryParams) {
-    Validate.argumentsAreNotNull(ownerEntity, path, queryParams);
-    try (final var jedis = jedisPool.getResource()) {
-      final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerEntity.getName());
-      final var entityKeys = jedis.zrange(setKey, 0, -1);
-      final var valueObjectKeys = entityKeys.stream().filter(k -> k.contains("#".concat(path))).toList();
-      final var result = valueObjectKeys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream)
-          .sorted(inReverseChronologicalOrder()).toList();
-      return applyQueryParams(result, queryParams);
+    @Override
+    public List<CdoSnapshot> getStateHistory(final Set<ManagedType> givenClasses, final QueryParams queryParams) {
+        Validate.argumentsAreNotNull(givenClasses, queryParams);
+        try (final var jedis = jedisPool.getResource()) {
+            final var result = givenClasses.stream()
+                    .map(givenClass -> {
+                        final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(givenClass.getName());
+                        return jedis.zrange(setKey, 0, -1);
+                    })
+                    .flatMap(List::stream)
+                    .filter(key -> !key.contains("#")) // skip keys of value objects
+                    .map(this::instanceId)
+                    .map(instanceId -> getStateHistory(instanceId, queryParams))
+                    .flatMap(List::stream)
+                    .sorted(inReverseChronologicalOrder())
+                    .toList();
+            return applyQueryParams(result, queryParams);
+        }
     }
-  }
 
-  @Override
-  public List<CdoSnapshot> getSnapshots(final QueryParams queryParams) {
-    Validate.argumentIsNotNull(queryParams);
-    try (final var jedis = jedisPool.getResource()) {
-      final var keys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS, 0, -1);
-      final var allCdoSnapshots = keys.stream()
-          .filter(k -> !k.contains("#"))
-          .map(this::instanceId)
-          .map(instanceId -> getStateHistory(instanceId, queryParams))
-          .flatMap(List::stream)
-          .skip(queryParams.skip())
-          .limit(queryParams.limit())
-          //.sorted(inReverseChronologicalOrder())
-          .toList();
-      return applyQueryParams(allCdoSnapshots, queryParams);
+    @Override
+    public List<CdoSnapshot> getValueObjectStateHistory(final EntityType ownerEntity, final String path, final QueryParams queryParams) {
+        Validate.argumentsAreNotNull(ownerEntity, path, queryParams);
+        try (final var jedis = jedisPool.getResource()) {
+            final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerEntity.getName());
+            final var entityKeys = jedis.zrange(setKey, 0, -1);
+            final var valueObjectKeys = entityKeys.stream().filter(k -> k.contains("#".concat(path))).toList();
+            final var result = valueObjectKeys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream)
+                    .sorted(inReverseChronologicalOrder()).toList();
+            return applyQueryParams(result, queryParams);
+        }
     }
-  }
 
-  @Override
-  public List<CdoSnapshot> getSnapshots(final Collection<SnapshotIdentifier> snapshotIdentifiers) {
-    try (final var jedis = jedisPool.getResource()) {
-      return snapshotIdentifiers.stream().map(snapshotIdentifier -> {
-        final var key = key(snapshotIdentifier);
-        final var size = jedis.llen(key);
-        final var index = size - snapshotIdentifier.getVersion();
-        return Optional.ofNullable(jedis.lrange(key, index, index)).orElse(emptyList()).stream().map(v -> jsonConverter.fromJson(v, CdoSnapshot.class))
-            .findFirst();
-      }).filter(Optional::isPresent).map(Optional::get).toList();
+    @Override
+    public List<CdoSnapshot> getSnapshots(final QueryParams queryParams) {
+        Validate.argumentIsNotNull(queryParams);
+        try (final var jedis = jedisPool.getResource()) {
+            final var keys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS, 0, -1);
+            final var allCdoSnapshots = keys.stream()
+                    .filter(k -> !k.contains("#"))
+                    .map(this::instanceId)
+                    .map(instanceId -> getStateHistory(instanceId, queryParams))
+                    .flatMap(List::stream)
+                    .skip(queryParams.skip())
+                    .limit(queryParams.limit())
+                    // .sorted(inReverseChronologicalOrder())
+                    .toList();
+            return applyQueryParams(allCdoSnapshots, queryParams);
+        }
     }
-  }
 
-  @Override
-  public void setJsonConverter(final JsonConverter jsonConverter) {
-    this.jsonConverter = jsonConverter;
-  }
-
-  @Override
-  public void ensureSchema() {
-    // NOOP
-  }
-
-  /**
-   * Executes Lua script on the Redis server, which performs housekeeping cleanup on all
-   * jv_snapshot_keys:&lt;Entity Name&gt; sets. It removes the keys of expired jv_snapshots.
-   * @See cleanExpiredSnapshots.lua
-   */
-  public void cleanExpiredSnapshotsKeysSets() {
-    try (final var jedis = jedisPool.getResource()) {
-      final var snapshotKeys = jedis.keys("jv_snapshots:*");
-      final var expiredSnapshotKeys = jedis.zrange("jv_snapshots_keys",ZRangeParams.zrangeParams(0,  -1));
-      expiredSnapshotKeys.removeAll(snapshotKeys);
-      log.debug("expired snapshot keys: {}", expiredSnapshotKeys.size());
-      expiredSnapshotKeys.forEach(expiredSnapshotKey -> {
-        jedis.zrem("jv_snapshots_keys", expiredSnapshotKey);
-        log.debug("{} removed from jv_snapshots_keys",expiredSnapshotKey);
-        final var entitySnapshotKeysSet = expiredSnapshotKey.substring(0, expiredSnapshotKey.indexOf('/')).replaceAll("jv_snapshots", "jv_snapshots_keys");
-        jedis.zrem(entitySnapshotKeysSet, expiredSnapshotKey);
-        log.debug("{} removed from {}",expiredSnapshotKey, entitySnapshotKeysSet);
-      });
-    } catch (final Exception e) {
-      log.error(e.getMessage());
+    @Override
+    public List<CdoSnapshot> getSnapshots(final Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        try (final var jedis = jedisPool.getResource()) {
+            return snapshotIdentifiers.stream().map(snapshotIdentifier -> {
+                final var key = key(snapshotIdentifier);
+                final var size = jedis.llen(key);
+                final var index = size - snapshotIdentifier.getVersion();
+                return Optional.ofNullable(jedis.lrange(key, index, index)).orElse(emptyList()).stream().map(v -> jsonConverter.fromJson(v, CdoSnapshot.class))
+                        .findFirst();
+            }).filter(Optional::isPresent).map(Optional::get).toList();
+        }
     }
-  }
 
-  private void initializeSubscriber() {
-    executor.execute(() -> {
-      try (final var jedis = jedisPool.getResource()) {
-        jedis.psubscribe(new CdoSnapshotKeyExpireListener(jedisPool), "__key*__:jv_snapshots:*");
-      } catch (final Exception e) {
-        log.warn("Redis subscription failed: {}", e.getMessage());
-      }
-    });
-  }
-
-  private void persist(final CdoSnapshot snapshot) {
-    final var key = key(snapshot);
-    final var value = jsonConverter.toJson(snapshot);
-    final var entityNameKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(snapshot.getGlobalId().getTypeName());
-    try (final var jedis = jedisPool.getResource()) {
-      final var commitInstantMs = (double) -snapshot.getCommitMetadata().getCommitDateInstant().toEpochMilli();
-      jedis.zadd(JV_SNAPSHOTS_ENTITY_KEYS, commitInstantMs, key); // all snapshot keys
-      if (snapshot.getGlobalId() instanceof InstanceId) {
-        jedis.zadd(entityNameKey, commitInstantMs, key);
-        final var entityTypeName = snapshot.getGlobalId().getTypeName();
-        jedis.zadd(JV_SNAPSHOTS_ENTITY_KEYS_SET, 0.0, JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(entityTypeName));
-      }
-      if (snapshot.getGlobalId() instanceof final ValueObjectId valueObjectId) {
-        final var ownerId = valueObjectId.getOwnerId();
-        final var ownerEntityNameKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerId.getTypeName());
-        jedis.zadd(ownerEntityNameKey, commitInstantMs, key);
-      }
-      jedis.lpush(key, value);
-      jedis.expire(key, duration);
+    @Override
+    public void setJsonConverter(final JsonConverter jsonConverter) {
+        this.jsonConverter = jsonConverter;
     }
-  }
 
-  private String key(final CdoSnapshot snapshot) {
-    return key(snapshot.getGlobalId());
-  }
-
-  private String key(final SnapshotIdentifier snapshotIdentifier) {
-    return key(snapshotIdentifier.getGlobalId());
-  }
-
-  private String key(final GlobalId globalId) {
-    return JV_SNAPSHOTS.concat(globalId.value());
-  }
-
-  private List<CdoSnapshot> getStateHistory(final String key, final QueryParams queryParams) {
-    try (final var jedis = jedisPool.getResource()) {
-      final var size = jedis.llen(key);
-      final var limit = queryParams.snapshotQueryLimit().orElse((int) size);
-      final var cdoSnapshotJsonList = jedis.lrange(key, 0, limit);
-      final var cdoSnapshots = cdoSnapshotJsonList.stream()
-          .map(cdoSnapshotJson -> jsonConverter.fromJson(cdoSnapshotJson, CdoSnapshot.class))
-          .toList();
-      return applyQueryParams(cdoSnapshots, queryParams);
+    @Override
+    public void ensureSchema() {
+        // NOOP
     }
-  }
 
-  private List<CdoSnapshot> applyQueryParams(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
-    if (!queryParams.commitIds().isEmpty()) {
-      snapshots = filterSnapshotsByCommitIds(snapshots, queryParams.commitIds());
+    public long cleanExpiredSnapshotsKeysSets() {
+        try (final var jedis = jedisPool.getResource()) {
+            final var snapshotKeys = jedis.keys(JV_SNAPSHOTS.concat("*"));
+            final var expiredSnapshotKeys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS, ZRangeParams.zrangeParams(0, -1));
+            expiredSnapshotKeys.removeAll(snapshotKeys);
+            log.debug("expired snapshot keys: {}", expiredSnapshotKeys.size());
+            expiredSnapshotKeys.forEach(expiredSnapshotKey -> {
+                jedis.zrem(JV_SNAPSHOTS_ENTITY_KEYS, expiredSnapshotKey);
+                log.debug("{} removed from jv_snapshots_keys", expiredSnapshotKey);
+                final var entitySnapshotKeysSet = expiredSnapshotKey.substring(0, expiredSnapshotKey.indexOf('/')).replace("jv_snapshots",
+                        JV_SNAPSHOTS_ENTITY_KEYS);
+                jedis.zrem(entitySnapshotKeysSet, expiredSnapshotKey);
+                log.debug("{} removed from {}", expiredSnapshotKey, entitySnapshotKeysSet);
+            });
+            return expiredSnapshotKeys.size();
+        } catch (final Exception e) {
+            log.error(e.getMessage());
+        }
+        return 0;
     }
-    if (queryParams.toCommitId().isPresent()) {
-      snapshots = filterSnapshotsByToCommitId(snapshots, queryParams.toCommitId().get());
+
+    private void initializeSubscriber() {
+        executor.execute(() -> {
+            try (final var jedis = jedisPool.getResource()) {
+                jedis.psubscribe(new CdoSnapshotKeyExpireListener(jedisPool), "__key*__:jv_snapshots:*");
+            } catch (final Exception e) {
+                log.warn("Redis subscription failed: {}", e.getMessage());
+            }
+        });
     }
-    if (queryParams.version().isPresent()) {
-      snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getVersion() == queryParams.version().get());
+
+    private void persist(final CdoSnapshot snapshot) {
+        final var key = key(snapshot);
+        final var value = jsonConverter.toJson(snapshot);
+        final var entityNameKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(snapshot.getGlobalId().getTypeName());
+        try (final var jedis = jedisPool.getResource()) {
+            final var commitInstantMs = (double) -snapshot.getCommitMetadata().getCommitDateInstant().toEpochMilli();
+            jedis.zadd(JV_SNAPSHOTS_ENTITY_KEYS, commitInstantMs, key); // all snapshot keys
+            if (snapshot.getGlobalId() instanceof InstanceId) {
+                jedis.zadd(entityNameKey, commitInstantMs, key);
+                final var entityTypeName = snapshot.getGlobalId().getTypeName();
+                jedis.zadd(JV_SNAPSHOTS_ENTITY_KEYS_SET, 0.0, JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(entityTypeName));
+            }
+            if (snapshot.getGlobalId() instanceof final ValueObjectId valueObjectId) {
+                final var ownerId = valueObjectId.getOwnerId();
+                final var ownerEntityNameKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerId.getTypeName());
+                jedis.zadd(ownerEntityNameKey, commitInstantMs, key);
+            }
+            jedis.lpush(key, value);
+            jedis.expire(key, duration);
+        }
     }
-    if (queryParams.author().isPresent()) {
-      snapshots = filterSnapshotsByAuthor(snapshots, queryParams.author().get());
+
+    private String key(final CdoSnapshot snapshot) {
+        return key(snapshot.getGlobalId());
     }
-    if (queryParams.authorLikeIgnoreCase().isPresent()) {
-      snapshots = filterSnapshotsByAuthorLikeIgnoreCase(snapshots, queryParams.authorLikeIgnoreCase().get());
+
+    private String key(final SnapshotIdentifier snapshotIdentifier) {
+        return key(snapshotIdentifier.getGlobalId());
     }
-    if (hasDates(queryParams)) {
-      snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
+
+    private String key(final GlobalId globalId) {
+        return JV_SNAPSHOTS.concat(globalId.value());
     }
-    if (hasInstants(queryParams)) {
-      snapshots = filterSnapshotsByCommitDateInstant(snapshots, queryParams);
+
+    private List<CdoSnapshot> getStateHistory(final String key, final QueryParams queryParams) {
+        try (final var jedis = jedisPool.getResource()) {
+            final var size = jedis.llen(key);
+            final var limit = queryParams.snapshotQueryLimit().orElse((int) size);
+            final var cdoSnapshotJsonList = jedis.lrange(key, 0, limit);
+            final var cdoSnapshots = cdoSnapshotJsonList.stream()
+                    .map(cdoSnapshotJson -> jsonConverter.fromJson(cdoSnapshotJson, CdoSnapshot.class))
+                    .toList();
+            return applyQueryParams(cdoSnapshots, queryParams);
+        }
     }
-    if (!queryParams.changedProperties().isEmpty()) {
-      snapshots = filterByPropertyNames(snapshots, queryParams.changedProperties());
+
+    private List<CdoSnapshot> applyQueryParams(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
+        if (!queryParams.commitIds().isEmpty()) {
+            snapshots = filterSnapshotsByCommitIds(snapshots, queryParams.commitIds());
+        }
+        if (queryParams.toCommitId().isPresent()) {
+            snapshots = filterSnapshotsByToCommitId(snapshots, queryParams.toCommitId().get());
+        }
+        if (queryParams.version().isPresent()) {
+            snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getVersion() == queryParams.version().get());
+        }
+        if (queryParams.author().isPresent()) {
+            snapshots = filterSnapshotsByAuthor(snapshots, queryParams.author().get());
+        }
+        if (queryParams.authorLikeIgnoreCase().isPresent()) {
+            snapshots = filterSnapshotsByAuthorLikeIgnoreCase(snapshots, queryParams.authorLikeIgnoreCase().get());
+        }
+        if (hasDates(queryParams)) {
+            snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
+        }
+        if (hasInstants(queryParams)) {
+            snapshots = filterSnapshotsByCommitDateInstant(snapshots, queryParams);
+        }
+        if (!queryParams.changedProperties().isEmpty()) {
+            snapshots = filterByPropertyNames(snapshots, queryParams.changedProperties());
+        }
+        if (queryParams.snapshotType().isPresent()) {
+            snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getType() == queryParams.snapshotType().get());
+        }
+        snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
+        snapshots = filterSnapshotsByCommitPropertiesLike(snapshots, queryParams.commitPropertiesLike());
+
+        return snapshots;
     }
-    if (queryParams.snapshotType().isPresent()) {
-      snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getType() == queryParams.snapshotType().get());
+
+    private List<CdoSnapshot> filterByPropertyNames(final List<CdoSnapshot> snapshots, final Set<String> propertyNames) {
+        return Lists.positiveFilter(snapshots, input -> propertyNames.stream().anyMatch(input::hasChangeAt));
     }
-    snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
-    snapshots = filterSnapshotsByCommitPropertiesLike(snapshots, queryParams.commitPropertiesLike());
 
-    return snapshots;
-  }
-
-  private List<CdoSnapshot> filterByPropertyNames(final List<CdoSnapshot> snapshots, final Set<String> propertyNames) {
-    return Lists.positiveFilter(snapshots, input -> propertyNames.stream().anyMatch(input::hasChangeAt));
-  }
-
-  private List<CdoSnapshot> filterSnapshotsByToCommitId(final List<CdoSnapshot> snapshots, final CommitId commitId) {
-    return Lists.positiveFilter(snapshots, snapshot -> snapshot.getCommitMetadata().getId().isBeforeOrEqual(commitId));
-  }
-
-  private List<CdoSnapshot> filterSnapshotsByCommitIds(final List<CdoSnapshot> snapshots, final Set<CommitId> commitIds) {
-    return Lists.positiveFilter(snapshots, snapshot -> commitIds.contains(snapshot.getCommitId()));
-  }
-
-  private List<CdoSnapshot> filterSnapshotsByAuthor(final List<CdoSnapshot> snapshots, final String author) {
-    return Lists.positiveFilter(snapshots, snapshot -> author.equals(snapshot.getCommitMetadata().getAuthor()));
-  }
-
-  private List<CdoSnapshot> filterSnapshotsByAuthorLikeIgnoreCase(final List<CdoSnapshot> snapshots, final String author) {
-    return Lists.positiveFilter(snapshots,
-        snapshot -> snapshot.getCommitMetadata().getAuthor().toLowerCase(Locale.ROOT).contains(author.toLowerCase(Locale.ROOT)));
-  }
-
-  private List<CdoSnapshot> filterSnapshotsByCommitDate(final List<CdoSnapshot> snapshots, final QueryParams queryParams) {
-    return Lists.positiveFilter(snapshots, snapshot -> isDateInRange(queryParams, snapshot.getCommitMetadata().getCommitDate()));
-  }
-
-  public boolean isDateInRange(final QueryParams q, final LocalDateTime date) {
-    if (q.from().map(from -> from.isAfter(date)).orElse(false)) {
-      return false;
-    } else {
-      return !(q.to().map(to -> to.isBefore(date)).orElse(false));
+    private List<CdoSnapshot> filterSnapshotsByToCommitId(final List<CdoSnapshot> snapshots, final CommitId commitId) {
+        return Lists.positiveFilter(snapshots, snapshot -> snapshot.getCommitMetadata().getId().isBeforeOrEqual(commitId));
     }
-  }
 
-  private List<CdoSnapshot> filterSnapshotsByCommitDateInstant(final List<CdoSnapshot> snapshots, final QueryParams queryParams) {
-    return Lists.positiveFilter(snapshots, snapshot -> isInstantInRange(queryParams, snapshot.getCommitMetadata().getCommitDateInstant()));
-  }
-
-  private boolean isInstantInRange(final QueryParams q, final Instant instant) {
-    if (q.fromInstant().map(from -> from.isAfter(instant)).orElse(false)) {
-      return false;
-    } else {
-      return !(q.toInstant().map(to -> to.isBefore(instant)).orElse(false));
+    private List<CdoSnapshot> filterSnapshotsByCommitIds(final List<CdoSnapshot> snapshots, final Set<CommitId> commitIds) {
+        return Lists.positiveFilter(snapshots, snapshot -> commitIds.contains(snapshot.getCommitId()));
     }
-  }
 
-  private List<CdoSnapshot> filterSnapshotsByCommitProperties(final List<CdoSnapshot> snapshots, final Map<String, Collection<String>> commitProperties) {
-    return Lists.positiveFilter(snapshots, snapshot -> commitProperties.entrySet().stream().allMatch(commitProperty -> {
-      final Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
-      return actualCommitProperties.containsKey(commitProperty.getKey())
-          && commitProperty.getValue().contains(actualCommitProperties.get(commitProperty.getKey()));
-    }));
-  }
+    private List<CdoSnapshot> filterSnapshotsByAuthor(final List<CdoSnapshot> snapshots, final String author) {
+        return Lists.positiveFilter(snapshots, snapshot -> author.equals(snapshot.getCommitMetadata().getAuthor()));
+    }
 
-  private List<CdoSnapshot> filterSnapshotsByCommitPropertiesLike(final List<CdoSnapshot> snapshots, final Map<String, String> commitPropertiesLike) {
-    return Lists.positiveFilter(snapshots, snapshot -> commitPropertiesLike.entrySet().stream().allMatch(commitProperty -> {
-      final Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
-      return actualCommitProperties.containsKey(commitProperty.getKey()) && actualCommitProperties.get(commitProperty.getKey()).toLowerCase(Locale.ROOT)
-          .contains(commitProperty.getValue().toLowerCase(Locale.ROOT));
-    }));
-  }
+    private List<CdoSnapshot> filterSnapshotsByAuthorLikeIgnoreCase(final List<CdoSnapshot> snapshots, final String author) {
+        return Lists.positiveFilter(snapshots,
+                snapshot -> snapshot.getCommitMetadata().getAuthor().toLowerCase(Locale.ROOT).contains(author.toLowerCase(Locale.ROOT)));
+    }
 
-  private boolean hasDates(final QueryParams q) {
-    return q.from().isPresent() || q.to().isPresent();
-  }
+    private List<CdoSnapshot> filterSnapshotsByCommitDate(final List<CdoSnapshot> snapshots, final QueryParams queryParams) {
+        return Lists.positiveFilter(snapshots, snapshot -> isDateInRange(queryParams, snapshot.getCommitMetadata().getCommitDate()));
+    }
 
-  public boolean hasInstants(final QueryParams q) {
-    return q.fromInstant().isPresent() || q.toInstant().isPresent();
-  }
+    public boolean isDateInRange(final QueryParams q, final LocalDateTime date) {
+        if (q.from().map(from -> from.isAfter(date)).orElse(false)) {
+            return false;
+        } else {
+            return !(q.to().map(to -> to.isBefore(date)).orElse(false));
+        }
+    }
 
-  private InstanceId instanceId(final String key) {
-    final var index = key.indexOf("/");
-    final var typeName = key.substring(13, index);
-    final var codId = key.substring(index + 1);
-    return new InstanceId(typeName, codId, codId);
-  }
+    private List<CdoSnapshot> filterSnapshotsByCommitDateInstant(final List<CdoSnapshot> snapshots, final QueryParams queryParams) {
+        return Lists.positiveFilter(snapshots, snapshot -> isInstantInRange(queryParams, snapshot.getCommitMetadata().getCommitDateInstant()));
+    }
 
-  private Comparator<? super CdoSnapshot> inReverseChronologicalOrder() {
-    return (s1, s2) -> Long.compare(s2.getCommitId().getMajorId(), s1.getCommitId().getMajorId());
-  }
+    private boolean isInstantInRange(final QueryParams q, final Instant instant) {
+        if (q.fromInstant().map(from -> from.isAfter(instant)).orElse(false)) {
+            return false;
+        } else {
+            return !(q.toInstant().map(to -> to.isBefore(instant)).orElse(false));
+        }
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByCommitProperties(final List<CdoSnapshot> snapshots, final Map<String, Collection<String>> commitProperties) {
+        return Lists.positiveFilter(snapshots, snapshot -> commitProperties.entrySet().stream().allMatch(commitProperty -> {
+            final Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
+            return actualCommitProperties.containsKey(commitProperty.getKey())
+                    && commitProperty.getValue().contains(actualCommitProperties.get(commitProperty.getKey()));
+        }));
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByCommitPropertiesLike(final List<CdoSnapshot> snapshots, final Map<String, String> commitPropertiesLike) {
+        return Lists.positiveFilter(snapshots, snapshot -> commitPropertiesLike.entrySet().stream().allMatch(commitProperty -> {
+            final Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
+            return actualCommitProperties.containsKey(commitProperty.getKey()) && actualCommitProperties.get(commitProperty.getKey()).toLowerCase(Locale.ROOT)
+                    .contains(commitProperty.getValue().toLowerCase(Locale.ROOT));
+        }));
+    }
+
+    private boolean hasDates(final QueryParams q) {
+        return q.from().isPresent() || q.to().isPresent();
+    }
+
+    public boolean hasInstants(final QueryParams q) {
+        return q.fromInstant().isPresent() || q.toInstant().isPresent();
+    }
+
+    private InstanceId instanceId(final String key) {
+        final var index = key.indexOf("/");
+        final var typeName = key.substring(13, index);
+        final var codId = key.substring(index + 1);
+        return new InstanceId(typeName, codId, codId);
+    }
+
+    private Comparator<? super CdoSnapshot> inReverseChronologicalOrder() {
+        return (s1, s2) -> Long.compare(s2.getCommitId().getMajorId(), s1.getCommitId().getMajorId());
+    }
 }
