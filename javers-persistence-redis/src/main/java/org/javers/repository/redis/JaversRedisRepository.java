@@ -4,7 +4,6 @@ import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.SerializationUtils.deserialize;
 import static org.apache.commons.lang3.SerializationUtils.serialize;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisSentinelPool;
+import redis.clients.jedis.params.ZRangeParams;
 import redis.clients.jedis.util.Pool;
 
 public class JaversRedisRepository implements JaversRepository {
@@ -107,7 +107,8 @@ public class JaversRedisRepository implements JaversRepository {
     try (final var jedis = jedisPool.getResource()) {
       if (queryParams.isAggregate()) {
         final var entityKey = key(globalId);
-        final var keys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(globalId.getTypeName()), 0, -1).stream()
+        final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(globalId.getTypeName());
+        final var keys = jedis.zrange(setKey, 0, -1).stream()
             .filter(v -> v.startsWith(entityKey)).toList();
         return keys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream).sorted(inReverseChronologicalOrder()).toList();
       } else {
@@ -122,7 +123,10 @@ public class JaversRedisRepository implements JaversRepository {
     Validate.argumentsAreNotNull(givenClasses, queryParams);
     try (final var jedis = jedisPool.getResource()) {
       final var result = givenClasses.stream()
-          .map(givenClass -> jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(givenClass.getName()), 0, -1))
+          .map(givenClass -> {
+            final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(givenClass.getName());
+            return jedis.zrange(setKey, 0, -1);
+          })
           .flatMap(List::stream)
           .filter(key -> !key.contains("#")) // skip keys of value objects
           .map(this::instanceId)
@@ -138,7 +142,8 @@ public class JaversRedisRepository implements JaversRepository {
   public List<CdoSnapshot> getValueObjectStateHistory(final EntityType ownerEntity, final String path, final QueryParams queryParams) {
     Validate.argumentsAreNotNull(ownerEntity, path, queryParams);
     try (final var jedis = jedisPool.getResource()) {
-      final var entityKeys = jedis.zrange(JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerEntity.getName()), 0, -1);
+      final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerEntity.getName());
+      final var entityKeys = jedis.zrange(setKey, 0, -1);
       final var valueObjectKeys = entityKeys.stream().filter(k -> k.contains("#".concat(path))).toList();
       final var result = valueObjectKeys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream)
           .sorted(inReverseChronologicalOrder()).toList();
@@ -193,11 +198,20 @@ public class JaversRedisRepository implements JaversRepository {
    * @See cleanExpiredSnapshots.lua
    */
   public void cleanExpiredSnapshotsKeysSets() {
-    try (final var jedis = jedisPool.getResource(); final var resource = this.getClass().getResourceAsStream("/scripts/cleanExpiredSnapshots.lua")) {
-      final var luaScript = new String(resource.readAllBytes());
-      jedis.eval(luaScript);
-    } catch (final IOException e) {
-      // NOOP
+    try (final var jedis = jedisPool.getResource()) {
+      final var snapshotKeys = jedis.keys("jv_snapshots:*");
+      final var expiredSnapshotKeys = jedis.zrange("jv_snapshots_keys",ZRangeParams.zrangeParams(0,  -1));
+      expiredSnapshotKeys.removeAll(snapshotKeys);
+      log.debug("expired snapshot keys: {}", expiredSnapshotKeys.size());
+      expiredSnapshotKeys.forEach(expiredSnapshotKey -> {
+        jedis.zrem("jv_snapshots_keys", expiredSnapshotKey);
+        log.debug("{} removed from jv_snapshots_keys",expiredSnapshotKey);
+        final var entitySnapshotKeysSet = expiredSnapshotKey.substring(0, expiredSnapshotKey.indexOf('/')).replaceAll("jv_snapshots", "jv_snapshots_keys");
+        jedis.zrem(entitySnapshotKeysSet, expiredSnapshotKey);
+        log.debug("{} removed from {}",expiredSnapshotKey, entitySnapshotKeysSet);
+      });
+    } catch (final Exception e) {
+      log.error(e.getMessage());
     }
   }
 
@@ -217,7 +231,7 @@ public class JaversRedisRepository implements JaversRepository {
     final var entityNameKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(snapshot.getGlobalId().getTypeName());
     try (final var jedis = jedisPool.getResource()) {
       final var commitInstantMs = (double) -snapshot.getCommitMetadata().getCommitDateInstant().toEpochMilli();
-      jedis.zadd(JV_SNAPSHOTS_ENTITY_KEYS, commitInstantMs, key);
+      jedis.zadd(JV_SNAPSHOTS_ENTITY_KEYS, commitInstantMs, key); // all snapshot keys
       if (snapshot.getGlobalId() instanceof InstanceId) {
         jedis.zadd(entityNameKey, commitInstantMs, key);
         final var entityTypeName = snapshot.getGlobalId().getTypeName();
@@ -351,12 +365,6 @@ public class JaversRedisRepository implements JaversRepository {
           .contains(commitProperty.getValue().toLowerCase(Locale.ROOT));
     }));
   }
-
-  // private List<CdoSnapshot> trimResultsToRequestedSlice(final List<CdoSnapshot> snapshots, final int from, final int size) {
-  // final int fromIndex = Math.min(from, snapshots.size());
-  // final int toIndex = Math.min(from + size, snapshots.size());
-  // return new ArrayList<>(snapshots.subList(fromIndex, toIndex));
-  // }
 
   private boolean hasDates(final QueryParams q) {
     return q.from().isPresent() || q.to().isPresent();
