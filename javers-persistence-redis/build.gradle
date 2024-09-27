@@ -5,7 +5,7 @@ java {
 }
 
 dependencies {
-    api project(':javers-core')
+    api project(":javers-core")
     implementation "redis.clients:jedis:$jedisVersion"
     implementation "org.apache.commons:commons-lang3:3.15.0"
 
@@ -14,4 +14,6 @@ dependencies {
     testImplementation "org.testcontainers:spock:$testcontainers"
     testImplementation "org.testcontainers:junit-jupiter:$testcontainers"
     testImplementation "org.awaitility:awaitility:4.2.1"
+    testImplementation "jakarta.persistence:jakarta.persistence-api:3.0.0"
+    testImplementation "com.google.guava:guava:$guavaVersion"
 }
