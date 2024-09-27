@@ -108,7 +108,9 @@ public class JaversRedisRepository implements JaversRepository {
             if (queryParams.isAggregate()) {
                 final var entityKey = key(globalId);
                 final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(globalId.getTypeName());
-                final var keys = jedis.zrange(setKey, 0, -1).stream()
+                final var start = queryParams.skip();
+                final var stop = queryParams.limit()-1;
+                final var keys = jedis.zrange(setKey, start, stop).stream()
                         .filter(v -> v.startsWith(entityKey)).toList();
                 return keys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream).sorted(inReverseChronologicalOrder()).toList();
             } else {
@@ -125,7 +127,10 @@ public class JaversRedisRepository implements JaversRepository {
             final var result = givenClasses.stream()
                     .map(givenClass -> {
                         final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(givenClass.getName());
-                        return jedis.zrange(setKey, 0, -1);
+                        final var start = queryParams.skip();
+                        final var stop = queryParams.limit() -1;
+                        final var range = jedis.zrange(setKey, start, stop);
+                        return range;
                     })
                     .flatMap(List::stream)
                     .filter(key -> !key.contains("#")) // skip keys of value objects
@@ -143,7 +148,9 @@ public class JaversRedisRepository implements JaversRepository {
         Validate.argumentsAreNotNull(ownerEntity, path, queryParams);
         try (final var jedis = jedisPool.getResource()) {
             final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(ownerEntity.getName());
-            final var entityKeys = jedis.zrange(setKey, 0, -1);
+            final var start = queryParams.skip();
+            final var stop = queryParams.limit()-1;
+            final var entityKeys = jedis.zrange(setKey, start, stop);
             final var valueObjectKeys = entityKeys.stream().filter(k -> k.contains("#".concat(path))).toList();
             final var result = valueObjectKeys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream)
                     .sorted(inReverseChronologicalOrder()).toList();
@@ -260,8 +267,9 @@ public class JaversRedisRepository implements JaversRepository {
     private List<CdoSnapshot> getStateHistory(final String key, final QueryParams queryParams) {
         try (final var jedis = jedisPool.getResource()) {
             final var size = jedis.llen(key);
-            final var limit = queryParams.snapshotQueryLimit().orElse((int) size);
-            final var cdoSnapshotJsonList = jedis.lrange(key, 0, limit);
+            final var start = queryParams.skip();
+            final var stop = queryParams.limit() - 1 ;// queryParams.snapshotQueryLimit().orElse((int) size);
+            final var cdoSnapshotJsonList = jedis.lrange(key, start, stop);
             final var cdoSnapshots = cdoSnapshotJsonList.stream()
                     .map(cdoSnapshotJson -> jsonConverter.fromJson(cdoSnapshotJson, CdoSnapshot.class))
                     .toList();

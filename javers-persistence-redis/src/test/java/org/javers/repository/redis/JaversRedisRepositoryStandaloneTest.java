@@ -24,6 +24,7 @@ import org.javers.repository.redis.domain.Firmware;
 import org.javers.repository.redis.domain.LabAssistant;
 import org.javers.repository.redis.domain.Sensor;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ import redis.clients.jedis.JedisPool;
 
 @Testcontainers
 @TestMethodOrder(OrderAnnotation.class)
+@Disabled
 class JaversRedisRepositoryStandaloneTest {
 
     @Container

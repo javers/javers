@@ -12,6 +12,7 @@ class DockerizedRedisContainer {
     DockerizedRedisContainer() {
         this.redisContainer = startRedis()
         def jedisPoolConfig = new GenericObjectPoolConfig()
+        jedisPoolConfig.setMaxTotal(4)
         jedisPoolConfig.setBlockWhenExhausted(false)
         this.jedisPool = new JedisPool(jedisPoolConfig, getRedisHost(), getRedisPort())
     }
