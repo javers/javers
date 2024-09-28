@@ -3,7 +3,7 @@ package org.javers.spring.boot.mongo;
 import org.javers.core.metamodel.annotation.Id;
 
 /**
- * @author pawelszymczyk
+ * @author bbrakefieldmn
  */
 public class DummyEntityWithDouble {
 
