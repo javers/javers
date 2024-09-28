@@ -9,7 +9,7 @@ import org.javers.repository.jql.QueryBuilder
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
- * @author pawelszymczyk
+ * @author bbrakefieldmn
  */
 class JaversMongoStarterNullDoubleTest extends BaseSpecification{
     static String DB_NAME = 'spring-mongo-default'
@@ -17,7 +17,7 @@ class JaversMongoStarterNullDoubleTest extends BaseSpecification{
     @Autowired Javers javers
 
     @Autowired
-    private MongoClient mongoClient; //from spring-boot-starter-data-mongodb
+    private MongoClient mongoClient;
 
     @Autowired
     JaversMongoProperties javersProperties
