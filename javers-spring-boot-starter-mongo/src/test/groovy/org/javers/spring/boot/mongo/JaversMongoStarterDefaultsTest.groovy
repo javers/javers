@@ -61,4 +61,6 @@ class JaversMongoStarterDefaultsTest extends BaseSpecification{
 
       mongoClient.getDatabase(DB_NAME).getCollection("jv_snapshots").countDocuments() == 1
     }
+
+
 }
