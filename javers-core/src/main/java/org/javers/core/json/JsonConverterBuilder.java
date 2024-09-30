@@ -24,6 +24,7 @@ public class JsonConverterBuilder {
 
     public JsonConverterBuilder() {
         this.gsonBuilder = new GsonBuilder();
+        this.gsonBuilder.serializeSpecialFloatingPointValues();
         this.gsonBuilder.setExclusionStrategies(new SkipFieldExclusionStrategy());
         this.gsonBuilder.setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE);
         registerBuiltInAdapters(Java8TypeAdapters.adapters());
