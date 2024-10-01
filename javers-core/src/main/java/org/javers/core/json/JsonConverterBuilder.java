@@ -24,6 +24,7 @@ public class JsonConverterBuilder {
 
     public JsonConverterBuilder() {
         this.gsonBuilder = new GsonBuilder();
+        this.gsonBuilder.serializeSpecialFloatingPointValues();
         this.gsonBuilder.setExclusionStrategies(new SkipFieldExclusionStrategy());
         this.gsonBuilder.setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE);
         registerBuiltInAdapters(Java8TypeAdapters.adapters());
@@ -52,7 +53,7 @@ public class JsonConverterBuilder {
         return this;
     }
 
-     /**
+    /**
      * @param prettyPrint default true
      */
     public JsonConverterBuilder prettyPrint(boolean prettyPrint) {
@@ -161,7 +162,7 @@ public class JsonConverterBuilder {
         gsonBuilder.enableComplexMapKeySerialization();
 
         gsonBuilder.serializeNulls()
-                   .setDateFormat(ISO_DATE_TIME_FORMAT);
+                .setDateFormat(ISO_DATE_TIME_FORMAT);
 
         return new JsonConverter(gsonBuilder.create());
     }
