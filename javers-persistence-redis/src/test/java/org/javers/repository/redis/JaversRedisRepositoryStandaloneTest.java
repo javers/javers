@@ -39,7 +39,6 @@ import redis.clients.jedis.JedisPool;
 
 @Testcontainers
 @TestMethodOrder(OrderAnnotation.class)
-@Disabled
 class JaversRedisRepositoryStandaloneTest {
 
     @Container
