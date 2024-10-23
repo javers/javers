@@ -7,14 +7,7 @@ import static org.apache.commons.lang3.SerializationUtils.serialize;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,7 +52,6 @@ public class JaversRedisRepository implements JaversRepository {
         this.duration = duration.toSeconds();
         this.executor = Executors.newSingleThreadExecutor();
         initializeSubscriber();
-
     }
 
     public JaversRedisRepository(final JedisSentinelPool jedisSentinelPool, final Duration duration) {
@@ -108,9 +100,7 @@ public class JaversRedisRepository implements JaversRepository {
             if (queryParams.isAggregate()) {
                 final var entityKey = key(globalId);
                 final var setKey = JV_SNAPSHOTS_ENTITY_KEYS.concat(":").concat(globalId.getTypeName());
-                final var start = queryParams.skip();
-                final var stop = queryParams.limit()-1;
-                final var keys = jedis.zrange(setKey, start, stop).stream()
+                final var keys = jedis.zrange(setKey, 0, -1).stream()
                         .filter(v -> v.startsWith(entityKey)).toList();
                 return keys.stream().map(key -> getStateHistory(key, queryParams)).flatMap(List::stream).sorted(inReverseChronologicalOrder()).toList();
             } else {
@@ -266,14 +256,12 @@ public class JaversRedisRepository implements JaversRepository {
 
     private List<CdoSnapshot> getStateHistory(final String key, final QueryParams queryParams) {
         try (final var jedis = jedisPool.getResource()) {
-            final var size = jedis.llen(key);
-            final var start = queryParams.skip();
-            final var stop = queryParams.limit() - 1 ;// queryParams.snapshotQueryLimit().orElse((int) size);
-            final var cdoSnapshotJsonList = jedis.lrange(key, start, stop);
+            final var cdoSnapshotJsonList = jedis.lrange(key, 0, -1);
             final var cdoSnapshots = cdoSnapshotJsonList.stream()
                     .map(cdoSnapshotJson -> jsonConverter.fromJson(cdoSnapshotJson, CdoSnapshot.class))
                     .toList();
-            return applyQueryParams(cdoSnapshots, queryParams);
+            final var filteredCdoSnapshots = applyQueryParams(cdoSnapshots, queryParams);
+            return trimResultsToRequestedSlice(filteredCdoSnapshots, queryParams);
         }
     }
 
@@ -286,6 +274,12 @@ public class JaversRedisRepository implements JaversRepository {
         }
         if (queryParams.version().isPresent()) {
             snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getVersion() == queryParams.version().get());
+        }
+        if (queryParams.fromVersion().isPresent()) {
+            snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getVersion() >= queryParams.fromVersion().get());
+        }
+        if (queryParams.toVersion().isPresent()) {
+            snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getVersion() <= queryParams.toVersion().get());
         }
         if (queryParams.author().isPresent()) {
             snapshots = filterSnapshotsByAuthor(snapshots, queryParams.author().get());
@@ -389,5 +383,11 @@ public class JaversRedisRepository implements JaversRepository {
 
     private Comparator<? super CdoSnapshot> inReverseChronologicalOrder() {
         return (s1, s2) -> Long.compare(s2.getCommitId().getMajorId(), s1.getCommitId().getMajorId());
+    }
+
+    private List<CdoSnapshot> trimResultsToRequestedSlice(List<CdoSnapshot> snapshots, QueryParams queryParams) {
+        final var start = Math.min(queryParams.skip(), snapshots.size());
+        final var stop = Math.min(queryParams.skip() + queryParams.limit(), snapshots.size());
+        return new ArrayList<>(snapshots.subList(start, stop));
     }
 }

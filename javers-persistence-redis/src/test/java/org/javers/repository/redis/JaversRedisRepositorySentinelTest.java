@@ -36,7 +36,6 @@ import redis.clients.jedis.JedisSentinelPool;
 
 @Testcontainers
 @TestMethodOrder(OrderAnnotation.class)
-@Disabled
 class JaversRedisRepositorySentinelTest {
 
     @Container
