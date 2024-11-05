@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportRuntimeHints;
 import java.util.Arrays;
 
 @Configuration
-@ImportRuntimeHints(JaversNativeConfiguration.ApplicationRuntimeHints.class)
-public class JaversNativeConfiguration {
+@ImportRuntimeHints(JaversNativeHints.ApplicationRuntimeHints.class)
+public class JaversNativeHints {
     static class ApplicationRuntimeHints implements RuntimeHintsRegistrar {
         @Override
         public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
