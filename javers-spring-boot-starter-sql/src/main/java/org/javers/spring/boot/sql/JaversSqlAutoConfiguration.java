@@ -1,5 +1,6 @@
 package org.javers.spring.boot.sql;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -125,8 +126,8 @@ public class JaversSqlAutoConfiguration {
 
     @Bean(name = "JpaHibernateConnectionProvider")
     @ConditionalOnMissingBean
-    public ConnectionProvider jpaConnectionProvider() {
-        return new JpaHibernateConnectionProvider();
+    public ConnectionProvider jpaConnectionProvider(EntityManager entityManager) {
+        return new JpaHibernateConnectionProvider(entityManager);
     }
 
     @Bean

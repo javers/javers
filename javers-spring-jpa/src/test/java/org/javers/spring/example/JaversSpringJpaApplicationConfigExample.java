@@ -1,5 +1,6 @@
 package org.javers.spring.example;
 
+import jakarta.persistence.EntityManager;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
@@ -48,10 +49,10 @@ public class JaversSpringJpaApplicationConfigExample {
      * Creates JaVers instance with {@link JaversSqlRepository}
      */
     @Bean
-    public Javers javers(PlatformTransactionManager txManager) {
+    public Javers javers(PlatformTransactionManager txManager, EntityManager entityManager) {
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
-                .withConnectionProvider(jpaConnectionProvider())
+                .withConnectionProvider(jpaConnectionProvider(entityManager))
                 .withDialect(DialectName.H2)
                 .build();
 
@@ -118,8 +119,8 @@ public class JaversSpringJpaApplicationConfigExample {
      * Integrates {@link JaversSqlRepository} with Spring {@link JpaTransactionManager}
      */
     @Bean
-    public ConnectionProvider jpaConnectionProvider() {
-        return new JpaHibernateConnectionProvider();
+    public ConnectionProvider jpaConnectionProvider(EntityManager entityManager) {
+        return new JpaHibernateConnectionProvider(entityManager);
     }
     //.. EOF JaVers setup ..
 
