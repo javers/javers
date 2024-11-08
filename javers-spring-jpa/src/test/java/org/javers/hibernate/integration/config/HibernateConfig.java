@@ -1,5 +1,7 @@
 package org.javers.hibernate.integration.config;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
 import org.javers.repository.sql.ConnectionProvider;
@@ -18,9 +20,8 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import jakarta.persistence.EntityManagerFactory;
+
 import javax.sql.DataSource;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -31,8 +32,8 @@ public class HibernateConfig {
      * Integrates {@link JaversSqlRepository} with Spring {@link JpaTransactionManager}
      */
     @Bean
-    public ConnectionProvider jpaConnectionProvider() {
-        return new JpaHibernateConnectionProvider();
+    public ConnectionProvider jpaConnectionProvider(EntityManager entityManager) {
+        return new JpaHibernateConnectionProvider(entityManager);
     }
 
     @Bean

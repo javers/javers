@@ -4,8 +4,6 @@ import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 import org.javers.repository.sql.ConnectionProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -13,11 +11,13 @@ import java.sql.SQLException;
 /**
  * @author bartosz walacik
  */
-@Component
 public class JpaHibernateConnectionProvider implements ConnectionProvider{
 
-    @Autowired
     private EntityManager entityManager;
+
+    public JpaHibernateConnectionProvider(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Connection getConnection() {
