@@ -143,12 +143,7 @@ public class JaversNativeHintsConfiguration {
                     
                     // Package: org.javers.spring.auditable.aspect.springdatajpa
                     "org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect",
-                    
-                    // Package: org.javers.spring.boot.sql
-                    "org.javers.spring.boot.sql.JaversSqlAutoConfiguration",
-                    "org.javers.spring.boot.sql.JaversSqlAutoConfiguration$$SpringCGLIB$$0",
-                    "org.javers.spring.boot.sql.JaversSqlProperties",
-                    
+
                     // Package: org.javers.core.graph
                     "org.javers.core.graph.SnapshotObjectHasher",
                     
