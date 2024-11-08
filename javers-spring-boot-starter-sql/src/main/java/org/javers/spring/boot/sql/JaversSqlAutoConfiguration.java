@@ -11,14 +11,9 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
-import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.javers.spring.auditable.EmptyPropertiesProvider;
-import org.javers.spring.auditable.MockAuthorProvider;
-import org.javers.spring.auditable.SpringSecurityAuthorProvider;
+import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
-import org.javers.spring.boot.aot.JaversNativeHintsConfiguration;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJpaJaversBuilder;
 import org.slf4j.Logger;
@@ -37,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +43,7 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties(value = {JaversSqlProperties.class, JpaProperties.class})
 @AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
-@Import({RegisterJsonTypeAdaptersPlugin.class, JaversNativeHintsConfiguration.class})
+@Import({RegisterJsonTypeAdaptersPlugin.class})
 public class JaversSqlAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversSqlAutoConfiguration.class);
 
