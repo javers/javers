@@ -14,6 +14,7 @@ import org.javers.spring.auditable.MockAuthorProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
+import org.javers.spring.boot.aot.JaversMongoNativeHintsConfiguration;
 import org.javers.spring.mongodb.TransactionalMongoJaversBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mo
 @Configuration
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties({JaversMongoProperties.class})
-@Import({RegisterJsonTypeAdaptersPlugin.class})
+@Import({RegisterJsonTypeAdaptersPlugin.class, JaversMongoNativeHintsConfiguration.class})
 public class JaversMongoAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversMongoAutoConfiguration.class);
 

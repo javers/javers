@@ -15,7 +15,7 @@ import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
-import org.javers.spring.boot.aot.JaversNativeHintsConfiguration;
+import org.javers.spring.boot.aot.JaversSqlNativeHintsConfiguration;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJpaJaversBuilder;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties(value = {JaversSqlProperties.class, JpaProperties.class})
 @AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
-@Import({RegisterJsonTypeAdaptersPlugin.class, JaversNativeHintsConfiguration.class})
+@Import({RegisterJsonTypeAdaptersPlugin.class, JaversSqlNativeHintsConfiguration.class})
 public class JaversSqlAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversSqlAutoConfiguration.class);
 

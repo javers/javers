@@ -5,9 +5,10 @@ import org.springframework.aot.hint.RuntimeHints;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-class JaversNativeHintsConfigurationTest {
+
+class JaversMongoNativeHintsConfigurationTest {
     @Test
     void registerNativeHints() {
-        assertThat(JaversNativeHintsConfiguration.registerNativeHints(new RuntimeHints())).isEqualTo(true);
+        assertThat(JaversMongoNativeHintsConfiguration.registerNativeHints(new RuntimeHints())).isEqualTo(true);
     }
 }
