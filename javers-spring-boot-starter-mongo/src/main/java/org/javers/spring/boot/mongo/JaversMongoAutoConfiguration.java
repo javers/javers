@@ -7,14 +7,10 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.JaversBuilderPlugin;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
-import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.javers.spring.auditable.EmptyPropertiesProvider;
-import org.javers.spring.auditable.MockAuthorProvider;
-import org.javers.spring.auditable.SpringSecurityAuthorProvider;
+import org.javers.spring.aot.JaversSpringNativeHints;
+import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
-import org.javers.spring.boot.aot.JaversMongoNativeHintsConfiguration;
 import org.javers.spring.mongodb.TransactionalMongoJaversBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClas
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoDatabaseUtils;
 import org.springframework.data.mongodb.MongoTransactionManager;
@@ -48,7 +41,8 @@ import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mo
 @Configuration
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties({JaversMongoProperties.class})
-@Import({RegisterJsonTypeAdaptersPlugin.class, JaversMongoNativeHintsConfiguration.class})
+@Import({RegisterJsonTypeAdaptersPlugin.class})
+@ImportRuntimeHints({JaversSpringNativeHints.class})
 public class JaversMongoAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversMongoAutoConfiguration.class);
 

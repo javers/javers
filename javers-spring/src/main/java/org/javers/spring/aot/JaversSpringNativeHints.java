@@ -1,21 +1,15 @@
-package org.javers.spring.boot.aot;
+package org.javers.spring.aot;
 
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportRuntimeHints;
 
 import java.util.Arrays;
 
-@Configuration
-@ImportRuntimeHints(JaversSqlNativeHintsConfiguration.ApplicationRuntimeHints.class)
-public class JaversSqlNativeHintsConfiguration {
-    static class ApplicationRuntimeHints implements RuntimeHintsRegistrar {
-        @Override
-        public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
-            registerNativeHints(hints);
-        }
+public class JaversSpringNativeHints implements RuntimeHintsRegistrar {
+    @Override
+    public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+        registerNativeHints(hints);
     }
 
     static boolean registerNativeHints(RuntimeHints hints) {
@@ -88,38 +82,10 @@ public class JaversSqlNativeHintsConfiguration {
                 "org.javers.guava.MultimapChangeAppender",
                 "org.javers.guava.MultisetChangeAppender",
 
-                // Package: org.javers.hibernate.integration
-                "org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook",
-
                 // Package: org.javers.repository.api
                 "org.javers.repository.api.JaversExtendedRepository",
                 "org.javers.repository.api.JaversRepository",
                 "org.javers.repository.api.QueryParams",
-
-                // Package: org.javers.repository.jql
-                "org.javers.repository.jql.ChangesQueryRunner",
-                "org.javers.repository.jql.QueryCompiler",
-                "org.javers.repository.jql.QueryRunner",
-                "org.javers.repository.jql.ShadowQueryRunner",
-                "org.javers.repository.jql.ShadowStreamQueryRunner",
-                "org.javers.repository.jql.SnapshotQueryRunner",
-
-                // Package: org.javers.repository.sql
-                "org.javers.repository.sql.ConnectionProvider",
-                "org.javers.repository.sql.DialectName",
-                "org.javers.repository.sql.JaversSqlRepository",
-                "org.javers.repository.sql.SqlRepositoryBuilder",
-                "org.javers.repository.sql.SqlRepositoryConfiguration",
-                "org.javers.repository.sql.finders.CdoSnapshotFinder",
-                "org.javers.repository.sql.finders.CommitPropertyFinder",
-                "org.javers.repository.sql.repositories.CdoSnapshotRepository",
-                "org.javers.repository.sql.repositories.CommitMetadataRepository",
-                "org.javers.repository.sql.repositories.GlobalIdRepository",
-                "org.javers.repository.sql.schema.FixedSchemaFactory",
-                "org.javers.repository.sql.schema.JaversSchemaManager",
-                "org.javers.repository.sql.schema.SchemaNameAware",
-                "org.javers.repository.sql.schema.TableNameProvider",
-                "org.javers.repository.sql.session.Session",
 
                 // Package: org.javers.shadow
                 "org.javers.shadow.ShadowFactory",
@@ -145,8 +111,6 @@ public class JaversSqlNativeHintsConfiguration {
                 // Package: org.javers.spring.auditable.aspect.springdata
                 "org.javers.spring.auditable.aspect.springdata.AbstractSpringAuditableRepositoryAspect",
 
-                // Package: org.javers.spring.auditable.aspect.springdatajpa
-                "org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect",
 
                 // Package: org.javers.core.graph
                 "org.javers.core.graph.SnapshotObjectHasher",
@@ -154,7 +118,6 @@ public class JaversSqlNativeHintsConfiguration {
                 // Package: org.javers.core.metamodel.type
                 "org.javers.core.metamodel.type.ListType"
         );
-
         classes.forEach(clazz -> {
             try {
                 hints.reflection().registerType(Class.forName(clazz), builder -> builder.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS));
@@ -164,5 +127,6 @@ public class JaversSqlNativeHintsConfiguration {
 
         });
         return true;
+
     }
 }
