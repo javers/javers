@@ -1,0 +1,32 @@
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+dependencies {
+    api project(':javers-core')
+    api project(':javers-persistence-redis')
+    api project(':javers-spring')
+
+    implementation "redis.clients:jedis:$jedisVersion"
+    implementation "org.springframework.boot:spring-boot:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+
+    optionalImplementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
+
+
+    testImplementation "org.springframework.data:spring-data-redis:$springDataRedisVersion"
+    testImplementation ("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
+    testImplementation "org.springframework.boot:spring-boot-starter-data-redis:$springDataRedisVersion"
+    testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
+
+    testImplementation "org.testcontainers:testcontainers:$testcontainers"
+    testImplementation "org.testcontainers:junit-jupiter:$testcontainers"
+}
+
+test {
+    useJUnitPlatform()
+}
