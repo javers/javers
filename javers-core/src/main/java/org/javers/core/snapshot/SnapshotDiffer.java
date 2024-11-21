@@ -9,12 +9,15 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 
 import java.util.*;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
+import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
 
 public class SnapshotDiffer {
 
@@ -59,7 +62,14 @@ public class SnapshotDiffer {
     private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot, CdoSnapshot previousSnapshot) {
         changes.add(new ObjectRemoved(terminalSnapshot.getGlobalId(), empty(), of(terminalSnapshot.getCommitMetadata())));
         if (previousSnapshot != null && javersCoreConfiguration.isTerminalChanges()) {
-            Diff terminalDiff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(terminalSnapshot), commitMetadata(terminalSnapshot));
+            CdoSnapshot terminalSnapshotWithEmptyState = cdoSnapshot()
+                    .withGlobalId(terminalSnapshot.getGlobalId())
+                    .withManagedType(terminalSnapshot.getManagedType())
+                    .withCommitMetadata(terminalSnapshot.getCommitMetadata())
+                    .withType(terminalSnapshot.getType())
+                    .withVersion(terminalSnapshot.getVersion())
+                    .build();
+            Diff terminalDiff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(terminalSnapshotWithEmptyState), commitMetadata(terminalSnapshot));
             changes.addAll(terminalDiff.getChanges());
         }
     }
