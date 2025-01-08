@@ -11,6 +11,9 @@ public class JaversRedisProperties extends JaversSpringProperties {
 
     @Override
     protected String defaultObjectAccessHook() {
+        if (getObjectAccessHook() != null) {
+            return getObjectAccessHook();
+        }
         return RedisObjectAccessHook.class.getName();
     }
 
