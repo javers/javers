@@ -18,7 +18,6 @@ import org.javers.spring.boot.redis.domain.LabAssistant;
 import org.javers.spring.boot.redis.domain.Sensor;
 import org.javers.spring.boot.redis.repository.DeviceRepository;
 import org.javers.spring.boot.redis.repository.LabAssistantRepository;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -279,24 +278,7 @@ class JaversRedisAutoConfigurationTest {
     }
 
     @Test
-    @Disabled
     @Order(15)
-    void testQueryWithCommitProperties() {
-        // given
-        final var query = QueryBuilder.byClass(LabAssistant.class).withCommitProperty("foo", "bar").build();
-
-        // when
-        final var changes = javers.findChanges(query);
-        final var snapshots = javers.findSnapshots(query);
-
-        // then
-        assertNotNull(changes);
-        assertNotNull(snapshots);
-        assertEquals(1, snapshots.size());
-    }
-
-    @Test
-    @Order(16)
     void testQueryWithCommitPropertiesNonExistingKey() {
         // given
         final var query = QueryBuilder.byClass(LabAssistant.class).withCommitProperty("non-existing", "bar").build();
@@ -325,23 +307,6 @@ class JaversRedisAutoConfigurationTest {
         assertNotNull(changes);
         assertNotNull(snapshots);
         assertEquals(0, snapshots.size());
-    }
-
-    @Test
-    @Disabled
-    @Order(17)
-    void testQueryWithCommitPropertiesLike() {
-        // given
-        final var query = QueryBuilder.byClass(LabAssistant.class).withCommitPropertyLike("baz", "Q").build();
-
-        // when
-        final var changes = javers.findChanges(query);
-        final var snapshots = javers.findSnapshots(query);
-
-        // then
-        assertNotNull(changes);
-        assertNotNull(snapshots);
-        assertEquals(1, snapshots.size());
     }
 
     @Test
