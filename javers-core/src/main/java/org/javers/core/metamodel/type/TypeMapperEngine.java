@@ -26,6 +26,8 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 class TypeMapperEngine {
     static final Logger logger = TypeMapper.logger;
 
+    private static final Object LOCK_MAPPED_TYPES = new Object();
+
     private final Map<String, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
     private final TypeMapperLazy typeMapperlazy;
@@ -101,7 +103,7 @@ class TypeMapperEngine {
             return javersType;
         }
 
-        synchronized (javaType) {
+        synchronized (LOCK_MAPPED_TYPES) {
             //map.contains double check
             JaversType mappedType = get(javaType);
             if (mappedType != null) {
