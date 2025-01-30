@@ -20,6 +20,8 @@ class CoreConfigurationBuilder {
 
     private boolean terminalChanges = true;
 
+    private boolean terminalSnapshot = false;
+
     private boolean usePrimitiveDefaults = true;
 
     private CommitIdGenerator commitIdGenerator = CommitIdGenerator.SYNCHRONIZED_SEQUENCE;
@@ -42,6 +44,7 @@ class CoreConfigurationBuilder {
                 commitIdGenerator,
                 customCommitIdGenerator,
                 terminalChanges,
+                terminalSnapshot,
                 prettyPrint,
                 usePrimitiveDefaults
         );
@@ -80,6 +83,11 @@ class CoreConfigurationBuilder {
 
     CoreConfigurationBuilder withTerminalChanges(boolean terminalChanges) {
         this.terminalChanges = terminalChanges;
+        return this;
+    }
+
+    CoreConfigurationBuilder withTerminalSnapshot(boolean terminalSnapshot) {
+        this.terminalSnapshot = terminalSnapshot;
         return this;
     }
 
