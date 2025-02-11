@@ -45,8 +45,8 @@ public class CdoSnapshotRepository extends SchemaNameAware {
                 .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
                 .value(SNAPSHOT_COMMIT_FK, commitIdPk)
                 .value(SNAPSHOT_VERSION, cdoSnapshot.getVersion())
-                .value(SNAPSHOT_STATE, cdoSnapshotStateCodec.encode(jsonConverter.toJson(cdoSnapshot.getState())))
-                .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged()))
+                .jsonValue(SNAPSHOT_STATE, cdoSnapshotStateCodec.encode(jsonConverter.toJson(cdoSnapshot.getState())))
+                .jsonValue(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged()))
                 .value(SNAPSHOT_MANAGED_TYPE, cdoSnapshot.getManagedType().getName())
                 .sequence(SNAPSHOT_PK, getSnapshotTablePkSeqName().nameWithSchema())
                 .execute();

@@ -24,6 +24,15 @@ public class InsertBuilder extends QueryBuilder<InsertBuilder> {
         return this;
     }
 
+    public InsertBuilder jsonValue(String name, String value) {
+        if (session.isUsingNativeJSONType() && session.getDialect().supportsJsonCasting()) {
+            parameters.add(new Parameter.JsonParameter(name, value, ((JsonColumnSupportDialect)session.getDialect()).jsonCastingExpression()));
+        } else {
+            parameters.add(new Parameter.StringParameter(name, value));
+        }
+        return this;
+    }
+
     public InsertBuilder value(String name, Integer value) {
         parameters.add(new Parameter.IntParameter(name, value));
         return this;

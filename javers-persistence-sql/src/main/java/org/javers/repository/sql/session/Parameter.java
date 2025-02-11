@@ -71,6 +71,27 @@ public abstract class Parameter<T> {
         }
     }
 
+    static class JsonParameter extends Parameter<String> {
+
+        private final JsonCastingExpression jsonCastingExpression;
+
+        JsonParameter(String name, String value, JsonCastingExpression jsonCastingExpression) {
+            super(name, value);
+            this.jsonCastingExpression = jsonCastingExpression;
+        }
+
+        @Override
+        String getRawSqlRepresentation() {
+            return jsonCastingExpression.castToJson(super.getRawSqlRepresentation());
+        }
+
+        @Override
+        int injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setString(order, getValue());
+            return order + 1;
+        }
+    }
+
     static class ListParameter extends Parameter<Collection<String>> {
         ListParameter(String name, Collection<String> value) {
             super(name, value);

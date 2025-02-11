@@ -79,6 +79,7 @@ public class JaversSqlAutoConfiguration {
                 .withConnectionProvider(connectionProvider)
                 .withDialect(javersSqlDialectName())
                 .withSchemaManagementEnabled(javersSqlProperties.isSqlSchemaManagementEnabled())
+                .withJsonTypeSupportEnabled(javersSqlProperties.isSqlJsonTypeSupportEnabled())
                 .withGlobalIdCacheDisabled(javersSqlProperties.isSqlGlobalIdCacheDisabled())
                 .withGlobalIdTableName(javersSqlProperties.getSqlGlobalIdTableName())
                 .withCommitTableName(javersSqlProperties.getSqlCommitTableName())
