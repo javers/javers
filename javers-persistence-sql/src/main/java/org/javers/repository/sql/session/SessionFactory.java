@@ -8,8 +8,8 @@ public class SessionFactory {
     private final ConnectionProvider connectionProvider;
     private final KeyGenerator keyGenerator;
 
-    public SessionFactory(DialectName dialectName, ConnectionProvider connectionProvider) {
-        this.dialect = Dialects.fromName(dialectName);
+    public SessionFactory(DialectName dialectName, ConnectionProvider connectionProvider, boolean jsonTypeSupportEnabled) {
+        this.dialect = Dialects.fromName(dialectName, jsonTypeSupportEnabled);
         this.connectionProvider = connectionProvider;
         this.keyGenerator = dialect.getKeyGeneratorDefinition().createKeyGenerator();
     }

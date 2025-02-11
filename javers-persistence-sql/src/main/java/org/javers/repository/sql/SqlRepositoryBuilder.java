@@ -27,6 +27,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private String schemaName;
     private boolean globalIdCacheDisabled;
     private boolean schemaManagementEnabled = true;
+    private boolean jsonTypeSupportEnabled = false;
 
     private String globalIdTableName;
     private String commitTableName;
@@ -83,6 +84,11 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+    public SqlRepositoryBuilder withJsonTypeSupportEnabled(boolean jsonTypeSupportEnabled) {
+        this.jsonTypeSupportEnabled = jsonTypeSupportEnabled;
+        return this;
+    }
+
     public SqlRepositoryBuilder withGlobalIdTableName(String globalIdTableName) {
         if(isNonEmpty(globalIdTableName)) {
             this.globalIdTableName = globalIdTableName;
@@ -120,13 +126,13 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
         SqlRepositoryConfiguration config =
                 new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName, schemaManagementEnabled,
-                        globalIdTableName, commitTableName, snapshotTableName, commitPropertyTableName);
+                        jsonTypeSupportEnabled, globalIdTableName, commitTableName, snapshotTableName, commitPropertyTableName);
         addComponent(config);
 
         PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
                 .usingManagedConnections(() -> connectionProvider.getConnection()).build();
 
-        SessionFactory sessionFactory = new SessionFactory(dialectName, connectionProvider);
+        SessionFactory sessionFactory = new SessionFactory(dialectName, connectionProvider, jsonTypeSupportEnabled);
 
         addComponent(polyJDBC);
         addComponent(sessionFactory);

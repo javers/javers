@@ -11,6 +11,7 @@ public class SqlRepositoryConfiguration {
     private final boolean globalIdCacheDisabled;
     private final String schemaName;
     private final boolean schemaManagementEnabled;
+    private final boolean jsonTypeSupportEnabled;
 
     private final String globalIdTableName;
     private final String commitTableName;
@@ -18,7 +19,7 @@ public class SqlRepositoryConfiguration {
     private final String commitPropertyTableName;
 
     SqlRepositoryConfiguration(boolean globalIdCacheDisabled, String schemaName,
-                                      boolean schemaManagementEnabled, String globalIdTableName,
+                                      boolean schemaManagementEnabled, boolean jsonTypeSupportEnabled, String globalIdTableName,
                                       String commitTableName,
                                       String snapshotTableName, String commitPropertyTableName) {
         Validate.argumentCheck(schemaName == null || !schemaName.isEmpty(),"schemaName should be null or non-empty");
@@ -26,6 +27,7 @@ public class SqlRepositoryConfiguration {
         this.globalIdCacheDisabled = globalIdCacheDisabled;
         this.schemaName = schemaName;
         this.schemaManagementEnabled = schemaManagementEnabled;
+        this.jsonTypeSupportEnabled = jsonTypeSupportEnabled;
         this.globalIdTableName = globalIdTableName;
         this.commitTableName = commitTableName;
         this.snapshotTableName = snapshotTableName;
@@ -65,5 +67,9 @@ public class SqlRepositoryConfiguration {
 
     public Optional<String> getCommitPropertyTableName() {
         return Optional.ofNullable(commitPropertyTableName);
+    }
+
+    public boolean isJsonTypeSupportEnabled() {
+        return jsonTypeSupportEnabled;
     }
 }

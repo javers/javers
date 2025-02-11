@@ -9,7 +9,14 @@ import static org.javers.repository.sql.session.Parameter.longParam;
 
 class Dialects {
 
-    static Dialect fromName(DialectName dialectName) {
+    static Dialect fromName(DialectName dialectName, boolean jsonTypeSupportEnabled) {
+        if (jsonTypeSupportEnabled) {
+            return createDialectWithJsonSupport(dialectName);
+        }
+        return createDialectWithoutJsonSupport(dialectName);
+    }
+
+    private static Dialect createDialectWithoutJsonSupport(DialectName dialectName) {
         if (DialectName.H2 == dialectName) {
             return new H2(dialectName);
         }
@@ -26,6 +33,13 @@ class Dialects {
             return new MsSqlDialect(dialectName);
         }
         throw new JaversException(JaversExceptionCode.UNSUPPORTED_SQL_DIALECT, dialectName);
+    }
+
+    private static PostgresWithJsonSupportDialect createDialectWithJsonSupport(DialectName dialectName) {
+        if (DialectName.POSTGRES == dialectName) {
+            return new PostgresWithJsonSupportDialect(dialectName);
+        }
+        throw new JaversException(JaversExceptionCode.JSON_COLUMN_TYPE_NOT_SUPPORTED_FOR_DIALECT, dialectName);
     }
 
     static class H2 extends Dialect {
@@ -81,6 +95,22 @@ class Dialects {
         @Override
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
             return (SequenceDefinition) seqName -> "nextval('" + seqName + "')";
+        }
+    }
+
+    static class PostgresWithJsonSupportDialect extends Dialect implements JsonColumnSupportDialect {
+        PostgresWithJsonSupportDialect(DialectName dialectName) {
+            super(dialectName);
+        }
+
+        @Override
+        KeyGeneratorDefinition getKeyGeneratorDefinition() {
+            return (SequenceDefinition) seqName -> "nextval('" + seqName + "')";
+        }
+
+        @Override
+        public JsonCastingExpression jsonCastingExpression() {
+            return param -> param + "::jsonb";
         }
     }
 
