@@ -237,6 +237,7 @@ class JaversRepositoryE2ETest extends Specification {
     def "should query for #what snapshot by GlobalId with limit"() {
         given:
         objects.each {
+            println("Committing object: $it")
             javers.commit("author",it)
         }
 

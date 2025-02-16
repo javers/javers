@@ -1,0 +1,16 @@
+javers:
+  redis:
+    jedis:
+      password: secret
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: secret
+      jedis:
+        pool:
+          enabled: true
+  main:
+    banner-mode: off

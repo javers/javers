@@ -1,0 +1,3 @@
+javers:
+  auditableAspectEnabled: false
+  springDataAuditableRepositoryAspectEnabled: false
