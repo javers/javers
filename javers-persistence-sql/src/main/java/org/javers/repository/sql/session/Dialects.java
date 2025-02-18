@@ -9,14 +9,7 @@ import static org.javers.repository.sql.session.Parameter.longParam;
 
 class Dialects {
 
-    static Dialect fromName(DialectName dialectName, boolean jsonTypeSupportEnabled) {
-        if (jsonTypeSupportEnabled) {
-            return createDialectWithJsonSupport(dialectName);
-        }
-        return createDialectWithoutJsonSupport(dialectName);
-    }
-
-    private static Dialect createDialectWithoutJsonSupport(DialectName dialectName) {
+    static Dialect fromName(DialectName dialectName) {
         if (DialectName.H2 == dialectName) {
             return new H2(dialectName);
         }
@@ -35,14 +28,7 @@ class Dialects {
         throw new JaversException(JaversExceptionCode.UNSUPPORTED_SQL_DIALECT, dialectName);
     }
 
-    private static PostgresWithJsonSupportDialect createDialectWithJsonSupport(DialectName dialectName) {
-        if (DialectName.POSTGRES == dialectName) {
-            return new PostgresWithJsonSupportDialect(dialectName);
-        }
-        throw new JaversException(JaversExceptionCode.JSON_COLUMN_TYPE_NOT_SUPPORTED_FOR_DIALECT, dialectName);
-    }
-
-    static class H2 extends Dialect {
+    static class H2 extends Dialect implements JsonColumnSupportDialect {
         H2(DialectName dialectName) {
             super(dialectName);
         }
@@ -51,9 +37,14 @@ class Dialects {
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
             return (SequenceDefinition) seqName ->  "NEXT VALUE FOR " + seqName;
         }
+
+        @Override
+        public JsonCastingExpression jsonCastingExpression() {
+            return param -> "JSON " + param;
+        }
     }
 
-    static class MysqlDialect extends Dialect {
+    static class MysqlDialect extends Dialect implements JsonColumnSupportDialect {
         MysqlDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -61,6 +52,11 @@ class Dialects {
         @Override
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
             return (KeyGeneratorDefinition.AutoincrementDefinition) () -> "select last_insert_id()";
+        }
+
+        @Override
+        public JsonCastingExpression jsonCastingExpression() {
+            return param -> param;
         }
     }
 
@@ -87,19 +83,8 @@ class Dialects {
         }
     }
 
-    static class PostgresDialect extends Dialect {
+    static class PostgresDialect extends Dialect implements JsonColumnSupportDialect {
         PostgresDialect(DialectName dialectName) {
-            super(dialectName);
-        }
-
-        @Override
-        KeyGeneratorDefinition getKeyGeneratorDefinition() {
-            return (SequenceDefinition) seqName -> "nextval('" + seqName + "')";
-        }
-    }
-
-    static class PostgresWithJsonSupportDialect extends Dialect implements JsonColumnSupportDialect {
-        PostgresWithJsonSupportDialect(DialectName dialectName) {
             super(dialectName);
         }
 
@@ -114,7 +99,7 @@ class Dialects {
         }
     }
 
-    static class OracleDialect extends Dialect {
+    static class OracleDialect extends Dialect implements JsonColumnSupportDialect {
         OracleDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -149,6 +134,11 @@ class Dialects {
                         "select b.* from (SELECT a.*, rownum r__ FROM (",
                         ") a WHERE rownum <= ? ) b where b.r__ >= ?", longParam(highRownum), longParam(lowRownum));
             }
+        }
+
+        @Override
+        public JsonCastingExpression jsonCastingExpression() {
+            return param -> "json(" + param + ")";
         }
     }
 }

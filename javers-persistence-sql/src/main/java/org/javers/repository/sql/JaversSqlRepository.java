@@ -184,7 +184,7 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void ensureSchema() {
-        if (sqlRepositoryConfiguration.isJsonTypeSupportEnabled() && sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
+        if (sqlRepositoryConfiguration.isUsingNativeJSONType() && sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
             throw new JaversException(JaversExceptionCode.SCHEMA_CREATION_NOT_SUPPORTED_WITH_JSON_COLUMN_SUPPORT_ENABLED);
         }
         if(sqlRepositoryConfiguration.isSchemaManagementEnabled()) {

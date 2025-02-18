@@ -134,8 +134,6 @@ public enum JaversExceptionCode {
 
     TRANSACTION_MANAGER_NOT_SET("Can't create javers bean due to missing configuration. Since javers-spring 2.8.0, transactionManager bean should be explicitly provided in TransactionalJaversBuilder.withTxManager(). See example at http://javers.org/documentation/spring-integration/#spring-jpa-example"),
 
-    JSON_COLUMN_TYPE_NOT_SUPPORTED_FOR_DIALECT("Json column type is not supported for dialect '%s'"),
-
     SCHEMA_CREATION_NOT_SUPPORTED_WITH_JSON_COLUMN_SUPPORT_ENABLED("Json column type is not supported with json column support enabled")
     ;
 
