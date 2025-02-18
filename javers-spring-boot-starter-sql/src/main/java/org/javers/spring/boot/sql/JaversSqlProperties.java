@@ -9,6 +9,7 @@ public class JaversSqlProperties extends JaversSpringProperties {
     private static final String DEFAULT_OBJECT_ACCESS_HOOK = HibernateUnproxyObjectAccessHook.class.getName();
 
     private boolean sqlSchemaManagementEnabled = true;
+    private boolean sqlJsonTypeSupportEnabled = false;
     private boolean sqlGlobalIdCacheDisabled = false;
     private String sqlSchema;
     private String sqlGlobalIdTableName;
@@ -74,5 +75,13 @@ public class JaversSqlProperties extends JaversSpringProperties {
 
     public void setSqlCommitPropertyTableName(String sqlCommitPropertyTableName) {
         this.sqlCommitPropertyTableName = sqlCommitPropertyTableName;
+    }
+
+    public boolean isSqlJsonTypeSupportEnabled() {
+        return sqlJsonTypeSupportEnabled;
+    }
+
+    public void setSqlJsonTypeSupportEnabled(boolean sqlJsonTypeSupportEnabled) {
+        this.sqlJsonTypeSupportEnabled = sqlJsonTypeSupportEnabled;
     }
 }

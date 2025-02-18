@@ -132,7 +132,9 @@ public enum JaversExceptionCode {
 
     RUNTIME_EXCEPTION("uncategorized runtime exception. %s"),
 
-    TRANSACTION_MANAGER_NOT_SET("Can't create javers bean due to missing configuration. Since javers-spring 2.8.0, transactionManager bean should be explicitly provided in TransactionalJaversBuilder.withTxManager(). See example at http://javers.org/documentation/spring-integration/#spring-jpa-example")
+    TRANSACTION_MANAGER_NOT_SET("Can't create javers bean due to missing configuration. Since javers-spring 2.8.0, transactionManager bean should be explicitly provided in TransactionalJaversBuilder.withTxManager(). See example at http://javers.org/documentation/spring-integration/#spring-jpa-example"),
+
+    SCHEMA_CREATION_NOT_SUPPORTED_WITH_JSON_COLUMN_SUPPORT_ENABLED("Json column type is not supported with json column support enabled")
     ;
 
     private final String message;

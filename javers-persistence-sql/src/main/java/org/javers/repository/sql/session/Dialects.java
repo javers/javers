@@ -28,7 +28,7 @@ class Dialects {
         throw new JaversException(JaversExceptionCode.UNSUPPORTED_SQL_DIALECT, dialectName);
     }
 
-    static class H2 extends Dialect {
+    static class H2 extends Dialect implements JsonColumnSupportDialect {
         H2(DialectName dialectName) {
             super(dialectName);
         }
@@ -37,9 +37,14 @@ class Dialects {
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
             return (SequenceDefinition) seqName ->  "NEXT VALUE FOR " + seqName;
         }
+
+        @Override
+        public JsonCastingExpression jsonCastingExpression() {
+            return param -> "JSON " + param;
+        }
     }
 
-    static class MysqlDialect extends Dialect {
+    static class MysqlDialect extends Dialect implements JsonColumnSupportDialect {
         MysqlDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -47,6 +52,11 @@ class Dialects {
         @Override
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
             return (KeyGeneratorDefinition.AutoincrementDefinition) () -> "select last_insert_id()";
+        }
+
+        @Override
+        public JsonCastingExpression jsonCastingExpression() {
+            return param -> param;
         }
     }
 
@@ -73,7 +83,7 @@ class Dialects {
         }
     }
 
-    static class PostgresDialect extends Dialect {
+    static class PostgresDialect extends Dialect implements JsonColumnSupportDialect {
         PostgresDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -82,9 +92,14 @@ class Dialects {
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
             return (SequenceDefinition) seqName -> "nextval('" + seqName + "')";
         }
+
+        @Override
+        public JsonCastingExpression jsonCastingExpression() {
+            return param -> param + "::jsonb";
+        }
     }
 
-    static class OracleDialect extends Dialect {
+    static class OracleDialect extends Dialect implements JsonColumnSupportDialect {
         OracleDialect(DialectName dialectName) {
             super(dialectName);
         }
@@ -119,6 +134,11 @@ class Dialects {
                         "select b.* from (SELECT a.*, rownum r__ FROM (",
                         ") a WHERE rownum <= ? ) b where b.r__ >= ?", longParam(highRownum), longParam(lowRownum));
             }
+        }
+
+        @Override
+        public JsonCastingExpression jsonCastingExpression() {
+            return param -> "json(" + param + ")";
         }
     }
 }

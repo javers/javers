@@ -1,5 +1,7 @@
 package org.javers.repository.sql;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -182,6 +184,9 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void ensureSchema() {
+        if (sqlRepositoryConfiguration.isUsingNativeJSONType() && sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
+            throw new JaversException(JaversExceptionCode.SCHEMA_CREATION_NOT_SUPPORTED_WITH_JSON_COLUMN_SUPPORT_ENABLED);
+        }
         if(sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
             schemaManager.ensureSchema();
         }
