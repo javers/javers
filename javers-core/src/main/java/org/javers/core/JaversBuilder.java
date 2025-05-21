@@ -694,7 +694,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return this;
     }
 
-    JaversBuilder withCustomCommitIdGenerator(Supplier<CommitId> commitIdGenerator) {
+    public JaversBuilder withCustomCommitIdGenerator(Supplier<CommitId> commitIdGenerator) {
         configurationBuilder().withCustomCommitIdGenerator(commitIdGenerator);
         return this;
     }
