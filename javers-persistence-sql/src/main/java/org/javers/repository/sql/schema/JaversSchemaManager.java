@@ -39,11 +39,11 @@ public class JaversSchemaManager extends SchemaNameAware {
         this.connectionProvider = connectionProvider;
     }
 
-    public void ensureSchema() {
+    public void ensureSchema(boolean useNativeJsonSupport) {
         this.schemaInspector = polyJDBC.schemaInspector();
         this.schemaManager = polyJDBC.schemaManager();
 
-        schemaFactory.allTablesSchema(dialect).forEach(p -> ensureTable(p.left(), p.right()));
+        schemaFactory.allTablesSchema(dialect, useNativeJsonSupport).forEach(p -> ensureTable(p.left(), p.right()));
 
         alterCommitIdColumnIfNeeded(); // JaVers 2.5 to 2.6 schema migration
 

@@ -23,12 +23,14 @@ public class Session implements AutoCloseable {
     private final ConnectionProvider connectionProvider;
     private final String sessionName;
     private final KeyGenerator keyGenerator;
+    private final boolean useNativeJSONType;
 
-    Session(Dialect dialect, KeyGenerator keyGenerator, ConnectionProvider connectionProvider, String sessionName) {
+    Session(Dialect dialect, KeyGenerator keyGenerator, ConnectionProvider connectionProvider, String sessionName, boolean useNativeJSONType) {
         this.dialect = dialect;
         this.connectionProvider = connectionProvider;
         this.sessionName = sessionName;
         this.keyGenerator = keyGenerator;
+        this.useNativeJSONType = useNativeJSONType;
     }
 
     public SelectBuilder select(String selectClauseSQL) {
@@ -148,5 +150,9 @@ public class Session implements AutoCloseable {
 
     public DialectName getDialectName() {
         return dialect.getName();
+    }
+
+    public boolean isUsingNativeJSONType() {
+        return useNativeJSONType;
     }
 }

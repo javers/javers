@@ -51,22 +51,23 @@ public class FixedSchemaFactory extends SchemaNameAware {
         this.dialect = dialect;
     }
 
-    List<Pair<String, Schema>> allTablesSchema(Dialect dialect) {
+    List<Pair<String, Schema>> allTablesSchema(Dialect dialect, boolean useNativeJsonSupport) {
         List<Pair<String, Schema>> schemas = new ArrayList<>();
 
         schemas.add(new Pair(getGlobalIdTableName().localName(), globalIdTableSchema(dialect)));
         schemas.add(new Pair(getCommitTableName().localName(),    commitTableSchema(dialect)));
         schemas.add(new Pair(getCommitPropertyTableName().localName(), commitPropertiesTableSchema(dialect)));
-        schemas.add(new Pair(getSnapshotTableName().localName(),  snapshotTableSchema(dialect)));
+        schemas.add(new Pair(getSnapshotTableName().localName(),  snapshotTableSchema(dialect, useNativeJsonSupport)));
 
         return schemas;
     }
 
-    private Schema snapshotTableSchema(Dialect dialect){
+    private Schema snapshotTableSchema(Dialect dialect, boolean useNativeJsonSupport){
         DBObjectName tableName = getSnapshotTableName();
         Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
         primaryKey(SNAPSHOT_PK, schema, relationBuilder, getSnapshotTablePkSeqName().localName());
+        // TODO use useNativeJsonSupport flag when polyjdbc will support it
         relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
                        .withAttribute().longAttr(SNAPSHOT_VERSION).and()
                        .withAttribute().text(SNAPSHOT_STATE).and()

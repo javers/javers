@@ -17,6 +17,10 @@ abstract class Dialect {
         return getKeyGeneratorDefinition() instanceof KeyGeneratorDefinition.SequenceDefinition;
     }
 
+    boolean supportsJsonCasting() {
+        return this instanceof JsonColumnSupportDialect;
+    }
+
     abstract <T extends KeyGeneratorDefinition> T getKeyGeneratorDefinition();
 
     DialectName getName() {

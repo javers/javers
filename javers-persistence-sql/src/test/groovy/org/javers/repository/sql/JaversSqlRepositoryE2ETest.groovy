@@ -39,6 +39,10 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
         connection.get()
     }
 
+    protected boolean isUsingNativeJsonSupport() {
+        false
+    }
+
     Connection createAndInitConnection() {
         def connection = createConnection()
         connection.setAutoCommit(false)
@@ -75,6 +79,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
                 .withCommitTableName(commitTableName)
                 .withSnapshotTableName(snapshotTableName)
                 .withCommitPropertyTableName(commitPropertyTableName)
+                .withJsonTypeSupportEnabled(isUsingNativeJsonSupport())
                 .build()
         this.schemaManager = repository.schemaManager
         repository
