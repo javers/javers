@@ -19,6 +19,11 @@ plugins {
     id 'com.adarshr.test-logger' version '3.2.0'
 }
 
+// JitPack compatibility: Use Git tag for version if building on JitPack
+if (project.hasProperty("jitpack")) {
+    project.version = System.getenv("JITPACK_GIT_TAG") ?: "1.0.0"
+}
+
 scmVersion {
     tag {
         prefix = 'javers'
@@ -34,7 +39,7 @@ subprojects {
     apply plugin: 'com.adarshr.test-logger'
 
     project.group = 'org.javers'
-    project.version = scmVersion.version
+    project.version = project.hasProperty("jitpack") ? rootProject.version : scmVersion.version
 
     repositories {
         mavenCentral()
@@ -127,6 +132,7 @@ subprojects {
     }
 
     signing {
+        required { gradle.taskGraph.hasTask("publish") && !project.hasProperty("jitpack") }
         sign publishing.publications
     }
     //-- eof maven-publish.publish spell --
@@ -141,19 +147,21 @@ subprojects {
     }
 }
 
-nexusPublishing {
-    packageGroup = 'org.javers'
+if (!project.hasProperty("jitpack")) {
+    nexusPublishing {
+        packageGroup = 'org.javers'
 
-    repositories {
-        sonatype {
-            username = project.findProperty('nexusUsername') ?: 'secured'
-            password = project.findProperty('nexusPassword') ?: 'secured'
+        repositories {
+            sonatype {
+                username = project.findProperty('nexusUsername') ?: 'secured'
+                password = project.findProperty('nexusPassword') ?: 'secured'
+            }
         }
-    }
-    // noinspection GroovyAssignabilityCheck
-    transitionCheckOptions {
-        maxRetries.set(50)
-        delayBetween.set(Duration.ofSeconds(5))
+        // noinspection GroovyAssignabilityCheck
+        transitionCheckOptions {
+            maxRetries.set(50)
+            delayBetween.set(Duration.ofSeconds(5))
+        }
     }
 }
 
