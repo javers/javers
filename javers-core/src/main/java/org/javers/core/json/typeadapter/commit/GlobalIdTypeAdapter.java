@@ -41,9 +41,10 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
             return parseInstanceId(jsonObject, context);
         } else if (jsonObject.get(OWNER_ID_FIELD) != null) {
             return parseValueObjectId(jsonObject, context);
-        } else {
+        } else if (jsonObject.get(VALUE_OBJECT_FIELD) != null) {
             return parseUnboundedValueObject(jsonObject);
         }
+        return null;
     }
 
     private UnboundedValueObjectId parseUnboundedValueObject(JsonObject jsonObject){
