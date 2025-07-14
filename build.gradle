@@ -21,7 +21,7 @@ plugins {
 
 // JitPack compatibility: Use Git tag for version if building on JitPack
 if (project.hasProperty("jitpack")) {
-    project.version = System.getenv("JITPACK_GIT_TAG") ?: "1.0.0"
+    project.version = System.getenv("JITPACK_GIT_TAG") ?: "7.8.2"
 }
 
 scmVersion {
