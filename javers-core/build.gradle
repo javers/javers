@@ -33,6 +33,13 @@ task testJar(type: Jar) {
     from sourceSets.test.output
 }
 
+task fatJar(type: Jar) {
+    archiveClassifier = 'all'
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 configurations {
     testArtifacts
 }
