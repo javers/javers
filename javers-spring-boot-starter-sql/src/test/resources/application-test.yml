@@ -23,4 +23,7 @@ javers:
   sqlCommitTableName: 'cust_jv_commit'
   sqlSnapshotTableName: 'cust_jv_snapshot'
   sqlCommitPropertyTableName: 'cust_jv_commit_property'
+  sqlGlobalIdSequenceName: 'cust_jv_global_id_pk_seq'
+  sqlCommitSequenceName: 'cust_jv_commit_pk_seq'
+  sqlSnapshotSequenceName: 'cust_jv_snapshot_pk_seq'
   usePrimitiveDefaults: false

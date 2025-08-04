@@ -57,6 +57,9 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javersProperties.sqlCommitTableName == null
         javersProperties.sqlSnapshotTableName == null
         javersProperties.sqlCommitPropertyTableName == null
+        javersProperties.sqlGlobalIdSequenceName == null
+        javersProperties.sqlCommitSequenceName == null
+        javersProperties.sqlSnapshotSequenceName == null
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath"() {
