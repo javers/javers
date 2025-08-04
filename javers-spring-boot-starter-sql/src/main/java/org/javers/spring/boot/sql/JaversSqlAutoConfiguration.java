@@ -84,6 +84,9 @@ public class JaversSqlAutoConfiguration {
                 .withCommitTableName(javersSqlProperties.getSqlCommitTableName())
                 .withSnapshotTableName(javersSqlProperties.getSqlSnapshotTableName())
                 .withCommitPropertyTableName(javersSqlProperties.getSqlCommitPropertyTableName())
+                .withGlobalIdSequenceName(javersSqlProperties.getSqlGlobalIdSequenceName())
+                .withCommitSequenceName(javersSqlProperties.getSqlCommitSequenceName())
+                .withSnapshotSequenceName(javersSqlProperties.getSqlSnapshotSequenceName())
                 .build();
     }
 
