@@ -15,6 +15,10 @@ public class JaversSqlProperties extends JaversSpringProperties {
     private String sqlCommitTableName;
     private String sqlSnapshotTableName;
     private String sqlCommitPropertyTableName;
+    private String sqlGlobalIdSequenceName;
+    private String sqlCommitSequenceName;
+    private String sqlSnapshotSequenceName;
+
 
     public boolean isSqlSchemaManagementEnabled() {
         return sqlSchemaManagementEnabled;
@@ -74,5 +78,29 @@ public class JaversSqlProperties extends JaversSpringProperties {
 
     public void setSqlCommitPropertyTableName(String sqlCommitPropertyTableName) {
         this.sqlCommitPropertyTableName = sqlCommitPropertyTableName;
+    }
+
+    public String getSqlGlobalIdSequenceName() {
+        return sqlGlobalIdSequenceName;
+    }
+
+    public void setSqlGlobalIdSequenceName(String sqlGlobalIdSequenceName) {
+        this.sqlGlobalIdSequenceName = sqlGlobalIdSequenceName;
+    }
+
+    public String getSqlCommitSequenceName() {
+        return sqlCommitSequenceName;
+    }
+
+    public void setSqlCommitSequenceName(String sqlCommitSequenceName) {
+        this.sqlCommitSequenceName = sqlCommitSequenceName;
+    }
+
+    public String getSqlSnapshotSequenceName() {
+        return sqlSnapshotSequenceName;
+    }
+
+    public void setSqlSnapshotSequenceName(String sqlSnapshotSequenceName) {
+        this.sqlSnapshotSequenceName = sqlSnapshotSequenceName;
     }
 }
