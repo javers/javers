@@ -33,7 +33,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     @Override
     public GlobalId fromJson(JsonElement json, JsonDeserializationContext context) {
         if (!(json instanceof JsonObject)) {
-            return null; //when user's class is refactored, a property can have changed type
+            return null; //when user's class is refactored, a property can have a changed type
         }
         JsonObject jsonObject = (JsonObject) json;
 
@@ -41,9 +41,10 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
             return parseInstanceId(jsonObject, context);
         } else if (jsonObject.get(OWNER_ID_FIELD) != null) {
             return parseValueObjectId(jsonObject, context);
-        } else {
+        } else if (jsonObject.get(VALUE_OBJECT_FIELD) != null) {
             return parseUnboundedValueObject(jsonObject);
         }
+        return null;
     }
 
     private UnboundedValueObjectId parseUnboundedValueObject(JsonObject jsonObject){
