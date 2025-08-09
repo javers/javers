@@ -33,7 +33,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     @Override
     public GlobalId fromJson(JsonElement json, JsonDeserializationContext context) {
         if (!(json instanceof JsonObject)) {
-            return null; //when user's class is refactored, a property can have changed type
+            return null; //when user's class is refactored, a property can have a changed type
         }
         JsonObject jsonObject = (JsonObject) json;
 
