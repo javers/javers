@@ -1,8 +1,16 @@
-package org.javers.repository.sql
+package org.javers.repository.sql.cases
 
 import groovy.sql.Sql
+import org.javers.core.Javers
+import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.ValueObject
+import org.javers.repository.sql.H2RepositoryBuilder
+import org.javers.repository.sql.JaversSqlRepository
+import spock.lang.Specification
+
+import java.sql.Connection
+import java.sql.DriverManager
 
 /**
  * E2E test to reproduce NPE that occurs when JaVers tries to commit changes
@@ -16,7 +24,7 @@ import org.javers.core.metamodel.annotation.ValueObject
  * 5. Deserialization fails with NPE in GlobalIdTypeAdapter.parseUnboundedValueObject()
  *    because old JSON doesn't have expected "valueObject" field
  */
-class RefactoredClassE2ETest extends H2SqlRepositoryE2ETest {
+class RefactoredClassE2ETest extends Specification {
 
     static class EntityBeforeRefactoring {
         @Id
@@ -38,9 +46,15 @@ class RefactoredClassE2ETest extends H2SqlRepositoryE2ETest {
 
     def "should be able to handle commits for refactored class when new type was introduced"() {
         given:
+
+        JaversSqlRepository sqlRepository = new H2RepositoryBuilder().build()
+        Javers javers = JaversBuilder.javers()
+                .registerJaversRepository(sqlRepository)
+                .build()
+
         def entityBeforeRefactoring = new EntityBeforeRefactoring(id: 1, totals: [revenue: 1000, cost: 500])
         javers.commit("user", entityBeforeRefactoring)
-        def sql = new Sql(connection);
+        def sql = new Sql(DriverManager.getConnection("jdbc:h2:mem:test"));
         // Simulate the old snapshot in the database after refactoring has been made
         sql.executeUpdate("""
             UPDATE jv_snapshot 
