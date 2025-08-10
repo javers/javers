@@ -4,4 +4,5 @@ plugins {
 
 rootProject.name = 'javers'
 
-include 'javers-core', 'javers-persistence-sql', 'javers-persistence-mongo', 'javers-persistence-redis', 'javers-spring', 'javers-spring-jpa', 'javers-spring-mongo', 'javers-spring-boot-starter-mongo', 'javers-spring-boot-starter-sql', 'javers-spring-boot-starter-redis'
+//include 'javers-core', 'javers-persistence-sql', 'javers-persistence-mongo', 'javers-persistence-redis', 'javers-spring', 'javers-spring-jpa', 'javers-spring-mongo', 'javers-spring-boot-starter-mongo', 'javers-spring-boot-starter-sql', 'javers-spring-boot-starter-redis'
+include 'javers-core', 'javers-persistence-sql', 'javers-persistence-mongo', 'javers-spring', 'javers-spring-jpa', 'javers-spring-mongo', 'javers-spring-boot-starter-mongo', 'javers-spring-boot-starter-sql'
