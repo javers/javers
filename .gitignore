@@ -1,3 +1,4 @@
+localDeploy.sh
 # IDE
 .idea
 *.iml
