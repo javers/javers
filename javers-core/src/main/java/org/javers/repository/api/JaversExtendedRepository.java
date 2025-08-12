@@ -99,7 +99,7 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     /**
-     * last snapshot with commitId <= given timePoint
+     * last snapshot with commitId &lt;= given timePoint
      */
     public List<CdoSnapshot> getHistoricals(GlobalId globalId, CommitId timePoint, boolean withChildValueObjects, int limit) {
         argumentsAreNotNull(globalId, timePoint);
@@ -111,7 +111,7 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     /**
-     * last snapshot with commitId <= given date
+     * last snapshot with commitId &lt;= given date
      */
     public Optional<CdoSnapshot> getHistorical(GlobalId globalId, LocalDateTime timePoint) {
         argumentsAreNotNull(globalId, timePoint);

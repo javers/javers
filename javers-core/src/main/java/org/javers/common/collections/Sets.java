@@ -117,7 +117,7 @@ public class Sets {
     }
 
     /**
-     * @return index -> value
+     * @return index -&gt; value
      */
     public static <T> Map<Integer, T> asMap(Set<T> input) {
         if (input == null){

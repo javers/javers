@@ -201,7 +201,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * a given Value Object type as Entity but still you want this type to be identifiable inside Sets.
      *
      * @see ValueObjectType
-     * @see Case1301ObjectHasherSpec
      */
     public JaversBuilder registerObjectHasher(Class<? extends ObjectHasher> objectHasherType) {
     	objectHasherImplementation = objectHasherType;
@@ -254,7 +253,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     /**
      * Registers an {@link EntityType}. <br/>
      * Use this method if you are not willing to use {@link Entity} annotation.
-     * <br/></br/>
+     * <br/><br/>
      *
      * Recommended way to create {@link EntityDefinition} is {@link EntityDefinitionBuilder},
      * for example:
@@ -305,7 +304,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     /**
      * Registers a {@link ValueObjectType}. <br/>
      * Use this method if you are not willing to use {@link ValueObject} annotations.
-     * <br/></br/>
+     * <br/><br/>
      *
      * Recommended way to create {@link ValueObjectDefinition} is {@link ValueObjectDefinitionBuilder}.
      * For example:
@@ -464,8 +463,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * <pre>
      * Javers javers = JaversBuilder.javers()
-     *     .registerValue(BigDecimal.class, (a, b) -> a.compareTo(b) == 0,
-     *                                           a -> a.stripTrailingZeros().toString())
+     *     .registerValue(BigDecimal.class, (a, b) -&gt; a.compareTo(b) == 0,
+     *                                           a -&gt; a.stripTrailingZeros().toString())
      *     .build();
      * </pre>
      *
@@ -555,7 +554,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * <pre>
      * Javers javers = JaversBuilder.javers()
-     *         .registerIgnoredClassesStrategy(c -> c.getName().startsWith("com.ignore.me"))
+     *         .registerIgnoredClassesStrategy(c -&gt; c.getName().startsWith("com.ignore.me"))
      *         .build();
      * </pre>
      *

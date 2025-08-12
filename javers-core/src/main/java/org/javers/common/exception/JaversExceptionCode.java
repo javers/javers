@@ -3,7 +3,7 @@ package org.javers.common.exception;
 /**
  * Enums with all Javers errors codes
  *
- * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
+ * @author Pawel Cierpiatka &lt;pawel.cierpiatka@gmail.com&gt;
  */
 public enum JaversExceptionCode {
     ATTEMPT_TO_OVERWRITE_EXISTING_CLIENT_CLASS_DEFINITION(

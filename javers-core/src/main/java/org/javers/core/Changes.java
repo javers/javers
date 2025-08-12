@@ -59,11 +59,11 @@ public class Changes extends AbstractList<Change> implements Serializable {
      *<br/><br/>
      *
      * <pre>
-     * changes.groupByCommit().forEach(byCommit -> {
+     * changes.groupByCommit().forEach(byCommit -&gt; {
      *   System.out.println("commit " + byCommit.getCommit().getId());
-     *   byCommit.groupByObject().forEach(byObject -> {
+     *   byCommit.groupByObject().forEach(byObject -&gt; {
      *     System.out.println("  changes on " + byObject.getGlobalId().value() + ":");
-     *     byObject.get().forEach(change -> System.out.println("  - " + change));
+     *     byObject.get().forEach(change -&gt; System.out.println("  - " + change));
      *   });
      * });
      * </pre>
@@ -161,14 +161,14 @@ public class Changes extends AbstractList<Change> implements Serializable {
      * * changes on Employee/Frodo :
      *   - 'lastPromotionDate' = '14.37.2021 12:37'
      *   - 'performance' map changes :
-     *      · entry ['1' : 'bb'] -> ['1' : 'aa']
+     *      · entry ['1' : 'bb'] -&gt; ['1' : 'aa']
      *      · entry ['2' : 'bb'] added
      *      · entry ['3' : 'aa'] removed
      *   - 'position' = 'Hero'
      *   - 'postalAddress.city' = 'Shire'
-     *   - 'primaryAddress.city' changed: 'Shire' -> 'Mordor'
+     *   - 'primaryAddress.city' changed: 'Shire' -&gt; 'Mordor'
      *   - 'primaryAddress.street' = 'Some Street'
-     *   - 'salary' changed: '10000' -> '12000'
+     *   - 'salary' changed: '10000' -&gt; '12000'
      *   - 'skills' collection changes :
      *      · 'agile coaching' added
      *   - 'subordinates' collection changes :

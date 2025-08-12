@@ -18,7 +18,7 @@ import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapsh
 import static org.javers.core.metamodel.object.SnapshotType.*;
 
 /**
- * Historical state of a domain object captured as the property->value Map.
+ * Historical state of a domain object captured as the property-&gt;value Map.
  * Values and primitives are stored 'by value'.
  * Referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalId}
  *
