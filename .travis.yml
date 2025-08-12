@@ -14,6 +14,7 @@ before_script:
 - mysql -e "GRANT ALL PRIVILEGES ON travis_ci_test.* TO 'javers'@'localhost' WITH GRANT OPTION;" -u root
 install: skip
 script:
+- ./gradlew javadoc --stacktrace --info
 - ./gradlew build
 - ./gradlew integrationTest
 deploy:
