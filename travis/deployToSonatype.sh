@@ -1,5 +1,9 @@
-echo "decrypting secring.gpg..."
-openssl aes-256-cbc -K $encrypted_750aaef1260c_key -iv $encrypted_750aaef1260c_iv -in $TRAVIS_BUILD_DIR/travis/secring.gpg.enc -out $TRAVIS_BUILD_DIR/travis/secring.gpg -d
+# commands to decode keys from base64 on CI:
+export JRELEASER_GPG_SECRET_KEY="$(echo "$JRELEASER_GPG_SECRET_KEY_B64" | base64 --decode)"
+export JRELEASER_GPG_PUBLIC_KEY="$(echo "$JRELEASER_GPG_PUBLIC_KEY_B64" | base64 --decode)"
 
 echo "publish..."
-./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -PnexusUsername=$sonatypeTokenUser -PnexusPassword=$sonatypeTokenPassword -Psigning.keyId=$signingKeyId -Psigning.password=$signingPassword -Psigning.secretKeyRingFile=$TRAVIS_BUILD_DIR/travis/secring.gpg
+./gradlew publish
+
+echo "jreleaserDeploy..."
+./gradlew jreleaserDeploy
