@@ -24,4 +24,7 @@ deploy:
   on:
     tags: true
     branch: master
-
+after_failure:
+  - echo "---- javadoc.options ----"
+  - cat build/tmp/javadoc/javadoc.options || true
+  - echo "-------------------------"
