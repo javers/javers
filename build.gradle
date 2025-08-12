@@ -61,6 +61,10 @@ subprojects {
         options.noTimestamp()
     }
 
+    tasks.withType(Javadoc).configureEach {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
     tasks.withType(JavaCompile).configureEach {
         options.compilerArgs << '-parameters'
     }
@@ -72,15 +76,6 @@ subprojects {
                 showStandardStreams = true
             }
             tasks.test.execute()
-        }
-    }
-
-    //disable javadoc doclint for Java8
-    if (JavaVersion.current().isJava8Compatible()) {
-        allprojects {
-            tasks.withType(Javadoc) {
-                options.addStringOption('Xdoclint:none', '-quiet')
-            }
         }
     }
 
@@ -215,3 +210,4 @@ jreleaser {
 wrapper() {
     gradleVersion = '8.7'
 }
+

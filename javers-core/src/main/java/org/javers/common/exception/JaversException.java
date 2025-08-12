@@ -3,7 +3,7 @@ package org.javers.common.exception;
 import static org.javers.common.exception.JaversExceptionCode.RUNTIME_EXCEPTION;
 
 /**
- *  @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
+ *  @author Pawel Cierpiatka &lt;pawel.cierpiatka@gmail.com&gt;
  */
 @SuppressWarnings("serial")
 public class JaversException extends RuntimeException {

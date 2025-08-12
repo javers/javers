@@ -13,7 +13,6 @@ before_script:
 - mysql -e "CREATE USER 'javers'@'localhost' IDENTIFIED BY 'javers';" -u root
 - mysql -e "GRANT ALL PRIVILEGES ON travis_ci_test.* TO 'javers'@'localhost' WITH GRANT OPTION;" -u root
 script:
-- ./gradlew javadoc --stacktrace --info
 - ./gradlew build
 - ./gradlew integrationTest
 deploy:
@@ -23,7 +22,4 @@ deploy:
   on:
     tags: true
     branch: master
-after_failure:
-  - echo "---- javadoc.options ----"
-  - cat build/tmp/javadoc/javadoc.options || true
-  - echo "-------------------------"
+

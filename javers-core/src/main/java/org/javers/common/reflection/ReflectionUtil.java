@@ -204,7 +204,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * for example: Map<String, String> -> Map
+     * for example: Map&lt;String, String&gt; -&gt; Map
      */
     public static Class extractClass(Type javaType) {
         if (javaType instanceof ParameterizedType

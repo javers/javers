@@ -18,13 +18,13 @@ import java.time.format.DateTimeFormatter;
  * <pre>
  * commit 3.0, author:another author, 2014-12-06 13:22:51
  *   changed object: org.javers.core.model.DummyUser/bob
- *     value changed on 'sex' property: 'null' -> 'FEMALE'
+ *     value changed on 'sex' property: 'null' -&gt; 'FEMALE'
  *     set changed on 'stringSet' property: [removed:'groovy', added:'java', added:'scala']
  *     list changed on 'integerList' property: [(0).added:'22', (1).added:'23']
  * commit 2.0, author:some author, 2014-12-06 13:22:51
- *     value changed on 'age' property: '0' -> '18'
- *     value changed on 'surname' property: 'Dijk' -> 'van Dijk'
- *     reference changed on 'supervisor' property: 'null' -> 'org.javers.core.model.DummyUser/New Supervisor'
+ *     value changed on 'age' property: '0' -&gt; '18'
+ *     value changed on 'surname' property: 'Dijk' -&gt; 'van Dijk'
+ *     reference changed on 'supervisor' property: 'null' -&gt; 'org.javers.core.model.DummyUser/New Supervisor'
  * </pre>
  *
  * @author bartosz walacik
