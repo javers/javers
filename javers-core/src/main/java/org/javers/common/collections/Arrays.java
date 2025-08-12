@@ -18,7 +18,7 @@ public class Arrays {
     public static Class OBJECT_ARRAY_TYPE = new Object[]{}.getClass();
 
     /**
-     * @return index -> value
+     * @return index -&gt; value
      */
     public static <T> Map<Integer, T> asMap(Object array) {
         Map<Integer, T> result = new HashMap<>();

@@ -6,7 +6,7 @@ import org.javers.core.diff.GraphPair;
 import java.util.Set;
 
 /**
- * Node scope change appender (NewObject & ObjectRemoved)
+ * Node scope change appender (NewObject &amp; ObjectRemoved)
  */
 public interface NodeChangeAppender {
 

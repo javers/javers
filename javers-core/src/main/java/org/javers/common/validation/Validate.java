@@ -2,7 +2,7 @@ package org.javers.common.validation;
 
 /**
  * Set of utils for methods preconditions.
- * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
+ * @author Pawel Cierpiatka &lt;pawel.cierpiatka@gmail.com&gt;
  */
 public class Validate {
 

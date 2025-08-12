@@ -519,7 +519,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Only snapshots with a version greater than or equal to (>=) a given version.
+     * Only snapshots with a version greater than or equal to (&gt;=) a given version.
      *
      * @see #withVersion(long)
      * @see #toVersion(long)
@@ -531,7 +531,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Only snapshots with a version less than or equal to (<=) a given version.
+     * Only snapshots with a version less than or equal to (&lt;=) a given version.
      *
      * @see #withVersion(long)
      * @see #fromVersion(long)
@@ -584,7 +584,7 @@ public class QueryBuilder {
 
     /**
      * Selects {@link ShadowScope#DEEP_PLUS}
-     * with <code></cpce>maxGapsToFill</code> defaulted to <b>10</b>.
+     * with <code>maxGapsToFill</code> defaulted to <b>10</b>.
      * <br/><br/>
      *
      * Read more about query scopes in {@link Javers#findShadows(JqlQuery)} javadoc.

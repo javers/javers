@@ -58,7 +58,7 @@ public interface JsonTypeAdapter<T> extends AbstractJsonTypeAdapter {
      * Each target  class should have a no-argument constructor (public or private).
      * <p/>
      *
-     * If adapter is designed to handle single class, should return a List with one element &mdash; a supported class.<br/
+     * If adapter is designed to handle single class, should return a List with one element &mdash; a supported class.<br/>
      * If adapter is polymorphic, should return all supported classes.
      */
     List<Class> getValueTypes();

@@ -109,7 +109,7 @@ public abstract class JaversType {
 
     /**
      * For generic types, returns a list of actual Class arguments.
-     * For example, for Set&lt;String&gt, returns String.
+     * For example, for Set&lt;String&gt;, returns String.
      * Non-concrete (like ?) or missing type arguments like are defaulted to Object.
      * <br/><br/>
      *

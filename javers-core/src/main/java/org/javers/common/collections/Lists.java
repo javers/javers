@@ -68,7 +68,7 @@ public class Lists {
     }
 
     /**
-     * @return index -> value
+     * @return index -&gt; value
      */
     public static <T> Map<Integer, T> asMap(List<T> input) {
         if (input == null) {

@@ -220,7 +220,7 @@ public interface Javers {
      * assert shadows.get(0).get() instanceof Person.class;
      * </pre>
      *
-     * <h2><b>Paging & limit</b></h2>
+     * <h2><b>Paging &amp; limit</b></h2>
      * Use {@link QueryBuilder#skip(int)} and {@link QueryBuilder#limit(int)} for paging Shadows.
      * <br/>
      * An underlying Snapshots query uses its own limit &mdash; {@link QueryBuilder#snapshotQueryLimit(Integer)}.<br/>
@@ -256,7 +256,7 @@ public interface Javers {
      * For example, let's say we have four Entities in the object graph, joined by references:
      * <br/><br/>
      * <pre>
-     * // E1 -> E2 -> E3 -> E4
+     * // E1 -&gt; E2 -&gt; E3 -&gt; E4
      * def e4 = new Entity(id:4)
      * def e3 = new Entity(id:3, ref:e4)
      * def e2 = new Entity(id:2, ref:e3)
@@ -339,7 +339,7 @@ public interface Javers {
      *  shadowE1.ref.ref.ref.id == 4
      *</pre>
      *
-     * <h2><b>Performance & Profiling</b></h2>
+     * <h2><b>Performance &amp; Profiling</b></h2>
      *
      * Each Shadow query executes one or more DB queries (Snapshot queries).<br/>
      * The number of executed DB queries depends on: selected {@link ShadowScope}, <br/>
@@ -467,7 +467,7 @@ public interface Javers {
 
     /**
      * Queries JaversRepository for object Snapshots. <br/>
-     * Snapshot is a historical state of a domain object captured as the property->value Map.
+     * Snapshot is a historical state of a domain object captured as the property-&gt;value Map.
      * <br/><br/>
      *
      * For example, to get latest Snapshots of "bob" Person, call:
