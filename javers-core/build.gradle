@@ -2,11 +2,9 @@ apply plugin: 'application'
 mainClassName = "org.javers.core.selftest.Application"
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
-
 dependencies {
     api "org.slf4j:slf4j-api:$slf4jApiVersion"
     api "com.google.code.gson:gson:$gsonVersion"
