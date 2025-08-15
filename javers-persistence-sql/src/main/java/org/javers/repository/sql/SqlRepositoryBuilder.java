@@ -33,6 +33,11 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private String snapshotTableName;
     private String commitPropertyTableName;
 
+    private String globalIdSequenceName;
+    private String commitSequenceName;
+    private String snapshotSequenceName;
+
+
     public SqlRepositoryBuilder() {
     }
 
@@ -111,6 +116,28 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+    public SqlRepositoryBuilder withGlobalIdSequenceName(String globalIdSequenceName) {
+        if(isNonEmpty(globalIdSequenceName)) {
+            this.globalIdSequenceName = globalIdSequenceName;
+        }
+        return this;
+    }
+
+    public SqlRepositoryBuilder withCommitSequenceName(String commitSequenceName) {
+        if(isNonEmpty(commitSequenceName)) {
+            this.commitSequenceName = commitSequenceName;
+        }
+        return this;
+    }
+
+    public SqlRepositoryBuilder withSnapshotSequenceName(String snapshotSequenceName) {
+        if(isNonEmpty(snapshotSequenceName)) {
+            this.snapshotSequenceName = snapshotSequenceName;
+        }
+        return this;
+    }
+
+
     public JaversSqlRepository build() {
         logger.info("starting SqlRepository...");
         logger.info("  dialect:                  {}", dialectName);
@@ -120,7 +147,8 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
         SqlRepositoryConfiguration config =
                 new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName, schemaManagementEnabled,
-                        globalIdTableName, commitTableName, snapshotTableName, commitPropertyTableName);
+                        globalIdTableName, commitTableName, snapshotTableName, commitPropertyTableName,
+                        globalIdSequenceName, commitSequenceName, snapshotSequenceName);
         addComponent(config);
 
         PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
