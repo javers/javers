@@ -60,6 +60,9 @@ class JaversSqlAutoConfigurationTest extends Specification {
         javersProperties.sqlCommitTableName == "cust_jv_commit"
         javersProperties.sqlSnapshotTableName == "cust_jv_snapshot"
         javersProperties.sqlCommitPropertyTableName == "cust_jv_commit_property"
+        javersProperties.sqlGlobalIdSequenceName == "cust_jv_global_id_pk_seq"
+        javersProperties.sqlCommitSequenceName == "cust_jv_commit_pk_seq"
+        javersProperties.sqlSnapshotSequenceName == "cust_jv_snapshot_pk_seq"
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {

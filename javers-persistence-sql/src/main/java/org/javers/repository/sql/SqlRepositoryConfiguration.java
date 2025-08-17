@@ -17,10 +17,15 @@ public class SqlRepositoryConfiguration {
     private final String snapshotTableName;
     private final String commitPropertyTableName;
 
+    private final String globalIdSequenceName;
+    private final String commitSequenceName;
+    private final String snapshotSequenceName;
+
     SqlRepositoryConfiguration(boolean globalIdCacheDisabled, String schemaName,
-                                      boolean schemaManagementEnabled, String globalIdTableName,
-                                      String commitTableName,
-                                      String snapshotTableName, String commitPropertyTableName) {
+                               boolean schemaManagementEnabled, String globalIdTableName,
+                               String commitTableName, String snapshotTableName, String commitPropertyTableName,
+                               String globalIdSequenceName, String commitSequenceName, String snapshotSequenceName
+                               ) {
         Validate.argumentCheck(schemaName == null || !schemaName.isEmpty(),"schemaName should be null or non-empty");
 
         this.globalIdCacheDisabled = globalIdCacheDisabled;
@@ -30,6 +35,9 @@ public class SqlRepositoryConfiguration {
         this.commitTableName = commitTableName;
         this.snapshotTableName = snapshotTableName;
         this.commitPropertyTableName = commitPropertyTableName;
+        this.globalIdSequenceName = globalIdSequenceName;
+        this.commitSequenceName = commitSequenceName;
+        this.snapshotSequenceName = snapshotSequenceName;
     }
 
     public boolean isGlobalIdCacheDisabled() {
@@ -66,4 +74,17 @@ public class SqlRepositoryConfiguration {
     public Optional<String> getCommitPropertyTableName() {
         return Optional.ofNullable(commitPropertyTableName);
     }
+
+    public Optional<String> getGlobalIdSequenceName() {
+        return Optional.ofNullable(globalIdSequenceName);
+    }
+
+    public Optional<String> getCommitSequenceName() {
+        return Optional.ofNullable(commitSequenceName);
+    }
+
+    public Optional<String> getSnapshotSequenceName() {
+        return Optional.ofNullable(snapshotSequenceName);
+    }
+
 }
