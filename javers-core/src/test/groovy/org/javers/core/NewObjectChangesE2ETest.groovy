@@ -6,6 +6,7 @@ import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.TerminalValueChange
 import org.javers.core.metamodel.annotation.Id
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
@@ -268,12 +269,19 @@ class NewObjectChangesE2ETest extends Specification {
         println diff.prettyPrint()
 
         then:
-        diff.changes.size() == 1
+        diff.changes.size() == 2
 
         with(diff.changes[0]) {
             assert it instanceof TerminalValueChange
             assert it.propertyName == "city"
             assert it.left == "Berlin"
+            assert it.right == null
+        }
+
+        with(diff.changes[1]) {
+            assert it instanceof TerminalValueChange
+            assert it.propertyName == "address"
+            assert it.left == new InstanceId("org.javers.core.NewObjectChangesE2ETest\$Employee", 1, "1")
             assert it.right == null
         }
     }
