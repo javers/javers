@@ -33,7 +33,7 @@ public class GraphPair {
         this.leftGraph = leftGraph;
         this.rightGraph = rightGraph;
 
-        Function<ObjectNode, Integer> hasher = objectNode -> objectNode.cdoHashCode();
+        Function<ObjectNode, String> hasher = objectNode -> objectNode.getGlobalId().value();
 
         this.onlyOnLeft = difference(leftGraph.nodes(), rightGraph.nodes(), hasher);
         this.onlyOnRight = difference(rightGraph.nodes(), leftGraph.nodes(), hasher);
