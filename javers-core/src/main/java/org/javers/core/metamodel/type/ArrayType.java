@@ -118,6 +118,6 @@ public class ArrayType extends ContainerType {
 
     @Override
     public Class<?> getEnumerableInterface() {
-        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED, "Array types do not have an interface");
     }
 }

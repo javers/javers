@@ -132,7 +132,7 @@ public abstract class JaversType {
                 .addField("typeName", getName());
     }
 
-    private static List<Type> buildListOfConcreteTypeArguments(Type baseJavaType, int expectedSize) {
+    protected static List<Type> buildListOfConcreteTypeArguments(Type baseJavaType, int expectedSize) {
 
         List<Type> allTypeArguments = ReflectionUtil.getAllTypeArguments(baseJavaType);
 
