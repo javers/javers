@@ -73,7 +73,7 @@ public class Sets {
     /**
      * null args are allowed
      */
-    public static <E> Collection<E> difference(Set<E> first, Set<E> second, Function<E, Integer> hasher) {
+    public static <E> Collection<E> difference(Set<E> first, Set<E> second, Function<E, String> hasher) {
         if (first == null || first.size() == 0) {
             return Collections.emptyList();
         }
@@ -82,7 +82,7 @@ public class Sets {
             return first;
         }
 
-        Map<Integer, E> map = new HashMap();
+        Map<String, E> map = new HashMap();
 
         first.stream().forEach(e -> map.put(hasher.apply(e), e));
         second.stream().forEach(e -> map.remove(hasher.apply(e)));
