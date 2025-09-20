@@ -239,10 +239,10 @@ class JaversCommitE2ETest extends Specification {
                     .hasValueChangeAt("city", null, "Tokyo")
     }
 
-    def "should not record ObjectRemoved for removed ValueObject"() {
+    def "should record ObjectRemoved for removed ValueObject"() {
         given:
         def javers = javers().build()
-        def user = dummyUser().withDetails(5).withAddress("Tokyo")
+        def user = dummyUser().withDetails().withAddress("Tokyo")
         javers.commit("some.login", user)
 
         when:
@@ -250,11 +250,12 @@ class JaversCommitE2ETest extends Specification {
         def commit = javers.commit("some.login", user)
 
         then:
-        def voId = valueObjectId(5, DummyUserDetails, "dummyAddress")
+        def voId = valueObjectId(1, DummyUserDetails, "dummyAddress")
         CommitAssert.assertThat(commit)
                     .hasSnapshots(1)
-                    .hasSnapshot(instanceId(5, DummyUserDetails))
-                    .hasChanges(0)
+                    .hasSnapshot(instanceId(1, DummyUserDetails),[id:1,addressList:[],integerList:[]])
+                    .hasChanges(1)
+                    .hasValueChangeAt("dummyAddress", voId, null)
     }
 
     def "should support new object added to List, deep in the graph"() {
