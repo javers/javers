@@ -24,6 +24,8 @@ dependencies {
 
     testImplementation "org.testcontainers:testcontainers:$testcontainers"
     testImplementation "org.testcontainers:junit-jupiter:$testcontainers"
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 }
 
 test {
