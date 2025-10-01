@@ -14,4 +14,6 @@ dependencies {
     testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
     testImplementation "org.spockframework:spock-spring:$spockVersion"
     testImplementation project(path: ":javers-spring", configuration: "testArtifacts")
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 }
