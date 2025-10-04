@@ -14,7 +14,7 @@ class NodeMatcherTest extends AbstractDiffTest{
         def currentGraph =   buildLiveGraph(dummyUser("b").withDetails(2))
 
         when:
-        def pairs = new NodeMatcher().match(new GraphPair(previousGraph,currentGraph))
+        def pairs = new NodeMatcher().match(previousGraph.nodes(),currentGraph.nodes(), Optional.empty())
 
         then:
         pairs.size() == 1

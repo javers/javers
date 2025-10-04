@@ -2,8 +2,6 @@ package org.javers.core.commit;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.graph.Cdo;
@@ -72,7 +70,7 @@ public class CommitFactory {
 
     private Commit createCommit(String author, Map<String, String> properties, LiveGraph currentGraph){
         CommitMetadata commitMetadata = newCommitMetadata(author, properties);
-        ObjectGraph<CdoSnapshot> latestSnapshotGraph = snapshotGraphFactory.createLatest(currentGraph.globalIds());
+        ObjectGraph<CdoSnapshot> latestSnapshotGraph = snapshotGraphFactory.loadLatestAndCreateGraph(currentGraph.globalIds());
         List<CdoSnapshot> changedCdoSnapshots =
             changedCdoSnapshotsFactory.create(currentGraph, latestSnapshotGraph.cdos(), commitMetadata);
         Diff diff = diffFactory.create(latestSnapshotGraph, currentGraph, Optional.of(commitMetadata));

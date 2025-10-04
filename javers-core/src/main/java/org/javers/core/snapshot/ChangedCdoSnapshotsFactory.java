@@ -4,11 +4,11 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.*;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.type.JaversProperty;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Builds snapshots for provided live objects.
@@ -19,9 +19,11 @@ import java.util.Set;
 public class ChangedCdoSnapshotsFactory {
 
     private final SnapshotFactory snapshotFactory;
+    private final SnapshotGraphFactory snapshotGraphFactory;
 
-    ChangedCdoSnapshotsFactory(SnapshotFactory snapshotFactory) {
+    ChangedCdoSnapshotsFactory(SnapshotFactory snapshotFactory, SnapshotGraphFactory snapshotGraphFactory) {
         this.snapshotFactory = snapshotFactory;
+        this.snapshotGraphFactory = snapshotGraphFactory;
     }
 
     /**
@@ -41,9 +43,37 @@ public class ChangedCdoSnapshotsFactory {
             CdoSnapshot currentSnapshot = createSnapshot(commitMetadata, liveNode, previousSnapshot);
             if (isCdoChanged(previousSnapshot, currentSnapshot)) {
                 result.add(currentSnapshot);
+
+                result.addAll(createTerminalVoSnapshots(previousSnapshot, currentSnapshot, commitMetadata));
+
             }
         }
         return result;
+    }
+
+    private List<CdoSnapshot> createTerminalVoSnapshots(Optional<CdoSnapshot> previousSnapshot, CdoSnapshot currentSnapshot, CommitMetadata commitMetadata){
+        if (!previousSnapshot.isPresent()){
+           return Collections.emptyList();
+        }
+
+        List<GlobalId> removedVO = new ArrayList<>();
+
+        for (JaversProperty property : currentSnapshot.getManagedType().getProperties()) {
+            if (!property.isValueObjectType()) {
+                continue;
+            }
+
+            Object oldVal = previousSnapshot.get().getPropertyValue(property);
+            Object newVal = currentSnapshot.getPropertyValue(property);
+
+            if (oldVal != null && newVal == null) {
+                removedVO.add((GlobalId) oldVal);
+            }
+        }
+
+        return snapshotGraphFactory.loadLatest(removedVO).stream()
+                .map(s -> snapshotFactory.createTerminal(s.getGlobalId(), s, commitMetadata))
+                .collect(Collectors.toList());
     }
 
     private CdoSnapshot createSnapshot(CommitMetadata commitMetadata,

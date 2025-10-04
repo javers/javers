@@ -57,7 +57,10 @@ public class SnapshotDiffer {
     }
 
     private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot, CdoSnapshot previousSnapshot) {
-        changes.add(new ObjectRemoved(terminalSnapshot.getGlobalId(), empty(), of(terminalSnapshot.getCommitMetadata())));
+        if (! (terminalSnapshot.isValueObject())){
+            changes.add(new ObjectRemoved(terminalSnapshot.getGlobalId(), empty(), of(terminalSnapshot.getCommitMetadata())));
+        }
+
         if (previousSnapshot != null && javersCoreConfiguration.isTerminalChanges()) {
             Diff terminalDiff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(terminalSnapshot), commitMetadata(terminalSnapshot));
             changes.addAll(terminalDiff.getChanges());

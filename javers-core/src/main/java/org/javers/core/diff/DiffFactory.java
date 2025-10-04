@@ -133,7 +133,7 @@ public class DiffFactory {
         }
 
         //calculate property-to-property diff
-        for (NodePair pair : nodeMatcher.match(graphPair)) {
+        for (NodePair pair : graphPair.getMatching()) {
             appendPropertyChanges(diff, pair);
         }
 

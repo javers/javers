@@ -6,6 +6,7 @@ import org.javers.common.date.DateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
@@ -141,6 +142,26 @@ class JaversRepositoryE2ETest extends Specification {
 
       then:
       javers.findChanges(QueryBuilder.anyDomainObject().build()).getChangesByType(ValueChange).size() == 15
+    }
+
+    def "should query for Terminal ValueChanges in ValueObject"() {
+        given:
+        def c1 = javers.commit("author", new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city:"London")))
+        def c2 = javers.commit("author", new SnapshotEntity(id:1))
+
+        when:
+        def changes = javers.
+                findChanges(QueryBuilder.byInstance(new SnapshotEntity(id:1))
+                        .withChildValueObjects()
+                        .build())
+        println changes.prettyPrint()
+
+        then:
+        changes.size() == 2
+        def valueChange = changes.getChangesByType(ValueChange)[0]
+        valueChange.left == "London"
+        !valueChange.right
+        changes.getChangesByType(NewObject).size() == 1
     }
 
     def "should query for ValueObject changes by owning Entity class"() {

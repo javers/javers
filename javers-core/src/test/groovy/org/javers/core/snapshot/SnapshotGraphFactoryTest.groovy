@@ -29,7 +29,7 @@ class SnapshotGraphFactoryTest extends Specification {
         def liveGraph = javers.createLiveGraph(cdo)
 
         when:
-        def snapshotGraph = snapshotGraphFactory.createLatest(liveGraph.globalIds())
+        def snapshotGraph = snapshotGraphFactory.loadLatestAndCreateGraph(liveGraph.globalIds())
 
         then:
         snapshotGraph.nodes().size() == 1

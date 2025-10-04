@@ -1,7 +1,6 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.api.JaversExtendedRepository;
@@ -19,7 +18,15 @@ public class SnapshotGraphFactory {
         this.javersRepository = javersRepository;
     }
 
-    public SnapshotGraph createLatest(Set<GlobalId> globalIds){
+    public List<CdoSnapshot> loadLatest(Collection<GlobalId> globalIds) {
+        Validate.argumentIsNotNull(globalIds);
+
+        return javersRepository.getLatest(globalIds)
+                .stream()
+                .collect(Collectors.toList());
+    }
+
+    public SnapshotGraph loadLatestAndCreateGraph(Set<GlobalId> globalIds){
         Validate.argumentIsNotNull(globalIds);
 
         Set<SnapshotNode> snapshotNodes = javersRepository.getLatest(globalIds)
