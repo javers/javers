@@ -24,6 +24,7 @@ import org.javers.core.metamodel.type.ManagedType
 import org.javers.core.metamodel.type.SetType
 import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.*
+import org.javers.repository.jql.QueryBuilder
 import spock.lang.Unroll
 
 import jakarta.persistence.EmbeddedId
@@ -888,5 +889,23 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
         then:
         changes.size() == 0
+    }
+
+    def "should calculate changes for removed ValueObject"() {
+        given:
+        def javers = javers().build()
+        def s1 = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city:"London"))
+        def s2 = new SnapshotEntity(id:1)
+
+        when:
+        def diff = javers.compare(s1, s2)
+        println diff.prettyPrint()
+
+        then:
+        diff.changes.size() == 1
+        def change = diff.changes[0]
+        change instanceof ValueChange
+        change.left == "London"
+        change.right == null
     }
 }

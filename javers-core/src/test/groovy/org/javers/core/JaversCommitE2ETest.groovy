@@ -239,7 +239,7 @@ class JaversCommitE2ETest extends Specification {
                     .hasValueChangeAt("city", null, "Tokyo")
     }
 
-    def "should not record ObjectRemoved for removed ValueObject"() {
+    def "should record terminal snapshots for removed ValueObject"() {
         given:
         def javers = javers().build()
         def user = dummyUser().withDetails(5).withAddress("Tokyo")
@@ -250,10 +250,10 @@ class JaversCommitE2ETest extends Specification {
         def commit = javers.commit("some.login", user)
 
         then:
-        def voId = valueObjectId(5, DummyUserDetails, "dummyAddress")
         CommitAssert.assertThat(commit)
-                    .hasSnapshots(1)
+                    .hasSnapshots(2)
                     .hasSnapshot(instanceId(5, DummyUserDetails))
+                    .hasTerminalSnapshot(valueObjectId(5, DummyUserDetails, "dummyAddress"))
                     .hasChanges(0)
     }
 

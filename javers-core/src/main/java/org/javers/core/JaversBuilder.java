@@ -707,7 +707,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * generate additional set of Initial Changes for each
      * property of a NewObject to capture its state.
      * <br/>
-     * Internally, Javers generates Initial Changes by comparing a virtual, totally empty object
+     * Internally, Javers generates Initial Changes by comparing a virtual, empty object
      * with a real NewObject.
      *
      * <br/><br/>

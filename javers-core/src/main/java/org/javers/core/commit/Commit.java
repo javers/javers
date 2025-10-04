@@ -3,17 +3,13 @@ package org.javers.core.commit;
 import org.javers.common.validation.Validate;
 import org.javers.core.Changes;
 import org.javers.core.CommitIdGenerator;
-import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
-import org.javers.core.graph.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.SnapshotType;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * JaVers commit is a similar concept to GIT commit.
@@ -110,11 +106,33 @@ public final class Commit {
     public String toString() {
         StringBuilder b = new StringBuilder();
         b.append("Commit(id:" + commitMetadata.getId());
-        b.append(", snapshots:" + snapshots.size());
+        b.append(", " + snapshotSummary());
         b.append(", author:" + commitMetadata.getAuthor());
-        b.append(", " + diff.changesSummary());
         b.append(")");
         return b.toString();
+    }
+
+    private String snapshotSummary(){
+        StringBuilder b = new StringBuilder();
+
+        b.append("snapshots:" + snapshots.size()+" ");
+        for (Map.Entry<SnapshotType, Integer> e : countByType().entrySet()){
+            b.append(e.getKey() + ":"+e.getValue()+" ");
+        }
+        return b.toString().trim();
+    }
+
+    private Map<SnapshotType, Integer> countByType(){
+        Map<SnapshotType, Integer> result = new HashMap<>();
+        for(CdoSnapshot snapshot : snapshots) {
+            SnapshotType key = snapshot.getType();
+            if (result.containsKey(key)){
+                result.put(key, (result.get(key))+1);
+            }else{
+                result.put(key, 1);
+            }
+        }
+        return result;
     }
 
     @Override

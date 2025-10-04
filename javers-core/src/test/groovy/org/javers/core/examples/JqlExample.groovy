@@ -352,10 +352,11 @@ class JqlExample extends Specification {
 
         when:
         Changes changes = javers.findChanges( QueryBuilder.byClass(DummyAddress.class).build() )
+        print changes.prettyPrint()
 
         then:
         println changes.prettyPrint()
-        assert changes.size() == 4
+        assert changes.size() == 5
     }
 
     def "should query for any domain object changes"() {

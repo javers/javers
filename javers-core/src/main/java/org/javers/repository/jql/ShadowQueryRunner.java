@@ -73,7 +73,10 @@ class ShadowQueryRunner {
     }
 
     private List<CdoSnapshot> queryForCoreSnapshots(JqlQuery query, ShadowStats queryStats) {
-        List<CdoSnapshot> snapshots = snapshotQueryRunner.queryForSnapshots(query);
+        List<CdoSnapshot> snapshots = snapshotQueryRunner.queryForSnapshots(query)
+                .stream()
+                .filter(s -> !s.isTerminalVO())
+                .collect(toList());
         queryStats.logShallowQuery(snapshots);
 
         return snapshots;

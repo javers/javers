@@ -6,6 +6,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.Cdo;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.ValueObjectType;
 
 import java.util.List;
 import java.util.Optional;
@@ -194,5 +195,13 @@ public final class CdoSnapshot extends Cdo {
         getManagedType().getProperties().forEach( p ->
                 builder.withPropertyValue(p, getPropertyValue(p)));
         return builder.build();
+    }
+
+    public boolean isValueObject() {
+        return getManagedType() instanceof ValueObjectType;
+    }
+
+    public boolean isTerminalVO() {
+        return isValueObject() && isTerminal();
     }
 }

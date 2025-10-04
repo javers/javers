@@ -22,7 +22,7 @@ public class GraphPair {
 
     private final Collection<ObjectNode> onlyOnLeft;
     private final Collection<ObjectNode> onlyOnRight;
-
+    private final Collection<NodePair> matching;
     private final Optional<CommitMetadata> commitMetadata;
 
     GraphPair(ObjectGraph leftGraph, ObjectGraph rightGraph) {
@@ -39,6 +39,7 @@ public class GraphPair {
         this.onlyOnRight = difference(rightGraph.nodes(), leftGraph.nodes(), hasher);
 
         this.commitMetadata = commitMetadata;
+        this.matching = NodeMatcher.match(leftGraph.nodes(), rightGraph.nodes(), commitMetadata);
     }
 
     //for initial
@@ -51,6 +52,12 @@ public class GraphPair {
         this.onlyOnRight = rightGraph.nodes();
 
         this.commitMetadata = Optional.empty();
+
+        this.matching = Collections.emptyList();
+    }
+
+    public Collection<NodePair> getMatching() {
+        return matching;
     }
 
     public Collection<ObjectNode> getOnlyOnLeft() {
