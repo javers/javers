@@ -5,7 +5,7 @@ import org.javers.repository.mongo.model.MongoHeadId;
 
 import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 
-class MongoRepositoryConfiguration {
+public class MongoRepositoryConfiguration {
     private static final String DEFAULT_SNAPSHOT_COLLECTION_NAME = "jv_snapshots";
 
     private static final String DEFAULT_HEAD_COLLECTION_NAME = "jv_head_id";
