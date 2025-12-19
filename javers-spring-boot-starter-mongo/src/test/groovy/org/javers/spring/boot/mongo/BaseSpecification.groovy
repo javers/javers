@@ -16,7 +16,7 @@ abstract class BaseSpecification extends Specification {
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> dockerizedMongoContainer.replicaSetUrl)
+        registry.add("spring.mongodb.uri", () -> dockerizedMongoContainer.replicaSetUrl)
     }
 
     static int getMongoPort() {

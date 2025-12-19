@@ -20,8 +20,8 @@ dependencies {
     testImplementation "org.spockframework:spock-spring:$spockVersion"
 
     testImplementation "com.github.silaev:mongodb-replica-set:0.4.3"
-    testImplementation "org.testcontainers:spock:$testcontainers"
-    testImplementation "org.testcontainers:mongodb:$testcontainers"
+    testImplementation "org.testcontainers:testcontainers-spock:$testcontainers"
+    testImplementation "org.testcontainers:testcontainers-mongodb:$testcontainers"
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 }

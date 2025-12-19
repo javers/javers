@@ -2,7 +2,7 @@ package org.javers.repository.mongo
 
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
-import org.testcontainers.containers.MongoDBContainer
+import org.testcontainers.mongodb.MongoDBContainer
 
 class DockerizedMongoContainer {
     MongoDBContainer mongoDBContainer

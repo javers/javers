@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.*;
 
 import java.util.Map;
@@ -51,19 +50,14 @@ public class JaversTransactionalJpaDecorator extends JaversTransactionalDecorato
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
        ensureSchema();
     }
 
     private void ensureSchema() {
         if (javersSqlRepository.getConfiguration().isSchemaManagementEnabled()) {
             TransactionTemplate tmpl = new TransactionTemplate(txManager);
-            tmpl.execute(new TransactionCallbackWithoutResult() {
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    javersSqlRepository.ensureSchema();
-                }
-            });
+            tmpl.executeWithoutResult(transactionStatus -> javersSqlRepository.ensureSchema());
         }
     }
 
@@ -73,7 +67,7 @@ public class JaversTransactionalJpaDecorator extends JaversTransactionalDecorato
         }
         if(TransactionSynchronizationManager.isSynchronizationActive() &&
            TransactionSynchronizationManager.isActualTransactionActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCompletion(int status) {
                     if (TransactionSynchronization.STATUS_ROLLED_BACK == status) {
