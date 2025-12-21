@@ -1,6 +1,5 @@
 package org.javers.spring.boot.mongo
 
-import com.github.silaev.mongodb.replicaset.MongoDbReplicaSet
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.WriteConcern
@@ -11,6 +10,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.data.mongodb.MongoDatabaseFactory
 import org.springframework.data.mongodb.MongoTransactionManager
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory
+import org.testcontainers.mongodb.MongoDBContainer
 
 import java.util.concurrent.TimeUnit
 
@@ -18,18 +18,15 @@ import java.util.concurrent.TimeUnit
 @Profile("TransactionalMongo")
 class TransactionalMongoConfig {
 
-    @Bean(destroyMethod = "stop")
-    MongoDbReplicaSet mongoDbReplicaSet() {
-        def replicaSet = MongoDbReplicaSet.builder()
-                .replicaSetNumber(1)
-                .mongoDockerImageName("mongo:4.4.4")
-                .build()
-        replicaSet.start()
-        replicaSet
+    @Bean(destroyMethod = "close")
+    MongoDBContainer mongoDBContainer() {
+        MongoDBContainer container = new MongoDBContainer("mongo:8.2").withReplicaSet()
+        container.start()
+        container
     }
 
-    @Bean MongoClient mongoClient (MongoDbReplicaSet replicaSet) {
-        def mongoRsUrl = replicaSet.getReplicaSetUrl()
+    @Bean MongoClient mongoClient (MongoDBContainer container) {
+        def mongoRsUrl = container.getReplicaSetUrl()
 
         println("mongoRsUrl: " + mongoRsUrl)
         def mongoSyncClient = com.mongodb.client.MongoClients.create(
