@@ -23,7 +23,7 @@ dependencies {
     testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
 
     testImplementation "org.testcontainers:testcontainers:$testcontainers"
-    testImplementation "org.testcontainers:junit-jupiter:$testcontainers"
+    testImplementation "org.testcontainers:testcontainers-junit-jupiter:$testcontainers"
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 }

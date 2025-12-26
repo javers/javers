@@ -10,10 +10,10 @@ dependencies {
 
     testImplementation project(path: ":javers-core", configuration: "testArtifacts")
     testImplementation "org.testcontainers:testcontainers:$testcontainers"
-    testImplementation "org.testcontainers:spock:$testcontainers"
-    testImplementation "org.testcontainers:junit-jupiter:$testcontainers"
+    testImplementation "org.testcontainers:testcontainers-spock:$testcontainers"
+    testImplementation "org.testcontainers:testcontainers-junit-jupiter:$testcontainers"
     testImplementation "org.awaitility:awaitility:4.2.1"
-    testImplementation "jakarta.persistence:jakarta.persistence-api:3.0.0"
+    testImplementation "jakarta.persistence:jakarta.persistence-api:3.2.0"
     testImplementation "com.google.guava:guava:$guavaVersion"
     testImplementation "org.codehaus.gpars:gpars:1.2.0"
     

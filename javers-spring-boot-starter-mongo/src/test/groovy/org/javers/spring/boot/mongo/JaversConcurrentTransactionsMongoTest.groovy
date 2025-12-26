@@ -1,6 +1,5 @@
 package org.javers.spring.boot.mongo
 
-import com.github.silaev.mongodb.replicaset.MongoDbReplicaSet
 import org.javers.core.Javers
 import org.javers.spring.transactions.UberService
 import org.javers.spring.transactions.User
@@ -17,9 +16,6 @@ import java.util.concurrent.Executors
         properties = ["javers.commitIdGenerator=random"])
 @ActiveProfiles("TransactionalMongo")
 class JaversConcurrentTransactionsMongoTest extends Specification {
-
-    @Autowired
-    MongoDbReplicaSet replicaSet
 
     @Autowired
     DummyTransactionalService dummyTransactionalService

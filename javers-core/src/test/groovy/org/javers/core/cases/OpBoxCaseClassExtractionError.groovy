@@ -14,7 +14,7 @@ class OpBoxCaseClassExtractionError extends Specification {
         String getName()
     }
 
-    class BooleanParamType extends ParamType {
+    class BooleanParamType implements ParamType {
         String name = "name"
         String getName() {
             name

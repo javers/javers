@@ -40,7 +40,7 @@ class RefactoredClassE2ETest extends H2SqlRepositoryE2ETest {
         given:
         def entityBeforeRefactoring = new EntityBeforeRefactoring(id: 1, totals: [revenue: 1000, cost: 500])
         javers.commit("user", entityBeforeRefactoring)
-        def sql = new Sql(connection);
+        def sql = new Sql(getConnection());
         // Simulate the old snapshot in the database after refactoring has been made
         sql.executeUpdate("""
             UPDATE jv_snapshot 

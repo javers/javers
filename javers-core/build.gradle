@@ -16,13 +16,13 @@ dependencies {
 
     testImplementation 'org.assertj:assertj-core:3.24.1'
     testImplementation "com.google.guava:guava:$guavaVersion"
-    testImplementation 'jakarta.persistence:jakarta.persistence-api:3.0.0'
+    testImplementation 'jakarta.persistence:jakarta.persistence-api:3.2.0'
     testImplementation "com.google.guava:guava:$guavaVersion"
     testImplementation "org.mongodb:mongodb-driver-sync:$mongoDbDriverVersion"
     testImplementation ('org.mongodb.morphia:morphia:0.108') {
         exclude group: 'org.mongodb', module: 'mongo-java-driver'
     }
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
+    testImplementation 'tools.jackson.core:jackson-databind:3.0.2'
     testImplementation 'org.codehaus.gpars:gpars:1.2.1'
 }
 
