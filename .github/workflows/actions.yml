@@ -1,0 +1,73 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: travis_ci_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: travis_ci_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: 'gradle'
+      
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+      
+      - name: Setup PostgreSQL database
+        run: |
+          PGPASSWORD=password psql -h localhost -U postgres -c 'create schema j_some authorization postgres;' travis_ci_test
+          PGPASSWORD=password psql -h localhost -U postgres -c "CREATE ROLE javers LOGIN PASSWORD 'javers' SUPERUSER;"
+          PGPASSWORD=password psql -h localhost -U postgres -c 'SHOW server_version_num;'
+      
+      - name: Setup MySQL database
+        run: |
+          mysql -h 127.0.0.1 -u root -ppassword -e "CREATE USER 'javers'@'%' IDENTIFIED BY 'javers';"
+          mysql -h 127.0.0.1 -u root -ppassword -e "GRANT ALL PRIVILEGES ON travis_ci_test.* TO 'javers'@'%' WITH GRANT OPTION;"
+          mysql -h 127.0.0.1 -u root -ppassword -e "FLUSH PRIVILEGES;"
+      
+      - name: Build
+        run: ./gradlew build
+      
+      - name: Integration tests
+        run: ./gradlew integrationTest
+      
+      - name: Deploy to Sonatype
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master' && startsWith(github.ref, 'refs/tags/')
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        run: ./travis/deployToSonatype.sh
