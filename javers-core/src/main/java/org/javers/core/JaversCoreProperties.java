@@ -15,6 +15,7 @@ public abstract class JaversCoreProperties {
     private String mappingStyle;
     private Boolean initialChanges;
     private Boolean terminalChanges;
+    private Boolean terminalSnapshot;
     private Boolean prettyPrint;
     private Boolean typeSafeValues;
     private String packagesToScan = "";
@@ -55,6 +56,10 @@ public abstract class JaversCoreProperties {
 
     public Boolean isTerminalChanges() {
         return terminalChanges;
+    }
+
+    public Boolean isTerminalSnapshot() {
+        return terminalSnapshot;
     }
 
     public Boolean isPrettyPrint() {
