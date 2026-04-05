@@ -418,6 +418,28 @@ class JaversRepositoryE2ETest extends Specification {
         changes[0].right == 2
     }
 
+    def "should query for Entity snapshots and changes by Entity class and changed property with case-insensitive match"() {
+        given:
+        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1) )
+        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 2) )
+
+        when: "query with different case"
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity)
+                .withChangedProperty("INTPROPERTY").build())
+
+        then: "should find snapshots regardless of case"
+        snapshots.size() == 2
+
+        when: "changes query with different case"
+        def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity)
+                .withChangedProperty("INTPROPERTY").build())
+
+        then: "should find changes regardless of case"
+        changes.size() == 1
+        changes[0] instanceof ValueChange
+        changes[0].propertyName == "intProperty"
+    }
+
     def "should query for Entity changes by Entity class"() {
         given:
         javers.commit("author", new SnapshotEntity(id:1, intProperty: 1))
