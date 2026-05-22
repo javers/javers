@@ -1,5 +1,7 @@
 package org.javers.repository.mongo
 
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import org.testcontainers.mongodb.MongoDBContainer
@@ -11,6 +13,13 @@ class DockerizedMongoContainer {
     DockerizedMongoContainer() {
         this.mongoDBContainer = startMongo()
         this.mongoClient = MongoClients.create(mongoDBContainer.replicaSetUrl)
+    }
+
+    DockerizedMongoContainer(MongoClientSettings.Builder mongoClientSettingsBuilder) {
+        this.mongoDBContainer = startMongo()
+        this.mongoClient = MongoClients.create(
+                mongoClientSettingsBuilder
+                        .applyConnectionString(new ConnectionString(mongoDBContainer.replicaSetUrl)).build())
     }
 
     MongoDBContainer startMongo() {
