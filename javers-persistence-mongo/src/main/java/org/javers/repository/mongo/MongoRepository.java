@@ -185,9 +185,14 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
     private Bson createIdQueryWithAggregate(GlobalId id) {
         if (id instanceof InstanceId) {
+            Object cdoId = ((InstanceId)id).getCdoId();
+            if (cdoId instanceof UUID) {
+                UUID uuidCdoId = (UUID) cdoId;
+                cdoId = uuidCdoId.toString();
+            }
             return Filters.or(
                 createIdQuery(id),
-                new BasicDBObject(GLOBAL_ID_OWNER_ID_CDO_ID, ((InstanceId)id).getCdoId().toString())
+                new BasicDBObject(GLOBAL_ID_OWNER_ID_CDO_ID, cdoId)
             );
         }
 
