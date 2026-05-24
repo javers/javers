@@ -68,7 +68,7 @@ class SnapshotQuery {
         if (queryParams.changedProperties().size() > 0) {
             selectBuilder.append("AND (" +
                     queryParams.changedProperties().stream()
-                            .map(it -> SNAPSHOT_CHANGED + " LIKE '%" + it + "%'")
+                            .map(it -> "LOWER(" + SNAPSHOT_CHANGED + ") LIKE '%" + it.toLowerCase() + "%'")
                             .collect(Collectors.joining(" OR ")) +
                     ")");
         }

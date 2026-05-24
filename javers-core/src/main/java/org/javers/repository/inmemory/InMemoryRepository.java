@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Fake impl of JaversRepository
@@ -286,8 +287,12 @@ public class InMemoryRepository implements JaversRepository {
         this.jsonConverter = jsonConverter;
     }
 
-    private List<CdoSnapshot> filterByPropertyNames(List<CdoSnapshot> snapshots, final Set<String> propertyNames){
-        return Lists.positiveFilter(snapshots, input -> propertyNames.stream().anyMatch(input::hasChangeAt));
+    private List<CdoSnapshot> filterByPropertyNames(List<CdoSnapshot> snapshots, final Set<String> propertyNames) {
+        Set<String> propertySet = propertyNames.stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        return Lists.positiveFilter(snapshots, input -> input.getChanged().stream().anyMatch(c -> propertySet.contains(c.toLowerCase())));
     }
 
     private List<CdoSnapshot> getAll(){

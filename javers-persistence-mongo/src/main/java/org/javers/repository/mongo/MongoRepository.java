@@ -348,8 +348,13 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
                 query = addCommitPropertiesLikeFilter(query, params.commitPropertiesLike());
             }
             if (params.changedProperties().size() > 0) {
-                query = Filters.and(query, Filters.or(params.changedProperties().stream()
-                        .map(it -> new BasicDBObject(CHANGED_PROPERTIES, it)).collect(Collectors.toList())));
+                List<Bson> regexFilters = params.changedProperties().stream()
+                        .map(it -> new BasicDBObject(CHANGED_PROPERTIES,
+                                new BasicDBObject("$regex", ".*" + it.toLowerCase(Locale.ROOT) + ".*")
+                                        .append("$options", "i")))
+                        .collect(Collectors.toList());
+
+                query = Filters.and(query, Filters.or(regexFilters));
             }
             if (params.snapshotType().isPresent()) {
                 query = Filters.and(query, new BasicDBObject(SNAPSHOT_TYPE, params.snapshotType().get().name()));

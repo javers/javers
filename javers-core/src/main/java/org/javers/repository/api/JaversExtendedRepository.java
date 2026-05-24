@@ -15,6 +15,7 @@ import org.javers.core.snapshot.SnapshotDiffer;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -173,8 +174,12 @@ public class JaversExtendedRepository implements JaversRepository {
             return changes;
         }
 
+        Set<String> propertySet = queryParams.changedProperties().stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
         return Lists.positiveFilter(changes, input -> input instanceof PropertyChange &&
-                queryParams.changedProperties().contains(((PropertyChange) input).getPropertyName()));
+                propertySet.contains(((PropertyChange) input).getPropertyName().toLowerCase()));
     }
 
     private List<Change> getChangesIntroducedBySnapshots(List<CdoSnapshot> snapshots) {

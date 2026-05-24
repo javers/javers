@@ -729,4 +729,18 @@ class JaversRedisRepositoryStandaloneTest {
 
     }
 
+    @Test
+    @Order(36)
+    void testQueryWithChangedPropertyCaseInsensitive() {
+        // given
+        final var query = QueryBuilder.byClass(Device.class).withChangedProperty("FIRMware").build();
+
+        // when
+        final var changes = javers.findChanges(query);
+        final var snapshots = javers.findSnapshots(query);
+
+        // then
+        assertNotNull(changes);
+        assertNotNull(snapshots);
+    }
 }

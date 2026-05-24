@@ -322,7 +322,11 @@ public class JaversRedisRepository implements JaversRepository {
     }
 
     private List<CdoSnapshot> filterByPropertyNames(final List<CdoSnapshot> snapshots, final Set<String> propertyNames) {
-        return Lists.positiveFilter(snapshots, input -> propertyNames.stream().anyMatch(input::hasChangeAt));
+        Set<String> propertySet = propertyNames.stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        return Lists.positiveFilter(snapshots, input -> input.getChanged().stream().anyMatch(c -> propertySet.contains(c.toLowerCase())));
     }
 
     private List<CdoSnapshot> filterSnapshotsByToCommitId(final List<CdoSnapshot> snapshots, final CommitId commitId) {
