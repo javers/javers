@@ -169,12 +169,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
         bootDateTimeProvider();
 
+        // IMPORTANT: Register core/built-in types BEFORE scanning packages
+        // This ensures LocalDateTime, UUID, etc. are recognized as Value types
+        // before they're encountered in user classes
+        typeMapper().registerCoreTypes(coreConfiguration, clientsClassDefinitions.values());
+
         // classes to scan & additionalTypes
         classesToScan.forEach(c -> typeMapper().getJaversType(c));
         typeMapper().addPluginTypes(additionalTypes);
-
-        // register core / well known types last
-        typeMapper().registerCoreTypes(coreConfiguration, clientsClassDefinitions.values());
 
         // client definitions (explicit types) should have the highest priority
         // if a client would like to register overwrite core types with
