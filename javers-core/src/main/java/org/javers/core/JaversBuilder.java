@@ -90,7 +90,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
 
-    private final Set<Class> classesToScan = new HashSet<>();
+    private final Set<Class> classesToScan = new LinkedHashSet<>();
 
     private final Set<ConditionalTypesPlugin> conditionalTypesPlugins;
 
