@@ -86,6 +86,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  */
 public class JaversBuilder extends AbstractContainerBuilder {
     public static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
+    private static volatile boolean proBannerPrinted = false;
     private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new LinkedHashMap<>();
 
     private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
@@ -132,8 +133,31 @@ public class JaversBuilder extends AbstractContainerBuilder {
         Javers javers = assembleJaversInstanceAndEnsureSchema();
 
         long boot = System.currentTimeMillis() - bootStart;
+        printProBanner();
         logger.info("JaVers instance started in {} ms", boot);
         return javers;
+    }
+
+    private static synchronized void printProBanner() {
+        if (proBannerPrinted) {
+            return;
+        }
+        proBannerPrinted = true;
+
+        String GREEN = "\u001B[32m";
+        String CYAN = "\u001B[36m";
+        String YELLOW = "\u001B[33m";
+        String BOLD = "\u001B[1m";
+        String RESET = "\u001B[0m";
+
+        System.out.println();
+        //                  inner width = 75 chars between ║ markers
+        System.out.println(GREEN + BOLD + "  ╔═══════════════════════════════════════════════════════════════════════════╗" + RESET);
+        System.out.println(GREEN + BOLD + "  ║" + CYAN + BOLD +   "  JaVers is Evolving to Open Core!                                       " + RESET + GREEN + BOLD + "║" + RESET);
+        System.out.println(GREEN + BOLD + "  ║" + CYAN +          "  Audit Explorer UI, Multitenancy, 5x Performance                         " + RESET + GREEN + BOLD + "║" + RESET);
+        System.out.println(GREEN + BOLD + "  ║" + YELLOW +        "  Waitlist for a 40% lifetime discount: https://javers.org/waiting-list    " + RESET + GREEN + BOLD + "║" + RESET);
+        System.out.println(GREEN + BOLD + "  ╚═══════════════════════════════════════════════════════════════════════════╝" + RESET);
+        System.out.println();
     }
 
     protected Javers assembleJaversInstanceAndEnsureSchema() {
