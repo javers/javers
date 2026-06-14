@@ -2,6 +2,7 @@
 ![logotype.svg](https://javers.org/img/logotype.svg)
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.javers/javers-core)](https://central.sonatype.com/artifact/org.javers/javers-core)
+[![Build Status](https://travis-ci.org/javers/javers.svg?branch=master)](https://travis-ci.org/javers/javers/)
 [![Financial Contributors on Open Collective](https://opencollective.com/javers/all/badge.svg?label=financial+contributors)](https://opencollective.com/javers)
 
 > ### JaVers Pro — Enterprise Audit Infrastructure
