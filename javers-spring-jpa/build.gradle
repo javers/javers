@@ -12,7 +12,7 @@ dependencies {
     api project(':javers-persistence-sql')
 
     implementation "org.aspectj:aspectjweaver:$aspectjweaverVersion"
-    implementation "org.hibernate:hibernate-core:$hibernateVersion"
+    implementation "org.hibernate.orm:hibernate-core:$hibernateVersion"
     optionalImplementation "org.springframework.data:spring-data-jpa:$springDataCommonsVersion"
 
     testImplementation "org.springframework.security:spring-security-core:$springSecurityVersion"
