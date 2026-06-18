@@ -45,6 +45,14 @@ class SnapshotsAssert {
         this
     }
 
+    SnapshotsAssert shouldHaveTerminalSnapshot(def expectedId){
+        def found = actual.find { it -> it.globalId == expectedId}
+
+        assert found.size() > 0 //terminal snapshot should not be empty when terminalSnapshot configuration is enabled
+        assert found.terminal
+        this
+    }
+
     private SnapshotsAssert assertState(CdoSnapshot found, Map<String, Object> expectedState) {
         assert found != null
         assert expectedState.size() == found.size()
