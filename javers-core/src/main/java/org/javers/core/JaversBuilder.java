@@ -99,6 +99,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     private JaversRepository repository;
     private DateProvider dateProvider;
     private long bootStart = System.currentTimeMillis();
+    private boolean printProBanner = false;
     private Class<? extends ObjectHasher> objectHasherImplementation = SnapshotObjectHasher.class;
 
     private IgnoredClassesStrategy ignoredClassesStrategy;
@@ -133,7 +134,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
         Javers javers = assembleJaversInstanceAndEnsureSchema();
 
         long boot = System.currentTimeMillis() - bootStart;
-        printProBanner();
+        if (printProBanner) {
+            printProBanner();
+        }
         logger.info("JaVers instance started in {} ms", boot);
         return javers;
     }
@@ -938,6 +941,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
         }
 
         withPrettyPrintDateFormats(javersProperties.getPrettyPrintDateFormats());
+        return this;
+    }
+
+    public JaversBuilder withPrintProBanner(boolean printProBanner) {
+        this.printProBanner = printProBanner;
         return this;
     }
 
