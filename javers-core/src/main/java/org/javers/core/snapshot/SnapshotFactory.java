@@ -4,7 +4,6 @@ import org.javers.common.collections.Defaults;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.diff.appenders.HashWrapper;
 import org.javers.core.graph.Cdo;
 import org.javers.core.graph.LiveNode;
 import org.javers.core.metamodel.object.*;
@@ -14,6 +13,9 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 import static org.javers.core.metamodel.object.SnapshotType.*;
@@ -57,7 +59,11 @@ public class SnapshotFactory {
                 .build();
     }
 
-    public CdoSnapshotState createSnapshotStateNoRefs(ManagedType managedType, Object instance) {
+    public CdoSnapshotState createSnapshotStateNoRefsSortedSets(Cdo liveCdo){
+        return createSnapshotStateNoRefsSortedSets(liveCdo.getManagedType(), liveCdo.getWrappedCdo().get());
+    }
+
+    private CdoSnapshotState createSnapshotStateNoRefsSortedSets(ManagedType managedType, Object instance) {
         CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
         for (JaversProperty property : managedType.getProperties()) {
             if (property.getType() instanceof ManagedType ||
@@ -73,6 +79,11 @@ public class SnapshotFactory {
             if (property.getType() instanceof CustomComparableType) {
                 String propertyValueToString = ((CustomComparableType) property.getType()).valueToString(propertyValue);
                 stateBuilder.withPropertyValue(property, propertyValueToString);
+                continue;
+            }
+
+            if (property.isSetOrListAsSetType()) {
+                stateBuilder.withPropertyValue(property, toOrderedSet((Set<?>)propertyValue));
             } else {
                 stateBuilder.withPropertyValue(property, propertyValue);
             }
@@ -80,8 +91,11 @@ public class SnapshotFactory {
         return stateBuilder.build();
     }
 
-    public CdoSnapshotState createSnapshotStateNoRefs(Cdo liveCdo){
-        return createSnapshotStateNoRefs(liveCdo.getManagedType(), liveCdo.getWrappedCdo().get());
+    private static <T> SortedSet<T> toOrderedSet(Set<T> set) {
+        if (set instanceof SortedSet) {
+            return (SortedSet)set;
+        }
+        return new TreeSet<>(set);
     }
 
     public CdoSnapshotState createSnapshotState(LiveNode liveNode){
