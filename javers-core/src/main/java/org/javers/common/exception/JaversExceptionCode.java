@@ -22,9 +22,9 @@ public enum JaversExceptionCode {
             "annotated with @JaversAuditableConditionalDelete is not an Entity nor a collection of Entities.\n" +
             "If your intention is to execute shallow delete by condition, the method should return an Entity or a collection of Entities."),
 
-    MALFORMED_JAVERS_MONGODB_PROPERTIES("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
+    MALFORMED_JAVERS_MONGODB_PROPERTIES("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url must be defined"),
 
-    CM("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
+    CM("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url must be defined"),
 
     ID_TYPE_NOT_SUPPORTED("%s %s can't be used as Id-property type. Problematic class: '%s'.") ,
 
@@ -115,10 +115,10 @@ public enum JaversExceptionCode {
             ", invalid property type, expected ValueObjectType, ContainerType<ValueObjectType> or MapType<?,ValueObjectType>, got '%s'"),
 
     CANT_PARSE_COMMIT_ID("can't parse given value {'%s'} to CommitId. " +
-            "CommitId should consists of two parts : majorId.minorId e.g. 1.0"),
+            "CommitId should consist of two parts : majorId.minorId e.g. 1.0"),
 
     CANT_DELETE_OBJECT_NOT_FOUND("failed to delete object {'%s'}, "+
-            "it doesn't exists in JaversRepository"),
+            "it doesn't exist in JaversRepository"),
 
     CANT_FIND_COMMIT_HEAD_ID("can't find commit head id in JaversRepository"),
 
