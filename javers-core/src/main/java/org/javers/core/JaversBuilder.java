@@ -153,8 +153,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
         System.out.println();
         //                  inner width = 75 chars between ║ markers
         System.out.println(GREEN + BOLD + "  ╔═══════════════════════════════════════════════════════════════════════════╗" + RESET);
-        System.out.println(GREEN + BOLD + "  ║" + CYAN + BOLD +   "  JaVers is Evolving to Open Core!                                       " + RESET + GREEN + BOLD + "║" + RESET);
-        System.out.println(GREEN + BOLD + "  ║" + CYAN +          "  Audit Explorer UI, Multitenancy, 5x Performance                         " + RESET + GREEN + BOLD + "║" + RESET);
+        System.out.println(GREEN + BOLD + "  ║" + CYAN + BOLD +   "  JaVers is Evolving to Open Core!                                         " + RESET + GREEN + BOLD + "║" + RESET);
+        System.out.println(GREEN + BOLD + "  ║" + CYAN +          "  Audit Explorer UI, Multitenancy, 5x Performance                          " + RESET + GREEN + BOLD + "║" + RESET);
         System.out.println(GREEN + BOLD + "  ║" + YELLOW +        "  Waitlist for a 40% lifetime discount: https://javers.org/waiting-list    " + RESET + GREEN + BOLD + "║" + RESET);
         System.out.println(GREEN + BOLD + "  ╚═══════════════════════════════════════════════════════════════════════════╝" + RESET);
         System.out.println();
