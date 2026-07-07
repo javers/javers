@@ -48,10 +48,6 @@ public class JaversProperty extends Property {
         return getType() instanceof ValueObjectType;
     }
 
-    public boolean isSetOrListAsSetType() {
-        return getType() instanceof SetType || getType() instanceof ListAsSetType;
-    }
-
     public boolean isPrimitiveOrValueType() {
         return getType() instanceof PrimitiveOrValueType;
     }

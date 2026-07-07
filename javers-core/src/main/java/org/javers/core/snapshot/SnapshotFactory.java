@@ -9,9 +9,12 @@ import org.javers.core.graph.LiveNode;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.CustomComparableType;
 import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.ListAsSetType;
 import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.SetType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
@@ -82,9 +85,13 @@ public class SnapshotFactory {
                 continue;
             }
 
-            if (property.isSetOrListAsSetType()) {
+            if (property.getType() instanceof SetType) {
                 stateBuilder.withPropertyValue(property, toOrderedSet((Set<?>)propertyValue));
-            } else {
+            }
+            else if (property.getType() instanceof ListAsSetType) {
+                stateBuilder.withPropertyValue(property, new TreeSet<>((List<?>)propertyValue));
+            }
+            else {
                 stateBuilder.withPropertyValue(property, propertyValue);
             }
         }
