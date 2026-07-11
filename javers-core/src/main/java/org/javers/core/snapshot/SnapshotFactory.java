@@ -87,11 +87,7 @@ public class SnapshotFactory {
 
             if (property.getType() instanceof SetType) {
                 stateBuilder.withPropertyValue(property, toOrderedSet((Set<?>)propertyValue));
-            }
-            else if (property.getType() instanceof ListAsSetType) {
-                stateBuilder.withPropertyValue(property, new TreeSet<>((List<?>)propertyValue));
-            }
-            else {
+            } else {
                 stateBuilder.withPropertyValue(property, propertyValue);
             }
         }
