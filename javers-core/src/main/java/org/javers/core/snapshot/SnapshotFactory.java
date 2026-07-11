@@ -9,13 +9,12 @@ import org.javers.core.graph.LiveNode;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.CustomComparableType;
 import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.ListAsSetType;
 import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.SetType;
 import org.javers.core.metamodel.type.TypeMapper;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 import static org.javers.core.metamodel.object.SnapshotType.*;
@@ -83,19 +82,20 @@ public class SnapshotFactory {
             }
 
             if (property.isSetOrListAsSetType()) {
-                stateBuilder.withPropertyValue(property, toOrderedSet((Set<?>)propertyValue));
-            } else {
-                stateBuilder.withPropertyValue(property, propertyValue);
+                stateBuilder.withPropertyValue(property, toOrderedSet((Collection<?>)propertyValue));
+                continue;
             }
+
+            stateBuilder.withPropertyValue(property, propertyValue);
         }
         return stateBuilder.build();
     }
 
-    private static <T> SortedSet<T> toOrderedSet(Set<T> set) {
-        if (set instanceof SortedSet) {
-            return (SortedSet)set;
+    private static <T> SortedSet<T> toOrderedSet(Collection<T> col) {
+        if (col instanceof SortedSet) {
+            return (SortedSet)col;
         }
-        return new TreeSet<>(set);
+        return new TreeSet<>(col);
     }
 
     public CdoSnapshotState createSnapshotState(LiveNode liveNode){
