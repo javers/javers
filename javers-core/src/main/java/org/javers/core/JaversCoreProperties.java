@@ -20,6 +20,7 @@ public abstract class JaversCoreProperties {
     private String packagesToScan = "";
     private PrettyPrintDateFormats prettyPrintDateFormats = new PrettyPrintDateFormats();
     private Boolean usePrimitiveDefaults;
+    private Boolean printProBanner;
 
     public String getAlgorithm() {
         return algorithm;
@@ -71,6 +72,14 @@ public abstract class JaversCoreProperties {
 
     public Boolean isTypeSafeValues() {
         return typeSafeValues;
+    }
+
+    public Boolean isPrintProBanner() {
+        return printProBanner;
+    }
+
+    public void setPrintProBanner(Boolean printProBanner) {
+        this.printProBanner = printProBanner;
     }
 
     public String getPackagesToScan() {
