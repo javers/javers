@@ -120,4 +120,25 @@ class JsonConverterDateTimeTest extends Specification {
       expect:
       jsonConverter.fromJson('"2015-10-02T17:37:07"', java.time.LocalDateTime) == noMillisDate
     }
+
+    @Unroll
+    def "should preserve SQL timestamp nanoseconds in JSON for #text"() {
+        given:
+        def timestamp = java.sql.Timestamp.valueOf(text)
+
+        when:
+        def json = jsonConverter.toJson(timestamp)
+        def restored = jsonConverter.fromJson(json, java.sql.Timestamp)
+
+        then:
+        restored == timestamp
+        restored.nanos == timestamp.nanos
+        json == '"' + text.replace(' ', 'T') + '"'
+
+        where:
+        text << ['2026-01-02 03:04:05.123456789',
+                 '2026-01-02 03:04:05.000000001',
+                 '1969-12-31 23:59:59.999999999',
+                 '2026-01-02 03:04:05.123']
+    }
 }

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 
 /**
- * Serializes java.sql.Timestamp to JSON String using ISO util format yyyy-MM-dd'T'HH:mm:ss.SSS
+ * Serializes java.sql.Timestamp to an ISO local date-time JSON string, preserving nanoseconds.
  *
  * @author bartosz walacik
  */
@@ -15,7 +15,7 @@ class JavaSqlTimestampTypeAdapter extends BasicStringTypeAdapter<Timestamp> {
 
     @Override
     public String serialize(Timestamp sourceValue) {
-        return UtilTypeCoreAdapters.serialize(sourceValue);
+        return UtilTypeCoreAdapters.serialize(sourceValue.toLocalDateTime());
     }
 
     @Override
