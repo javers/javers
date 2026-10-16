@@ -135,6 +135,29 @@ class JaversCommitE2ETest extends Specification {
         opType << ["using object instance","using globalId"]
     }
 
+
+    def "should create terminal commit with snapshot for removed object when enabling terminalSnapshot"() {
+        given:
+        def final javers = javers().withTerminalSnapshot(true).build()
+        def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
+        javers.commit("some.login", anEntity)
+
+        when:
+        def commit = deleteMethod.call(javers)
+
+        then:
+        CommitAssert.assertThat(commit)
+                .hasId("2.00")
+                .hasChanges(1)
+                .hasObjectRemoved(instanceId(1,SnapshotEntity))
+                .hasSnapshots(1)
+                .shouldHaveTerminalSnapshot(instanceId(1,SnapshotEntity))
+
+        where:
+        deleteMethod << [ { j -> j.commitShallowDelete("some.login", new SnapshotEntity(id:1)) },
+                          { j -> j.commitShallowDeleteById("some.login", InstanceIdDTO.instanceId(1,SnapshotEntity))} ]
+    }
+
     def "should create terminal commit when deleting non existing object"() {
         given:
         def javers = javers().build()
