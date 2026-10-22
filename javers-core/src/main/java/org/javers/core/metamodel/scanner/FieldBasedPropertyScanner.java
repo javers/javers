@@ -10,8 +10,8 @@ import java.util.List;
  */
 class FieldBasedPropertyScanner extends PropertyScanner {
 
-    FieldBasedPropertyScanner(AnnotationNamesProvider annotationNamesProvider) {
-        super(annotationNamesProvider);
+    FieldBasedPropertyScanner(AnnotationNamesProvider annotationNamesProvider, final CascadeFallbackEvaluator cascadeFallbackEvaluator) {
+        super(annotationNamesProvider, cascadeFallbackEvaluator);
     }
 
     @Override

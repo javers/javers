@@ -80,6 +80,18 @@ public class DiffFactory {
     }
 
     /**
+     * @see Javers#commitCascadingDelete(String, Object)
+     */
+    public Diff multiTerminal(List<GlobalId> removedIds, CommitMetadata commitMetadata){
+        Validate.argumentsAreNotNull(removedIds, commitMetadata);
+
+        DiffBuilder diff = new DiffBuilder(javersCoreConfiguration.getPrettyValuePrinter());
+        removedIds.forEach(removedId -> diff.addChange(new ObjectRemoved(removedId, empty(), of(commitMetadata))));
+
+        return diff.build();
+    }
+
+    /**
      * @param newDomainObject object or handle to object graph, nullable
      */
     public Diff initial(Object newDomainObject) {

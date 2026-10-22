@@ -10,15 +10,25 @@ import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectGraph;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.scanner.CascadeFallbackEvaluator;
+import org.javers.core.metamodel.type.EnumerableType;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.snapshot.ChangedCdoSnapshotsFactory;
 import org.javers.core.snapshot.SnapshotFactory;
 import org.javers.core.snapshot.SnapshotGraphFactory;
 import org.javers.repository.api.JaversExtendedRepository;
+import org.jspecify.annotations.NonNull;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -34,8 +44,9 @@ public class CommitFactory {
     private final SnapshotGraphFactory snapshotGraphFactory;
     private final ChangedCdoSnapshotsFactory changedCdoSnapshotsFactory;
     private final CommitIdFactory commitIdFactory;
+    private final CascadeFallbackEvaluator cascadeFallbackEvaluator;
 
-    public CommitFactory(DiffFactory diffFactory, JaversExtendedRepository javersRepository, DateProvider dateProvider, LiveGraphFactory liveGraphFactory, SnapshotFactory snapshotFactory, SnapshotGraphFactory snapshotGraphFactory, ChangedCdoSnapshotsFactory changedCdoSnapshotsFactory, CommitIdFactory commitIdFactory) {
+    public CommitFactory(DiffFactory diffFactory, JaversExtendedRepository javersRepository, DateProvider dateProvider, LiveGraphFactory liveGraphFactory, SnapshotFactory snapshotFactory, SnapshotGraphFactory snapshotGraphFactory, ChangedCdoSnapshotsFactory changedCdoSnapshotsFactory, CommitIdFactory commitIdFactory, final CascadeFallbackEvaluator cascadeFallbackEvaluator) {
         this.diffFactory = diffFactory;
         this.javersRepository = javersRepository;
         this.dateProvider = dateProvider;
@@ -44,6 +55,7 @@ public class CommitFactory {
         this.snapshotGraphFactory = snapshotGraphFactory;
         this.changedCdoSnapshotsFactory = changedCdoSnapshotsFactory;
         this.commitIdFactory = commitIdFactory;
+        this.cascadeFallbackEvaluator = cascadeFallbackEvaluator;
     }
 
     public Commit createTerminalByGlobalId(String author, Map<String, String> properties, GlobalId removedId){
@@ -62,8 +74,91 @@ public class CommitFactory {
         return createTerminalByGlobalId(author, properties, removedCdo.getGlobalId());
     }
 
+    /**
+     * @see org.javers.core.Javers#commitCascadingDelete(String, Object)
+     */
+    public Commit createCascadingTerminal(String author, Map<String, String> properties, Object removed){
+        argumentsAreNotNull(author, properties, removed);
+        Cdo removedCdo = liveGraphFactory.createCdo(removed);
+        return createCascadingTerminalByGlobalId(author, properties, removedCdo.getGlobalId());
+    }
+
+    /**
+     * @see org.javers.core.Javers#commitCascadingDelete(String, Object)
+     */
+    public Commit createCascadingTerminalByGlobalId(String author, Map<String, String> properties, GlobalId removedId){
+        argumentsAreNotNull(author, properties, removedId);
+
+        CommitMetadata commitMetadata = newCommitMetadata(author, properties);
+
+        List<GlobalId> idsToDelete = collectCascadingIds(removedId);
+
+        List<CdoSnapshot> terminalSnapshots = new ArrayList<>();
+        for (GlobalId id : idsToDelete) {
+            Optional<CdoSnapshot> previousSnapshot = javersRepository.getLatest(id);
+            terminalSnapshots.add(snapshotFactory.createTerminal(id, previousSnapshot.orElse(null), commitMetadata));
+        }
+
+        Diff diff = diffFactory.multiTerminal(idsToDelete, commitMetadata);
+        return new Commit(commitMetadata, terminalSnapshots, diff);
+    }
+
+    /**
+     * Breadth-first traversal of the object graph starting at {@code rootId},
+     * following only references held in properties annotated with {@code @Cascading}.
+     */
+    private List<GlobalId> collectCascadingIds(GlobalId rootId) {
+        List<GlobalId> result = new ArrayList<>();
+        Set<GlobalId> visited = new LinkedHashSet<>();
+        Deque<GlobalId> queue = new ArrayDeque<>();
+
+        visited.add(rootId);
+        queue.add(rootId);
+
+        while (!queue.isEmpty()) {
+            GlobalId currentId = queue.poll();
+            result.add(currentId);
+
+            Optional<CdoSnapshot> currentSnapshot = javersRepository.getLatest(currentId);
+            if (!currentSnapshot.isPresent()) {
+                continue;
+            }
+
+            CdoSnapshot snapshot = currentSnapshot.get();
+            for (JaversProperty property : snapshot.getManagedType().getProperties(this::shouldCascade)) {
+                for (GlobalId reference : extractReferences(snapshot, property)) {
+                    if (visited.add(reference)) {
+                        queue.add(reference);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private boolean shouldCascade(final JaversProperty property) {
+        return property.shouldCascade().orElseGet(() -> cascadeFallbackEvaluator.shouldCascade(property.getType()));
+    }
+
+    private List<GlobalId> extractReferences(CdoSnapshot snapshot, JaversProperty property) {
+        Object propertyValue = snapshot.getPropertyValue(property);
+        if (propertyValue == null) {
+            return Collections.emptyList();
+        }
+        if (propertyValue instanceof GlobalId) {
+            return Collections.singletonList((GlobalId) propertyValue);
+        }
+        if (property.getType() instanceof EnumerableType) {
+            EnumerableType enumerableType = property.getType();
+            return enumerableType.filterToList(propertyValue, GlobalId.class);
+        }
+        return Collections.emptyList();
+    }
+
     public Commit create(String author, Map<String, String> properties, Object currentVersion){
         argumentsAreNotNull(author, currentVersion);
+        // When deleting, creating and deleting an entity again, the value object is not deleted in the last commit
         LiveGraph currentGraph = createLiveGraph(currentVersion);
         return createCommit(author, properties, currentGraph);
     }

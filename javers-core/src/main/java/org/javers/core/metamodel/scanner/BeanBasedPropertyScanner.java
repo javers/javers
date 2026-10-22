@@ -10,9 +10,10 @@ import java.util.List;
  */
 class BeanBasedPropertyScanner extends PropertyScanner {
 
-    BeanBasedPropertyScanner(AnnotationNamesProvider annotationNamesProvider) {
-        super(annotationNamesProvider);
+    BeanBasedPropertyScanner(AnnotationNamesProvider annotationNamesProvider, final CascadeFallbackEvaluator cascadeFallbackEvaluator) {
+        super(annotationNamesProvider, cascadeFallbackEvaluator);
     }
+
 
     @Override
     List<JaversMember> getMembers(Class<?> managedClass) {
