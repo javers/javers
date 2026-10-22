@@ -1,6 +1,7 @@
 package org.javers.spring.mongodb;
 
 import com.mongodb.client.ClientSession;
+import org.javers.common.validation.Validate;
 import org.javers.core.CoreConfiguration;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -23,6 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 class TransactionalMongoRepository implements JaversRepository, ConfigurationAware {
     private final MongoRepository delegate;
@@ -36,50 +40,56 @@ class TransactionalMongoRepository implements JaversRepository, ConfigurationAwa
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        return delegate.getStateHistory(globalId, queryParams);
+        return supplyInTransaction(session -> delegate.getStateHistory(globalId, queryParams, session));
     }
 
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
-        return delegate.getValueObjectStateHistory(ownerEntity, path, queryParams);
+        return supplyInTransaction(session -> delegate.getValueObjectStateHistory(ownerEntity, path, queryParams, session));
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
-        return delegate.getStateHistory(givenClasses, queryParams);
+        return supplyInTransaction(session -> delegate.getStateHistory(givenClasses, queryParams, session));
     }
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        return delegate.getLatest(globalId);
+        return supplyInTransaction(session -> delegate.getLatest(globalId, session));
     }
 
     @Override
     public List<CdoSnapshot> getLatest(Collection<GlobalId> globalIds) {
-        return delegate.getLatest(globalIds);
+        return supplyInTransaction(session -> getLatest(globalIds, session));
+    }
+
+    private List<CdoSnapshot> getLatest(Collection<GlobalId> globalIds, ClientSession clientSession) {
+        Validate.argumentsAreNotNull(globalIds);
+
+        return globalIds.stream()
+            .map(globalId -> delegate.getLatest(globalId, clientSession))
+            .flatMap(Optional::stream)
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
-        return delegate.getSnapshots(queryParams);
+        return supplyInTransaction(session -> delegate.getSnapshots(queryParams, session));
     }
 
     @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return delegate.getSnapshots(snapshotIdentifiers);
+        return supplyInTransaction(session -> delegate.getSnapshots(snapshotIdentifiers, session));
     }
 
     @Override
     public void persist(Commit commit) {
-        transactionTemplate.execute(status -> {
-            ClientSession session = ClientSessionExtractor.getFrom((DefaultTransactionStatus)status);
-            delegate.persist(commit, session);
-            return null;
-        });
+        doInTransaction(session -> delegate.persist(commit, session));
     }
 
     @Override
     public CommitId getHeadId() {
+        // Don't delegate within a transaction because only actually persisted commits should be taken into account.
         return delegate.getHeadId();
     }
 
@@ -96,5 +106,19 @@ class TransactionalMongoRepository implements JaversRepository, ConfigurationAwa
     @Override
     public void setConfiguration(CoreConfiguration coreConfiguration) {
         delegate.setConfiguration(coreConfiguration);
+    }
+
+    private void doInTransaction(final Consumer<ClientSession> consumer) {
+        supplyInTransaction(session -> {
+            consumer.accept(session);
+            return null;
+        });
+    }
+
+    private <T> T supplyInTransaction(final Function<ClientSession, T> supplier) {
+        return transactionTemplate.execute(status -> {
+            ClientSession session = ClientSessionExtractor.getFrom((DefaultTransactionStatus)status);
+            return supplier.apply(session);
+        });
     }
 }
