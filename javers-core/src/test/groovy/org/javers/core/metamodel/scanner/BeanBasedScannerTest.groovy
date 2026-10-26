@@ -5,6 +5,6 @@ package org.javers.core.metamodel.scanner
 class BeanBasedScannerTest extends PropertyScannerTest {
 
     def setupSpec() {
-        propertyScanner = new BeanBasedPropertyScanner(new AnnotationNamesProvider(), new CascadeFallbackEvaluator.NoneFallbackEvaluator())
+        propertyScanner = new BeanBasedPropertyScanner(new AnnotationNamesProvider())
     }
 }

@@ -20,11 +20,9 @@ import java.util.Set;
 abstract class PropertyScanner {
 
     private final AnnotationNamesProvider annotationNamesProvider;
-    private final CascadeFallbackEvaluator cascadeFallbackEvaluator;
 
-    PropertyScanner(AnnotationNamesProvider annotationNamesProvider, final CascadeFallbackEvaluator cascadeFallbackEvaluator) {
+    PropertyScanner(AnnotationNamesProvider annotationNamesProvider) {
         this.annotationNamesProvider = annotationNamesProvider;
-        this.cascadeFallbackEvaluator = cascadeFallbackEvaluator;
     }
 
     public PropertyScan scan(Class<?> managedClass, boolean ignoreDeclaredProperties) {

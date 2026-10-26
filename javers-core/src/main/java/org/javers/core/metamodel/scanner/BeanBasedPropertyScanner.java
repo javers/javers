@@ -10,8 +10,8 @@ import java.util.List;
  */
 class BeanBasedPropertyScanner extends PropertyScanner {
 
-    BeanBasedPropertyScanner(AnnotationNamesProvider annotationNamesProvider, final CascadeFallbackEvaluator cascadeFallbackEvaluator) {
-        super(annotationNamesProvider, cascadeFallbackEvaluator);
+    BeanBasedPropertyScanner(AnnotationNamesProvider annotationNamesProvider) {
+        super(annotationNamesProvider);
     }
 
 

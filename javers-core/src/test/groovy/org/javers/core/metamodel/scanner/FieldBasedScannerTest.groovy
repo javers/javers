@@ -12,7 +12,7 @@ import static PropertyScanAssert.assertThat
 class FieldBasedScannerTest extends PropertyScannerTest {
 
     def setupSpec() {
-        propertyScanner = new FieldBasedPropertyScanner(new AnnotationNamesProvider(), new CascadeFallbackEvaluator.NoneFallbackEvaluator())
+        propertyScanner = new FieldBasedPropertyScanner(new AnnotationNamesProvider())
     }
 
     def "should ignore transient field"() {

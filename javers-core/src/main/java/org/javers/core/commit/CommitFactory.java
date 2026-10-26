@@ -17,7 +17,6 @@ import org.javers.core.snapshot.ChangedCdoSnapshotsFactory;
 import org.javers.core.snapshot.SnapshotFactory;
 import org.javers.core.snapshot.SnapshotGraphFactory;
 import org.javers.repository.api.JaversExtendedRepository;
-import org.jspecify.annotations.NonNull;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
