@@ -149,11 +149,11 @@ public class Changes extends AbstractList<Change> implements Serializable {
     }
 
     /**
-     * Alias of {@code prettyPrint(Order.NORMAL)}
+     * Alias of {@code prettyPrint(Order.DESC_BY_DATE)}
      * @see #prettyPrint(Order)
      */
     public final String prettyPrint() {
-        return prettyPrint(Order.NORMAL);
+        return prettyPrint(Order.DESC_BY_DATE);
     }
 
     /**
@@ -195,11 +195,11 @@ public class Changes extends AbstractList<Change> implements Serializable {
      *   - 'skills' collection changes :
      *      · 'management' added
      * </pre>
-     * @param order the order in which commits are printed.<br/>({@code NORMAL} or {@code CHRONOLOGICAL})
+     * @param order the order in which commits are printed.<br/>({@code DESC_BY_DATE} or {@code ASC_BY_DATE})
      */
     public final String prettyPrint(final Order order) {
         List<ChangesByCommit> changedByCommits = new LinkedList<>(groupByCommit());
-        if (order == Order.CHRONOLOGICAL) {
+        if (order == Order.ASC_BY_DATE) {
             Collections.reverse(changedByCommits);
         }
 
@@ -267,10 +267,10 @@ public class Changes extends AbstractList<Change> implements Serializable {
         /**
          * Order in which commits were created. (The oldest commit first.)
          */
-        CHRONOLOGICAL,
+        ASC_BY_DATE,
         /**
          * Reverse chronological order. The newest commit first, the oldest last.
          */
-        NORMAL
+        DESC_BY_DATE
     }
 }

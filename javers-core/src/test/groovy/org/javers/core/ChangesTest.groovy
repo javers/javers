@@ -28,20 +28,20 @@ class ChangesTest extends Specification {
         javers.findChanges(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
     }
 
-    def "default prettyPrint() should be an alias of prettyPrint(Order.NORMAL)"() {
+    def "default prettyPrint() should be an alias of prettyPrint(Order.DESC_BY_DATE)"() {
         given:
         def changes = threeCommitsOfChanges()
 
         expect:
-        changes.prettyPrint() == changes.prettyPrint(Changes.Order.NORMAL)
+        changes.prettyPrint() == changes.prettyPrint(Changes.Order.DESC_BY_DATE)
     }
 
-    def "prettyPrint(NORMAL) should list commits newest first"() {
+    def "prettyPrint(DESC_BY_DATE) should list commits newest first"() {
         given:
         def changes = threeCommitsOfChanges()
 
         when:
-        def printed = changes.prettyPrint(Changes.Order.NORMAL)
+        def printed = changes.prettyPrint(Changes.Order.DESC_BY_DATE)
         def commitIds = changes.groupByCommit()*.commit*.id*.value()
 
         then:
@@ -50,7 +50,7 @@ class ChangesTest extends Specification {
         printed.indexOf(commitIds[0]) < printed.indexOf(commitIds[-1])
     }
 
-    def "prettyPrint(CHRONOLOGICAL) should list commits oldest first"() {
+    def "prettyPrint(ASC_BY_DATE) should list commits oldest first"() {
         given:
         def changes = threeCommitsOfChanges()
 
@@ -59,18 +59,10 @@ class ChangesTest extends Specification {
         def commitIdsNormalOrder = changes.groupByCommit()*.commit*.id*.value()
         def oldestCommitId = commitIdsNormalOrder[-1]
         def newestCommitId = commitIdsNormalOrder[0]
+        def printed = changes.prettyPrint(Changes.Order.ASC_BY_DATE)
 
         then:
         printed.indexOf(oldestCommitId) < printed.indexOf(newestCommitId)
-    }
-
-    def "prettyPrint(CHRONOLOGICAL) should be the exact reverse of prettyPrint(NORMAL) at the commit-group level"() {
-        given:
-        def changes = threeCommitsOfChanges()
-
-        expect:
-        changes.groupByCommit()*.commit.id ==
-                changes.groupByCommit().reverse()*.commit.id.reverse()
     }
 
     def "a single commit should print the same way regardless of order"() {
@@ -80,7 +72,7 @@ class ChangesTest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         expect:
-        changes.prettyPrint(Changes.Order.NORMAL) == changes.prettyPrint(Changes.Order.CHRONOLOGICAL)
+        changes.prettyPrint(Changes.Order.DESC_BY_DATE) == changes.prettyPrint(Changes.Order.ASC_BY_DATE)
     }
 
     def "an empty Changes list should print just the header, regardless of order"() {
@@ -90,7 +82,7 @@ class ChangesTest extends Specification {
 
         expect:
         changes.isEmpty()
-        changes.prettyPrint(Changes.Order.NORMAL) == "Changes:\n"
-        changes.prettyPrint(Changes.Order.CHRONOLOGICAL) == "Changes:\n"
+        changes.prettyPrint(Changes.Order.DESC_BY_DATE) == "Changes:\n"
+        changes.prettyPrint(Changes.Order.ASC_BY_DATE) == "Changes:\n"
     }
 }
