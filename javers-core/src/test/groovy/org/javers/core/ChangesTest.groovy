@@ -55,23 +55,26 @@ class ChangesTest extends Specification {
         def changes = threeCommitsOfChanges()
 
         when:
-        def printed = changes.prettyPrint(Changes.Order.CHRONOLOGICAL)
-        def commitIdsNormalOrder = changes.groupByCommit()*.commit*.id*.value()
-        def oldestCommitId = commitIdsNormalOrder[-1]
-        def newestCommitId = commitIdsNormalOrder[0]
         def printed = changes.prettyPrint(Changes.Order.ASC_BY_DATE)
+        def oldestCommit = changes.groupByCommit()[-1]
+        def newestCommit = changes.groupByCommit()[0]
 
         then:
-        printed.indexOf(oldestCommitId) < printed.indexOf(newestCommitId)
+        def oldestCommitIdx = printed.indexOf(oldestCommit.prettyPrint())
+        oldestCommitIdx >= 0 // make sure commitId was actually found
+        def newestCommitIdx = printed.indexOf(newestCommit.prettyPrint())
+        newestCommitIdx >= 0
+        oldestCommitIdx < newestCommitIdx
     }
 
     def "a single commit should print the same way regardless of order"() {
         given:
-        def javers = javers().build()
+        def javers = javers().withInitialChanges(true).build()
         javers.commit("author", new SnapshotEntity(id: 1, intProperty: 1))
         def changes = javers.findChanges(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         expect:
+        changes.size() == 2
         changes.prettyPrint(Changes.Order.DESC_BY_DATE) == changes.prettyPrint(Changes.Order.ASC_BY_DATE)
     }
 
