@@ -6,6 +6,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.Cdo;
 import org.javers.core.graph.LiveNode;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.CustomComparableType;
 import org.javers.core.metamodel.type.JaversProperty;
@@ -25,8 +26,11 @@ import static org.javers.core.metamodel.object.SnapshotType.*;
 public class SnapshotFactory {
     private final TypeMapper typeMapper;
 
-    SnapshotFactory(TypeMapper typeMapper) {
+    private final JsonConverter jsonConverter;
+
+    SnapshotFactory(TypeMapper typeMapper, JsonConverter jsonConverter) {
         this.typeMapper = typeMapper;
+        this.jsonConverter = jsonConverter;
     }
 
     public CdoSnapshot createTerminal(GlobalId globalId, CdoSnapshot previous, CommitMetadata commitMetadata) {
@@ -91,11 +95,22 @@ public class SnapshotFactory {
         return stateBuilder.build();
     }
 
-    private static <T> SortedSet<T> toOrderedSet(Collection<T> col) {
+    private <T> Collection<T> toOrderedSet(Collection<T> col) {
         if (col instanceof SortedSet) {
             return (SortedSet)col;
         }
-        return new TreeSet<>(col);
+        try {
+            return new TreeSet<>(col);
+        } catch (ClassCastException | NullPointerException e) {
+            // Values need not implement Comparable, and collections may contain nulls.
+            // Keep natural ordering where supported
+            // so that existing hashes do not change, and canonicalize other Values by JSON.
+            List<T> ordered = new ArrayList<>(new HashSet<>(col));
+            Map<T, String> jsonByValue = new IdentityHashMap<>();
+            ordered.forEach(value -> jsonByValue.put(value, jsonConverter.toJson(value)));
+            ordered.sort(Comparator.comparing(jsonByValue::get));
+            return ordered;
+        }
     }
 
     public CdoSnapshotState createSnapshotState(LiveNode liveNode){
