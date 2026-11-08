@@ -86,7 +86,6 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  */
 public class JaversBuilder extends AbstractContainerBuilder {
     public static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
-    private static volatile boolean proBannerPrinted = false;
     private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new LinkedHashMap<>();
 
     private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
@@ -99,7 +98,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     private JaversRepository repository;
     private DateProvider dateProvider;
     private long bootStart = System.currentTimeMillis();
-    private boolean printProBanner = true;
+    private boolean printProBanner = false;
     private Class<? extends ObjectHasher> objectHasherImplementation = SnapshotObjectHasher.class;
 
     private IgnoredClassesStrategy ignoredClassesStrategy;
@@ -142,10 +141,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     private static synchronized void printProBanner() {
-        if (proBannerPrinted) {
-            return;
-        }
-        proBannerPrinted = true;
 
         String GREEN = "\u001B[32m";
         String CYAN = "\u001B[36m";
