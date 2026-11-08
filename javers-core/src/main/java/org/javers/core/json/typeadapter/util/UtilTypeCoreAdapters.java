@@ -86,7 +86,8 @@ public class UtilTypeCoreAdapters {
                 new JavaSqlTimestampTypeAdapter(),
                 new JavaSqlTimeTypeAdapter(),
                 new FileTypeAdapter(),
-                new UUIDTypeAdapter()
+                new UUIDTypeAdapter(),
+                new JsonSortedSetAdapter()
                 );
     }
 
