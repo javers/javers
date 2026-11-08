@@ -11,7 +11,7 @@ import static org.javers.core.JaversBuilder.javers
  */
 class ChangesTest extends Specification {
 
-    private static Changes threeCommitsOfChanges() {
+    private static Changes changesFromFourCommits() {
         def javers = javers().build()
         def entity = new SnapshotEntity(id: 1, intProperty: 0)
         javers.commit("author", entity)
@@ -30,7 +30,7 @@ class ChangesTest extends Specification {
 
     def "default prettyPrint() should be an alias of prettyPrint(Order.DESC_BY_DATE)"() {
         given:
-        def changes = threeCommitsOfChanges()
+        def changes = changesFromFourCommits()
 
         expect:
         changes.prettyPrint() == changes.prettyPrint(Changes.Order.DESC_BY_DATE)
@@ -38,24 +38,29 @@ class ChangesTest extends Specification {
 
     def "prettyPrint(DESC_BY_DATE) should list commits newest first"() {
         given:
-        def changes = threeCommitsOfChanges()
+        def changes = changesFromFourCommits()
 
         when:
         def printed = changes.prettyPrint(Changes.Order.DESC_BY_DATE)
-        def commitIds = changes.groupByCommit()*.commit*.id*.value()
+        println(printed)
+        def oldestCommit = changes.groupByCommit()[-1]
+        def newestCommit = changes.groupByCommit()[0]
 
         then:
-        // newest commit (highest id/version) comes first in the printout
-        commitIds == commitIds.sort(false).reverse()
-        printed.indexOf(commitIds[0]) < printed.indexOf(commitIds[-1])
+        def newestCommitIdx = printed.indexOf(newestCommit.prettyPrint())
+        newestCommitIdx >= 0 // make sure the commit was actually found
+        def oldestCommitIdx = printed.indexOf(oldestCommit.prettyPrint())
+        oldestCommitIdx >= 0
+        newestCommitIdx < oldestCommitIdx
     }
 
     def "prettyPrint(ASC_BY_DATE) should list commits oldest first"() {
         given:
-        def changes = threeCommitsOfChanges()
+        def changes = changesFromFourCommits()
 
         when:
         def printed = changes.prettyPrint(Changes.Order.ASC_BY_DATE)
+        println(printed)
         def oldestCommit = changes.groupByCommit()[-1]
         def newestCommit = changes.groupByCommit()[0]
 
