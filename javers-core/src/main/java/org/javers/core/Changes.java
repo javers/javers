@@ -149,6 +149,14 @@ public class Changes extends AbstractList<Change> implements Serializable {
     }
 
     /**
+     * Alias of {@code prettyPrint(Order.DESC_BY_DATE)}
+     * @see #prettyPrint(Order)
+     */
+    public final String prettyPrint() {
+        return prettyPrint(Order.DESC_BY_DATE);
+    }
+
+    /**
      * Prints the list of Changes to a nicely formatted String.<br/>
      * Can be used on GUI to show Changes to your users.
      * <br/><br/>
@@ -187,12 +195,17 @@ public class Changes extends AbstractList<Change> implements Serializable {
      *   - 'skills' collection changes :
      *      · 'management' added
      * </pre>
+     * @param order the order in which commits are printed.<br/>({@code DESC_BY_DATE} or {@code ASC_BY_DATE})
      */
-    public final String prettyPrint() {
-        StringBuilder b = new StringBuilder();
+    public final String prettyPrint(final Order order) {
+        List<ChangesByCommit> changedByCommits = new LinkedList<>(groupByCommit());
+        if (order == Order.ASC_BY_DATE) {
+            Collections.reverse(changedByCommits);
+        }
 
+        StringBuilder b = new StringBuilder();
         b.append("Changes:\n");
-        for (ChangesByCommit c : groupByCommit()){
+        for (ChangesByCommit c : changedByCommits){
             b.append(c.prettyPrint());
         }
         return b.toString();
@@ -250,4 +263,14 @@ public class Changes extends AbstractList<Change> implements Serializable {
         return b.toString();
     }
 
+    public enum Order {
+        /**
+         * Order in which commits were created. (The oldest commit first.)
+         */
+        ASC_BY_DATE,
+        /**
+         * Reverse chronological order. The newest commit first, the oldest last.
+         */
+        DESC_BY_DATE
+    }
 }
