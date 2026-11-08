@@ -24,6 +24,7 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.repository.api.*;
 import org.javers.repository.mongo.model.MongoHeadId;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -90,7 +91,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             mongo, mongoRepositoryConfiguration.getSnapshotCollectionName(),
             mongoRepositoryConfiguration.getHeadCollectionName());
         int cacheSize = mongoRepositoryConfiguration.getCacheSize();
-        this.cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
+        this.cache = new LatestSnapshotCache(cacheSize, (input, clientSession) -> getLatest(createIdQuery(input), clientSession));
         this.schemaManagementEnabled = mongoRepositoryConfiguration.isSchemaManagementEnabled();
     }
 
@@ -106,49 +107,84 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     }
 
     void clean(){
-        snapshotsCollection().deleteMany(new Document());
-        headCollection().deleteMany(new Document());
+        clean(null);
+    }
+
+    void clean(@Nullable ClientSession clientSession){
+        final var filter = new Document();
+        if (clientSession == null) {
+            snapshotsCollection().deleteMany(filter);
+            headCollection().deleteMany(filter);
+        } else {
+            snapshotsCollection().deleteMany(clientSession, filter);
+            headCollection().deleteMany(clientSession, filter);
+        }
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
+        return getStateHistory(globalId, queryParams, null);
+    }
+
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams, @Nullable ClientSession clientSession) {
         Bson query;
         if (queryParams.isAggregate()){
             query = createIdQueryWithAggregate(globalId);
         } else {
             query = createIdQuery(globalId);
         }
-        return queryForSnapshots(query, Optional.of(queryParams));
+        return queryForSnapshots(query, Optional.of(queryParams), clientSession);
     }
+
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        return cache.getLatest(globalId);
+        return getLatest(globalId, null);
+    }
+
+    public Optional<CdoSnapshot> getLatest(GlobalId globalId, @Nullable ClientSession clientSession) {
+        return cache.getLatest(globalId, clientSession);
     }
 
     @Override
     public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
-        return queryForSnapshots(new BasicDBObject(), Optional.of(queryParams));
+        return getSnapshots(queryParams, null);
+    }
+
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams, @Nullable ClientSession clientSession) {
+        return queryForSnapshots(new BasicDBObject(), Optional.of(queryParams), clientSession);
     }
 
     @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return snapshotIdentifiers.isEmpty() ? Collections.<CdoSnapshot>emptyList() :
-            queryForSnapshots(createSnapshotIdentifiersQuery(snapshotIdentifiers), Optional.<QueryParams>empty());
+        return getSnapshots(snapshotIdentifiers, null);
+    }
+
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers, @Nullable ClientSession clientSession) {
+        return snapshotIdentifiers.isEmpty() ? Collections.emptyList() :
+            queryForSnapshots(createSnapshotIdentifiersQuery(snapshotIdentifiers), Optional.empty(), clientSession);
     }
 
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
+        return getValueObjectStateHistory(ownerEntity, path, queryParams, null);
+    }
+
+    public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams, @Nullable ClientSession clientSession) {
         BasicDBObject query = new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ownerEntity.getName());
         query.append(GLOBAL_ID_FRAGMENT, path);
 
-        return queryForSnapshots(query, Optional.of(queryParams));
+        return queryForSnapshots(query, Optional.of(queryParams), clientSession);
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
+        return getStateHistory(givenClasses, queryParams, null);
+    }
+
+    public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams, @Nullable ClientSession clientSession) {
         Bson query = createManagedTypeQuery(givenClasses, queryParams.isAggregate());
-        return queryForSnapshots(query, Optional.of(queryParams));
+        return queryForSnapshots(query, Optional.of(queryParams), clientSession);
     }
 
     @Override
@@ -288,9 +324,12 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         return Filters.eq(OBJECT_ID, document.getObjectId("_id"));
     }
 
-    private MongoCursor<Document> getMongoSnapshotsCursor(Bson query, Optional<QueryParams> queryParams) {
-        FindIterable<Document> findIterable = snapshotsCollection()
-            .find(applyQueryParams(query, queryParams));
+    private MongoCursor<Document> getMongoSnapshotsCursor(Bson query, Optional<QueryParams> queryParams, @Nullable ClientSession clientSession) {
+        final MongoCollection<Document> collection = snapshotsCollection();
+        final Bson filter = applyQueryParams(query, queryParams);
+        FindIterable<Document> findIterable = clientSession == null
+            ? collection.find(filter)
+            : collection.find(clientSession, filter);
 
         if (coreConfiguration.getCommitIdGenerator() == CommitIdGenerator.SYNCHRONIZED_SEQUENCE) {
             findIterable.sort(orderBy(descending(COMMIT_ID, OBJECT_ID)));
@@ -400,16 +439,16 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
     }
 
-    private Optional<CdoSnapshot> getLatest(Bson idQuery) {
+    private Optional<CdoSnapshot> getLatest(Bson idQuery, @Nullable ClientSession clientSession) {
         QueryParams queryParams = QueryParamsBuilder.withLimit(1).build();
-        MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, Optional.of(queryParams));
+        MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, Optional.of(queryParams), clientSession);
 
         return getOne(mongoLatest).map(d -> readFromDBObject(d));
     }
 
-    private List<CdoSnapshot> queryForSnapshots(Bson query, Optional<QueryParams> queryParams) {
+    private List<CdoSnapshot> queryForSnapshots(Bson query, Optional<QueryParams> queryParams, @Nullable ClientSession clientSession) {
         List<CdoSnapshot> snapshots = new ArrayList<>();
-        try (MongoCursor<Document> mongoSnapshots = getMongoSnapshotsCursor(query, queryParams)) {
+        try (MongoCursor<Document> mongoSnapshots = getMongoSnapshotsCursor(query, queryParams, clientSession)) {
             while (mongoSnapshots.hasNext()) {
                 Document dbObject = mongoSnapshots.next();
                 snapshots.add(readFromDBObject(dbObject));
