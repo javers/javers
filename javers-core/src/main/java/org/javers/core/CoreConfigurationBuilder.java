@@ -22,6 +22,8 @@ class CoreConfigurationBuilder {
 
     private boolean usePrimitiveDefaults = true;
 
+    private CascadingMode cascadingMode = CascadingMode.NONE;
+
     private CommitIdGenerator commitIdGenerator = CommitIdGenerator.SYNCHRONIZED_SEQUENCE;
 
     private Supplier<CommitId> customCommitIdGenerator;
@@ -43,7 +45,8 @@ class CoreConfigurationBuilder {
                 customCommitIdGenerator,
                 terminalChanges,
                 prettyPrint,
-                usePrimitiveDefaults
+                usePrimitiveDefaults,
+                cascadingMode
         );
     }
 
@@ -97,6 +100,12 @@ class CoreConfigurationBuilder {
     CoreConfigurationBuilder withPrettyPrintDateFormats(JaversCoreProperties.PrettyPrintDateFormats prettyPrintDateFormats) {
         Validate.argumentIsNotNull(prettyPrintDateFormats);
         prettyValuePrinter = new PrettyValuePrinter(prettyPrintDateFormats);
+        return this;
+    }
+
+    CoreConfigurationBuilder withCascadingMode(CascadingMode cascadingMode) {
+        Validate.argumentIsNotNull(cascadingMode);
+        this.cascadingMode = cascadingMode;
         return this;
     }
 }

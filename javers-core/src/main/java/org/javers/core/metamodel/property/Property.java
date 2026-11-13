@@ -1,6 +1,5 @@
 package org.javers.core.metamodel.property;
 
-import java.lang.reflect.Field;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.JaversMember;
@@ -21,10 +20,11 @@ public class Property {
     private transient final boolean hasTransientAnn;
     private transient final boolean hasIncludedAnn;
     private transient final boolean hasShallowReferenceAnn;
+    private transient final Boolean cascading;
     private final String name;
     private final String originalName;
 
-    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, Optional<String> name, boolean hasIncludedAnn){
+    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, Optional<String> name, boolean hasIncludedAnn, Boolean cascading){
         argumentIsNotNull(member);
         this.member = member;
         this.hasTransientAnn = hasTransientAnn;
@@ -32,14 +32,15 @@ public class Property {
         this.originalName = member.propertyName();
         this.name = name.orElse(originalName);
         this.hasIncludedAnn = hasIncludedAnn;
+        this.cascading = cascading;
     }
 
-    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, String name, boolean hasIncludedAnn){
-        this(member, hasTransientAnn, hasShallowReferenceAnn, Optional.of(name), hasIncludedAnn);
+    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, String name, boolean hasIncludedAnn, Boolean cascading){
+        this(member, hasTransientAnn, hasShallowReferenceAnn, Optional.of(name), hasIncludedAnn, cascading);
     }
 
     public Property(JaversMember member) {
-        this(member, false, false, Optional.empty(), false);
+        this(member, false, false, Optional.empty(), false, null);
     }
 
     public Type getGenericType() {
@@ -126,6 +127,10 @@ public class Property {
 
     public boolean hasShallowReferenceAnn() {
         return hasShallowReferenceAnn;
+    }
+
+    public Optional<Boolean> shouldCascade() {
+        return Optional.ofNullable(cascading);
     }
 
     @Override

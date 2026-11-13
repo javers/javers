@@ -29,8 +29,10 @@ public class CoreConfiguration {
 
     private final Supplier<CommitId> customCommitIdGenerator;
 
+    private final CascadingMode cascadingMode;
+
     CoreConfiguration(PrettyValuePrinter prettyValuePrinter, MappingStyle mappingStyle, ListCompareAlgorithm listCompareAlgorithm, boolean initialChanges, CommitIdGenerator commitIdGenerator, Supplier<CommitId> customCommitIdGenerator, boolean terminalChanges, boolean prettyPrint,
-            boolean usePrimitiveDefaults) {
+                      boolean usePrimitiveDefaults, final CascadingMode cascadingMode) {
         this.prettyValuePrinter = prettyValuePrinter;
         this.mappingStyle = mappingStyle;
         this.listCompareAlgorithm = listCompareAlgorithm;
@@ -40,6 +42,7 @@ public class CoreConfiguration {
         this.terminalChanges = terminalChanges;
         this.prettyPrint = prettyPrint;
         this.usePrimitiveDefaults = usePrimitiveDefaults;
+        this.cascadingMode = cascadingMode;
     }
 
     public PrettyValuePrinter getPrettyValuePrinter() {
@@ -76,5 +79,9 @@ public class CoreConfiguration {
 
     public boolean isPrettyPrint() {
         return prettyPrint;
+    }
+
+    public CascadingMode getCascadingMode() {
+        return cascadingMode;
     }
 }

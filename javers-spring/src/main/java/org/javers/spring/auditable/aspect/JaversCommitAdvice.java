@@ -61,9 +61,9 @@ public class JaversCommitAdvice {
         for (Object arg : AspectUtil.collectArguments(jp)) {
             JaversType javersType = javers.getTypeMapping(arg.getClass());
             if (javersType instanceof ManagedType) {
-                commitShallowDelete(jp, arg);
+                commitCascadingDelete(jp, arg);
             } else if (javersType instanceof PrimitiveOrValueType) {
-                commitShallowDeleteById(jp, arg, getDomainTypeToDelete(jp, arg));
+                commitCascadingDeleteById(jp, arg, getDomainTypeToDelete(jp, arg));
             }
         }
     }
@@ -73,7 +73,7 @@ public class JaversCommitAdvice {
         for (Object arg : AspectUtil.collectReturnedObjects(entities)) {
             JaversType javersType = javers.getTypeMapping(arg.getClass());
             if (javersType instanceof ManagedType) {
-                commitShallowDelete(jp, arg);
+                commitCascadingDelete(jp, arg);
             } else {
                 Method method = ((MethodSignature) jp.getSignature()).getMethod();
                 throw new JaversException(JaversExceptionCode.WRONG_USAGE_OF_JAVERS_AUDITABLE_CONDITIONAL_DELETE, method);
@@ -96,12 +96,32 @@ public class JaversCommitAdvice {
         javers.commit(author, domainObject, propsForCommit(jp, domainObject));
     }
 
+    public void commitCascadingDelete(final JoinPoint pjp, final Object domainObjectOrId) {
+        String author = authorProvider.provide();
+        javers.commitCascadingDelete(author, domainObjectOrId, propsForDeletedObject(pjp, domainObjectOrId));
+    }
+
+    public void commitCascadingDeleteById(JoinPoint jp, Object domainObjectId, Class<?> domainType) {
+        String author = authorProvider.provide();
+
+        javers.commitCascadingDeleteById(author, instanceId(domainObjectId, domainType),
+            propsForDeletedById(jp, domainType, domainObjectId));
+    }
+
+    /**
+     * @deprecated Use {@link #commitCascadingDelete(JoinPoint, Object)} instead.
+     */
+    @Deprecated
     public void commitShallowDelete(JoinPoint jp, Object domainObject) {
         String author = authorProvider.provide();
 
         javers.commitShallowDelete(author, domainObject, propsForDeletedObject(jp, domainObject));
     }
 
+    /**
+     * @deprecated Use {@link #commitCascadingDeleteById(JoinPoint, Object, Class)} instead.
+     */
+    @Deprecated
     public void commitShallowDeleteById(JoinPoint jp, Object domainObjectId, Class<?> domainType) {
         String author = authorProvider.provide();
 
@@ -157,6 +177,6 @@ public class JaversCommitAdvice {
 
         return getAdvancedCommitPropertiesProvider()
                 .map(adv -> Maps.merge(adv.provideForDeleteById(domainObjectClass, domainObjectId, AuditedMethodExecutionContext.from(jp)), basicProps))
-                .orElse(basicProps);
+            .orElse(basicProps);
     }
 }

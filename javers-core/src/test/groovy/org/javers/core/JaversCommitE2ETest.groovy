@@ -1,11 +1,14 @@
 package org.javers.core
 
+import jakarta.persistence.Id
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert
+import org.javers.core.metamodel.annotation.Cascading
 import org.javers.core.metamodel.clazz.EntityDefinitionBuilder
 import org.javers.core.model.*
 import org.javers.repository.jql.InstanceIdDTO
+import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -133,6 +136,254 @@ class JaversCommitE2ETest extends Specification {
         deleteMethod << [ { j -> j.commitShallowDelete("some.login", new SnapshotEntity(id:1)) },
                           { j -> j.commitShallowDeleteById("some.login", InstanceIdDTO.instanceId(1,SnapshotEntity))} ]
         opType << ["using object instance","using globalId"]
+    }
+
+    def "should create terminal commits for the deleted object and its cascading children when using commitCascadingDelete"() {
+        given:
+        def javers = javers().build()
+        def grandchild = new SnapshotEntity(id: 3)
+        def child = new SnapshotEntity(id: 2, cascadingRef: grandchild)
+        def nonCascadingChild = new SnapshotEntity(id: 4)
+        def root = new SnapshotEntity(id: 1, cascadingRef: child, entityRef: nonCascadingChild)
+        javers.commit("some.login", root)
+
+        when:
+        def commit = javers.commitCascadingDelete("some.login", new SnapshotEntity(id: 1))
+
+        then:
+        CommitAssert.assertThat(commit)
+                .hasChanges(3)
+                .hasObjectRemoved(instanceId(1, SnapshotEntity))
+                .hasObjectRemoved(instanceId(2, SnapshotEntity))
+                .hasObjectRemoved(instanceId(3, SnapshotEntity))
+                .hasSnapshots(3)
+                .hasTerminalSnapshot(instanceId(1, SnapshotEntity))
+                .hasTerminalSnapshot(instanceId(2, SnapshotEntity))
+                .hasTerminalSnapshot(instanceId(3, SnapshotEntity))
+
+        javers.getLatestSnapshot(4, SnapshotEntity).get().terminal == false
+    }
+
+    def "should create terminal commits for the deleted object and its cascading children when using commitCascadingDeleteById"() {
+        given:
+        def javers = javers().build()
+        def grandchild = new SnapshotEntity(id: 3)
+        def child = new SnapshotEntity(id: 2, cascadingRef: grandchild)
+        def nonCascadingChild = new SnapshotEntity(id: 4)
+        def root = new SnapshotEntity(id: 1, cascadingRef: child, entityRef: nonCascadingChild)
+        javers.commit("some.login", root)
+
+        when:
+        def commit = javers.commitCascadingDeleteById("some.login", InstanceIdDTO.instanceId(1, SnapshotEntity))
+
+        then:
+        CommitAssert.assertThat(commit)
+                .hasChanges(3)
+                .hasObjectRemoved(instanceId(1, SnapshotEntity))
+                .hasObjectRemoved(instanceId(2, SnapshotEntity))
+                .hasObjectRemoved(instanceId(3, SnapshotEntity))
+                .hasSnapshots(3)
+                .hasTerminalSnapshot(instanceId(1, SnapshotEntity))
+                .hasTerminalSnapshot(instanceId(2, SnapshotEntity))
+                .hasTerminalSnapshot(instanceId(3, SnapshotEntity))
+
+        javers.getLatestSnapshot(4, SnapshotEntity).get().terminal == false
+    }
+
+    def "should fall back to a shallow delete when cascading-deleting-by-id a never-committed object"() {
+        given:
+        def javers = javers().build()
+
+        when:
+        def commit = javers.commitCascadingDeleteById("author", InstanceIdDTO.instanceId(1, SnapshotEntity))
+
+        then:
+        CommitAssert.assertThat(commit)
+                .hasChanges(1)
+                .hasObjectRemoved(instanceId(1, SnapshotEntity))
+                .hasSnapshots(1)
+    }
+
+    def "commitCascadingDeleteById() should pass through the given commitProperties"() {
+        given:
+        def javers = javers().build()
+        javers.commit("author", new SnapshotEntity(id: 1))
+
+        when:
+        def commit = javers.commitCascadingDeleteById("author", InstanceIdDTO.instanceId(1, SnapshotEntity), ["key": "ok"])
+
+        then:
+        commit.properties == ["key": "ok"]
+    }
+
+    def "should fall back to a shallow delete when cascading-deleting a never-committed object"() {
+        given:
+        def javers = javers().build()
+
+        when:
+        def commit = javers.commitCascadingDelete("author", new SnapshotEntity(id: 1))
+
+        then:
+        // Cascading traversal relies on reading the previous snapshot from the repository.
+        // When the object was never committed, there is nothing to traverse, so this silently
+        // behaves just like commitShallowDelete.
+        CommitAssert.assertThat(commit)
+                .hasChanges(1)
+                .hasObjectRemoved(instanceId(1, SnapshotEntity))
+                .hasSnapshots(1)
+    }
+
+    def "should cascade delete through a List of @Cascading children"() {
+        given:
+        def javers = javers().build()
+        def child1 = new SnapshotEntity(id: 2)
+        def child2 = new SnapshotEntity(id: 3)
+        def root = new SnapshotEntity(id: 1, cascadingRefs: [child1, child2])
+        javers.commit("author", root)
+
+        when:
+        def commit = javers.commitCascadingDelete("author", new SnapshotEntity(id: 1))
+
+        then:
+        CommitAssert.assertThat(commit)
+                .hasChanges(3)
+                .hasObjectRemoved(instanceId(1, SnapshotEntity))
+                .hasObjectRemoved(instanceId(2, SnapshotEntity))
+                .hasObjectRemoved(instanceId(3, SnapshotEntity))
+    }
+
+    def "should handle cyclic cascading references without an infinite loop"() {
+        given:
+        def javers = javers().build()
+        def a = new SnapshotEntity(id: 1)
+        def b = new SnapshotEntity(id: 2, cascadingRef: a)
+        a.cascadingRef = b
+        javers.commit("author", a)
+
+        when:
+        def commit = javers.commitCascadingDelete("author", new SnapshotEntity(id: 1))
+
+        then:
+        CommitAssert.assertThat(commit)
+                .hasChanges(2)
+                .hasObjectRemoved(instanceId(1, SnapshotEntity))
+                .hasObjectRemoved(instanceId(2, SnapshotEntity))
+    }
+
+    def "should cascade-delete a child shared by two independent parents (documents current all-or-nothing behavior)"() {
+        given:
+        def javers = javers().build()
+        def sharedChild = new SnapshotEntity(id: 3)
+        def parentA = new SnapshotEntity(id: 1, cascadingRef: sharedChild)
+        def parentB = new SnapshotEntity(id: 2, cascadingRef: sharedChild)
+        javers.commit("author", parentA)
+        javers.commit("author", parentB)
+
+        when:
+        javers.commitCascadingDelete("author", new SnapshotEntity(id: 1))
+
+        then:
+        // KNOWN LIMITATION: sharedChild is deleted even though parentB is still alive
+        // and still references it. Cascading delete doesn't check for other owners.
+        javers.getLatestSnapshot(3, SnapshotEntity).get().terminal == true
+        javers.getLatestSnapshot(2, SnapshotEntity).get().terminal == false
+    }
+
+    def "should create a redundant terminal snapshot when cascading into an already-terminal descendant"() {
+        given:
+        def javers = javers().build()
+        def child = new SnapshotEntity(id: 2)
+        def root = new SnapshotEntity(id: 1, cascadingRef: child)
+        javers.commit("author", root)
+        javers.commitCascadingDelete("author", new SnapshotEntity(id: 1))
+        def childHistorySizeAfterFirstDelete =
+                javers.findSnapshots(QueryBuilder.byInstanceId(2, SnapshotEntity).build()).size()
+
+        when:
+        javers.commit("author", new SnapshotEntity(id: 1, cascadingRef: child))
+        def commit = javers.commitCascadingDelete("author", new SnapshotEntity(id: 1))
+
+        then:
+        // KNOWN LIMITATION: child(2) was already terminal, but it gets a second,
+        // redundant terminal snapshot/ObjectRemoved change instead of being skipped.
+        CommitAssert.assertThat(commit)
+                .hasObjectRemoved(instanceId(2, SnapshotEntity))
+        javers.findSnapshots(QueryBuilder.byInstanceId(2, SnapshotEntity).build()).size() >
+                childHistorySizeAfterFirstDelete
+    }
+
+    def "should cascade into ValueObjects but not Entities under CascadingMode.VALUE_OBJECTS fallback"() {
+        given:
+        def javers = javers().withCascadingMode(CascadingMode.VALUE_OBJECTS).build()
+        def entityChild = new SnapshotEntity(id: 2)
+        def root = new SnapshotEntity(id: 1, entityRef: entityChild, valueObjectRef: new DummyAddress("London"))
+        javers.commit("author", root)
+
+        when:
+        def commit = javers.commitCascadingDelete("author", new SnapshotEntity(id: 1))
+
+        then:
+        def voId = valueObjectId(1, SnapshotEntity, "valueObjectRef")
+        CommitAssert.assertThat(commit)
+                .hasChanges(2)
+                .hasObjectRemoved(instanceId(1, SnapshotEntity))
+                .hasObjectRemoved(voId)
+        javers.getLatestSnapshot(2, SnapshotEntity).get().terminal == false
+    }
+
+    def "should cascade into Entities under CascadingMode.ALL fallback"() {
+        given:
+        def javers = javers().withCascadingMode(CascadingMode.ALL).build()
+        def entityChild = new SnapshotEntity(id: 2)
+        def root = new SnapshotEntity(id: 1, entityRef: entityChild)
+        javers.commit("author", root)
+
+        when:
+        def commit = javers.commitCascadingDelete("author", new SnapshotEntity(id: 1))
+
+        then:
+        CommitAssert.assertThat(commit)
+                .hasChanges(2)
+                .hasObjectRemoved(instanceId(1, SnapshotEntity))
+                .hasObjectRemoved(instanceId(2, SnapshotEntity))
+    }
+
+    def "should respect @Cascading(false) override even when CascadingMode is ALL"() {
+        given:
+        def javers = javers().withCascadingMode(CascadingMode.ALL).build()
+        def child = new SnapshotEntity(id: 10)
+        def parent = new CascadingOverrideParent(id: 1, child: child)
+        javers.commit("author", parent)
+
+        when:
+        javers.commitCascadingDelete("author", new CascadingOverrideParent(id: 1))
+
+        then:
+        javers.getLatestSnapshot(10, SnapshotEntity).get().terminal == false
+    }
+
+    def "should cascade through a @ShallowReference property under CascadingMode.ALL (documents current behavior)"() {
+        given:
+        def javers = javers().withCascadingMode(CascadingMode.ALL).build()
+        def phone = new PhoneWithShallowCategory(id: 1L, shallowCategory: new CategoryC(2L, "old"))
+        javers.commit("author", phone)
+
+        when:
+        javers.commitCascadingDelete("author", new PhoneWithShallowCategory(id: 1L))
+
+        then:
+        // KNOWN LIMITATION: @ShallowReference is meant to exclude a property from deep graph
+        // traversal, but the cascading fallback mode doesn't take it into account. A terminal
+        // snapshot is created for CategoryC(2) even though it never had a snapshot of its own.
+        javers.getLatestSnapshot(2L, CategoryC).get().terminal == true
+    }
+
+    static class CascadingOverrideParent {
+        @Id
+        int id
+
+        @Cascading(false)
+        SnapshotEntity child
     }
 
     def "should create terminal commit when deleting non existing object"() {

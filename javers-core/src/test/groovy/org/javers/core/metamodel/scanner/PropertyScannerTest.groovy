@@ -3,6 +3,7 @@ package org.javers.core.metamodel.scanner
 import com.google.gson.reflect.TypeToken
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
+import org.javers.core.metamodel.annotation.Cascading
 import org.javers.core.metamodel.annotation.DiffIgnore
 import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.clazz.JaversEntity
@@ -32,12 +33,53 @@ abstract class PropertyScannerTest extends Specification {
         }
     }
 
+    class EntityWithCascading extends JaversEntity {
+        @Cascading String cascadingField
+
+        @Cascading String getCascadingField() {
+            return cascadingField
+        }
+    }
+
+    class EntityWithCascadingExplicitlyDisabled extends JaversEntity {
+        @Cascading(false) String notCascadingField
+
+        @Cascading(false) String getNotCascadingField() {
+            return notCascadingField
+        }
+    }
+
     def "should scan included property"() {
         when:
         def properties = propertyScanner.scan(EntityWithDiffInclude)
 
         then:
         assertThat(properties).hasProperty("includedField").isIncluded()
+    }
+
+    def "should scan cascading property"() {
+        when:
+        def properties = propertyScanner.scan(EntityWithCascading)
+
+        then:
+        assertThat(properties).hasProperty("cascadingField").isCascading()
+    }
+
+    def "should scan non-cascading property as not cascading"() {
+        when:
+        def properties = propertyScanner.scan(DummyUser)
+
+        then:
+        assertThat(properties).hasProperty("name").isNotCascading()
+        assertThat(properties).hasProperty("name").hasNoCascadingConfiguration()
+    }
+
+    def "should distinguish an explicit @Cascading(false) override from an absent annotation"() {
+        when:
+        def properties = propertyScanner.scan(EntityWithCascadingExplicitlyDisabled)
+
+        then:
+        assertThat(properties).hasProperty("notCascadingField").isExplicitlyNotCascading()
     }
 
     def "should scan and get inherited property"() {

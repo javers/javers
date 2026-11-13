@@ -53,12 +53,12 @@ public class AbstractSpringAuditableRepositoryAspect {
                 if (javers.findSnapshots(QueryBuilder.byInstanceId(domainObjectOrId, domainType).limit(1).build()).size() == 0) {
                     return;
                 }
-                javersCommitAdvice.commitShallowDeleteById(pjp, domainObjectOrId, domainType);
+                javersCommitAdvice.commitCascadingDeleteById(pjp, domainObjectOrId, domainType);
             } else if (isDomainClass(repositoryMetadata, domainObjectOrId)) {
                 if (javers.findSnapshots(QueryBuilder.byInstance(domainObjectOrId).limit(1).build()).size() == 0) {
                     return;
                 }
-                javersCommitAdvice.commitShallowDelete(pjp, domainObjectOrId);
+                javersCommitAdvice.commitCascadingDelete(pjp, domainObjectOrId);
             } else {
                 throw new IllegalArgumentException("Domain object or object id expected");
             }
