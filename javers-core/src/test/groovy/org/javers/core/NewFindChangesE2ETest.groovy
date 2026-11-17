@@ -87,7 +87,7 @@ class NewFindChangesE2ETest extends Specification {
         changesByObject.size() == 2
         changesByObject[0].get().size() == 2
         changesByObject[1].get().size() == 2
-        changesByObject.every { byObject -> byObject.get().every { it instanceof NewObject } }
+        changesByObject.every { byObject -> byObject.get().every { it instanceof ValueChange } }
         changesByObject.collect{it.globalId.value()} as Set == ['Employee/kaz','Employee/stef'] as Set
 
         when:
