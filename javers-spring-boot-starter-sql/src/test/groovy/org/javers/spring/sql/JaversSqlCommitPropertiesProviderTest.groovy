@@ -106,7 +106,7 @@ class JaversSqlCommitPropertiesProviderTest extends Specification {
         then:
         employeeSnapshots.size() == 4
         employeeSnapshots.each {
-            it.getPropertyValue("department").cdoId == dept1.id
+            assert it.getPropertyValue("department").cdoId == dept1.id
         }
     }
 

@@ -119,9 +119,9 @@ class JaversSpringDataAspectIntegrationTest extends BaseSpecification {
         def snapshots2 = javers.findSnapshots(byInstanceId(o2.id, DummyObject).build())
 
         [snapshots1, snapshots2].each { snapshots ->
-            snapshots.size() == 2
-            snapshots[0].terminal
-            snapshots[1].initial
+            assert snapshots.size() == 2
+            assert snapshots[0].terminal
+            assert snapshots[1].initial
         }
     }
 

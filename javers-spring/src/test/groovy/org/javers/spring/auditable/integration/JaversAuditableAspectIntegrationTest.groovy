@@ -102,7 +102,7 @@ class JaversAuditableAspectIntegrationTest extends BaseSpecification {
 
         then:
         objects.each {
-            javers.findSnapshots(QueryBuilder.byInstanceId(it.id, DummyObject).build()).size() == 1
+            assert javers.findSnapshots(QueryBuilder.byInstanceId(it.id, DummyObject).build()).size() == 1
         }
     }
 

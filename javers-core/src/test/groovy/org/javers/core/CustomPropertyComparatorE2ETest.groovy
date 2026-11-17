@@ -253,7 +253,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
             assert diff.changes.size() == 0
         }
         else {
-            diff.changes.size() == 1
+            assert diff.changes.size() == 1
             ListChange change = diff.changes[0]
             assert change.changes.size() == expectedChanges
         }
