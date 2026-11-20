@@ -5,13 +5,13 @@ import com.mongodb.client.MongoDatabase;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.JaversBuilderPlugin;
-import org.javers.repository.mongo.MongoRepository;
+import org.javers.repository.api.JaversRepository;
 import org.javers.spring.RegisterJsonTypeAdaptersPlugin;
 import org.javers.spring.aot.JaversSpringNativeHints;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
-import org.javers.spring.mongodb.TransactionalMongoJaversBuilder;
+import org.javers.spring.mongodb.TransactionalMongoRepositoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,7 @@ import java.util.Optional;
 
 import static org.javers.repository.mongo.MongoDialect.DOCUMENT_DB;
 import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mongoRepositoryConfiguration;
+import static org.javers.spring.mongodb.TransactionalMongoRepositoryBuilder.transactionalMongoRepository;
 
 /**
  * @author pawelszymczyk
@@ -74,13 +75,11 @@ public class JaversMongoAutoConfiguration {
     public Javers javers() {
         logger.info("Starting javers-spring-boot-starter-mongo ...");
 
-        MongoDatabase mongoDatabase = initJaversMongoDatabase();
+        var mongoDatabase = initJaversMongoDatabase();
+        var javersRepository = createMongoRepository(mongoDatabase);
 
-        MongoRepository javersRepository = createMongoRepository(mongoDatabase);
-
-        JaversBuilder javersBuilder = TransactionalMongoJaversBuilder.javers()
+        var javersBuilder = JaversBuilder.javers()
                 .registerJaversRepository(javersRepository)
-                .withTxManager(mongoTransactionManager.orElse(null))
                 .withProperties(javersMongoProperties)
                 .withObjectAccessHook(javersMongoProperties.createObjectAccessHookInstance());
 
@@ -89,31 +88,29 @@ public class JaversMongoAutoConfiguration {
         return javersBuilder.build();
     }
 
-    private MongoRepository createMongoRepository(MongoDatabase mongoDatabase) {
-        if (javersMongoProperties.isDocumentDbCompatibilityEnabled()) {
-            logger.info("enabling Amazon DocumentDB compatibility");
-
-            return new MongoRepository(
-                mongoDatabase,
-                mongoRepositoryConfiguration()
-                    .withSnapshotCollectionName(javersMongoProperties.getSnapshotCollectionName())
-                    .withHeadCollectionName(javersMongoProperties.getHeadCollectionName())
-                    .withCacheSize(javersMongoProperties.getSnapshotsCacheSize())
-                    .withDialect(DOCUMENT_DB)
-                    .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled())
-                    .build()
-            );
-        }
-
-        return new MongoRepository(
-            mongoDatabase,
-            mongoRepositoryConfiguration()
+    private JaversRepository createMongoRepository(MongoDatabase mongoDatabase) {
+        var configBuilder = mongoRepositoryConfiguration()
                 .withSnapshotCollectionName(javersMongoProperties.getSnapshotCollectionName())
                 .withHeadCollectionName(javersMongoProperties.getHeadCollectionName())
                 .withCacheSize(javersMongoProperties.getSnapshotsCacheSize())
-                .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled())
-                .build()
-        );
+                .withSchemaManagementEnabled(javersMongoProperties.isSchemaManagementEnabled());
+
+        if (javersMongoProperties.isDocumentDbCompatibilityEnabled()) {
+            logger.info("enabling Amazon DocumentDB compatibility");
+            configBuilder.withDialect(DOCUMENT_DB);
+        }
+
+        Optional<MongoTransactionManager> txManager = mongoTransactionManager;
+        if (javersMongoProperties.isDedicatedMongodbConfigurationEnabled() && txManager.isPresent()) {
+            //Javers' dedicated Mongo database is not covered by the application's MongoTransactionManager
+            //Javers will not join the application's transactions
+            txManager = Optional.empty();
+        }
+
+        return transactionalMongoRepository(mongoDatabase)
+                .withMongoRepositoryConfiguration(configBuilder.build())
+                .withTxManager(txManager)
+                .build();
     }
 
     private MongoDatabase initJaversMongoDatabase() {
