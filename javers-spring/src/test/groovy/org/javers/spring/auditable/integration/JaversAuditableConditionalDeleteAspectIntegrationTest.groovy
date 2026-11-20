@@ -50,9 +50,9 @@ class JaversAuditableConditionalDeleteAspectIntegrationTest extends BaseSpecific
         def snapshots3 = javers.findSnapshots(QueryBuilder.byInstanceId(o3.id, DummyObject).build())
 
         [snapshots1, snapshots2].each { snapshots ->
-            snapshots.size() == 2
-            snapshots[0].terminal
-            snapshots[1].initial
+            assert snapshots.size() == 2
+            assert snapshots[0].terminal
+            assert snapshots[1].initial
         }
 
         snapshots3.size() == 1
