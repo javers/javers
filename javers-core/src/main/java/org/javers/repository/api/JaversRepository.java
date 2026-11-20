@@ -97,6 +97,12 @@ public interface JaversRepository {
 
     void persist(Commit commit);
 
+    /**
+     * ID of the latest <b>persisted</b> commit.
+     * <br/>
+     * Only actually persisted commits are taken into account.
+     * Commits that were made within a not yet commited transaction are ignored.
+     */
     CommitId getHeadId();
 
     void setJsonConverter(JsonConverter jsonConverter);

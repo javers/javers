@@ -37,19 +37,27 @@ import static org.javers.repository.mongo.MongoRepositoryConfigurationBuilder.mo
 import static org.javers.repository.mongo.MongoSchemaManager.*;
 
 /**
- * @author pawel szymczyk
+ * MongoDB implementation of {@link JaversRepository}.
+ * <br/><br/>
+ *
+ * Joins the Mongo transaction started by the application, if a {@link MongoSessionProvider} is given.
+ * Without it, reads and writes are done outside any transaction.
+ * For Spring transactions see <code>TransactionalMongoRepositoryBuilder</code>.
  */
 public class MongoRepository implements JaversRepository, ConfigurationAware {
     private final static double COMMIT_ID_PRECISION = 0.005;
 
-    private static final int DESC = -1;
+    private final MongoDatabase mongo;
+    private final MongoRepositoryConfiguration configuration;
+    private final MongoSessionProvider sessionProvider;
     private final MongoSchemaManager mongoSchemaManager;
     private JsonConverter jsonConverter;
     private CoreConfiguration coreConfiguration;
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
-    private final LatestSnapshotCache cache;
-    private MongoDialect mongoDialect;
+    private final LatestSnapshotCache latestSnapshotCache;
+    private final MongoDialect mongoDialect;
     private final boolean schemaManagementEnabled;
+    private final boolean cacheDisabled;
 
     public MongoRepository(MongoDatabase mongo) {
         this(mongo, mongoRepositoryConfiguration().build());
@@ -84,28 +92,86 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     }
 
     public MongoRepository(MongoDatabase mongo, MongoRepositoryConfiguration mongoRepositoryConfiguration) {
+        this(mongo, mongoRepositoryConfiguration, MongoSessionProvider.noTransactions());
+    }
+
+    /**
+     * @param sessionProvider provides the application's Mongo transaction, which this repository joins
+     * @since 7.12
+     */
+    public MongoRepository(MongoDatabase mongo, MongoRepositoryConfiguration config, MongoSessionProvider sessionProvider) {
         Validate.argumentsAreNotNull(mongo);
-        this.mongoDialect = mongoRepositoryConfiguration.getMongoDialect();
+        Validate.argumentsAreNotNull(config);
+        Validate.argumentsAreNotNull(sessionProvider);
+        this.mongo = mongo;
+        this.configuration = config;
+        this.sessionProvider = sessionProvider;
+        this.mongoDialect = config.getMongoDialect();
         this.mongoSchemaManager = new MongoSchemaManager(
-            mongo, mongoRepositoryConfiguration.getSnapshotCollectionName(),
-            mongoRepositoryConfiguration.getHeadCollectionName());
-        int cacheSize = mongoRepositoryConfiguration.getCacheSize();
-        this.cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
-        this.schemaManagementEnabled = mongoRepositoryConfiguration.isSchemaManagementEnabled();
+            mongo, config.getSnapshotCollectionName(),
+            config.getHeadCollectionName());
+        int cacheSize = config.getCacheSize();
+        this.cacheDisabled = cacheSize == 0;
+        this.latestSnapshotCache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input), Optional.empty()));
+        this.schemaManagementEnabled = config.isSchemaManagementEnabled();
+    }
+
+    /**
+     * Creates a repository on the same database and configuration as the source, with its own cache.
+     */
+    protected MongoRepository(MongoRepository source, MongoSessionProvider sessionProvider) {
+        this(source.mongo, source.configuration, sessionProvider);
     }
 
     @Override
     public void persist(Commit commit) {
-        persistSnapshots(commit, Optional.empty());
-        persistHeadId(commit, Optional.empty());
+        Optional<MongoTransaction> tx = sessionProvider.currentTransaction();
+        Optional<ClientSession> session = tx.map(MongoTransaction::clientSession);
+        persistSnapshots(commit, session);
+        persistHeadId(commit, session);
+
+        if (!cacheDisabled) {
+            tx.ifPresentOrElse(
+                    t -> t.cacheLocallyAndPromoteOnCommit(commit, latestSnapshotCache),
+                    () -> cacheCommitted(commit));
+        }
     }
 
-    public void persist(Commit commit, ClientSession clientSession) {
+    /**
+     * Writes the commit with the given session, without caching it.
+     * For a caller which runs its own transaction and caches the commit
+     * with {@link #cacheCommitted(Commit)} after the transaction has committed.
+     */
+    protected void persistToDb(Commit commit, ClientSession clientSession) {
         persistSnapshots(commit, Optional.of(clientSession));
         persistHeadId(commit, Optional.of(clientSession));
     }
 
-    void clean(){
+    /**
+     * Puts snapshots of an already committed commit to the latest-snapshot cache (L2).
+     */
+    protected void cacheCommitted(Commit commit) {
+        latestSnapshotCache.putAll(commit);
+    }
+
+    /**
+     * <b>Warning! Do not use this method!</b>
+     *
+     * <br/>
+     * Snapshots are put to the latest-snapshot cache right away, before the transaction commits,
+     * so they stay in the cache even if the transaction is rolled back (which is a bad thing).
+     *
+     * @deprecated pass a {@link MongoSessionProvider} to the constructor and use {@link #persist(Commit)},
+     *             which caches snapshots only after the transaction commits
+     */
+    @Deprecated
+    public void persist(Commit commit, ClientSession clientSession) {
+        persistSnapshots(commit, Optional.of(clientSession));
+        persistHeadId(commit, Optional.of(clientSession));
+        latestSnapshotCache.putAll(commit);
+    }
+
+    void clean() {
         snapshotsCollection().deleteMany(new Document());
         headCollection().deleteMany(new Document());
     }
@@ -118,48 +184,98 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         } else {
             query = createIdQuery(globalId);
         }
-        return queryForSnapshots(query, Optional.of(queryParams));
+        return queryForSnapshots(query, Optional.of(queryParams), currentSession());
     }
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        return cache.getLatest(globalId);
+        Optional<MongoTransaction> tx = sessionProvider.currentTransaction();
+        if (cacheDisabled) {
+            return getLatestFromDb(globalId, tx);
+        }
+        if (tx.isEmpty()) {
+            return latestSnapshotCache.getLatest(globalId);
+        }
+        return getLatestFromCacheTransactionAware(globalId, tx.get());
+    }
+
+    /**
+     * Snapshots written by this transaction come from L1.
+     * If L1 dropped one (overflow), L2 may hold its older version,
+     * so it's read from the database with the transaction's session.
+     * Entities not written by this transaction come from L2.
+     */
+    private Optional<CdoSnapshot> getLatestFromCacheTransactionAware(GlobalId globalId, MongoTransaction tx) {
+        TransactionLocalLatestSnapshotCache l1 = tx.localLatestSnapshotCache().orElse(null);
+        if (l1 == null) {
+            // nothing written in this transaction yet
+            return latestSnapshotCache.getLatest(globalId);
+        }
+        Optional<CdoSnapshot> fromL1 = l1.get(globalId);
+        if (fromL1.isPresent()) {
+            return fromL1;
+        }
+        if (l1.isOverflowed(globalId)) {
+            return getLatestFromDb(globalId, Optional.of(tx));
+        }
+        return latestSnapshotCache.getLatest(globalId);
+    }
+
+    private Optional<CdoSnapshot> getLatestFromDb(GlobalId globalId, Optional<MongoTransaction> tx) {
+        return getLatest(createIdQuery(globalId), tx.map(MongoTransaction::clientSession));
     }
 
     @Override
     public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
-        return queryForSnapshots(new BasicDBObject(), Optional.of(queryParams));
+        return queryForSnapshots(new BasicDBObject(), Optional.of(queryParams), currentSession());
     }
 
     @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return snapshotIdentifiers.isEmpty() ? Collections.<CdoSnapshot>emptyList() :
-            queryForSnapshots(createSnapshotIdentifiersQuery(snapshotIdentifiers), Optional.<QueryParams>empty());
+        return snapshotIdentifiers.isEmpty() ? Collections.emptyList() :
+            queryForSnapshots(createSnapshotIdentifiersQuery(snapshotIdentifiers), Optional.empty(), currentSession());
     }
 
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
         BasicDBObject query = new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ownerEntity.getName());
         query.append(GLOBAL_ID_FRAGMENT, path);
-
-        return queryForSnapshots(query, Optional.of(queryParams));
+        return queryForSnapshots(query, Optional.of(queryParams), currentSession());
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
         Bson query = createManagedTypeQuery(givenClasses, queryParams.isAggregate());
-        return queryForSnapshots(query, Optional.of(queryParams));
+        return queryForSnapshots(query, Optional.of(queryParams), currentSession());
     }
 
+    /**
+     * Always reads outside the transaction, only committed commits count.
+     */
     @Override
     public CommitId getHeadId() {
         Document headId = headCollection().find().first();
-
         if (headId == null) {
             return null;
         }
-
         return new MongoHeadId(headId).toCommitId();
+    }
+
+    /**
+     * Stats of the shared (L2) latest snapshots cache, which holds only committed data.
+     */
+    public CacheStats latestSnapshotCacheStats() {
+        return latestSnapshotCache.stats();
+    }
+
+    /**
+     * Stats of the transaction-local latest snapshot cache (L1) of this repository in the current transaction.
+     */
+    public CacheStats currentTransactionCacheStats() {
+        return sessionProvider.currentTransaction()
+                .flatMap(MongoTransaction::localLatestSnapshotCache)
+                .map(TransactionLocalLatestSnapshotCache::stats)
+                .orElseGet(() -> CacheStats.l1(0, 0, 0));
     }
 
     @Override
@@ -174,9 +290,13 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
     @Override
     public void ensureSchema() {
-        if(schemaManagementEnabled) {
+        if (schemaManagementEnabled) {
             mongoSchemaManager.ensureSchema(mongoDialect);
         }
+    }
+
+    private Optional<ClientSession> currentSession() {
+        return sessionProvider.currentTransaction().map(MongoTransaction::clientSession);
     }
 
     private Bson createIdQuery(GlobalId id) {
@@ -242,11 +362,11 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         return jsonConverter.fromJson(fromDocument(mapKeyDotReplacer.back(dbObject)), CdoSnapshot.class);
     }
 
-    private Document writeToDBObject(CdoSnapshot snapshot){
+    private Document writeToDBObject(CdoSnapshot snapshot) {
         conditionFulfilled(jsonConverter != null, "MongoRepository: jsonConverter is null");
         Document dbObject = toDocument((JsonObject)jsonConverter.toJsonElement(snapshot));
         dbObject = mapKeyDotReplacer.replaceInSnapshotState(dbObject);
-        dbObject.append(GLOBAL_ID_KEY,snapshot.getGlobalId().value());
+        dbObject.append(GLOBAL_ID_KEY, snapshot.getGlobalId().value());
         return dbObject;
     }
 
@@ -262,8 +382,6 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         MongoCollection<Document> collection = snapshotsCollection();
         commit.getSnapshots().forEach(snapshot -> {
             transactionalInsert(collection, writeToDBObject(snapshot), clientSession);
-            //TODO should be evicted on transaction rollback
-            cache.put(snapshot);
         });
     }
 
@@ -274,7 +392,9 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
         MongoCollection<Document> headIdCollection = headCollection();
 
-        Document oldHead = headIdCollection.find().first();
+        Document oldHead = clientSession
+                .map(s -> headIdCollection.find(s).first())
+                .orElseGet(() -> headIdCollection.find().first());
         MongoHeadId newHeadId = new MongoHeadId(commit.getId());
 
         if (oldHead == null) {
@@ -288,9 +408,13 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         return Filters.eq(OBJECT_ID, document.getObjectId("_id"));
     }
 
-    private MongoCursor<Document> getMongoSnapshotsCursor(Bson query, Optional<QueryParams> queryParams) {
-        FindIterable<Document> findIterable = snapshotsCollection()
-            .find(applyQueryParams(query, queryParams));
+    private MongoCursor<Document> getMongoSnapshotsCursor(Bson query, Optional<QueryParams> queryParams, Optional<ClientSession> clientSession) {
+        final MongoCollection<Document> collection = snapshotsCollection();
+        final Bson filter = applyQueryParams(query, queryParams);
+
+        FindIterable<Document> findIterable = clientSession
+                .map(session -> collection.find(session, filter))
+                .orElseGet(() -> collection.find(filter));
 
         if (coreConfiguration.getCommitIdGenerator() == CommitIdGenerator.SYNCHRONIZED_SEQUENCE) {
             findIterable.sort(orderBy(descending(COMMIT_ID, OBJECT_ID)));
@@ -400,16 +524,15 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
     }
 
-    private Optional<CdoSnapshot> getLatest(Bson idQuery) {
+    private Optional<CdoSnapshot> getLatest(Bson idQuery, Optional<ClientSession> clientSession) {
         QueryParams queryParams = QueryParamsBuilder.withLimit(1).build();
-        MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, Optional.of(queryParams));
-
+        MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, Optional.of(queryParams), clientSession);
         return getOne(mongoLatest).map(d -> readFromDBObject(d));
     }
 
-    private List<CdoSnapshot> queryForSnapshots(Bson query, Optional<QueryParams> queryParams) {
+    private List<CdoSnapshot> queryForSnapshots(Bson query, Optional<QueryParams> queryParams, Optional<ClientSession> clientSession) {
         List<CdoSnapshot> snapshots = new ArrayList<>();
-        try (MongoCursor<Document> mongoSnapshots = getMongoSnapshotsCursor(query, queryParams)) {
+        try (MongoCursor<Document> mongoSnapshots = getMongoSnapshotsCursor(query, queryParams, clientSession)) {
             while (mongoSnapshots.hasNext()) {
                 Document dbObject = mongoSnapshots.next();
                 snapshots.add(readFromDBObject(dbObject));
@@ -418,8 +541,8 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         }
     }
 
-    private static <T> Optional<T> getOne(MongoCursor<T> mongoCursor){
-        try{
+    private static <T> Optional<T> getOne(MongoCursor<T> mongoCursor) {
+        try {
             if (!mongoCursor.hasNext()) {
                 return Optional.empty();
             }
@@ -430,8 +553,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         }
     }
 
-    //enables index range scan
-    private static Bson prefixQuery(String fieldName, String prefix){
+    private static Bson prefixQuery(String fieldName, String prefix) {
         return Filters.regex(fieldName, "^" + RegexEscape.escape(prefix) + ".*");
     }
 
@@ -439,7 +561,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             MongoCollection<Document> collection,
             Document document,
             Optional<ClientSession> clientSession) {
-        clientSession.map(s-> collection.insertOne(s, document))
+        clientSession.map(s -> collection.insertOne(s, document))
                 .orElseGet(() -> collection.insertOne(document));
     }
 
@@ -447,7 +569,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             MongoCollection<Document> collection,
             Bson filter, Bson update,
             Optional<ClientSession> clientSession) {
-        clientSession.map(s-> collection.updateOne(s, filter, update))
+        clientSession.map(s -> collection.updateOne(s, filter, update))
                 .orElseGet(() -> collection.updateOne(filter, update));
     }
 }

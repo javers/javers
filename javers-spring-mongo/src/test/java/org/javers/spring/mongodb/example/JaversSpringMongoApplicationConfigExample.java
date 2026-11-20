@@ -5,6 +5,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.annotation.JaversAuditableAsync;
@@ -16,7 +17,7 @@ import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
-import org.javers.spring.mongodb.TransactionalMongoJaversBuilder;
+import org.javers.spring.mongodb.TransactionalMongoRepositoryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,6 +32,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+
+import static org.javers.spring.mongodb.TransactionalMongoRepositoryBuilder.transactionalMongoRepository;
 
 @Configuration
 @ComponentScan(basePackages = "org.javers.spring.mongodb.example")
@@ -53,9 +56,12 @@ public class JaversSpringMongoApplicationConfigExample {
      */
     @Bean
     public Javers javers() {
-        return TransactionalMongoJaversBuilder.javers()
-                .registerJaversRepository(new MongoRepository(mongo()))
-                .withTxManager(mongoTransactionManager.orElse(null))
+        var transactionalMongoRepository = transactionalMongoRepository(mongo())
+                .withTxManager(mongoTransactionManager)
+                .build();
+
+        return JaversBuilder.javers()
+                .registerJaversRepository(transactionalMongoRepository)
                 .build();
     }
 

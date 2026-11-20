@@ -24,7 +24,9 @@ import static org.javers.common.validation.Validate.argumentCheck;
  * <a href="https://www.mongodb.com/blog/post/mongodb-multi-document-acid-transactions-general-availability">https://www.mongodb.com/blog/post/mongodb-multi-document-acid-transactions-general-availability</a>
  *
  * @since 6.5
+ * @deprecated use {@link TransactionalMongoRepositoryBuilder}
  */
+@Deprecated(since = "7.12", forRemoval = true)
 public final class TransactionalMongoJaversBuilder extends JaversBuilder {
 
     private MongoRepository mongoRepository;
