@@ -3,6 +3,7 @@ package org.javers.core.model
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multiset
 import groovy.transform.EqualsAndHashCode
+import org.javers.core.metamodel.annotation.Cascading
 
 import java.time.LocalDate
 
@@ -24,6 +25,12 @@ class SnapshotEntity {
     int intProperty
 
     private SnapshotEntity entityRef
+
+    @Cascading
+    private SnapshotEntity cascadingRef
+
+    @Cascading
+    List<SnapshotEntity> cascadingRefs
 
     private DummyAddress valueObjectRef
 
@@ -90,5 +97,13 @@ class SnapshotEntity {
 
     void setEntityRef(SnapshotEntity entityRef) {
         this.entityRef = entityRef
+    }
+
+    SnapshotEntity getCascadingRef() {
+        cascadingRef
+    }
+
+    void setCascadingRef(SnapshotEntity cascadingRef) {
+        this.cascadingRef = cascadingRef
     }
 }

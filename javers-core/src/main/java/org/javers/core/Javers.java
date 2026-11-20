@@ -89,6 +89,29 @@ public interface Javers {
                                           Executor executor);
 
     /**
+     * Marks given object and recursively all cascading entity children as deleted.
+     * <br/><br/>
+     *
+     * Unlike {@link Javers#commitShallowDelete(String, Object)}, this method is deep
+     * and affects the given object and all its @Cascading entity children.
+     * <br/><br/>
+     *
+     * This method doesn't delete anything from JaVers repository.
+     * It just persists 'terminal snapshot' of the objects.
+     *
+     * @param deleted object to be marked as deleted (Entity or Value Object)
+     */
+    Commit commitCascadingDelete(String author, Object deleted);
+
+    /**
+     * Variant of {@link #commitCascadingDelete(String, Object)} with commitProperties.
+     * <br/>
+     *
+     * See {@link #commit(String, Object, Map)} for commitProperties description.
+     */
+    Commit commitCascadingDelete(String author, Object deleted, Map<String, String> commitProperties);
+
+    /**
      * Marks given object as deleted.
      * <br/><br/>
      *
@@ -100,7 +123,9 @@ public interface Javers {
      * It just persists 'terminal snapshot' of a given object.
      *
      * @param deleted object to be marked as deleted (Entity or Value Object)
+     * @deprecated use {@link #commitCascadingDelete(String, Object)} instead. It behaves like this method per default but supports cascading deletes if enabled.
      */
+    @Deprecated
     Commit commitShallowDelete(String author, Object deleted);
 
     /**
@@ -108,22 +133,45 @@ public interface Javers {
      * <br/>
      *
      * See {@link #commit(String, Object, Map)} for commitProperties description.
+     * @deprecated use {@link #commitCascadingDelete(String, Object, Map)} instead. It behaves like this method per default but supports cascading deletes if enabled.
      */
+    @Deprecated
     Commit commitShallowDelete(String author, Object deleted, Map<String, String> commitProperties);
 
     /**
      * The same like {@link #commitShallowDelete(String,Object)}
      * but deleted object is selected using globalId
+     * @deprecated use {@link #commitCascadingDeleteById(String, GlobalIdDTO)} instead. It behaves like this method per default but supports cascading deletes if enabled.
      */
+    @Deprecated
     Commit commitShallowDeleteById(String author, GlobalIdDTO globalId);
+
+    /**
+     * The same like {@link #commitCascadingDelete(String,Object)}
+     * but deleted object is selected using globalId
+     * <br/>
+     * Uses previous snapshot for cascading traversal.
+     */
+    Commit commitCascadingDeleteById(String author, GlobalIdDTO globalId);
 
     /**
      * Variant of {@link #commitShallowDeleteById(String, GlobalIdDTO)} with commitProperties.
      * <br/>
      *
      * See {@link #commit(String, Object, Map)} for commitProperties description.
+     * @deprecated Use {@link #commitCascadingDeleteById(String, GlobalIdDTO, Map)} instead. It behaves like this method per default but supports cascading deletes if enabled.
      */
+    @Deprecated
     Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> commitProperties);
+
+    /**
+     * Variant of {@link #commitCascadingDeleteById(String, GlobalIdDTO)} with commitProperties.
+     * <br/>
+     * Uses previous snapshot for cascading traversal.
+     *
+     * See {@link #commit(String, Object, Map)} for commitProperties description.
+     */
+    Commit commitCascadingDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties);
 
     /**
      * <h2>Deep compare</h2>

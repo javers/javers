@@ -144,6 +144,11 @@ class JaversCore implements Javers {
     }
 
     @Override
+    public Commit commitCascadingDelete(String author, Object deleted) {
+        return commitCascadingDelete(author, deleted, Collections.emptyMap());
+    }
+
+    @Override
     public Commit commitShallowDelete(String author, Object deleted, Map<String, String> properties) {
         argumentsAreNotNull(author, properties, deleted);
 
@@ -155,16 +160,44 @@ class JaversCore implements Javers {
     }
 
     @Override
+    public Commit commitCascadingDelete(String author, Object deleted, Map<String, String> properties) {
+        argumentsAreNotNull(author, properties, deleted);
+
+        Commit commit = commitFactory.createCascadingTerminal(author, properties, deleted);
+
+        repository.persist(commit);
+        logger.info(commit.toString());
+        return commit;
+    }
+
+    @Override
+    @Deprecated
     public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId) {
         return commitShallowDeleteById(author, globalId, Collections.<String, String>emptyMap());
     }
 
+    @Override
+    public Commit commitCascadingDeleteById(String author, GlobalIdDTO globalId) {
+        return commitCascadingDeleteById(author, globalId, Collections.emptyMap());
+    }
 
     @Override
+    @Deprecated
     public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
         argumentsAreNotNull(author, properties, globalId);
 
         Commit commit = commitFactory.createTerminalByGlobalId(author, properties, globalIdFactory.createFromDto(globalId));
+
+        repository.persist(commit);
+        logger.info(commit.toString());
+        return commit;
+    }
+
+    @Override
+    public Commit commitCascadingDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
+        argumentsAreNotNull(author, globalId);
+
+        Commit commit = commitFactory.createCascadingTerminalByGlobalId(author, properties, globalIdFactory.createFromDto(globalId));
 
         repository.persist(commit);
         logger.info(commit.toString());
