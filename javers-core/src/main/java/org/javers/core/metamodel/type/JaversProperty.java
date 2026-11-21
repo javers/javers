@@ -21,7 +21,7 @@ public class JaversProperty extends Property {
     private final boolean isListedAsShallowReference;
 
     public JaversProperty(Supplier<JaversType> propertyType, Property property) {
-        this(propertyType, property.getMember(), property.hasTransientAnn(), property.hasShallowReferenceAnn(), property.getName(), property.isHasIncludedAnn(), false, property.shouldCascade().orElse(null));
+        this(propertyType, property.getMember(), property.hasTransientAnn(), property.hasShallowReferenceAnn(), property.getName(), property.isHasIncludedAnn(), false);
     }
 
     private JaversProperty(Supplier<JaversType> propertyType,
@@ -30,9 +30,8 @@ public class JaversProperty extends Property {
                            boolean hasShallowReferenceAnn,
                            String name,
                            boolean hasIncludedAnn,
-                           boolean isListedAsShallowReference,
-                           Boolean cascading) {
-      super(member, hasTransientAnn, hasShallowReferenceAnn, name, hasIncludedAnn, cascading);
+                           boolean isListedAsShallowReference) {
+      super(member, hasTransientAnn, hasShallowReferenceAnn, name, hasIncludedAnn);
       this.propertyType = propertyType;
       this.isListedAsShallowReference = isListedAsShallowReference;
     }
@@ -90,9 +89,7 @@ public class JaversProperty extends Property {
               hasShallowReferenceAnn(),
               getName(),
               isHasIncludedAnn(),
-              true,
-              shouldCascade().orElse(null)
-          );
+              true);
     }
 
     @Override

@@ -38,28 +38,6 @@ class PropertyAssert {
         this
     }
 
-    PropertyAssert isCascading() {
-        assert actual.shouldCascade()
-        assert actual.shouldCascade().get()
-        this
-    }
-
-    PropertyAssert isNotCascading() {
-        assert !actual.shouldCascade() || !actual.shouldCascade().get()
-        this
-    }
-
-    PropertyAssert isExplicitlyNotCascading() {
-        assert actual.shouldCascade().isPresent()
-        assert !actual.shouldCascade().get()
-        this
-    }
-
-    PropertyAssert hasNoCascadingConfiguration() {
-        assert !actual.shouldCascade().isPresent()
-        this
-    }
-
     PropertyAssert looksLikeId() {
         assert actual.looksLikeId()
         this

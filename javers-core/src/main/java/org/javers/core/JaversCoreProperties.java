@@ -8,7 +8,6 @@ import java.time.temporal.Temporal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public abstract class JaversCoreProperties {
     private String algorithm;
@@ -22,7 +21,6 @@ public abstract class JaversCoreProperties {
     private PrettyPrintDateFormats prettyPrintDateFormats = new PrettyPrintDateFormats();
     private Boolean usePrimitiveDefaults;
     private Boolean printProBanner;
-    private CascadingMode cascadingMode;
 
     public String getAlgorithm() {
         return algorithm;
@@ -122,14 +120,6 @@ public abstract class JaversCoreProperties {
 
     public void setTerminalChanges(Boolean terminalChanges) {
         this.terminalChanges = terminalChanges;
-    }
-
-    public CascadingMode getCascadingMode() {
-        return cascadingMode;
-    }
-
-    public void setCascadingMode(final CascadingMode cascadingMode) {
-        this.cascadingMode = cascadingMode;
     }
 
     public static class PrettyPrintDateFormats {

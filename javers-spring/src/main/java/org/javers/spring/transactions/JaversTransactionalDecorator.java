@@ -70,54 +70,50 @@ public abstract class JaversTransactionalDecorator implements Javers {
 
     @Override
     @Transactional
-    public Commit commitCascadingDelete(String author, Object deleted) {
-        return delegate.commitCascadingDelete(author, deleted);
-    }
-
-    @Override
-    @Transactional
-    public Commit commitCascadingDelete(String author, Object deleted, Map<String, String> commitProperties) {
-        return delegate.commitCascadingDelete(author, deleted, commitProperties);
-    }
-
-    @Override
-    @Transactional
-    public Commit commitCascadingDeleteById(String author, GlobalIdDTO globalId) {
-        return delegate.commitCascadingDeleteById(author, globalId);
-    }
-
-    @Override
-    @Transactional
-    public Commit commitCascadingDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
-        return delegate.commitCascadingDeleteById(author, globalId, properties);
-    }
-
-    @Override
-    @Transactional
-    @Deprecated
     public Commit commitShallowDelete(String author, Object deleted) {
         return delegate.commitShallowDelete(author, deleted);
     }
 
     @Override
     @Transactional
-    @Deprecated
     public Commit commitShallowDelete(String author, Object deleted, Map<String, String> properties) {
         return delegate.commitShallowDelete(author, deleted, properties);
     }
 
     @Override
     @Transactional
-    @Deprecated
     public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId) {
         return delegate.commitShallowDeleteById(author, globalId);
     }
 
     @Override
     @Transactional
-    @Deprecated
     public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
         return delegate.commitShallowDeleteById(author, globalId, properties);
+    }
+
+    @Override
+    @Transactional
+    public Commit commitAggregateDelete(String author, Object deleted) {
+        return delegate.commitAggregateDelete(author, deleted);
+    }
+
+    @Override
+    @Transactional
+    public Commit commitAggregateDelete(String author, Object deleted, Map<String, String> properties) {
+        return delegate.commitAggregateDelete(author, deleted, properties);
+    }
+
+    @Override
+    @Transactional
+    public Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId) {
+        return delegate.commitAggregateDeleteById(author, globalId);
+    }
+
+    @Override
+    @Transactional
+    public Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
+        return delegate.commitAggregateDeleteById(author, globalId, properties);
     }
 
     @Override

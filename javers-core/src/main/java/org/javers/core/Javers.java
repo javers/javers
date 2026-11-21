@@ -50,6 +50,12 @@ public interface Javers {
      *
      * JaVers applies commit() to given object and all objects navigable from it.
      * You can capture a state of an arbitrary complex object graph with a single commit() call.
+     * <br/><br/>
+     *
+     * A Value Object removed from the graph is marked as deleted only when it was held
+     * in a property set to null. Value Objects removed from Lists, Sets, Maps, arrays or Optionals,
+     * and nested Value Objects of a removed Value Object, are not marked as deleted
+     * (see {@link #commitAggregateDelete(String, Object)}).
      *
      * @see <a href="http://javers.org/documentation/repository-examples/">http://javers.org/documentation/repository-examples</a>
      * @param author current user
@@ -89,43 +95,20 @@ public interface Javers {
                                           Executor executor);
 
     /**
-     * Marks given object and recursively all cascading entity children as deleted.
-     * <br/><br/>
-     *
-     * Unlike {@link Javers#commitShallowDelete(String, Object)}, this method is deep
-     * and affects the given object and all its @Cascading entity children.
-     * <br/><br/>
-     *
-     * This method doesn't delete anything from JaVers repository.
-     * It just persists 'terminal snapshot' of the objects.
-     *
-     * @param deleted object to be marked as deleted (Entity or Value Object)
-     */
-    Commit commitCascadingDelete(String author, Object deleted);
-
-    /**
-     * Variant of {@link #commitCascadingDelete(String, Object)} with commitProperties.
-     * <br/>
-     *
-     * See {@link #commit(String, Object, Map)} for commitProperties description.
-     */
-    Commit commitCascadingDelete(String author, Object deleted, Map<String, String> commitProperties);
-
-    /**
      * Marks given object as deleted.
      * <br/><br/>
      *
      * Unlike {@link Javers#commit(String, Object)}, this method is shallow
      * and affects only given object.
+     * Child Value Objects of a given Entity are not marked as deleted,
+     * see {@link #commitAggregateDelete(String, Object)}.
      * <br/><br/>
      *
      * This method doesn't delete anything from JaVers repository.
      * It just persists 'terminal snapshot' of a given object.
      *
      * @param deleted object to be marked as deleted (Entity or Value Object)
-     * @deprecated use {@link #commitCascadingDelete(String, Object)} instead. It behaves like this method per default but supports cascading deletes if enabled.
      */
-    @Deprecated
     Commit commitShallowDelete(String author, Object deleted);
 
     /**
@@ -133,45 +116,91 @@ public interface Javers {
      * <br/>
      *
      * See {@link #commit(String, Object, Map)} for commitProperties description.
-     * @deprecated use {@link #commitCascadingDelete(String, Object, Map)} instead. It behaves like this method per default but supports cascading deletes if enabled.
      */
-    @Deprecated
     Commit commitShallowDelete(String author, Object deleted, Map<String, String> commitProperties);
 
     /**
      * The same like {@link #commitShallowDelete(String,Object)}
      * but deleted object is selected using globalId
-     * @deprecated use {@link #commitCascadingDeleteById(String, GlobalIdDTO)} instead. It behaves like this method per default but supports cascading deletes if enabled.
      */
-    @Deprecated
     Commit commitShallowDeleteById(String author, GlobalIdDTO globalId);
-
-    /**
-     * The same like {@link #commitCascadingDelete(String,Object)}
-     * but deleted object is selected using globalId
-     * <br/>
-     * Uses previous snapshot for cascading traversal.
-     */
-    Commit commitCascadingDeleteById(String author, GlobalIdDTO globalId);
 
     /**
      * Variant of {@link #commitShallowDeleteById(String, GlobalIdDTO)} with commitProperties.
      * <br/>
      *
      * See {@link #commit(String, Object, Map)} for commitProperties description.
-     * @deprecated Use {@link #commitCascadingDeleteById(String, GlobalIdDTO, Map)} instead. It behaves like this method per default but supports cascading deletes if enabled.
      */
-    @Deprecated
     Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> commitProperties);
 
     /**
-     * Variant of {@link #commitCascadingDeleteById(String, GlobalIdDTO)} with commitProperties.
+     * Marks given Entity and all its child Value Objects as deleted
+     * (the aggregate, as JaVers models it).
+     * Entities referenced by the given Entity are not marked as deleted, they have their own lifecycle.
+     * <br/><br/>
+     *
+     * Child Value Objects are all Value Objects the Entity has ever owned and not yet marked as deleted:
+     * in properties, in Lists, Sets, Maps, arrays and Optionals, and nested ones (a Value Object inside a Value Object).
+     * They are read from JaVers repository, not from the given object.
+     * <br/><br/>
+     *
+     * This goes further than {@link #commit(String, Object)} after an object graph change,
+     * which marks as deleted only a Value Object held in a property set to null,
+     * and neither Value Objects removed from containers nor nested Value Objects.
+     * This method marks as deleted also these Value Objects, removed earlier but left not marked as deleted.
+     * <br/><br/>
+     *
+     * How it works: JaVers reads all snapshots of the Entity and its Value Objects (the whole history of the aggregate)
+     * in one query, and persists a terminal snapshot for the Entity and for each Value Object
+     * not yet marked as deleted.
+     * It reads the whole history of the aggregate and writes a snapshot per Value Object,
+     * which can be costly for extremely large object graphs or very long histories.
+     * <br/><br/>
+     *
+     * <b>Important!</b> All snapshots of the aggregate's history are loaded into memory at once (no limit).
+     * For an aggregate with a huge history, this can cause an {@link OutOfMemoryError}.
+     * Use {@link #commitShallowDelete(String, Object)} for such aggregates.
+     * <br/><br/>
+     *
+     * Given a Value Object (bound or unbounded), this method marks as deleted only that Value Object,
+     * like {@link #commitShallowDelete(String, Object)}.
+     * <br/><br/>
+     *
+     * This method doesn't delete anything from JaVers repository.
+     * It just persists 'terminal snapshots'.
+     *
+     * @param deleted Entity to be marked as deleted together with its child Value Objects
+     * @since 7.13.0
+     */
+    Commit commitAggregateDelete(String author, Object deleted);
+
+    /**
+     * Variant of {@link #commitAggregateDelete(String, Object)} with commitProperties.
      * <br/>
-     * Uses previous snapshot for cascading traversal.
      *
      * See {@link #commit(String, Object, Map)} for commitProperties description.
+     *
+     * @since 7.13.0
      */
-    Commit commitCascadingDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties);
+    Commit commitAggregateDelete(String author, Object deleted, Map<String, String> commitProperties);
+
+    /**
+     * The same like {@link #commitAggregateDelete(String,Object)}
+     * but deleted Entity is selected using globalId
+     *
+     * @since 7.13.0
+     */
+    Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId);
+
+    /**
+     * Variant of {@link #commitAggregateDeleteById(String, GlobalIdDTO)} with commitProperties.
+     * <br/>
+     *
+     * See {@link #commit(String, Object, Map)} for commitProperties description.
+     *
+     * @since 7.13.0
+     */
+    Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId, Map<String, String> commitProperties);
 
     /**
      * <h2>Deep compare</h2>

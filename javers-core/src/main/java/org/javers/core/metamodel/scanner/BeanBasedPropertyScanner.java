@@ -14,7 +14,6 @@ class BeanBasedPropertyScanner extends PropertyScanner {
         super(annotationNamesProvider);
     }
 
-
     @Override
     List<JaversMember> getMembers(Class<?> managedClass) {
         return (List)ReflectionUtil.getAllGetters(managedClass);
