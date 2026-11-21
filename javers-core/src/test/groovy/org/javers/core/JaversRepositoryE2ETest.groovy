@@ -1181,6 +1181,21 @@ class JaversRepositoryE2ETest extends Specification {
         changes[2].affectedGlobalId.value() == "$sName/1"
     }
 
+    def "should query withChildValueObjects only for Value Objects owned by given Entity, not by other Entity with the same id"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London")))
+        javers.commit("author", new DummyUserDetails(id: 1, dummyAddress: new DummyAddress(city: "Paris")))
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).withChildValueObjects().build())
+
+        then:
+        snapshots.collect { it.globalId.value() } as Set == [
+                SnapshotEntity.name + "/1",
+                SnapshotEntity.name + "/1#valueObjectRef"
+        ] as Set
+    }
+
     def "should query withChildValueObjects for snapshots and changes by Entity type"() {
         given:
         def london = new DummyAddress(city: "London")

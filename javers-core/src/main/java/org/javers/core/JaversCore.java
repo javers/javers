@@ -154,9 +154,8 @@ class JaversCore implements Javers {
 
         Commit commit = commitFactory.createTerminal(author, properties, deleted);
 
-        repository.persist(commit);
         logger.info(commit.toString());
-        return commit;
+        return persist(commit);
     }
 
     @Override
@@ -188,9 +187,8 @@ class JaversCore implements Javers {
 
         Commit commit = commitFactory.createTerminalByGlobalId(author, properties, globalIdFactory.createFromDto(globalId));
 
-        repository.persist(commit);
         logger.info(commit.toString());
-        return commit;
+        return persist(commit);
     }
 
     @Override

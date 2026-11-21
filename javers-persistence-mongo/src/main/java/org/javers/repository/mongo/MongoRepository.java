@@ -312,7 +312,10 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             }
             return Filters.or(
                 createIdQuery(id),
-                new BasicDBObject(GLOBAL_ID_OWNER_ID_CDO_ID, cdoId)
+                Filters.and(
+                    new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, id.getTypeName()),
+                    new BasicDBObject(GLOBAL_ID_OWNER_ID_CDO_ID, cdoId)
+                )
             );
         }
 

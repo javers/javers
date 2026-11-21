@@ -402,6 +402,29 @@ class JaversCommitE2ETest extends Specification {
                 .hasTerminalSnapshot(instanceId(1,SnapshotEntity))
     }
 
+    def "should not mark again as deleted already deleted object when #opType"() {
+        given:
+        def javers = javers().build()
+        javers.commit("some.login", new SnapshotEntity(id:1))
+        deleteMethod.call(javers)
+
+        when:
+        def commit = deleteMethod.call(javers)
+
+        then:
+        CommitAssert.assertThat(commit)
+                .hasSnapshots(0)
+                .hasChanges(0)
+
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        snapshots.findAll { it.terminal }.size() == 1
+
+        where:
+        deleteMethod << [ { j -> j.commitShallowDelete("some.login", new SnapshotEntity(id:1)) },
+                          { j -> j.commitShallowDeleteById("some.login", InstanceIdDTO.instanceId(1,SnapshotEntity))} ]
+        opType << ["using object instance","using globalId"]
+    }
+
     def "should create initial commit for new objects"() {
         given:
         def javers = javers().build()

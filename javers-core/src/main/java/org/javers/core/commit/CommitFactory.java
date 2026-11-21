@@ -3,6 +3,7 @@ package org.javers.core.commit;
 import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
 import org.javers.core.diff.Diff;
+import org.javers.core.diff.DiffBuilder;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.graph.Cdo;
 import org.javers.core.graph.LiveGraph;
@@ -62,6 +63,9 @@ public class CommitFactory {
         Optional<CdoSnapshot> previousSnapshot = javersRepository.getLatest(removedId);
 
         CommitMetadata commitMetadata = newCommitMetadata(author, properties);
+        if (previousSnapshot.isPresent() && previousSnapshot.get().isTerminal()) {
+            return new Commit(commitMetadata, Collections.emptyList(), DiffBuilder.empty());
+        }
         CdoSnapshot terminalSnapshot = snapshotFactory.createTerminal(removedId, previousSnapshot.orElse(null), commitMetadata);
         Diff diff = diffFactory.singleTerminal(removedId, commitMetadata);
         return new Commit(commitMetadata, Lists.asList(terminalSnapshot), diff);
