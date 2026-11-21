@@ -85,8 +85,10 @@ class JaversAuditableAspectIntegrationTest extends BaseSpecification {
         snapshot.commitMetadata.properties["TargetClassName"].endsWith("DummyAuditedRepository")
 
         when:
-        repository.deleteById(o.id)
-        snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())[0]
+        def o2 = new DummyObject()
+        repository.save(o2)
+        repository.deleteById(o2.id)
+        snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build())[0]
 
         then:
         snapshot.commitMetadata.properties["TargetMethodName"] == "deleteById"
