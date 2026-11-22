@@ -17,6 +17,7 @@ import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
+import org.javers.repository.jql.InstanceIdDTO
 import org.javers.repository.jql.JqlQuery
 import org.javers.repository.jql.QueryBuilder
 import org.junit.rules.ExpectedException
@@ -1179,6 +1180,180 @@ class JaversRepositoryE2ETest extends Specification {
         changes[0].affectedGlobalId.value() == "$sName/1#valueObjectRef/networkAddress"
         changes[1].affectedGlobalId.value() == "$sName/1#valueObjectRef"
         changes[2].affectedGlobalId.value() == "$sName/1"
+    }
+
+    def "should query withChildValueObjects only for Value Objects owned by given Entity, not by other Entity with the same id"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London")))
+        javers.commit("author", new DummyUserDetails(id: 1, dummyAddress: new DummyAddress(city: "Paris")))
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).withChildValueObjects().build())
+
+        then:
+        snapshots.collect { it.globalId.value() } as Set == [
+                SnapshotEntity.name + "/1",
+                SnapshotEntity.name + "/1#valueObjectRef"
+        ] as Set
+    }
+
+    def "should mark Entity and its direct child Value Objects as deleted, #voLocation"() {
+        given:
+        javers.commit("author", entity)
+
+        when:
+        def commit = javers.commitAggregateDelete("author", entity)
+
+        then:
+        def latest = latestInAggregate(SnapshotEntity)
+        latest.size() == 2
+        latest.values().every { it.terminal }
+        commit.changes*.affectedGlobalId == [instanceId(1, SnapshotEntity)]
+
+        where:
+        voLocation    | entity
+        "VO property" | new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress("London"))
+        "List"        | new SnapshotEntity(id: 1, listOfValueObjects: [new DummyAddress("London")])
+        "Set"         | new SnapshotEntity(id: 1, setOfValueObjects: [new DummyAddress("London")] as Set)
+        "Map"         | new SnapshotEntity(id: 1, mapPrimitiveToVO: [a: new DummyAddress("London")])
+        "array"       | new SnapshotEntity(id: 1, arrayOfValueObjects: [new DummyAddress("London")] as DummyAddress[])
+        "Optional"    | new SnapshotEntity(id: 1, optionalValueObject: Optional.of(new DummyAddress("London")))
+    }
+
+    def "should mark Entity and its nested child Value Objects as deleted, #voLocation"() {
+        given:
+        javers.commit("author", entity)
+
+        when:
+        javers.commitAggregateDelete("author", entity)
+
+        then:
+        def latest = latestInAggregate(SnapshotEntity)
+        latest.size() == 3
+        latest.values().every { it.terminal }
+
+        where:
+        voLocation           | entity
+        "VO property"        | new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "a")))
+        "List"               | new SnapshotEntity(id: 1, listOfValueObjects: [new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "a"))])
+    }
+
+    def "should not mark Entities referenced by deleted Entity as deleted, #refLocation"() {
+        given:
+        javers.commit("author", entity)
+
+        when:
+        javers.commitAggregateDelete("author", entity)
+
+        then:
+        javers.getLatestSnapshot(1, SnapshotEntity).get().terminal
+        !javers.getLatestSnapshot(2, SnapshotEntity).get().terminal
+
+        where:
+        refLocation | entity
+        "property"  | new SnapshotEntity(id: 1, entityRef: new SnapshotEntity(id: 2))
+        "List"      | new SnapshotEntity(id: 1, listOfEntities: [new SnapshotEntity(id: 2)])
+    }
+
+    def "should mark unbounded Value Object as deleted without its child Value Objects"() {
+        given:
+        def category = new CategoryVo("child")
+        category.parent = new CategoryVo("parent")
+        javers.commit("author", category)
+
+        when:
+        javers.commitAggregateDelete("author", category)
+
+        then:
+        def latest = latestSnapshots(anyDomainObject().build())
+        latest[CategoryVo.name + "/"].terminal
+        !latest[CategoryVo.name + "/#parent"].terminal
+    }
+
+    def "should mark Entity and all its child Value Objects as deleted again when Entity is re-created and deleted"() {
+        given:
+        def entity = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress("London"), listOfValueObjects: [new DummyAddress("Paris")])
+        javers.commit("author", entity)
+        javers.commitAggregateDelete("author", entity)
+        javers.commit("author", entity)
+
+        when:
+        javers.commitAggregateDelete("author", entity)
+
+        then:
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).withChildValueObjects().build())
+        snapshots.findAll { it.terminal }.groupBy { it.globalId }.collect { id, terminals -> terminals.size() } == [2, 2, 2]
+    }
+
+    def "should not mark again as deleted child Value Object removed from Entity before"() {
+        given:
+        def entity = new EntityWithTwoValueObjects(id: 1, first: new DummyAddress("London"), second: new DummyAddress("Paris"))
+        javers.commit("author", entity)
+        entity.first = null
+        javers.commit("author", entity) // marks #first as deleted
+
+        when:
+        javers.commitAggregateDelete("author", entity)
+
+        then:
+        def terminals = javers.findSnapshots(byInstanceId(1, EntityWithTwoValueObjects).withChildValueObjects().build())
+                              .findAll { it.terminal }
+        terminals*.globalId*.value().sort() == ["", "#first", "#second"].collect { EntityWithTwoValueObjects.name + "/1" + it }
+    }
+
+    static class EntityWithTwoValueObjects {
+        @Id int id
+        DummyAddress first
+        DummyAddress second
+    }
+
+    def "should mark as deleted all child Value Objects ever owned by Entity, whatever the given object contains, #opType"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1,
+                listOfValueObjects: [new DummyAddress("London"), new DummyAddress("Paris")],
+                mapPrimitiveToVO: [a: new DummyAddress("Berlin"), b: new DummyAddress("Madrid")]))
+        // commit() leaves #listOfValueObjects/1 and #mapPrimitiveToVO/b not deleted
+        javers.commit("author", new SnapshotEntity(id: 1,
+                listOfValueObjects: [new DummyAddress("London")],
+                mapPrimitiveToVO: [a: new DummyAddress("Berlin")]))
+
+        when:
+        deleteMethod.call(javers)
+
+        then:
+        def latest = latestInAggregate(SnapshotEntity)
+        latest.size() == 5
+        latest.values().every { it.terminal }
+
+        where:
+        opType                        | deleteMethod
+        "using empty object instance" | { j -> j.commitAggregateDelete("author", new SnapshotEntity(id: 1)) }
+        "using globalId"              | { j -> j.commitAggregateDeleteById("author", InstanceIdDTO.instanceId(1, SnapshotEntity)) }
+    }
+
+    def "should mark as deleted child Value Objects of Entity deleted before by commitShallowDelete"() {
+        given:
+        def entity = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress("London"))
+        javers.commit("author", entity)
+        javers.commitShallowDelete("author", entity)
+
+        when:
+        def commit = javers.commitAggregateDelete("author", entity)
+
+        then:
+        latestInAggregate(SnapshotEntity).values().every { it.terminal }
+        javers.findSnapshots(byInstanceId(1, SnapshotEntity).build()).count { it.terminal } == 1
+        commit.changes.empty
+    }
+
+    private Map latestInAggregate(Class entityClass) {
+        latestSnapshots(byInstanceId(1, entityClass).withChildValueObjects().build())
+    }
+
+    private Map latestSnapshots(JqlQuery query) {
+        javers.findSnapshots(query)
+              .groupBy { it.globalId.value() }
+              .collectEntries { id, snapshots -> [id, snapshots.max { it.version }] }
     }
 
     def "should query withChildValueObjects for snapshots and changes by Entity type"() {

@@ -93,6 +93,30 @@ public abstract class JaversTransactionalDecorator implements Javers {
     }
 
     @Override
+    @Transactional
+    public Commit commitAggregateDelete(String author, Object deleted) {
+        return delegate.commitAggregateDelete(author, deleted);
+    }
+
+    @Override
+    @Transactional
+    public Commit commitAggregateDelete(String author, Object deleted, Map<String, String> properties) {
+        return delegate.commitAggregateDelete(author, deleted, properties);
+    }
+
+    @Override
+    @Transactional
+    public Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId) {
+        return delegate.commitAggregateDeleteById(author, globalId);
+    }
+
+    @Override
+    @Transactional
+    public Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
+        return delegate.commitAggregateDeleteById(author, globalId, properties);
+    }
+
+    @Override
     public Diff compare(Object oldVersion, Object currentVersion) {
         return delegate.compare(oldVersion, currentVersion);
     }

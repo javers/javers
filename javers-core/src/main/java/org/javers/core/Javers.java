@@ -51,6 +51,20 @@ public interface Javers {
      * JaVers applies commit() to given object and all objects navigable from it.
      * You can capture a state of an arbitrary complex object graph with a single commit() call.
      *
+     * <h3>Marking objects as deleted</h3>
+     * JaVers marks an object as deleted by persisting its terminal snapshot.
+     * <br/><br/>
+     *
+     * <b>Entities</b> are never marked as deleted by commit(), even if they disappear from the graph.
+     * To mark an Entity as deleted, use {@link #commitShallowDelete(String, Object)} (only the Entity)
+     * or {@link #commitAggregateDelete(String, Object)} (the Entity together with all its Value Objects).
+     * <br/><br/>
+     *
+     * <b>Value Objects</b> are marked as deleted by commit() only when the property holding them is set to null.
+     * Other removed Value Objects (for example, removed from a List) are not marked as deleted.
+     * To mark such Value Objects as deleted, use {@link #commitAggregateDelete(String, Object)}
+     * on their owning Entity.
+     *
      * @see <a href="http://javers.org/documentation/repository-examples/">http://javers.org/documentation/repository-examples</a>
      * @param author current user
      * @param currentVersion standalone object or handle to an object graph
@@ -94,10 +108,14 @@ public interface Javers {
      *
      * Unlike {@link Javers#commit(String, Object)}, this method is shallow
      * and affects only given object.
-     * <br/><br/>
+     * <br/>
      *
      * This method doesn't delete anything from JaVers repository.
      * It just persists 'terminal snapshot' of a given object.
+     * <br/><br/>
+     *
+     * Child Value Objects of a given (Entity) object are not marked as deleted.
+     * To mark them as deleted, use {@link #commitAggregateDelete(String, Object)}.
      *
      * @param deleted object to be marked as deleted (Entity or Value Object)
      */
@@ -124,6 +142,62 @@ public interface Javers {
      * See {@link #commit(String, Object, Map)} for commitProperties description.
      */
     Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> commitProperties);
+
+    /**
+     * Marks given Entity and all its child Value Objects as deleted
+     * (the aggregate, as JaVers models it).
+     * Entities referenced by the given Entity are not marked as deleted, they have their own lifecycle.
+     * <br/><br/>
+     *
+     * Child Value Objects are all Value Objects ever owned by the Entity:
+     * in properties, in Lists, Sets, Maps, arrays and Optionals, and nested ones.
+     * This includes Value Objects removed earlier, which {@link #commit(String, Object)} doesn't mark as deleted.
+     * They are read from JaVers repository, so only the Entity's id matters.
+     * <br/><br/>
+     *
+     * <b>Important!</b> This method loads the whole history of the Entity and its Value Objects into memory,
+     * in one query. For an Entity with a huge history, this can be slow or cause an {@link OutOfMemoryError},
+     * use {@link #commitShallowDelete(String, Object)} instead.
+     * <br/><br/>
+     *
+     * Given a Value Object, this method works like {@link #commitShallowDelete(String, Object)}.
+     * <br/><br/>
+     *
+     * This method doesn't delete anything from JaVers repository.
+     * It just persists 'terminal snapshots'.
+     *
+     * @param deleted Entity to be marked as deleted together with its child Value Objects
+     * @since 7.13.0
+     */
+    Commit commitAggregateDelete(String author, Object deleted);
+
+    /**
+     * Variant of {@link #commitAggregateDelete(String, Object)} with commitProperties.
+     * <br/>
+     *
+     * See {@link #commit(String, Object, Map)} for commitProperties description.
+     *
+     * @since 7.13.0
+     */
+    Commit commitAggregateDelete(String author, Object deleted, Map<String, String> commitProperties);
+
+    /**
+     * The same like {@link #commitAggregateDelete(String,Object)}
+     * but deleted Entity is selected using globalId
+     *
+     * @since 7.13.0
+     */
+    Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId);
+
+    /**
+     * Variant of {@link #commitAggregateDeleteById(String, GlobalIdDTO)} with commitProperties.
+     * <br/>
+     *
+     * See {@link #commit(String, Object, Map)} for commitProperties description.
+     *
+     * @since 7.13.0
+     */
+    Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId, Map<String, String> commitProperties);
 
     /**
      * <h2>Deep compare</h2>

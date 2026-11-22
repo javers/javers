@@ -149,9 +149,8 @@ class JaversCore implements Javers {
 
         Commit commit = commitFactory.createTerminal(author, properties, deleted);
 
-        repository.persist(commit);
         logger.info(commit.toString());
-        return commit;
+        return persist(commit);
     }
 
     @Override
@@ -166,9 +165,38 @@ class JaversCore implements Javers {
 
         Commit commit = commitFactory.createTerminalByGlobalId(author, properties, globalIdFactory.createFromDto(globalId));
 
-        repository.persist(commit);
         logger.info(commit.toString());
-        return commit;
+        return persist(commit);
+    }
+
+    @Override
+    public Commit commitAggregateDelete(String author, Object deleted) {
+        return commitAggregateDelete(author, deleted, Collections.<String, String>emptyMap());
+    }
+
+    @Override
+    public Commit commitAggregateDelete(String author, Object deleted, Map<String, String> properties) {
+        argumentsAreNotNull(author, properties, deleted);
+
+        Commit commit = commitFactory.createAggregateTerminal(author, properties, deleted);
+
+        logger.info(commit.toString());
+        return persist(commit);
+    }
+
+    @Override
+    public Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId) {
+        return commitAggregateDeleteById(author, globalId, Collections.<String, String>emptyMap());
+    }
+
+    @Override
+    public Commit commitAggregateDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
+        argumentsAreNotNull(author, properties, globalId);
+
+        Commit commit = commitFactory.createAggregateTerminalByGlobalId(author, properties, globalIdFactory.createFromDto(globalId));
+
+        logger.info(commit.toString());
+        return persist(commit);
     }
 
     @Override
