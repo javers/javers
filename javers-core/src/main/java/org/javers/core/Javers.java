@@ -50,12 +50,20 @@ public interface Javers {
      *
      * JaVers applies commit() to given object and all objects navigable from it.
      * You can capture a state of an arbitrary complex object graph with a single commit() call.
+     *
+     * <h3>Marking objects as deleted</h3>
+     * JaVers marks an object as deleted by persisting its terminal snapshot.
      * <br/><br/>
      *
-     * A Value Object removed from the graph is marked as deleted only when it was held
-     * in a property set to null. Value Objects removed from Lists, Sets, Maps, arrays or Optionals,
-     * and nested Value Objects of a removed Value Object, are not marked as deleted
-     * (see {@link #commitAggregateDelete(String, Object)}).
+     * <b>Entities</b> are never marked as deleted by commit(), even if they disappear from the graph.
+     * To mark an Entity as deleted, use {@link #commitShallowDelete(String, Object)} (only the Entity)
+     * or {@link #commitAggregateDelete(String, Object)} (the Entity together with all its Value Objects).
+     * <br/><br/>
+     *
+     * <b>Value Objects</b> are marked as deleted by commit() only when the property holding them is set to null.
+     * Other removed Value Objects (for example, removed from a List) are not marked as deleted.
+     * To mark such Value Objects as deleted, use {@link #commitAggregateDelete(String, Object)}
+     * on their owning Entity.
      *
      * @see <a href="http://javers.org/documentation/repository-examples/">http://javers.org/documentation/repository-examples</a>
      * @param author current user
@@ -100,12 +108,14 @@ public interface Javers {
      *
      * Unlike {@link Javers#commit(String, Object)}, this method is shallow
      * and affects only given object.
-     * Child Value Objects of a given Entity are not marked as deleted,
-     * see {@link #commitAggregateDelete(String, Object)}.
-     * <br/><br/>
+     * <br/>
      *
      * This method doesn't delete anything from JaVers repository.
      * It just persists 'terminal snapshot' of a given object.
+     * <br/><br/>
+     *
+     * Child Value Objects of a given (Entity) object are not marked as deleted.
+     * To mark them as deleted, use {@link #commitAggregateDelete(String, Object)}.
      *
      * @param deleted object to be marked as deleted (Entity or Value Object)
      */
@@ -139,31 +149,18 @@ public interface Javers {
      * Entities referenced by the given Entity are not marked as deleted, they have their own lifecycle.
      * <br/><br/>
      *
-     * Child Value Objects are all Value Objects the Entity has ever owned and not yet marked as deleted:
-     * in properties, in Lists, Sets, Maps, arrays and Optionals, and nested ones (a Value Object inside a Value Object).
-     * They are read from JaVers repository, not from the given object.
+     * Child Value Objects are all Value Objects ever owned by the Entity:
+     * in properties, in Lists, Sets, Maps, arrays and Optionals, and nested ones.
+     * This includes Value Objects removed earlier, which {@link #commit(String, Object)} doesn't mark as deleted.
+     * They are read from JaVers repository, so only the Entity's id matters.
      * <br/><br/>
      *
-     * This goes further than {@link #commit(String, Object)} after an object graph change,
-     * which marks as deleted only a Value Object held in a property set to null,
-     * and neither Value Objects removed from containers nor nested Value Objects.
-     * This method marks as deleted also these Value Objects, removed earlier but left not marked as deleted.
+     * <b>Important!</b> This method loads the whole history of the Entity and its Value Objects into memory,
+     * in one query. For an Entity with a huge history, this can be slow or cause an {@link OutOfMemoryError},
+     * use {@link #commitShallowDelete(String, Object)} instead.
      * <br/><br/>
      *
-     * How it works: JaVers reads all snapshots of the Entity and its Value Objects (the whole history of the aggregate)
-     * in one query, and persists a terminal snapshot for the Entity and for each Value Object
-     * not yet marked as deleted.
-     * It reads the whole history of the aggregate and writes a snapshot per Value Object,
-     * which can be costly for extremely large object graphs or very long histories.
-     * <br/><br/>
-     *
-     * <b>Important!</b> All snapshots of the aggregate's history are loaded into memory at once (no limit).
-     * For an aggregate with a huge history, this can cause an {@link OutOfMemoryError}.
-     * Use {@link #commitShallowDelete(String, Object)} for such aggregates.
-     * <br/><br/>
-     *
-     * Given a Value Object (bound or unbounded), this method marks as deleted only that Value Object,
-     * like {@link #commitShallowDelete(String, Object)}.
+     * Given a Value Object, this method works like {@link #commitShallowDelete(String, Object)}.
      * <br/><br/>
      *
      * This method doesn't delete anything from JaVers repository.
